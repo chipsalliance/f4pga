@@ -1,0 +1,3 @@
+[submodule "source/prjxray"]
+	path = source/prjxray
+	url = git@github.com:SymbiFlow/prjxray
