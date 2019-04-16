@@ -1,3 +1,6 @@
 [submodule "source/prjxray"]
 	path = source/prjxray
 	url = ../prjxray
+[submodule "source/prjtrellis"]
+	path = source/prjtrellis
+	url = ../prjtrellis

@@ -8,3 +8,4 @@ SymbiFlow documentation
    introduction
    fasm-specification
    prjxray/docs/index
+   prjtrellis/docs/index
