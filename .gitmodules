@@ -1,6 +1,11 @@
-[submodule "source/prjxray"]
-	path = source/prjxray
-	url = ../prjxray
 [submodule "source/prjtrellis"]
 	path = source/prjtrellis
 	url = ../prjtrellis
+        branch = master
+[submodule "source/symbiflow-arch-defs"]
+	path = source/symbiflow-arch-defs
+	url = ../symbiflow-arch-defs
+        branch = master
+[submodule "source/prjxray"]
+	path = source/prjxray
+	url = ../prjxray
