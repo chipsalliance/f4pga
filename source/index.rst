@@ -7,6 +7,6 @@ SymbiFlow documentation
 
    introduction
    fasm-specification
-   symbiflow-arch-defs/docs/index
+   symbiflow-arch-defs/docs/source/index
    prjxray/docs/index
    prjtrellis/docs/index
