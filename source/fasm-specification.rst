@@ -10,7 +10,7 @@ A FASM file declares that specific "Features" within the bitstream should be ena
 
 A FASM file is illegal if a bit in the final bitstream must be set and cleared to respect the set of features specified in the FASM file.
 
-An empty FASM file will generate a platform specific "default" bitstream. The FASM file will specific zero or more features that mutate the "default" bitstream into the target bitstream.
+An empty FASM file will generate a platform specific "default" bitstream. The FASM file will specify zero or more features that mutate the "default" bitstream into the target bitstream.
 
 File Syntax description
 -----------------------
