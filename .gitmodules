@@ -9,3 +9,6 @@
 [submodule "source/prjxray"]
 	path = source/prjxray
 	url = ../prjxray
+[submodule "source/fasm"]
+	path = source/fasm
+	url = ../fasm
