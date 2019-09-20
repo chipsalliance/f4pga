@@ -10,4 +10,4 @@ as well as the basic concepts of the FPGA design flow.
    symbiflow-arch-defs/docs/source/getting-started
    toolchain-desc/design-flow
    toolchain-desc/yosys
-   toolchain-desc/vpr
+   vtr-verilog-to-routing/doc/src/vpr/index

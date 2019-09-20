@@ -12,3 +12,6 @@
 [submodule "source/fasm"]
 	path = source/fasm
 	url = ../fasm
+[submodule "source/vtr-verilog-to-routing"]
+	path = source/vtr-verilog-to-routing
+	url = ../vtr-verilog-to-routing
