@@ -25,7 +25,8 @@ needs_sphinx = '1.6'
 extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.imgmath',  # breathe
-    'breathe'
+    'breathe',
+    'symbolator_sphinx',
 ]
 
 numfig = True
@@ -318,4 +319,8 @@ breathe_projects = {
     "prjxray" : "../build/doxygen/prjxray/xml",
 }
 
+### SYMBOLATOR ###
+
+symbolator_cmd_args       = ['--transparent']
+symbolator_output_format  = 'svg'
 
