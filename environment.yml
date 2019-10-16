@@ -1,0 +1,9 @@
+name: SymbiFlow-docs
+channels:
+  - symbiflow
+  - conda-forge
+  - defaults
+dependencies:
+  - pip
+  - pip:
+    - -r file:requirements.txt
