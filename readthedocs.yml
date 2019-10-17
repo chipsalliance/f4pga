@@ -18,3 +18,7 @@ python:
 
 conda:
   environment: environment.yml
+
+submodules:
+  include: all
+  recursive: true
