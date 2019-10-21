@@ -6,6 +6,9 @@ channels:
 dependencies:
   - doxygen
   - cmake
+  - pygobject
+  - cairo
+  - pango
   - pip
   - pip:
     - -r file:requirements.txt
