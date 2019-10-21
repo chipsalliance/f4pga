@@ -22,7 +22,11 @@ needs_sphinx = '1.6'
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.todo']
+extensions = [
+    'sphinx.ext.todo',
+    'sphinx.ext.imgmath',  # breathe
+    'breathe'
+]
 
 numfig = True
 
@@ -289,3 +293,29 @@ rst_prolog = """
 .. role:: raw-html(raw)
    :format: html
 """
+
+### BREATHE ###
+
+from pathlib import Path
+import subprocess
+
+# For building doxygen only on Read the Docs see:
+# https://breathe.readthedocs.io/en/latest/readthedocs.html
+
+def doxygen_generate(log_file=None):
+   doxygen_cmake_build_dir = Path('../doxygen/build')
+   if not doxygen_cmake_build_dir.exists():
+      doxygen_cmake_build_dir.mkdir(parents=True, exist_ok=True)
+      cmd = "cd " + str(doxygen_cmake_build_dir) + "&& cmake .. && make"
+   else:
+      cmd = "cd " + str(doxygen_cmake_build_dir) + "&& make"
+
+   subprocess.call(cmd, shell=True, stderr=log_file, stdout=log_file)
+
+doxygen_generate()
+
+breathe_projects = {
+    "prjxray" : "../build/doxygen/prjxray/xml",
+}
+
+
