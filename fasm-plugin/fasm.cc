@@ -18,13 +18,10 @@
  *
  *  ---
  *
- *   XDC commands + FASM backend.
+ *   FASM backend
  *
- *   This plugin operates on the existing design and modifies its structure
- *   based on the content of the XDC (Xilinx Design Constraints) file.
- *   Since the XDC file consists of Tcl commands it is read using Yosys's
- *   tcl command and processed by the new XDC commands imported to the
- *   Tcl interpreter.
+ *   This plugin writes out the design's fasm features based on the parameter
+ *   annotations on the design cells.
  */
 
 #include "kernel/register.h"
@@ -57,7 +54,7 @@ struct WriteFasm : public Backend {
 	void process_vref(std::ostream *&f, RTLIL::Design* design) {
 		RTLIL::Module* top_module(design->top_module());
 		if (top_module == nullptr) {
-			log("write_fasm: No top module detected\n");
+			log("write_fasm: No top module detected.\n");
 			return;
 		}
 		// Return if no BANK module exists as this means there are no cells
@@ -66,16 +63,22 @@ struct WriteFasm : public Backend {
 		}
 
 		BankTilesMap bank_tiles(get_bank_tiles());
-		if (bank_tiles.size()) {
-			// Generate a fasm feature associated with the INTERNAL_VREF value per bank
-			// e.g. VREF value of 0.675 for bank 34 is associated with tile HCLK_IOI3_X113Y26
-			// hence we need to emit the following fasm feature: HCLK_IOI3_X113Y26.VREF.V_675_MV
-			for (auto cell : top_module->cells()) {
-				if (cell->type != ID(BANK)) continue;
-				int bank_number(cell->getParam(ID(NUMBER)).as_int());
-				int bank_vref(cell->getParam(ID(INTERNAL_VREF)).as_int());
-				*f << "HCLK_IOI3_" << bank_tiles[bank_number] <<".VREF.V_" << bank_vref << "_MV\n";
+		// Generate a fasm feature associated with the INTERNAL_VREF value per bank
+		// e.g. VREF value of 0.675 for bank 34 is associated with tile HCLK_IOI3_X113Y26
+		// hence we need to emit the following fasm feature: HCLK_IOI3_X113Y26.VREF.V_675_MV
+		for (auto cell : top_module->cells()) {
+			if (cell->type != ID(BANK)) continue;
+			if (bank_tiles.size() == 0) {
+				log("write_fasm: No bank tiles available on the target part.\n");
+				return;
 			}
+			int bank_number(cell->getParam(ID(NUMBER)).as_int());
+			if (bank_tiles.count(bank_number) == 0) {
+				log("write_fasm: No IO bank number %d on the target part.\n", bank_number);
+				return;
+			}
+			int bank_vref(cell->getParam(ID(INTERNAL_VREF)).as_int());
+			*f << "HCLK_IOI3_" << bank_tiles[bank_number] <<".VREF.V_" << bank_vref << "_MV\n";
 		}
 	}
 } WriteFasm;
