@@ -19,40 +19,33 @@
  */
 #include "kernel/log.h"
 #include "libs/json11/json11.hpp"
-//#include <sstream>
 
-#define PART_JSON "PRJXRAY_PART_JSON"
 
 USING_YOSYS_NAMESPACE
 // Coordinates of HCLK_IOI tiles associated with a specified bank
 using BankTilesMap = std::unordered_map<int, std::string>;
+BankTilesMap bank_tiles;
 using json11::Json;
 
 // Find the part's JSON file with information including the IO Banks
 // and extract the bank tiles.
-BankTilesMap get_bank_tiles() {
+BankTilesMap get_bank_tiles(const std::string json_file_name) {
 	BankTilesMap bank_tiles;
-	std::string part_json;
-	try {
-		part_json = std::string(getenv(PART_JSON));
-	} catch (...) {
-		log("write_fasm: %s not defined\n", PART_JSON);
-		return BankTilesMap();
+	std::ifstream json_file(json_file_name);
+	if (!json_file.good()) {
+		log_cmd_error("Can't open JSON file %s", json_file_name.c_str());
 	}
-	std::ifstream json_file(part_json);
 	std::string json_str((std::istreambuf_iterator<char>(json_file)),
-                 std::istreambuf_iterator<char>());
+			std::istreambuf_iterator<char>());
 	std::string error;
 	Json json = Json::parse(json_str, error);
 	if (!error.empty()) {
-		log("get_bank_tiles: json parsing failed \n");
-		return BankTilesMap();
+		log_cmd_error("%s\n", error.c_str());
 	}
 	auto json_objects = json.object_items();
 	auto iobanks = json_objects.find("iobanks");
 	if (iobanks == json_objects.end()) {
-		log("get_bank_tiles: IO Banks information missing in the part's json: %s\n", part_json.c_str());
-		return BankTilesMap();
+		log_cmd_error("IO Bank information missing in the part's json: %s\n", json_file_name.c_str());
 	}
 
 	for (auto iobank : iobanks->second.object_items()) {
