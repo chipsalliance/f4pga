@@ -188,11 +188,8 @@ struct SetProperty : public Pass {
 		// Create a new BANK module if it hasn't been created so far
 		RTLIL::Module* top_module = design->top_module();
 		if (!design->has(ID(BANK))) {
-			RTLIL::Module* bank_module = design->addModule(ID(BANK));
-			bank_module->makeblackbox();
-			bank_module->avail_parameters.insert(ID(FASM_EXTRA));
-			bank_module->avail_parameters.insert(ID(NUMBER));
-			bank_module->avail_parameters.insert(ID(INTERNAL_VREF));
+			std::string fasm_extra_modules_dir(proc_share_dirname() + "/plugins/fasm_extra_modules");
+			Pass::call(design, "read_verilog " + fasm_extra_modules_dir + "/BANK.v");
 		}
 
 		// Set parameters on a new bank instance or update an existing one
