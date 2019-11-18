@@ -190,6 +190,7 @@ struct SetProperty : public Pass {
 		if (!design->has(ID(BANK))) {
 			RTLIL::Module* bank_module = design->addModule(ID(BANK));
 			bank_module->makeblackbox();
+			bank_module->avail_parameters.insert(ID(FASM_EXTRA));
 			bank_module->avail_parameters.insert(ID(NUMBER));
 			bank_module->avail_parameters.insert(ID(INTERNAL_VREF));
 		}
@@ -201,6 +202,7 @@ struct SetProperty : public Pass {
 		if (!bank_cell) {
 			bank_cell = top_module->addCell(RTLIL::IdString(bank_cell_name), ID(BANK));
 		}
+		bank_cell->setParam(ID(FASM_EXTRA), RTLIL::Const("INTERNAL_VREF"));
 		bank_cell->setParam(ID(NUMBER), RTLIL::Const(iobank));
 		bank_cell->setParam(ID(INTERNAL_VREF), RTLIL::Const(internal_vref));
 	}
