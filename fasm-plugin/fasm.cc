@@ -39,9 +39,9 @@ struct WriteFasm : public Backend {
 	void help() YS_OVERRIDE {
 		//   |---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|
 		log("\n");
-		log("    write_fasm filename\n");
+		log("    write_fasm -part_json <part_json_filename> <filename>\n");
 		log("\n");
-		log("Write out a file with vref FASM features\n");
+		log("Write out a file with vref FASM features.\n");
 		log("\n");
 	}
 

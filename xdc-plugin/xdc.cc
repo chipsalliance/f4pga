@@ -55,7 +55,7 @@ struct ReadXdc : public Frontend {
 	void help() YS_OVERRIDE {
 		//   |---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|
 		log("\n");
-		log("    read_xdc <filename>\n");
+		log("    read_xdc -part_json <part_json_filename> <filename>\n");
 		log("\n");
 		log("Read XDC file.\n");
 		log("\n");
