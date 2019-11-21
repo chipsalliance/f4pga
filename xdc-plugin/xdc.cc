@@ -26,7 +26,7 @@
  *   Tcl interpreter and processed by the new XDC commands imported to the
  *   Tcl interpreter.
  */
-
+#include <cassert>
 #include "kernel/register.h"
 #include "kernel/rtlil.h"
 #include "kernel/log.h"
