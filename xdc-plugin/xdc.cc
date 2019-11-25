@@ -37,7 +37,6 @@ USING_YOSYS_NAMESPACE
 
 PRIVATE_NAMESPACE_BEGIN
 
-
 enum class SetPropertyOptions { INTERNAL_VREF };
 
 const std::unordered_map<std::string, SetPropertyOptions> set_property_options_map  = {
@@ -49,37 +48,6 @@ void register_in_tcl_interpreter(const std::string& command) {
 	std::string tcl_script = stringf("proc %s args { return [yosys %s {*}$args] }", command.c_str(), command.c_str());
 	Tcl_Eval(interp, tcl_script.c_str());
 }
-
-struct ReadXdc : public Frontend {
-	ReadXdc() : Frontend("xdc", "Read XDC file") {}
-
-	void help() YS_OVERRIDE {
-		//   |---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|
-		log("\n");
-		log("    read_xdc -part_json <part_json_filename> <filename>\n");
-		log("\n");
-		log("Read XDC file.\n");
-		log("\n");
-	}
-
-	void execute(std::istream *&f, std::string filename, std::vector<std::string> args, RTLIL::Design*) YS_OVERRIDE {
-                if (args.size() < 2) {
-                        log_cmd_error("Missing script file.\n");
-		}
-                Tcl_Interp *interp = yosys_get_tcl_interp();
-		size_t argidx = 1;
-		if (args[argidx] == "-part_json" && argidx + 1 < args.size()) {
-			bank_tiles = get_bank_tiles(args[++argidx]);
-			argidx++;
-		}
-		extra_args(f, filename, args, argidx);
-		std::string content{std::istreambuf_iterator<char>(*f), std::istreambuf_iterator<char>()};
-		log("%s\n", content.c_str());
-                if (Tcl_EvalFile(interp, args[argidx].c_str()) != TCL_OK) {
-                        log_cmd_error("TCL interpreter returned an error: %s\n", Tcl_GetStringResult(interp));
-		}
-	}
-} ReadXdc;
 
 struct GetPorts : public Pass {
 	GetPorts() : Pass("get_ports", "Print matching ports") {
@@ -97,6 +65,7 @@ struct GetPorts : public Pass {
 		log("Print the output to stdout too. This is useful when all Yosys is executed\n");
 		log("\n");
 	}
+
 	void execute(std::vector<std::string> args, RTLIL::Design*) YS_OVERRIDE
 	{
 		std::string text;
@@ -108,10 +77,12 @@ struct GetPorts : public Pass {
 		}
 		log("%s\n", text.c_str());
 	}
-} GetPorts;
+};
 
 struct GetIOBanks : public Pass {
-	GetIOBanks() : Pass("get_iobanks", "Set IO Bank number") {
+	GetIOBanks(std::function<const BankTilesMap&()> get_bank_tiles)
+		: Pass("get_iobanks", "Set IO Bank number")
+		, get_bank_tiles(get_bank_tiles) {
 		register_in_tcl_interpreter(pass_name);
 	}
 
@@ -128,14 +99,23 @@ struct GetIOBanks : public Pass {
 		if (args.size() < 2) {
 			log_cmd_error("%s: Missing bank number.\n", pass_name.c_str());
 		}
+		auto bank_tiles = get_bank_tiles();
+		if (bank_tiles.count(std::atoi(args[1].c_str())) == 0) {
+			log_cmd_error("%s:Bank number %s is not present in the target device.\n", args[1].c_str(), pass_name.c_str());
+		}
+
                 Tcl_Interp *interp = yosys_get_tcl_interp();
 		Tcl_SetResult(interp, const_cast<char*>(args[1].c_str()), NULL);
 		log("%s\n", args[1].c_str());
 	}
-} GetIOBanks;
+
+	std::function<const BankTilesMap&()> get_bank_tiles;
+};
 
 struct SetProperty : public Pass {
-	SetProperty() : Pass("set_property", "Set a given property") {
+	SetProperty(std::function<const BankTilesMap&()> get_bank_tiles)
+		: Pass("set_property", "Set a given property")
+		, get_bank_tiles(get_bank_tiles) {
 		register_in_tcl_interpreter(pass_name);
 	}
 
@@ -173,6 +153,7 @@ struct SetProperty : public Pass {
 			log_error("set_property INTERNAL_VREF: Incorrect number of arguments.\n");
 		}
 		int iobank = std::atoi(args[1].c_str());
+		auto bank_tiles = get_bank_tiles();
 		if (bank_tiles.count(iobank) == 0) {
 			log_cmd_error("set_property INTERNAL_VREF: Invalid IO bank.\n");
 		}
@@ -205,10 +186,54 @@ struct SetProperty : public Pass {
 		bank_cell->setParam(ID(INTERNAL_VREF), RTLIL::Const(internal_vref));
 	}
 
-} SetProperty;
+	std::function<const BankTilesMap&()> get_bank_tiles;
+};
+
+struct ReadXdc : public Frontend {
+	ReadXdc()
+	       	: Frontend("xdc", "Read XDC file")
+		, GetIOBanks(std::bind(&ReadXdc::get_bank_tiles, this))
+		, SetProperty(std::bind(&ReadXdc::get_bank_tiles, this)) {}
+
+	void help() YS_OVERRIDE {
+		//   |---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|
+		log("\n");
+		log("    read_xdc -part_json <part_json_filename> <filename>\n");
+		log("\n");
+		log("Read XDC file.\n");
+		log("\n");
+	}
+
+	void execute(std::istream *&f, std::string filename, std::vector<std::string> args, RTLIL::Design*) YS_OVERRIDE {
+                if (args.size() < 2) {
+                        log_cmd_error("Missing script file.\n");
+		}
+                Tcl_Interp *interp = yosys_get_tcl_interp();
+		size_t argidx = 1;
+		if (args[argidx] == "-part_json" && argidx + 1 < args.size()) {
+			bank_tiles = ::get_bank_tiles(args[++argidx]);
+			argidx++;
+		}
+		extra_args(f, filename, args, argidx);
+		std::string content{std::istreambuf_iterator<char>(*f), std::istreambuf_iterator<char>()};
+		log("%s\n", content.c_str());
+                if (Tcl_EvalFile(interp, args[argidx].c_str()) != TCL_OK) {
+                        log_cmd_error("TCL interpreter returned an error: %s\n", Tcl_GetStringResult(interp));
+		}
+	}
+	const BankTilesMap& get_bank_tiles() {
+		return bank_tiles;
+	}
+
+	BankTilesMap bank_tiles;
+	GetPorts GetPorts;
+	GetIOBanks GetIOBanks;
+	SetProperty SetProperty;
+} ReadXdc;
 
 struct GetBankTiles : public Pass {
-	GetBankTiles() : Pass("get_bank_tiles", "Inspect IO Bank tiles") {
+	GetBankTiles()
+	       	: Pass("get_bank_tiles", "Inspect IO Bank tiles") {
 		register_in_tcl_interpreter(pass_name);
 	}
 
@@ -227,7 +252,7 @@ struct GetBankTiles : public Pass {
                         log_cmd_error("Missing JSON file.\n");
 		}
 		// Check if the part has the specified bank
-		bank_tiles = get_bank_tiles(args[1]);
+		auto bank_tiles = get_bank_tiles(args[1]);
 		if (bank_tiles.size()) {
 			log("Available bank tiles:\n");
 			for (auto bank : bank_tiles) {

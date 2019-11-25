@@ -61,7 +61,7 @@ struct WriteFasm : public Backend {
 		if (top_module == nullptr) {
 			log_cmd_error("%s: No top module detected.\n", pass_name.c_str());
 		}
-		bank_tiles = get_bank_tiles(part_json);
+		auto bank_tiles = get_bank_tiles(part_json);
 		// Generate a fasm feature associated with the INTERNAL_VREF value per bank
 		// e.g. VREF value of 0.675 for bank 34 is associated with tile HCLK_IOI3_X113Y26
 		// hence we need to emit the following fasm feature: HCLK_IOI3_X113Y26.VREF.V_675_MV

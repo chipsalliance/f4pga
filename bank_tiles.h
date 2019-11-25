@@ -24,7 +24,6 @@
 USING_YOSYS_NAMESPACE
 // Coordinates of HCLK_IOI tiles associated with a specified bank
 using BankTilesMap = std::unordered_map<int, std::string>;
-BankTilesMap bank_tiles;
 
 // Find the part's JSON file with information including the IO Banks
 // and extract the bank tiles.
@@ -53,3 +52,4 @@ BankTilesMap get_bank_tiles(const std::string json_file_name) {
 
 	return bank_tiles;
 }
+
