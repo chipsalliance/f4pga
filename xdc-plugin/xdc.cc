@@ -37,10 +37,11 @@ USING_YOSYS_NAMESPACE
 
 PRIVATE_NAMESPACE_BEGIN
 
-enum SetPropertyOptions { INTERNAL_VREF };
 
-std::unordered_map<std::string, SetPropertyOptions> set_property_options_map  = {
-	{"INTERNAL_VREF", INTERNAL_VREF}
+enum class SetPropertyOptions { INTERNAL_VREF };
+
+const std::unordered_map<std::string, SetPropertyOptions> set_property_options_map  = {
+	{"INTERNAL_VREF", SetPropertyOptions::INTERNAL_VREF}
 };
 
 void register_in_tcl_interpreter(const std::string& command) {
@@ -158,8 +159,8 @@ struct SetProperty : public Pass {
 			return;
 		}
 
-		switch (set_property_options_map[option]) {
-			case INTERNAL_VREF:
+		switch (set_property_options_map.at(option)) {
+			case SetPropertyOptions::INTERNAL_VREF:
 				process_vref(std::vector<std::string>(args.begin() + 2, args.end()), design);
 				break;
 			default:
