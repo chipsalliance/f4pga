@@ -210,6 +210,7 @@ struct ReadXdc : public Frontend {
 		}
                 Tcl_Interp *interp = yosys_get_tcl_interp();
 		size_t argidx = 1;
+		bank_tiles.clear();
 		if (args[argidx] == "-part_json" && argidx + 1 < args.size()) {
 			bank_tiles = ::get_bank_tiles(args[++argidx]);
 			argidx++;
