@@ -227,9 +227,9 @@ struct ReadXdc : public Frontend {
 	}
 
 	BankTilesMap bank_tiles;
-	GetPorts GetPorts;
-	GetIOBanks GetIOBanks;
-	SetProperty SetProperty;
+	struct GetPorts GetPorts;
+	struct GetIOBanks GetIOBanks;
+	struct SetProperty SetProperty;
 } ReadXdc;
 
 struct GetBankTiles : public Pass {
