@@ -37,18 +37,20 @@ USING_YOSYS_NAMESPACE
 
 PRIVATE_NAMESPACE_BEGIN
 
-bool isInputPort(RTLIL::Wire* wire) {
+static bool isInputPort(RTLIL::Wire* wire) {
 	return wire->port_input;
 }
-bool isOutputPort(RTLIL::Wire* wire) {
+static bool isOutputPort(RTLIL::Wire* wire) {
 	return wire->port_output;
 }
 
-enum class SetPropertyOptions { INTERNAL_VREF, IOSTANDARD };
+enum class SetPropertyOptions { INTERNAL_VREF, IOSTANDARD, SLEW, IN_TERM };
 
 const std::unordered_map<std::string, SetPropertyOptions> set_property_options_map  = {
 	{"INTERNAL_VREF", SetPropertyOptions::INTERNAL_VREF},
-	{"IOSTANDARD", SetPropertyOptions::IOSTANDARD}
+	{"IOSTANDARD", SetPropertyOptions::IOSTANDARD},
+	{"SLEW", SetPropertyOptions::SLEW},
+	{"IN_TERM", SetPropertyOptions::IN_TERM}
 };
 
 void register_in_tcl_interpreter(const std::string& command) {
@@ -163,7 +165,9 @@ struct SetProperty : public Pass {
 				process_vref(std::vector<std::string>(args.begin() + 2, args.end()), design);
 				break;
 			case SetPropertyOptions::IOSTANDARD:
-				process_iostandard(std::vector<std::string>(args.begin() + 2, args.end()), design);
+			case SetPropertyOptions::SLEW:
+			case SetPropertyOptions::IN_TERM:
+				process_port_parameter(std::vector<std::string>(args.begin() + 1, args.end()), design);
 				break;
 			default:
 				assert(false);
@@ -208,13 +212,34 @@ struct SetProperty : public Pass {
 		bank_cell->setParam(ID(INTERNAL_VREF), RTLIL::Const(internal_vref));
 	}
 
-	void process_iostandard(std::vector<std::string> args, RTLIL::Design* design) {
-		if (args.size() < 2) {
-			log_error("set_property IOSTANDARD: Incorrect number of arguments.\n");
+	void process_port_parameter(std::vector<std::string> args, RTLIL::Design* design) {
+		if (args.size() < 1) {
+			log_error("set_property: Incorrect number of arguments.\n");
 		}
-		std::string port(args.at(1));
-		std::string value(args.at(0));
-		log("Setting IOSTANDARD %s on port %s\n", value.c_str(), port.c_str());
+		std::string parameter(args.at(0));
+		if (args.size() < 3) {
+			log_error("set_property %s: Incorrect number of arguments.\n", parameter.c_str());
+		}
+		std::string port(args.at(2));
+		std::string value(args.at(1));
+		RTLIL::Module* top_module = design->top_module();
+		RTLIL::IdString port_id(RTLIL::escape_id(port));
+		for (auto cell_obj : top_module->cells_) {
+			RTLIL::Cell* cell = cell_obj.second;
+			RTLIL::IdString cell_id = cell_obj.first;
+			for (auto connection : cell->connections_) {
+				if (connection.second.is_wire()) {
+					RTLIL::Wire* cell_wire = connection.second.as_wire();
+					if (cell_wire == nullptr) {
+						continue;
+					}
+					if (cell_wire->name == port_id) {
+						cell->setParam(RTLIL::IdString(RTLIL::escape_id(parameter)), RTLIL::Const(value));
+						log("Setting parameter %s to value %s on cell %s \n", parameter.c_str(), value.c_str(), cell_id.c_str());
+					}
+				}
+			}
+		}
 	}
 
 	std::function<const BankTilesMap&()> get_bank_tiles;
