@@ -37,10 +37,18 @@ USING_YOSYS_NAMESPACE
 
 PRIVATE_NAMESPACE_BEGIN
 
-enum class SetPropertyOptions { INTERNAL_VREF };
+bool isInputPort(RTLIL::Wire* wire) {
+	return wire->port_input;
+}
+bool isOutputPort(RTLIL::Wire* wire) {
+	return wire->port_output;
+}
+
+enum class SetPropertyOptions { INTERNAL_VREF, IOSTANDARD };
 
 const std::unordered_map<std::string, SetPropertyOptions> set_property_options_map  = {
-	{"INTERNAL_VREF", SetPropertyOptions::INTERNAL_VREF}
+	{"INTERNAL_VREF", SetPropertyOptions::INTERNAL_VREF},
+	{"IOSTANDARD", SetPropertyOptions::IOSTANDARD}
 };
 
 void register_in_tcl_interpreter(const std::string& command) {
@@ -66,17 +74,28 @@ struct GetPorts : public Pass {
 		log("\n");
 	}
 
-	void execute(std::vector<std::string> args, RTLIL::Design*) YS_OVERRIDE
+	void execute(std::vector<std::string> args, RTLIL::Design* design) YS_OVERRIDE
 	{
-		std::string text;
-		for (auto& arg : args) {
-			text += arg + ' ';
+		if (args.size() < 2) {
+			log_cmd_error("No port specified.\n");
 		}
-		if (!text.empty()) {
-			text.resize(text.size()-1);
+		RTLIL::Module* top_module = design->top_module();
+		if (top_module == nullptr) {
+			log_cmd_error("No top module detected\n");
 		}
-		log("%s\n", text.c_str());
+		// TODO handle more than one port
+		port_name = args.at(1);
+		RTLIL::IdString port_id(RTLIL::escape_id(port_name));
+		if (auto wire = top_module->wire(port_id)) {
+			if (isInputPort(wire) || isOutputPort(wire)) {
+				Tcl_Interp *interp = yosys_get_tcl_interp();
+				Tcl_SetResult(interp, const_cast<char*>(port_name.c_str()), NULL);
+				return;
+			}
+		}
+		log_warning("Couldn't find port %s\n", port_name.c_str());
 	}
+	std::string port_name;
 };
 
 struct GetIOBanks : public Pass {
@@ -143,6 +162,9 @@ struct SetProperty : public Pass {
 			case SetPropertyOptions::INTERNAL_VREF:
 				process_vref(std::vector<std::string>(args.begin() + 2, args.end()), design);
 				break;
+			case SetPropertyOptions::IOSTANDARD:
+				process_iostandard(std::vector<std::string>(args.begin() + 2, args.end()), design);
+				break;
 			default:
 				assert(false);
 		}
@@ -184,6 +206,15 @@ struct SetProperty : public Pass {
 		bank_cell->setParam(ID(FASM_EXTRA), RTLIL::Const("INTERNAL_VREF"));
 		bank_cell->setParam(ID(NUMBER), RTLIL::Const(iobank));
 		bank_cell->setParam(ID(INTERNAL_VREF), RTLIL::Const(internal_vref));
+	}
+
+	void process_iostandard(std::vector<std::string> args, RTLIL::Design* design) {
+		if (args.size() < 2) {
+			log_error("set_property IOSTANDARD: Incorrect number of arguments.\n");
+		}
+		std::string port(args.at(1));
+		std::string value(args.at(0));
+		log("Setting IOSTANDARD %s on port %s\n", value.c_str(), port.c_str());
 	}
 
 	std::function<const BankTilesMap&()> get_bank_tiles;
