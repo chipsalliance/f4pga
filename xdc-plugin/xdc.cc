@@ -87,11 +87,19 @@ struct GetPorts : public Pass {
 		}
 		// TODO handle more than one port
 		port_name = args.at(1);
-		RTLIL::IdString port_id(RTLIL::escape_id(port_name));
+		char port[128];
+		int bit(0);
+		std::string port_signal(port_name);
+		if (sscanf(port_name.c_str(), "%[^[][%d]", port, &bit) == 2) {
+			port_signal = std::string(port);
+		}
+
+		RTLIL::IdString port_id(RTLIL::escape_id(port_signal.c_str()));
 		if (auto wire = top_module->wire(port_id)) {
 			if (isInputPort(wire) || isOutputPort(wire)) {
 				Tcl_Interp *interp = yosys_get_tcl_interp();
 				Tcl_SetResult(interp, const_cast<char*>(port_name.c_str()), NULL);
+				log("Found port %s\n", port_name.c_str());
 				return;
 			}
 		}
@@ -220,23 +228,23 @@ struct SetProperty : public Pass {
 		if (args.size() < 3) {
 			log_error("set_property %s: Incorrect number of arguments.\n", parameter.c_str());
 		}
-		std::string port(args.at(2));
+		std::string port_name(args.at(2));
 		std::string value(args.at(1));
+		char port[128];
+		char bit[64];
+		if (sscanf(port_name.c_str(), "%[^[]%s", port, bit) == 2) {
+			port_name = std::string(port) + " " + std::string(bit);
+		}
 		RTLIL::Module* top_module = design->top_module();
-		RTLIL::IdString port_id(RTLIL::escape_id(port));
+		RTLIL::IdString port_id(RTLIL::escape_id(port_name.c_str()));
 		for (auto cell_obj : top_module->cells_) {
 			RTLIL::Cell* cell = cell_obj.second;
 			RTLIL::IdString cell_id = cell_obj.first;
 			for (auto connection : cell->connections_) {
-				if (connection.second.is_wire()) {
-					RTLIL::Wire* cell_wire = connection.second.as_wire();
-					if (cell_wire == nullptr) {
-						continue;
-					}
-					if (cell_wire->name == port_id) {
-						cell->setParam(RTLIL::IdString(RTLIL::escape_id(parameter)), RTLIL::Const(value));
-						log("Setting parameter %s to value %s on cell %s \n", parameter.c_str(), value.c_str(), cell_id.c_str());
-					}
+				RTLIL::SigSpec cell_signals = connection.second;
+				if (!strcmp(log_signal(cell_signals),port_id.c_str())) {
+					cell->setParam(RTLIL::IdString(RTLIL::escape_id(parameter)), RTLIL::Const(value));
+					log("Setting parameter %s to value %s on cell %s \n", parameter.c_str(), value.c_str(), cell_id.c_str());
 				}
 			}
 		}
