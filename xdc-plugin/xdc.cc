@@ -44,12 +44,13 @@ static bool isOutputPort(RTLIL::Wire* wire) {
 	return wire->port_output;
 }
 
-enum class SetPropertyOptions { INTERNAL_VREF, IOSTANDARD, SLEW, IN_TERM };
+enum class SetPropertyOptions { INTERNAL_VREF, IOSTANDARD, SLEW, DRIVE, IN_TERM };
 
 const std::unordered_map<std::string, SetPropertyOptions> set_property_options_map  = {
 	{"INTERNAL_VREF", SetPropertyOptions::INTERNAL_VREF},
 	{"IOSTANDARD", SetPropertyOptions::IOSTANDARD},
 	{"SLEW", SetPropertyOptions::SLEW},
+	{"DRIVE", SetPropertyOptions::DRIVE},
 	{"IN_TERM", SetPropertyOptions::IN_TERM}
 };
 
@@ -174,6 +175,7 @@ struct SetProperty : public Pass {
 				break;
 			case SetPropertyOptions::IOSTANDARD:
 			case SetPropertyOptions::SLEW:
+			case SetPropertyOptions::DRIVE:
 			case SetPropertyOptions::IN_TERM:
 				process_port_parameter(std::vector<std::string>(args.begin() + 1, args.end()), design);
 				break;
