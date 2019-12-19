@@ -97,14 +97,16 @@ struct GetPorts : public Pass {
 
 		RTLIL::IdString port_id(RTLIL::escape_id(port_signal.c_str()));
 		if (auto wire = top_module->wire(port_id)) {
-			if (isInputPort(wire) || isOutputPort(wire)) {
-				Tcl_Interp *interp = yosys_get_tcl_interp();
-				Tcl_SetResult(interp, const_cast<char*>(port_name.c_str()), NULL);
-				log("Found port %s\n", port_name.c_str());
-				return;
+			if (bit >= wire->start_offset && bit < wire->start_offset + wire->width) {
+				if (isInputPort(wire) || isOutputPort(wire)) {
+					Tcl_Interp *interp = yosys_get_tcl_interp();
+					Tcl_SetResult(interp, const_cast<char*>(port_name.c_str()), NULL);
+					log("Found port %s\n", port_name.c_str());
+					return;
+				}
 			}
 		}
-		log_warning("Couldn't find port %s\n", port_name.c_str());
+		log_error("Couldn't find port %s\n", port_name.c_str());
 	}
 	std::string port_name;
 };
@@ -227,7 +229,7 @@ struct SetProperty : public Pass {
 			log_error("set_property: Incorrect number of arguments.\n");
 		}
 		std::string parameter(args.at(0));
-		if (args.size() < 3) {
+		if (args.size() < 3 || args.at(2).size() == 0) {
 			log_error("set_property %s: Incorrect number of arguments.\n", parameter.c_str());
 		}
 		std::string port_name(args.at(2));
