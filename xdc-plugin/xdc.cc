@@ -54,6 +54,14 @@ const std::unordered_map<std::string, SetPropertyOptions> set_property_options_m
 	{"IN_TERM", SetPropertyOptions::IN_TERM}
 };
 
+const std::unordered_map<std::string, std::vector<std::string>> supported_primitive_parameters  = {
+	{"OBUF", {"IOSTANDARD", "DRIVE", "SLEW", "IN_TERM"}},
+	{"OBUFDS", {"IOSTANDARD", "SLEW", "IN_TERM"}},
+	{"OBUFTDS", {"IOSTANDARD", "SLEW", "IN_TERM"}},
+	{"IBUF", {"IOSTANDARD"}},
+	{"IOBUF", {"IOSTANDARD", "DRIVE", "SLEW", "IN_TERM"}}
+};
+
 void register_in_tcl_interpreter(const std::string& command) {
 	Tcl_Interp* interp = yosys_get_tcl_interp();
 	std::string tcl_script = stringf("proc %s args { return [yosys %s {*}$args] }", command.c_str(), command.c_str());
@@ -95,7 +103,7 @@ struct GetPorts : public Pass {
 			port_signal = std::string(port);
 		}
 
-		RTLIL::IdString port_id(RTLIL::escape_id(port_signal.c_str()));
+		RTLIL::IdString port_id(RTLIL::escape_id(port_signal));
 		if (auto wire = top_module->wire(port_id)) {
 			if (bit >= wire->start_offset && bit < wire->start_offset + wire->width) {
 				if (isInputPort(wire) || isOutputPort(wire)) {
@@ -240,15 +248,30 @@ struct SetProperty : public Pass {
 			port_name = std::string(port) + " " + std::string(bit);
 		}
 		RTLIL::Module* top_module = design->top_module();
-		RTLIL::IdString port_id(RTLIL::escape_id(port_name.c_str()));
+		RTLIL::IdString port_id(RTLIL::escape_id(port_name));
+		RTLIL::IdString parameter_id(RTLIL::escape_id(parameter));
 		for (auto cell_obj : top_module->cells_) {
-			RTLIL::Cell* cell = cell_obj.second;
 			RTLIL::IdString cell_id = cell_obj.first;
+			RTLIL::Cell* cell = cell_obj.second;
+
+			// Check if the cell is of the type we are looking for
+			auto primitive_parameters_iter = supported_primitive_parameters.find(RTLIL::unescape_id(cell->type.str()));
+			if (primitive_parameters_iter == supported_primitive_parameters.end()) {
+				continue;
+			}
+
+			// Check if the attribute is allowed for this module
+			auto primitive_parameters = primitive_parameters_iter->second;
+			if (std::find(primitive_parameters.begin(), primitive_parameters.end(), parameter) == primitive_parameters.end()) {
+			       log_error("Cell %s of type %s doesn't support the %s attribute\n", cell->name.c_str(), cell->type.c_str(), parameter_id.c_str());
+			}
+
+			// Set the parameter on the cell connected to the selected port
 			for (auto connection : cell->connections_) {
 				RTLIL::SigSpec cell_signals = connection.second;
-				if (!strcmp(log_signal(cell_signals),port_id.c_str())) {
-					cell->setParam(RTLIL::IdString(RTLIL::escape_id(parameter)), RTLIL::Const(value));
-					log("Setting parameter %s to value %s on cell %s \n", parameter.c_str(), value.c_str(), cell_id.c_str());
+				if (!strcmp(log_signal(cell_signals), port_id.c_str())) {
+					cell->setParam(parameter_id, RTLIL::Const(value));
+					log("Setting parameter %s to value %s on cell %s \n", parameter_id.c_str(), value.c_str(), cell_obj.first.c_str());
 				}
 			}
 		}
