@@ -37,10 +37,29 @@ USING_YOSYS_NAMESPACE
 
 PRIVATE_NAMESPACE_BEGIN
 
-enum class SetPropertyOptions { INTERNAL_VREF };
+static bool isInputPort(RTLIL::Wire* wire) {
+	return wire->port_input;
+}
+static bool isOutputPort(RTLIL::Wire* wire) {
+	return wire->port_output;
+}
+
+enum class SetPropertyOptions { INTERNAL_VREF, IOSTANDARD, SLEW, DRIVE, IN_TERM };
 
 const std::unordered_map<std::string, SetPropertyOptions> set_property_options_map  = {
-	{"INTERNAL_VREF", SetPropertyOptions::INTERNAL_VREF}
+	{"INTERNAL_VREF", SetPropertyOptions::INTERNAL_VREF},
+	{"IOSTANDARD", SetPropertyOptions::IOSTANDARD},
+	{"SLEW", SetPropertyOptions::SLEW},
+	{"DRIVE", SetPropertyOptions::DRIVE},
+	{"IN_TERM", SetPropertyOptions::IN_TERM}
+};
+
+const std::unordered_map<std::string, std::vector<std::string>> supported_primitive_parameters  = {
+	{"OBUF", {"IOSTANDARD", "DRIVE", "SLEW", "IN_TERM"}},
+	{"OBUFDS", {"IOSTANDARD", "SLEW", "IN_TERM"}},
+	{"OBUFTDS", {"IOSTANDARD", "SLEW", "IN_TERM"}},
+	{"IBUF", {"IOSTANDARD"}},
+	{"IOBUF", {"IOSTANDARD", "DRIVE", "SLEW", "IN_TERM"}}
 };
 
 void register_in_tcl_interpreter(const std::string& command) {
@@ -66,17 +85,38 @@ struct GetPorts : public Pass {
 		log("\n");
 	}
 
-	void execute(std::vector<std::string> args, RTLIL::Design*) YS_OVERRIDE
+	void execute(std::vector<std::string> args, RTLIL::Design* design) YS_OVERRIDE
 	{
-		std::string text;
-		for (auto& arg : args) {
-			text += arg + ' ';
+		if (args.size() < 2) {
+			log_cmd_error("No port specified.\n");
 		}
-		if (!text.empty()) {
-			text.resize(text.size()-1);
+		RTLIL::Module* top_module = design->top_module();
+		if (top_module == nullptr) {
+			log_cmd_error("No top module detected\n");
 		}
-		log("%s\n", text.c_str());
+		// TODO handle more than one port
+		port_name = args.at(1);
+		char port[128];
+		int bit(0);
+		std::string port_signal(port_name);
+		if (sscanf(port_name.c_str(), "%[^[][%d]", port, &bit) == 2) {
+			port_signal = std::string(port);
+		}
+
+		RTLIL::IdString port_id(RTLIL::escape_id(port_signal));
+		if (auto wire = top_module->wire(port_id)) {
+			if (bit >= wire->start_offset && bit < wire->start_offset + wire->width) {
+				if (isInputPort(wire) || isOutputPort(wire)) {
+					Tcl_Interp *interp = yosys_get_tcl_interp();
+					Tcl_SetResult(interp, const_cast<char*>(port_name.c_str()), NULL);
+					log("Found port %s\n", port_name.c_str());
+					return;
+				}
+			}
+		}
+		log_error("Couldn't find port %s\n", port_name.c_str());
 	}
+	std::string port_name;
 };
 
 struct GetIOBanks : public Pass {
@@ -143,6 +183,12 @@ struct SetProperty : public Pass {
 			case SetPropertyOptions::INTERNAL_VREF:
 				process_vref(std::vector<std::string>(args.begin() + 2, args.end()), design);
 				break;
+			case SetPropertyOptions::IOSTANDARD:
+			case SetPropertyOptions::SLEW:
+			case SetPropertyOptions::DRIVE:
+			case SetPropertyOptions::IN_TERM:
+				process_port_parameter(std::vector<std::string>(args.begin() + 1, args.end()), design);
+				break;
 			default:
 				assert(false);
 		}
@@ -184,6 +230,51 @@ struct SetProperty : public Pass {
 		bank_cell->setParam(ID(FASM_EXTRA), RTLIL::Const("INTERNAL_VREF"));
 		bank_cell->setParam(ID(NUMBER), RTLIL::Const(iobank));
 		bank_cell->setParam(ID(INTERNAL_VREF), RTLIL::Const(internal_vref));
+	}
+
+	void process_port_parameter(std::vector<std::string> args, RTLIL::Design* design) {
+		if (args.size() < 1) {
+			log_error("set_property: Incorrect number of arguments.\n");
+		}
+		std::string parameter(args.at(0));
+		if (args.size() < 3 || args.at(2).size() == 0) {
+			log_error("set_property %s: Incorrect number of arguments.\n", parameter.c_str());
+		}
+		std::string port_name(args.at(2));
+		std::string value(args.at(1));
+		char port[128];
+		char bit[64];
+		if (sscanf(port_name.c_str(), "%[^[]%s", port, bit) == 2) {
+			port_name = std::string(port) + " " + std::string(bit);
+		}
+		RTLIL::Module* top_module = design->top_module();
+		RTLIL::IdString port_id(RTLIL::escape_id(port_name));
+		RTLIL::IdString parameter_id(RTLIL::escape_id(parameter));
+		for (auto cell_obj : top_module->cells_) {
+			RTLIL::IdString cell_id = cell_obj.first;
+			RTLIL::Cell* cell = cell_obj.second;
+
+			// Check if the cell is of the type we are looking for
+			auto primitive_parameters_iter = supported_primitive_parameters.find(RTLIL::unescape_id(cell->type.str()));
+			if (primitive_parameters_iter == supported_primitive_parameters.end()) {
+				continue;
+			}
+
+			// Check if the attribute is allowed for this module
+			auto primitive_parameters = primitive_parameters_iter->second;
+			if (std::find(primitive_parameters.begin(), primitive_parameters.end(), parameter) == primitive_parameters.end()) {
+			       log_error("Cell %s of type %s doesn't support the %s attribute\n", cell->name.c_str(), cell->type.c_str(), parameter_id.c_str());
+			}
+
+			// Set the parameter on the cell connected to the selected port
+			for (auto connection : cell->connections_) {
+				RTLIL::SigSpec cell_signals = connection.second;
+				if (!strcmp(log_signal(cell_signals), port_id.c_str())) {
+					cell->setParam(parameter_id, RTLIL::Const(value));
+					log("Setting parameter %s to value %s on cell %s \n", parameter_id.c_str(), value.c_str(), cell_obj.first.c_str());
+				}
+			}
+		}
 	}
 
 	std::function<const BankTilesMap&()> get_bank_tiles;
