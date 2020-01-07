@@ -98,15 +98,15 @@ struct GetPorts : public Pass {
 		port_name = args.at(1);
 		char port[128];
 		int bit(0);
-		std::string port_signal(port_name);
-		if (sscanf(port_name.c_str(), "%[^[][%d]", port, &bit) == 2) {
-			port_signal = std::string(port);
+		if (!sscanf(port_name.c_str(), "%[^[][%d]", port, &bit)) {
+			log_error("Couldn't find port %s\n", port_name.c_str());
 		}
+		std::string port_signal(port);
 
 		RTLIL::IdString port_id(RTLIL::escape_id(port_signal));
 		if (auto wire = top_module->wire(port_id)) {
-			if (bit >= wire->start_offset && bit < wire->start_offset + wire->width) {
-				if (isInputPort(wire) || isOutputPort(wire)) {
+			if (isInputPort(wire) || isOutputPort(wire)) {
+				if (bit >= wire->start_offset && bit < wire->start_offset + wire->width) {
 					Tcl_Interp *interp = yosys_get_tcl_interp();
 					Tcl_SetResult(interp, const_cast<char*>(port_name.c_str()), NULL);
 					log("Found port %s\n", port_name.c_str());
@@ -236,21 +236,37 @@ struct SetProperty : public Pass {
 		if (args.size() < 1) {
 			log_error("set_property: Incorrect number of arguments.\n");
 		}
+
 		std::string parameter(args.at(0));
 		if (args.size() < 3 || args.at(2).size() == 0) {
 			log_error("set_property %s: Incorrect number of arguments.\n", parameter.c_str());
 		}
+
 		std::string port_name(args.at(2));
 		std::string value(args.at(1));
-		char port[128];
-		char bit[64];
-		if (sscanf(port_name.c_str(), "%[^[]%s", port, bit) == 2) {
-			port_name = std::string(port) + " " + std::string(bit);
+
+		auto port_signal = extract_signal(port_name);
+		std::string port(port_signal.first);
+		int port_bit = port_signal.second;
+
+		RTLIL::Wire* wire = design->top_module()->wire(RTLIL::escape_id(port));
+		if (wire == nullptr) {
+			log_error("Couldn't find port %s\n", port_name.c_str());
 		}
-		RTLIL::Module* top_module = design->top_module();
-		RTLIL::IdString port_id(RTLIL::escape_id(port_name));
+
+		if (!isInputPort(wire) && !isOutputPort(wire)) {
+			log_error("Port %s is not a top port\n", port_name.c_str());
+		}
+
+		if (port_bit < wire->start_offset || port_bit >= wire->start_offset + wire->width) {
+			log_error("Incorrect top port index %d in port %s\n", port_bit, port_name.c_str());
+		}
+
+		// Traverse the port wire
+		traverse_wire(port_name, design->top_module());
+
 		RTLIL::IdString parameter_id(RTLIL::escape_id(parameter));
-		for (auto cell_obj : top_module->cells_) {
+		for (auto cell_obj : design->top_module()->cells_) {
 			RTLIL::IdString cell_id = cell_obj.first;
 			RTLIL::Cell* cell = cell_obj.second;
 
@@ -268,13 +284,69 @@ struct SetProperty : public Pass {
 
 			// Set the parameter on the cell connected to the selected port
 			for (auto connection : cell->connections_) {
-				RTLIL::SigSpec cell_signals = connection.second;
-				if (!strcmp(log_signal(cell_signals), port_id.c_str())) {
+				RTLIL::SigSpec cell_signal = connection.second;
+				if (is_signal_port(cell_signal, port_name)) {
 					cell->setParam(parameter_id, RTLIL::Const(value));
 					log("Setting parameter %s to value %s on cell %s \n", parameter_id.c_str(), value.c_str(), cell_obj.first.c_str());
 				}
 			}
 		}
+		log("\n");
+	}
+
+	// Search module's connections for the specified destination port
+	// and traverse from the specified destination wire to the source wire
+	void traverse_wire(std::string& port_name, RTLIL::Module* module) {
+		auto port_signal = extract_signal(port_name);
+		std::string signal_name(port_signal.first);
+		int port_bit = port_signal.second;
+		for (auto connection : module->connections_) {
+			auto dst_sig = connection.first;
+			auto src_sig = connection.second;
+			if (dst_sig.is_chunk()) {
+				auto chunk = dst_sig.as_chunk();
+				if (chunk.wire) {
+					if (chunk.wire->name != RTLIL::IdString(RTLIL::escape_id(signal_name))) {
+						continue;
+					}
+					if (port_bit < chunk.offset || port_bit > chunk.width) {
+						continue;
+					}
+					auto src_wires = src_sig.to_sigbit_vector();
+					auto src_wire_sigbit = src_wires.at(port_bit - chunk.offset);
+					if (src_wire_sigbit.wire) {
+						port_name = src_wires.at(port_bit - chunk.offset).wire->name.str();
+						if (src_wire_sigbit.offset > 0) {
+							port_name += "[" + std::to_string(src_wire_sigbit.offset) + "]";
+						}
+						return;
+					}
+				}
+			}
+		}
+	}
+
+	// Extract signal name and port bit information from port name
+	std::pair<std::string, int> extract_signal(const std::string& port_name) {
+		char port[128];
+		int port_bit(0);
+		sscanf(port_name.c_str(), "%[^[][%d]", port, &port_bit);
+		return std::make_pair(std::string(port), port_bit);
+	}
+
+	// Check if the specified port name is part of the provided connection signal
+	bool is_signal_port(RTLIL::SigSpec signal, const std::string& port_name) {
+		auto port_signal = extract_signal(port_name);
+		std::string port(port_signal.first);
+		int port_bit = port_signal.second;
+		if (signal.is_chunk()) {
+			auto chunk = signal.as_chunk();
+			if (chunk.wire) {
+				return (chunk.wire->name == RTLIL::IdString(RTLIL::escape_id(port))) &&
+							(port_bit == chunk.offset);
+			}
+		}
+		return false;
 	}
 
 	std::function<const BankTilesMap&()> get_bank_tiles;
