@@ -14,6 +14,9 @@ install: fasm.so
 	mkdir -p $(PLUGINS_DIR)
 	cp $< $(PLUGINS_DIR)/$<
 
+test: install
+	$(MAKE) -C tests all
+
 clean:
 	rm -f *.d *.o fasm.so
 
