@@ -18,6 +18,9 @@ install_modules: $(VERILOG_MODULES)
 	mkdir -p $(PLUGINS_DIR)/fasm_extra_modules/
 	cp $< $(PLUGINS_DIR)/fasm_extra_modules/$<
 
+test: install_plugin install_modules
+	$(MAKE) -C tests all
+
 .PHONY: install
 install: install_modules install_plugin
 
