@@ -6,6 +6,7 @@ yosys -import
 # Some of symbiflow expects eblifs with only one module.
 synth_xilinx -vpr -flatten -abc9 -nosrl -noclkbuf -nodsp
 
+#Read the design constraints
 read_xdc -part_json $::env(PART_JSON) $::env(INPUT_XDC_FILE)
 
 # Write the design in JSON format.
