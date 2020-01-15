@@ -1,7 +1,7 @@
 module top (
 	input  clk,
 	output [3:0] led,
-	output out_a,
+	inout out_a,
 	output [1:0] out_b
 );
 
