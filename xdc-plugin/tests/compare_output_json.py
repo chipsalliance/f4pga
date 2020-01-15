@@ -9,6 +9,8 @@ The return code of this script is used to check if the output is equivalent.
 import sys
 import json
 
+parameters = ["IOSTANDARD", "DRIVE", "SLEW", "IN_TERM"]
+
 def read_cells(json_file):
     with open(json_file) as f:
         data = json.load(f)
@@ -16,7 +18,10 @@ def read_cells(json_file):
     cells = data['modules']['top']['cells']
     cells_parameters = dict()
     for cell, opts in cells.items():
-        cells_parameters[cell] = opts['parameters']
+        attributes = opts['parameters']
+        if len(attributes.keys()):
+            if any([x in parameters for x in attributes.keys()]):
+                cells_parameters[cell] = attributes
     return cells_parameters
 
 
@@ -29,6 +34,9 @@ def main():
     if cells1 == cells2:
         exit(0)
     else:
+        print(json.dumps(cells1, indent=4))
+        print("VS")
+        print(json.dumps(cells2, indent=4))
         exit(1)
 
 if __name__ == "__main__":
