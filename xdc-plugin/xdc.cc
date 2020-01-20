@@ -96,7 +96,9 @@ struct GetPorts : public Pass {
 		}
 		// TODO handle more than one port
 		port_name = args.at(1);
-		char port[128];
+		std::string port_str;
+		char* port = const_cast<char*>(port_str.c_str());
+		port_str.reserve(port_name.size());
 		int bit(0);
 		if (!sscanf(port_name.c_str(), "%[^[][%d]", port, &bit)) {
 			log_error("Couldn't find port %s\n", port_name.c_str());
@@ -328,8 +330,10 @@ struct SetProperty : public Pass {
 
 	// Extract signal name and port bit information from port name
 	std::pair<std::string, int> extract_signal(const std::string& port_name) {
-		char port[128];
 		int port_bit(0);
+		std::string port_str;
+		port_str.reserve(port_name.size());
+		char* port = const_cast<char*>(port_str.c_str());
 		sscanf(port_name.c_str(), "%[^[][%d]", port, &port_bit);
 		return std::make_pair(std::string(port), port_bit);
 	}
