@@ -1,6 +1,6 @@
 {
   "OBUF_6": {
-    "DRIVE": "I12",
+    "DRIVE": "12",
     "IOSTANDARD": "LVCMOS33",
     "SLEW": "SLOW"
   },

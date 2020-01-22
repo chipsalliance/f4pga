@@ -1,5 +1,5 @@
 #set_property LOC R2 [get_ports led]
-set_property DRIVE I12 [get_ports {led[0]}]
+set_property DRIVE 12 [get_ports {led[0]}]
 set_property IN_TERM UNTUNED_SPLIT_40 [get_ports {led[1]}]
 set_property SLEW FAST [get_ports {led[1]}]
 set_property IOSTANDARD SSTL135 [get_ports {led[1]}]
