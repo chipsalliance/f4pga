@@ -97,14 +97,12 @@ struct GetPorts : public Pass {
 		// TODO handle more than one port
 		port_name = args.at(1);
 		std::string port_str(port_name.size(), '\0');
-		char* port = const_cast<char*>(port_str.c_str());
 		int bit(0);
-		if (!sscanf(port_name.c_str(), "%[^[][%d]", port, &bit)) {
+		if (!sscanf(port_name.c_str(), "%[^[][%d]", &port_str[0], &bit)) {
 			log_error("Couldn't find port %s\n", port_name.c_str());
 		}
-		std::string port_signal(port);
 
-		RTLIL::IdString port_id(RTLIL::escape_id(port_signal));
+		RTLIL::IdString port_id(RTLIL::escape_id(port_str));
 		if (auto wire = top_module->wire(port_id)) {
 			if (isInputPort(wire) || isOutputPort(wire)) {
 				if (bit >= wire->start_offset && bit < wire->start_offset + wire->width) {
@@ -331,9 +329,8 @@ struct SetProperty : public Pass {
 	std::pair<std::string, int> extract_signal(const std::string& port_name) {
 		int port_bit(0);
 		std::string port_str(port_name.size(), '\0');
-		char* port = const_cast<char*>(port_str.c_str());
-		sscanf(port_name.c_str(), "%[^[][%d]", port, &port_bit);
-		return std::make_pair(std::string(port), port_bit);
+		sscanf(port_name.c_str(), "%[^[][%d]", &port_str[0], &port_bit);
+		return std::make_pair(port_str, port_bit);
 	}
 
 	// Check if the specified port name is part of the provided connection signal
