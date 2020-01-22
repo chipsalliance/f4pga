@@ -30,7 +30,7 @@ def main(args):
     cells = read_cells(args.json)
     if args.update:
         with open(args.golden, 'w') as f:
-            json.dump(cells, f)
+            json.dump(cells, f, indent=2)
     else:
         with open(args.golden) as f:
             cells_golden = json.load(f)

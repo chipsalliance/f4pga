@@ -1,1 +1,33 @@
-{"OBUF_7": {"IN_TERM": "UNTUNED_SPLIT_40", "SLEW": "FAST", "IOSTANDARD": "SSTL135"}, "OBUF_6": {"IOSTANDARD": "LVCMOS33", "DRIVE": "I12", "SLEW": "SLOW"}, "bottom_inst.OBUF_9": {"IOSTANDARD": "SSTL135", "SLEW": "FAST"}, "OBUF_OUT": {"IN_TERM": "UNTUNED_SPLIT_40", "SLEW": "FAST", "IOSTANDARD": "SSTL135"}, "bottom_inst.OBUF_11": {"IOSTANDARD": "SSTL135", "SLEW": "FAST"}, "bottom_inst.OBUF_10": {"IOSTANDARD": "SSTL135", "SLEW": "FAST"}, "bottom_intermediate_inst.OBUF_8": {"IOSTANDARD": "SSTL135", "SLEW": "FAST"}}
+{
+  "OBUF_6": {
+    "DRIVE": "I12",
+    "IOSTANDARD": "LVCMOS33",
+    "SLEW": "SLOW"
+  },
+  "OBUF_7": {
+    "IN_TERM": "UNTUNED_SPLIT_40",
+    "IOSTANDARD": "SSTL135",
+    "SLEW": "FAST"
+  },
+  "OBUF_OUT": {
+    "IN_TERM": "UNTUNED_SPLIT_40",
+    "IOSTANDARD": "SSTL135",
+    "SLEW": "FAST"
+  },
+  "bottom_inst.OBUF_10": {
+    "IOSTANDARD": "SSTL135",
+    "SLEW": "FAST"
+  },
+  "bottom_inst.OBUF_11": {
+    "IOSTANDARD": "SSTL135",
+    "SLEW": "FAST"
+  },
+  "bottom_inst.OBUF_9": {
+    "IOSTANDARD": "SSTL135",
+    "SLEW": "FAST"
+  },
+  "bottom_intermediate_inst.OBUF_8": {
+    "IOSTANDARD": "SSTL135",
+    "SLEW": "FAST"
+  }
+}
