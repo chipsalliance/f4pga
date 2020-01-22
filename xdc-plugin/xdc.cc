@@ -102,6 +102,7 @@ struct GetPorts : public Pass {
 			log_error("Couldn't find port %s\n", port_name.c_str());
 		}
 
+		port_str.resize(strlen(port_str.c_str()));
 		RTLIL::IdString port_id(RTLIL::escape_id(port_str));
 		if (auto wire = top_module->wire(port_id)) {
 			if (isInputPort(wire) || isOutputPort(wire)) {
@@ -330,6 +331,7 @@ struct SetProperty : public Pass {
 		int port_bit(0);
 		std::string port_str(port_name.size(), '\0');
 		sscanf(port_name.c_str(), "%[^[][%d]", &port_str[0], &port_bit);
+		port_str.resize(strlen(port_str.c_str()));
 		return std::make_pair(port_str, port_bit);
 	}
 
