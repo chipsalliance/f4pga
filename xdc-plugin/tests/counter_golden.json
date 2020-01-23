@@ -10,24 +10,26 @@
     "SLEW": "FAST"
   },
   "OBUF_OUT": {
-    "IN_TERM": "UNTUNED_SPLIT_40",
-    "IOSTANDARD": "SSTL135",
+    "IN_TERM": "UNTUNED_SPLIT_50",
+    "IOSTANDARD": "LVCMOS33",
     "SLEW": "FAST"
   },
   "bottom_inst.OBUF_10": {
-    "IOSTANDARD": "SSTL135",
-    "SLEW": "FAST"
+    "IOSTANDARD": "LVCMOS18",
+    "SLEW": "SLOW"
   },
   "bottom_inst.OBUF_11": {
-    "IOSTANDARD": "SSTL135",
+    "DRIVE": "4",
+    "IOSTANDARD": "LVCMOS25",
     "SLEW": "FAST"
   },
   "bottom_inst.OBUF_9": {
-    "IOSTANDARD": "SSTL135",
+    "IOSTANDARD": "DIFF_SSTL135",
     "SLEW": "FAST"
   },
   "bottom_intermediate_inst.OBUF_8": {
+    "DRIVE": "16",
     "IOSTANDARD": "SSTL135",
-    "SLEW": "FAST"
+    "SLEW": "SLOW"
   }
 }
