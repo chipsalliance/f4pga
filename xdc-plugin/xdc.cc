@@ -299,6 +299,7 @@ struct SetProperty : public Pass {
 	void traverse_wire(std::string& port_name, RTLIL::Module* module) {
 		auto port_signal = extract_signal(port_name);
 		std::string signal_name(port_signal.first);
+		auto signal_name_idstr = RTLIL::IdString(RTLIL::escape_id(signal_name));
 		int port_bit = port_signal.second;
 		for (auto connection : module->connections_) {
 			auto dst_sig = connection.first;
@@ -306,10 +307,10 @@ struct SetProperty : public Pass {
 			if (dst_sig.is_chunk()) {
 				auto chunk = dst_sig.as_chunk();
 				if (chunk.wire) {
-					if (chunk.wire->name != RTLIL::IdString(RTLIL::escape_id(signal_name))) {
+					if (chunk.wire->name != signal_name_idstr) {
 						continue;
 					}
-					if (port_bit < chunk.offset || port_bit > chunk.width) {
+					if (port_bit < chunk.offset || port_bit >= (chunk.offset + chunk.width)) {
 						continue;
 					}
 					auto src_wires = src_sig.to_sigbit_vector();
