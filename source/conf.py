@@ -324,3 +324,10 @@ breathe_projects = {
 symbolator_cmd_args       = ['--transparent']
 symbolator_output_format  = 'svg'
 
+### PRJXRAY FUZZERS AND MINITESTS LINKS
+
+def prjxray_fuzzers_and_minitests_links():
+    cmd = "cd prjxray/docs && make links"
+    subprocess.call(cmd, shell=True)
+
+prjxray_fuzzers_and_minitests_links()
