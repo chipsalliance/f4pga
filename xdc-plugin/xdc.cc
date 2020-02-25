@@ -271,21 +271,23 @@ struct SetProperty : public Pass {
 			RTLIL::Cell* cell = cell_obj.second;
 
 			// Check if the cell is of the type we are looking for
-			auto primitive_parameters_iter = supported_primitive_parameters.find(RTLIL::unescape_id(cell->type.str()));
+			auto cell_type_str = RTLIL::unescape_id(cell->type.str());
+			auto primitive_parameters_iter = supported_primitive_parameters.find(cell_type_str);
 			if (primitive_parameters_iter == supported_primitive_parameters.end()) {
 				continue;
-			}
-
-			// Check if the attribute is allowed for this module
-			auto primitive_parameters = primitive_parameters_iter->second;
-			if (std::find(primitive_parameters.begin(), primitive_parameters.end(), parameter) == primitive_parameters.end()) {
-			       log_error("Cell %s of type %s doesn't support the %s attribute\n", cell->name.c_str(), cell->type.c_str(), parameter_id.c_str());
 			}
 
 			// Set the parameter on the cell connected to the selected port
 			for (auto connection : cell->connections_) {
 				RTLIL::SigSpec cell_signal = connection.second;
 				if (is_signal_port(cell_signal, port_name)) {
+					// Check if the attribute is allowed for this module
+					auto primitive_parameters = primitive_parameters_iter->second;
+					if (std::find(primitive_parameters.begin(), primitive_parameters.end(), parameter) == primitive_parameters.end()) {
+						log_error("Cell %s of type %s doesn't support the %s attribute\n",
+								cell->name.c_str(), cell->type.c_str(),
+								parameter_id.c_str());
+					}
 					cell->setParam(parameter_id, RTLIL::Const(value));
 					log("Setting parameter %s to value %s on cell %s \n", parameter_id.c_str(), value.c_str(), cell_obj.first.c_str());
 				}
@@ -299,6 +301,7 @@ struct SetProperty : public Pass {
 	void traverse_wire(std::string& port_name, RTLIL::Module* module) {
 		auto port_signal = extract_signal(port_name);
 		std::string signal_name(port_signal.first);
+		auto signal_name_idstr = RTLIL::IdString(RTLIL::escape_id(signal_name));
 		int port_bit = port_signal.second;
 		for (auto connection : module->connections_) {
 			auto dst_sig = connection.first;
@@ -306,10 +309,10 @@ struct SetProperty : public Pass {
 			if (dst_sig.is_chunk()) {
 				auto chunk = dst_sig.as_chunk();
 				if (chunk.wire) {
-					if (chunk.wire->name != RTLIL::IdString(RTLIL::escape_id(signal_name))) {
+					if (chunk.wire->name != signal_name_idstr) {
 						continue;
 					}
-					if (port_bit < chunk.offset || port_bit > chunk.width) {
+					if (port_bit < chunk.offset || port_bit >= (chunk.offset + chunk.width)) {
 						continue;
 					}
 					auto src_wires = src_sig.to_sigbit_vector();
