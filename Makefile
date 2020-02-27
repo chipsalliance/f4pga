@@ -6,7 +6,7 @@ SPHINXOPTS    =
 CMDS          = cd source/prjxray/docs && make links && cd - &&
 SPHINXBUILD   = $(CMDS) sphinx-build
 PAPER         =
-BUILDDIR      = build
+BUILDDIR      = build/sphinx
 
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
@@ -15,6 +15,8 @@ ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) sou
 
 CONDA_DIR       = build/conda
 CONDA_ENV_FILE  = environment.yml
+
+DOXYGEN_DIR     = build/doxygen
 
 .PHONY: help clean html dirhtml singlehtml pickle json htmlhelp epub latex latexpdf text man changes linkcheck doctest env
 
@@ -35,9 +37,11 @@ help:
 	@echo "  linkcheck  to check all external links for integrity"
 	@echo "  doctest    to run all doctests embedded in the documentation (if enabled)"
 	@echo "  env        to create a conda environment with the needed packages"
+	@echo "  env-clean  to remove the conda environment"
 
 clean:
-	-rm -rf $(BUILDDIR)/*
+	-rm -rf $(BUILDDIR)/
+	-rm -rf $(DOXYGEN_DIR)/
 
 html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
@@ -118,7 +122,7 @@ doctest:
 
 env:
 	@rm -rf $(CONDA_DIR)
-	@mkdir -p $(BUILDDIR) && mkdir -p $(CONDA_DIR)
+	@mkdir -p $(CONDA_DIR)
 	@wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh\
 		-O $(CONDA_DIR)/miniconda.sh
 	@bash $(CONDA_DIR)/miniconda.sh -f -b -p  $(CONDA_DIR) > /dev/null &&\
@@ -126,3 +130,6 @@ env:
 	@./$(CONDA_DIR)/bin/conda env create -q -f $(CONDA_ENV_FILE) > /dev/null &&\
 		echo "Conda packages installed successfully..."
 	@echo "To use conda environment type:\nsource enter-env.sh"
+
+env-clean:
+	@rm -rf $(CONDA_DIR)
