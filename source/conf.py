@@ -27,6 +27,7 @@ extensions = [
     'sphinx.ext.imgmath',  # breathe
     'breathe',
     'symbolator_sphinx',
+    'sphinxcontrib.images'
 ]
 
 numfig = True
