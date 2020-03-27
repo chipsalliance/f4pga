@@ -20,14 +20,23 @@ import sys, os
 # If your documentation needs a minimal Sphinx version, state it here.
 needs_sphinx = '1.6'
 
+# For VTR documentation support
+sys.path.append(os.path.abspath('./vtr-verilog-to-routing/doc/_exts'))
+
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
     'sphinx.ext.todo',
+    'sphinx.ext.autodoc',
     'sphinx.ext.imgmath',  # breathe
     'breathe',
     'symbolator_sphinx',
-    'sphinxcontrib.images'
+    'sphinxcontrib.images',
+    'sphinxcontrib.bibtex',
+    'sdcdomain',
+    'archdomain',
+    'rrgraphdomain',
+    'recommonmark'
 ]
 
 numfig = True
@@ -36,7 +45,7 @@ numfig = True
 templates_path = ['_templates']
 
 # The suffix of source filenames.
-source_suffix = '.rst'
+source_suffix = ['.rst', '.md']
 
 # The encoding of source files.
 #source_encoding = 'utf-8-sig'
@@ -71,7 +80,16 @@ today_fmt = '%Y-%m-%d'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = []
+exclude_patterns = [
+    'symbiflow-arch-defs/*',
+    'symbiflow-arch-defs/third_party/**',
+    'prjtrellis/third_party/**',
+    'prjxray/third_party/**',
+    'prjxray/docs/db_dev_process/fuzzers/index/**',
+    'prjxray/docs/db_dev_process/minitests/index/**',
+    'vtr-verilog-to-routing/libs/EXTERNAL/**.md',
+    'vtr-verilog-to-routing/.github/**',
+]
 
 # The reST default role (used for this markup: `text`) to use for all documents.
 #default_role = None
