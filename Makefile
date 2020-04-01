@@ -3,8 +3,7 @@
 
 # You can set these variables from the command line.
 SPHINXOPTS    =
-CMDS          = cd source/prjxray/docs && make links && cd - &&
-SPHINXBUILD   = $(CMDS) sphinx-build
+SPHINXBUILD   = sphinx-build
 PAPER         =
 BUILDDIR      = build/sphinx
 
