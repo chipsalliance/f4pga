@@ -36,6 +36,8 @@ public:
         const std::string padName;
         const std::string comment;
 
+        Constraint () = default;
+
         Constraint (
             const std::string& a_NetName,
             const std::string& a_PadName,
