@@ -1,9 +1,0 @@
-set_io inp    FBIO_0
-set_io out    FBIO_1 # A comment
-
-# Another comment
-
-set_io led[5] FBIO_2
-set_io bus(7) FBIO_3
-set_io btn    SFBIO_15
-#set_io sw[8]  SFBIO_16

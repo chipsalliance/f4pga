@@ -1,0 +1,5 @@
+set_io clk    FBIO_8
+set_io led(0) FBIO_0
+set_io led(1) FBIO_1
+set_io led(2) SFBIO_2
+set_io led(3) SFBIO_3

@@ -12,11 +12,11 @@ $(NAME).so: $(OBJS)
 
 .PHONY: install
 
-install: $(NAME).so
+install: test
 	mkdir -p $(PLUGINS_DIR)
 	cp $< $(PLUGINS_DIR)/$<
 
-test: install
+test: $(NAME).so
 	$(MAKE) -C tests all
 
 clean:
