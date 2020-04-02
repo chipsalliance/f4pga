@@ -107,70 +107,68 @@ struct QuicklogicIob : public Pass {
 
             log("    %-10s | %-20s ", cellType.c_str(), cell->name.c_str());
 
+            std::string padName;
+            std::string locName;
+            std::string cellName;
+
             // Get connections to the specified port
             std::string port = RTLIL::escape_id(ioCellTypes.at(cellType));
-            if (cell->connections().count(port) == 0) {
-                log(" Port '%s' not found!\n", port.c_str());
-                continue;
+            if (cell->connections().count(port)) {
+
+                // Get the sigspec of the connection
+                auto sigspec = cell->connections().at(port);
+
+                // Get the connected wire
+                // FIXME: This assumes that the cell is directly connected to a
+                // top-level port.
+                if (sigspec.is_wire()) {
+                    auto wire = sigspec.as_wire();
+
+                    // Has to be top level wire
+                    if (wire->port_input || wire->port_output) {
+
+                        // Check if the wire is constrained
+                        auto wireName = RTLIL::unescape_id(wire->name);
+                        if (constraintMap.count(wireName)) {
+
+                            // Get the constraint
+                            auto constraint = constraintMap.at(wireName);
+
+                            // Check if there is an entry in the pinmap for this pad name
+                            if (pinmapMap.count(constraint.padName)) {
+
+                                // Get the entry
+                                auto entry = pinmapMap.at(constraint.padName);
+                                padName = constraint.padName;
+
+                                // Location string
+                                if (entry.count("x") && entry.count("y")) {
+                                    locName = stringf("X%sY%s", 
+                                        entry.at("x").c_str(),
+                                        entry.at("y").c_str()
+                                    );
+                                }
+
+                                // Cell name
+                                if (entry.count("cell")) {
+                                    cellName = entry.at("cell");
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
-            // Get the sigspec of the connection
-            auto sigspec = cell->connections().at(port);
-
-            // Get the connected wire
-            if (!sigspec.is_wire()) {
-                log(" Couldn't determine the connection!\n");
-                continue;
-            }
-            auto wire = sigspec.as_wire();
-
-            // Has to be top level wire
-            if (!wire->port_input && !wire->port_output) {
-                log(" Not a top-level wire!\n");
-                continue;
-            }
-
-            // Check if the wire is constrained
-            auto wireName = RTLIL::unescape_id(wire->name);
-            if (constraintMap.count(wireName) == 0) {
-                log("\n");
-                continue;
-            }
-
-            // Get the constraint
-            auto constraint = constraintMap.at(wireName);
-            log("| %-10s ", constraint.padName.c_str());
-
-            // Check if there is an entry in the pinmap for this pad name
-            if (pinmapMap.count(constraint.padName) == 0) {
-                log("\n");
-                continue;
-            }
-
-            // Get the entry
-            auto entry = pinmapMap.at(constraint.padName);
-
-            // The pinmap entry does not have cell type defined, skip it.
-            if (entry.count("cell") == 0) {
-                log("\n");
-                continue;
-            }
-
-            // Location string
-            std::string loc;
-            if (entry.count("x") && entry.count("y")) {
-                loc = stringf("X%sY%s", 
-                    entry.at("x").c_str(),
-                    entry.at("y").c_str()
-                );
-            }
-
-            log("| %-8s | %s\n", loc.c_str(), entry.at("cell").c_str());
+            log("| %-10s | %-8s | %s\n", 
+                padName.c_str(),
+                locName.c_str(),
+                cellName.c_str()
+            );
 
             // Annotate the cell by setting its parameters
-            cell->setParam(RTLIL::escape_id("IO_PAD"),  constraint.padName);
-            cell->setParam(RTLIL::escape_id("IO_LOC"),  loc);
-            cell->setParam(RTLIL::escape_id("IO_TYPE"), entry.at("cell"));
+            cell->setParam(RTLIL::escape_id("IO_PAD"),  padName);
+            cell->setParam(RTLIL::escape_id("IO_LOC"),  locName);
+            cell->setParam(RTLIL::escape_id("IO_TYPE"), cellName);
         }
     }
 
