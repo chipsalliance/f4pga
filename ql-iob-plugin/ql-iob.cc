@@ -24,6 +24,8 @@
 #include "kernel/register.h"
 #include "kernel/rtlil.h"
 
+#include <regex>
+
 USING_YOSYS_NAMESPACE
 PRIVATE_NAMESPACE_BEGIN
 
@@ -41,12 +43,64 @@ struct QuicklogicIob : public Pass {
         }    
 
     void help() YS_OVERRIDE {
-        log("Help!\n");
+        log("\n");
+        log("    quicklogic_iob <PCF file> <pinmap file> [<io cell specs>]");
+        log("\n");
+        log("This command assigns certain parameters of the specified IO cell types\n");
+        log("basing on the placement constraints and the pin map of the target device\n");
+        log("\n");
+        log("Each affected IO cell is assigned the followin parameters:\n");
+        log(" - IO_PAD  = \"<IO pad name>\"\n");
+        log(" - IO_LOC  = \"<IO cell location>\"\n");
+        log(" - IO_CELL = \"<IO cell type>\"\n");
+        log("\n");
+        log("Parameters:\n");
+        log("\n");
+        log("    - <PCF file>\n");
+        log("        Path to a PCF file with IO constraints for the design\n");
+        log("\n");
+        log("    - <pinmap file>\n");
+        log("        Path to a pinmap CSV file with package pin map\n");
+        log("\n");
+        log("    - <io cell specs>\n");
+        log("        A space-separated list of <io cell type>:<port>. Each\n");
+        log("        entry defines a type of IO cell to be affected an its port\n");
+        log("        name that should connect to the top-level port of the design.\n");
+        log("\n");
     }
     
     void execute(std::vector<std::string> a_Args, RTLIL::Design* a_Design) YS_OVERRIDE {
         if (a_Args.size() < 3) {
-            log_cmd_error("Usage: quicklogic_iob <PCF file> <pinmap file>");
+            log_cmd_error("    Usage: quicklogic_iob <PCF file> <pinmap file> [<io cell specs>]");
+        }
+
+        // A map of IO cell types and their port names that should go to a pad
+        std::unordered_map<std::string, std::string> ioCellTypes;
+
+        // Parse io cell specification
+        if (a_Args.size() > 3) {
+
+            // FIXME: Are these characters set the only ones that can be in
+            // cell / port name ?
+            std::regex re("^([\\w$]+):([\\w$]+)$");
+
+            for (size_t i=3; i<a_Args.size(); ++i) {
+                std::cmatch cm;
+                if (std::regex_match(a_Args[i].c_str(), cm, re)) {
+                    ioCellTypes.insert(std::make_pair(cm[1].str(), cm[2].str()));
+                }
+                else {
+                    log_cmd_error("Invalid IO cell+port spec: '%s'\n", a_Args[i].c_str());
+                }
+            }
+        }
+
+        // Use the default IO cells for QuickLogic FPGAs
+        else {
+            ioCellTypes.insert(std::make_pair("inpad",  "P"));
+            ioCellTypes.insert(std::make_pair("outpad", "P"));
+            ioCellTypes.insert(std::make_pair("bipad",  "P"));
+            ioCellTypes.insert(std::make_pair("ckpad",  "P"));
         }
 
         // Get the top module of the design
@@ -86,17 +140,11 @@ struct QuicklogicIob : public Pass {
             }
         }
 
-        // A map of IO cell types and their port names that should go to a pad
-        std::unordered_map<std::string, std::string> ioCellTypes;
-
-        // TODO
-        ioCellTypes.insert(std::make_pair("inpad", "P"));
-        ioCellTypes.insert(std::make_pair("outpad", "P"));
-
         // Check all IO cells
+        log("Processing cells...");
         log("\n");
-        log("    type       | instance             | pad        | loc      | cell     \n");
-        log("   ------------+----------------------+------------+----------+----------\n");
+        log("  type       | instance             | net        | pad        | loc      | cell     \n");
+        log(" ------------+----------------------+------------+------------+----------+----------\n");
         for (auto cell : topModule->cells()) {
             auto cellType = RTLIL::unescape_id(cell->type); 
 
@@ -105,8 +153,9 @@ struct QuicklogicIob : public Pass {
                 continue;
             }
 
-            log("    %-10s | %-20s ", cellType.c_str(), cell->name.c_str());
+            log("  %-10s | %-20s ", cellType.c_str(), cell->name.c_str());
 
+            std::string netName;
             std::string padName;
             std::string locName;
             std::string cellName;
@@ -128,11 +177,11 @@ struct QuicklogicIob : public Pass {
                     if (wire->port_input || wire->port_output) {
 
                         // Check if the wire is constrained
-                        auto wireName = RTLIL::unescape_id(wire->name);
-                        if (constraintMap.count(wireName)) {
+                        netName = RTLIL::unescape_id(wire->name);
+                        if (constraintMap.count(netName)) {
 
                             // Get the constraint
-                            auto constraint = constraintMap.at(wireName);
+                            auto constraint = constraintMap.at(netName);
 
                             // Check if there is an entry in the pinmap for this pad name
                             if (pinmapMap.count(constraint.padName)) {
@@ -159,7 +208,8 @@ struct QuicklogicIob : public Pass {
                 }
             }
 
-            log("| %-10s | %-8s | %s\n", 
+            log("| %-10s | %-10s | %-8s | %s\n",
+                netName.c_str(),
                 padName.c_str(),
                 locName.c_str(),
                 cellName.c_str()
