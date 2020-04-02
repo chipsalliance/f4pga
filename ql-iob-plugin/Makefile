@@ -10,11 +10,11 @@ OBJS = $(NAME).o pcf_parser.cc pinmap_parser.cc
 $(NAME).so: $(OBJS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared -o $@ $^ $(LDLIBS)
 
-.PHONY: install
+.PHONY: install test
 
 install: test
 	mkdir -p $(PLUGINS_DIR)
-	cp $< $(PLUGINS_DIR)/$<
+	cp $(NAME).so $(PLUGINS_DIR)/$(NAME).so
 
 test: $(NAME).so
 	$(MAKE) -C tests all
