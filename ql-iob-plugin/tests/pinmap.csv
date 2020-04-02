@@ -1,4 +1,4 @@
-name,x,y,z,cell
+name,x,y,z,type
 FBIO_0,2,2,0,BIDIR
 FBIO_1,4,2,0,BIDIR
 FBIO_2,6,2,0,BIDIR

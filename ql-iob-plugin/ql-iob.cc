@@ -146,22 +146,22 @@ struct QuicklogicIob : public Pass {
         log("  type       | instance             | net        | pad        | loc      | cell     \n");
         log(" ------------+----------------------+------------+------------+----------+----------\n");
         for (auto cell : topModule->cells()) {
-            auto cellType = RTLIL::unescape_id(cell->type); 
+            auto ysCellType = RTLIL::unescape_id(cell->type); 
 
             // Not an IO cell
-            if (ioCellTypes.count(cellType) == 0) {
+            if (ioCellTypes.count(ysCellType) == 0) {
                 continue;
             }
 
-            log("  %-10s | %-20s ", cellType.c_str(), cell->name.c_str());
+            log("  %-10s | %-20s ", ysCellType.c_str(), cell->name.c_str());
 
             std::string netName;
             std::string padName;
             std::string locName;
-            std::string cellName;
+            std::string cellType;
 
             // Get connections to the specified port
-            std::string port = RTLIL::escape_id(ioCellTypes.at(cellType));
+            std::string port = RTLIL::escape_id(ioCellTypes.at(ysCellType));
             if (cell->connections().count(port)) {
 
                 // Get the sigspec of the connection
@@ -198,9 +198,9 @@ struct QuicklogicIob : public Pass {
                                     );
                                 }
 
-                                // Cell name
-                                if (entry.count("cell")) {
-                                    cellName = entry.at("cell");
+                                // Cell type
+                                if (entry.count("type")) {
+                                    cellType = entry.at("type");
                                 }
                             }
                         }
@@ -212,13 +212,13 @@ struct QuicklogicIob : public Pass {
                 netName.c_str(),
                 padName.c_str(),
                 locName.c_str(),
-                cellName.c_str()
+                cellType.c_str()
             );
 
             // Annotate the cell by setting its parameters
             cell->setParam(RTLIL::escape_id("IO_PAD"),  padName);
             cell->setParam(RTLIL::escape_id("IO_LOC"),  locName);
-            cell->setParam(RTLIL::escape_id("IO_TYPE"), cellName);
+            cell->setParam(RTLIL::escape_id("IO_TYPE"), cellType);
         }
     }
 
