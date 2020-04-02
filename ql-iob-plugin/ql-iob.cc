@@ -50,8 +50,8 @@ struct QuicklogicIob : public Pass {
         }
 
         // Get the top module of the design
-		m_topModule = a_Design->top_module();
-		if (m_topModule == nullptr) {
+		RTLIL::Module* topModule = a_Design->top_module();
+		if (topModule == nullptr) {
 			log_cmd_error("No top module detected!\n");
 		}
 
@@ -78,6 +78,14 @@ struct QuicklogicIob : public Pass {
             log_cmd_error("Failed to parse the pinmap CSV file!\n");
         }
 
+        // Build a map of pad names to entries
+        std::unordered_map<std::string, const PinmapParser::Entry> pinmapMap;
+        for (auto& entry : pinmapParser.getEntries()) {
+            if (entry.count("name") != 0) {
+                pinmapMap.emplace(entry.at("name"), entry);
+            }
+        }
+
         // A map of IO cell types and their port names that should go to a pad
         std::unordered_map<std::string, std::string> ioCellTypes;
 
@@ -86,15 +94,18 @@ struct QuicklogicIob : public Pass {
         ioCellTypes.insert(std::make_pair("outpad", "P"));
 
         // Check all IO cells
-        for (auto cell : m_topModule->cells()) {
+        log("\n");
+        log("    type       | instance             | pad        | loc      | cell     \n");
+        log("   ------------+----------------------+------------+----------+----------\n");
+        for (auto cell : topModule->cells()) {
             auto cellType = RTLIL::unescape_id(cell->type); 
 
-            // No an IO cell
+            // Not an IO cell
             if (ioCellTypes.count(cellType) == 0) {
                 continue;
             }
 
-            log("   %-16s %-40s ", cellType.c_str(), cell->name.c_str());
+            log("    %-10s | %-20s ", cellType.c_str(), cell->name.c_str());
 
             // Get connections to the specified port
             std::string port = RTLIL::escape_id(ioCellTypes.at(cellType));
@@ -108,14 +119,14 @@ struct QuicklogicIob : public Pass {
 
             // Get the connected wire
             if (!sigspec.is_wire()) {
-                log(" Couldn't determine connection\n");
+                log(" Couldn't determine the connection!\n");
                 continue;
             }
             auto wire = sigspec.as_wire();
 
             // Has to be top level wire
             if (!wire->port_input && !wire->port_output) {
-                log(" No top-level port!\n");
+                log(" Not a top-level wire!\n");
                 continue;
             }
 
@@ -128,83 +139,39 @@ struct QuicklogicIob : public Pass {
 
             // Get the constraint
             auto constraint = constraintMap.at(wireName);
-            log("%s\n", constraint.padName.c_str());
-        }
+            log("| %-10s ", constraint.padName.c_str());
 
-//        log("%zu connections\n", m_topModule->connections().size());
-
-//        for (auto cell : m_topModule->cells()) {
-//            log("'%s' '%s' %zu\n", cell->name.c_str(), cell->type.c_str(), cell->connections().size());
-//            for (auto c : cell->connections()) {
-//                log(" '%s'\n", c.first.c_str());
-//            }
-//        }
-
-/*        // Get top-level wires
-        for (auto wire : m_topModule->wires()) {
-
-            // Not a top-level
-		    if (!wire->port_input && !wire->port_output) {
+            // Check if there is an entry in the pinmap for this pad name
+            if (pinmapMap.count(constraint.padName) == 0) {
+                log("\n");
                 continue;
             }
 
-            log("'%s'\n", wire->name.c_str());
-            //getConnectedCell(wire, 0);
-        }*/
-    }
+            // Get the entry
+            auto entry = pinmapMap.at(constraint.padName);
 
-    // ..............................................................
-
-    RTLIL::Module* m_topModule = nullptr;
-
-    // ..............................................................
-
-    RTLIL::Module* getConnectedCell(RTLIL::Wire* wire, size_t bit = 0) {
-
-        RTLIL::Module* module = wire->module;
-
-        log("'%s' %d\n", wire->name.c_str(), bit);
-        for (auto connection : m_topModule->connections_) {
-            log("k");
-			auto dst_sig = connection.first;
-			auto src_sig = connection.second;
-
-            // Go down
-            if (dst_sig.is_chunk()) {
-				auto chunk = dst_sig.as_chunk();
-                if (chunk.wire) {
-                    log(" '%s'\n", chunk.wire->name.c_str());
-                }
-                log("%d\n", chunk.width);
-            }
-            
-            if (dst_sig.is_wire()) {
-                auto w = dst_sig.as_wire();
-                log(" '%s'\n",w->name.c_str());
+            // The pinmap entry does not have cell type defined, skip it.
+            if (entry.count("cell") == 0) {
+                log("\n");
+                continue;
             }
 
-/*			if (dst_sig.is_chunk()) {
-				auto chunk = dst_sig.as_chunk();
+            // Location string
+            std::string loc;
+            if (entry.count("x") && entry.count("y")) {
+                loc = stringf("X%sY%s", 
+                    entry.at("x").c_str(),
+                    entry.at("y").c_str()
+                );
+            }
 
-				if (chunk.wire) {
+            log("| %-8s | %s\n", loc.c_str(), entry.at("cell").c_str());
 
-					if (chunk.wire->name != wire->name) {
-						continue;
-					}
-					if (bit < chunk.offset || bit >= (chunk.offset + chunk.width)) {
-						continue;
-					}
-
-					auto src_wires = src_sig.to_sigbit_vector();
-					auto src_wire_sigbit = src_wires.at(bit - chunk.offset);
-					if (src_wire_sigbit.wire) {
-                        log(" '%s'\n", src_wire_sigbit.wire->name.c_str());
-                    }
-                }
-            }*/
+            // Annotate the cell by setting its parameters
+            cell->setParam(RTLIL::escape_id("IO_PAD"),  constraint.padName);
+            cell->setParam(RTLIL::escape_id("IO_LOC"),  loc);
+            cell->setParam(RTLIL::escape_id("IO_TYPE"), entry.at("cell"));
         }
-
-        return nullptr;
     }
 
 } QuicklogicIob;
