@@ -104,10 +104,10 @@ struct QuicklogicIob : public Pass {
         }
 
         // Get the top module of the design
-		RTLIL::Module* topModule = a_Design->top_module();
-		if (topModule == nullptr) {
-			log_cmd_error("No top module detected!\n");
-		}
+        RTLIL::Module* topModule = a_Design->top_module();
+        if (topModule == nullptr) {
+            log_cmd_error("No top module detected!\n");
+        }
 
         // Read and parse the PCF file
         log("Loading PCF from '%s'...\n", a_Args[1].c_str());
