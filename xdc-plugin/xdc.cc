@@ -375,7 +375,6 @@ struct ReadXdc : public Frontend {
                 if (args.size() < 2) {
                         log_cmd_error("Missing script file.\n");
 		}
-                Tcl_Interp *interp = yosys_get_tcl_interp();
 		size_t argidx = 1;
 		bank_tiles.clear();
 		if (args[argidx] == "-part_json" && argidx + 1 < args.size()) {
@@ -385,9 +384,25 @@ struct ReadXdc : public Frontend {
 		extra_args(f, filename, args, argidx);
 		std::string content{std::istreambuf_iterator<char>(*f), std::istreambuf_iterator<char>()};
 		log("%s\n", content.c_str());
+
+		// According to page 6 of UG903 XDC is tcl, hence quuoting of bracketed numbers,
+		// such as bus indexes, is required. However, it's quite common for EDA tools
+		// to allow for correct processing of the bracketed numbers without quoting.
+		// Possible TCL implementations of such a feature include registering a TCL command
+		// for each integer which returns itself but surrounded with brackets or
+		// using the 'unknown' command which is invoked by the Tcl interpreter
+		// whenever a script tries to invoke a command that does not exist.
+		// In the XDC plugin the latter approach is used, however it's limited to
+		// the read_xdc command, hence the 'unknown' command works solely or the
+		// content of the XDC file.
+		Tcl_Interp* interp = yosys_get_tcl_interp();
+		Tcl_Eval(interp, "rename unknown _original_unknown");
+		Tcl_Eval(interp, "proc unknown args { return \\[[lindex $args 0]\\] }");
                 if (Tcl_EvalFile(interp, args[argidx].c_str()) != TCL_OK) {
                         log_cmd_error("TCL interpreter returned an error: %s\n", Tcl_GetStringResult(interp));
 		}
+		Tcl_Eval(interp, "rename unknown \"\"");
+		Tcl_Eval(interp, "rename unknown _original_unknown");
 	}
 	const BankTilesMap& get_bank_tiles() {
 		return bank_tiles;
