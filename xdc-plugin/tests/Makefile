@@ -1,4 +1,5 @@
-TESTS = counter
+TESTS = counter \
+	port_indexes #Bus port indexes passed without curly braces 
 
 all: $(TESTS)
 
