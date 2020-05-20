@@ -19,7 +19,7 @@ $(1).json: $(1).v
 	PART_JSON=xc7a35tcsg324-1.json \
 	OUT_JSON=$(1).json \
 	INPUT_XDC_FILE=$(1).xdc \
-	yosys -p "tcl synth.tcl" $$< -l yosys.log
+	yosys -p "tcl $(1).tcl" $$< -l yosys.log
 
 update_$(1): $(1).json
 	@python compare_output_json.py --json $$< --golden $(1)_golden.json --update
