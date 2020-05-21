@@ -1,11 +1,16 @@
 TESTS = counter \
-	port_indexes #Bus port indexes passed without curly braces 
+	port_indexes #Bus port indexes passed without curly braces
+
+counter_verify = $(call compare_json, counter)
+port_indexes_verify = $(call compare_json, port_indexes) && test $$(grep "'unknown' proc command handler" port_indexes.txt | wc -l) -eq 2
 
 all: $(TESTS)
 
+compare_json = python compare_output_json.py --json $(1).json --golden $(1)_golden.json
+
 define test_tpl =
 $(1): $(1).json
-	@python compare_output_json.py --json $$< --golden $(1)_golden.json; \
+	$$($(1)_verify);
 	RETVAL=$$$$? ; \
 	if [ $$$$RETVAL -eq 0 ]; then \
 		echo "$(1) PASS"; \
