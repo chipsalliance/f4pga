@@ -26,4 +26,5 @@ install: install_modules install_plugin
 
 clean:
 	rm -f *.d *.o xdc.so
+	$(MAKE) -C tests clean
 

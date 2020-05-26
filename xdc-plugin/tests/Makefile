@@ -1,10 +1,16 @@
-TESTS = counter
+TESTS = counter \
+	port_indexes #Bus port indexes passed without curly braces
+
+counter_verify = $(call compare_json, counter)
+port_indexes_verify = $(call compare_json, port_indexes) && test $$(grep "'unknown' proc command handler" port_indexes.txt | wc -l) -eq 2
 
 all: $(TESTS)
 
+compare_json = python compare_output_json.py --json $(1).json --golden $(1)_golden.json
+
 define test_tpl =
 $(1): $(1).json
-	@python compare_output_json.py --json $$< --golden $(1)_golden.json; \
+	$$($(1)_verify);
 	RETVAL=$$$$? ; \
 	if [ $$$$RETVAL -eq 0 ]; then \
 		echo "$(1) PASS"; \
@@ -18,7 +24,7 @@ $(1).json: $(1).v
 	PART_JSON=xc7a35tcsg324-1.json \
 	OUT_JSON=$(1).json \
 	INPUT_XDC_FILE=$(1).xdc \
-	yosys -p "tcl synth.tcl" $$< -l yosys.log
+	yosys -p "tcl $(1).tcl" $$< -l yosys.log
 
 update_$(1): $(1).json
 	@python compare_output_json.py --json $$< --golden $(1)_golden.json --update
