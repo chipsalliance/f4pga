@@ -44,22 +44,23 @@ static bool isOutputPort(RTLIL::Wire* wire) {
 	return wire->port_output;
 }
 
-enum class SetPropertyOptions { INTERNAL_VREF, IOSTANDARD, SLEW, DRIVE, IN_TERM };
+enum class SetPropertyOptions { INTERNAL_VREF, IOSTANDARD, SLEW, DRIVE, IN_TERM, LOC };
 
 const std::unordered_map<std::string, SetPropertyOptions> set_property_options_map  = {
 	{"INTERNAL_VREF", SetPropertyOptions::INTERNAL_VREF},
 	{"IOSTANDARD", SetPropertyOptions::IOSTANDARD},
 	{"SLEW", SetPropertyOptions::SLEW},
 	{"DRIVE", SetPropertyOptions::DRIVE},
-	{"IN_TERM", SetPropertyOptions::IN_TERM}
+	{"IN_TERM", SetPropertyOptions::IN_TERM},
+	{"LOC", SetPropertyOptions::LOC}
 };
 
 const std::unordered_map<std::string, std::vector<std::string>> supported_primitive_parameters  = {
-	{"OBUF", {"IOSTANDARD", "DRIVE", "SLEW", "IN_TERM"}},
-	{"OBUFDS", {"IOSTANDARD", "SLEW", "IN_TERM"}},
-	{"OBUFTDS", {"IOSTANDARD", "SLEW", "IN_TERM"}},
-	{"IBUF", {"IOSTANDARD"}},
-	{"IOBUF", {"IOSTANDARD", "DRIVE", "SLEW", "IN_TERM"}}
+	{"OBUF", {"LOC", "IOSTANDARD", "DRIVE", "SLEW", "IN_TERM"}},
+	{"OBUFDS", {"LOC", "IOSTANDARD", "SLEW", "IN_TERM"}},
+	{"OBUFTDS", {"LOC", "IOSTANDARD", "SLEW", "IN_TERM"}},
+	{"IBUF", {"LOC", "IOSTANDARD"}},
+	{"IOBUF", {"LOC", "IOSTANDARD", "DRIVE", "SLEW", "IN_TERM"}}
 };
 
 void register_in_tcl_interpreter(const std::string& command) {
@@ -189,6 +190,12 @@ struct SetProperty : public Pass {
 			case SetPropertyOptions::IN_TERM:
 				process_port_parameter(std::vector<std::string>(args.begin() + 1, args.end()), design);
 				break;
+			case SetPropertyOptions::LOC: {
+				std::vector<std::string> new_args(args.begin() + 1, args.end());
+				new_args.at(1) = new_args.at(2) + ":" + new_args.at(1);
+				process_port_parameter(new_args, design);
+				break;
+			}
 			default:
 				assert(false);
 		}
