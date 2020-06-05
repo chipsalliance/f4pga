@@ -295,6 +295,10 @@ struct SetProperty : public Pass {
 								cell->name.c_str(), cell->type.c_str(),
 								parameter_id.c_str());
 					}
+					if (parameter_id == ID(LOC) and cell->hasParam(parameter_id)) {
+						std::string cur_value(cell->getParam(parameter_id).decode_string());
+						value = cur_value + "," + value;
+					}
 					cell->setParam(parameter_id, RTLIL::Const(value));
 					log("Setting parameter %s to value %s on cell %s \n", parameter_id.c_str(), value.c_str(), cell_obj.first.c_str());
 				}
