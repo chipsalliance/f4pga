@@ -1,8 +1,14 @@
+# counter - basic test for IOSTANDARD, SLEW, DRIVE, IN_TERM properties
+# port_indexes - like counter but bus port indices are passes without curly braces
+# minilitex_ddr_arty - litex design with more types of IOBUFS including differential
+
 TESTS = counter \
-	port_indexes #Bus port indexes passed without curly braces
+	port_indexes \
+	minilitex_ddr_arty
 
 counter_verify = $(call compare_json, counter)
 port_indexes_verify = $(call compare_json, port_indexes) && test $$(grep "'unknown' proc command handler" port_indexes.txt | wc -l) -eq 2
+minilitex_ddr_arty_verify = $(call compare_json, minilitex_ddr_arty)
 
 all: $(TESTS)
 
