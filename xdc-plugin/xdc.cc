@@ -44,22 +44,23 @@ static bool isOutputPort(RTLIL::Wire* wire) {
 	return wire->port_output;
 }
 
-enum class SetPropertyOptions { INTERNAL_VREF, IOSTANDARD, SLEW, DRIVE, IN_TERM };
+enum class SetPropertyOptions { INTERNAL_VREF, IOSTANDARD, SLEW, DRIVE, IN_TERM, IO_LOC_PAIRS };
 
 const std::unordered_map<std::string, SetPropertyOptions> set_property_options_map  = {
 	{"INTERNAL_VREF", SetPropertyOptions::INTERNAL_VREF},
 	{"IOSTANDARD", SetPropertyOptions::IOSTANDARD},
 	{"SLEW", SetPropertyOptions::SLEW},
 	{"DRIVE", SetPropertyOptions::DRIVE},
-	{"IN_TERM", SetPropertyOptions::IN_TERM}
+	{"IN_TERM", SetPropertyOptions::IN_TERM},
+	{"LOC", SetPropertyOptions::IO_LOC_PAIRS}
 };
 
 const std::unordered_map<std::string, std::vector<std::string>> supported_primitive_parameters  = {
-	{"OBUF", {"IOSTANDARD", "DRIVE", "SLEW", "IN_TERM"}},
-	{"OBUFDS", {"IOSTANDARD", "SLEW", "IN_TERM"}},
-	{"OBUFTDS", {"IOSTANDARD", "SLEW", "IN_TERM"}},
-	{"IBUF", {"IOSTANDARD"}},
-	{"IOBUF", {"IOSTANDARD", "DRIVE", "SLEW", "IN_TERM"}}
+	{"OBUF", {"IO_LOC_PAIRS", "IOSTANDARD", "DRIVE", "SLEW", "IN_TERM"}},
+	{"OBUFDS", {"IO_LOC_PAIRS", "IOSTANDARD", "SLEW", "IN_TERM"}},
+	{"OBUFTDS", {"IO_LOC_PAIRS", "IOSTANDARD", "SLEW", "IN_TERM"}},
+	{"IBUF", {"IO_LOC_PAIRS", "IOSTANDARD"}},
+	{"IOBUF", {"IO_LOC_PAIRS", "IOSTANDARD", "DRIVE", "SLEW", "IN_TERM"}}
 };
 
 void register_in_tcl_interpreter(const std::string& command) {
@@ -189,6 +190,14 @@ struct SetProperty : public Pass {
 			case SetPropertyOptions::IN_TERM:
 				process_port_parameter(std::vector<std::string>(args.begin() + 1, args.end()), design);
 				break;
+			case SetPropertyOptions::IO_LOC_PAIRS: {
+				// args "set_property LOC PAD PORT" become "IO_LOC_PAIRS PORT:PAD PORT"
+				std::vector<std::string> new_args(args.begin() + 1, args.end());
+				new_args.at(0) = "IO_LOC_PAIRS";
+				new_args.at(1) = new_args.at(2) + ":" + new_args.at(1);
+				process_port_parameter(new_args, design);
+				break;
+			}
 			default:
 				assert(false);
 		}
@@ -287,6 +296,10 @@ struct SetProperty : public Pass {
 						log_error("Cell %s of type %s doesn't support the %s attribute\n",
 								cell->name.c_str(), cell->type.c_str(),
 								parameter_id.c_str());
+					}
+					if (parameter_id == ID(IO_LOC_PAIRS) and cell->hasParam(parameter_id)) {
+						std::string cur_value(cell->getParam(parameter_id).decode_string());
+						value = cur_value + "," + value;
 					}
 					cell->setParam(parameter_id, RTLIL::Const(value));
 					log("Setting parameter %s to value %s on cell %s \n", parameter_id.c_str(), value.c_str(), cell_obj.first.c_str());
