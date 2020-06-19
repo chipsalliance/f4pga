@@ -1,4 +1,4 @@
-Sphinx==2.4.0
+Sphinx==3.0.4
 git+http://github.com/SymbiFlow/sphinx_materialdesign_theme.git@master#egg=sphinx_symbiflow_theme
 sphinx-markdown-tables==0.0.12
 breathe==4.18.1

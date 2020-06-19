@@ -18,7 +18,7 @@ import sys, os
 # -- General configuration -----------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
-needs_sphinx = '1.6'
+needs_sphinx = '3.0.4'
 
 # For VTR documentation support
 sys.path.append(os.path.abspath('./vtr-verilog-to-routing/doc/_exts'))
@@ -81,7 +81,6 @@ today_fmt = '%Y-%m-%d'
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 exclude_patterns = [
-    'symbiflow-arch-defs/*',
     'symbiflow-arch-defs/third_party/**',
     'prjtrellis/third_party/**',
     'prjxray/third_party/**',
