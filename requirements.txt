@@ -7,3 +7,4 @@ sphinxcontrib-images==0.9.2
 recommonmark==0.6.0
 sphinxcontrib-bibtex==0.4.2
 sphinxcontrib-domaintools==0.3
+sphinx-tabs==1.1.13

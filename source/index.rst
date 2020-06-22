@@ -11,3 +11,5 @@ SymbiFlow documentation
    prjxray/docs/index
    prjtrellis/docs/index
    fasm/docs/specification
+   howto/index
+   tutorials/index
