@@ -73,6 +73,10 @@ bool PinmapParser::parseData (std::istream*& a_Stream) {
         std::string line;
         std::getline(*a_Stream, line);
 
+        if (line.empty()) {
+            continue;
+        }
+
         // Parse datafields
         auto data = getFields(line);
 
