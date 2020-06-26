@@ -21,4 +21,4 @@ test: $(NAME).so
 
 clean:
 	rm -f *.d *.o *.so
-
+	$(MAKE) -C tests clean

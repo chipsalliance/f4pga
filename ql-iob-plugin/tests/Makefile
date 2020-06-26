@@ -1,7 +1,13 @@
-TESTS = generic
+TESTS = sdiomux ckpad
 
-all: $(TESTS)
+all: $(addsuffix /ok,$(TESTS))
 
-generic:
-	yosys -p "plugin -i ../ql-iob.so; read_verilog design.v; synth_quicklogic ; stat; quicklogic_iob design.pcf pinmap.csv; stat; write_blif -attr -param -cname design.eblif"
-	@echo $@ PASS
+clean:
+	@find . -name "ok" | xargs rm -rf
+
+sdiomux/ok:
+	cd sdiomux && $(MAKE) test
+ckpad/ok:
+	cd ckpad && $(MAKE) test
+
+.PHONY: all clean

@@ -1,0 +1,14 @@
+plugin -i ../../ql-iob.so
+read_verilog design.v
+
+synth_quicklogic 
+stat
+
+quicklogic_iob design.pcf ../pinmap.csv
+
+select r:IO_TYPE=BIDIR   -assert-count 11
+select r:IO_TYPE=CLOCK   -assert-count 1
+select r:IO_TYPE=SDIOMUX -assert-count 0
+select r:IO_TYPE=        -assert-count 0
+
+write_blif -attr -param -cname design.eblif

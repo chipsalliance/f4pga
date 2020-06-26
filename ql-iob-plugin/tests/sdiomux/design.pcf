@@ -1,0 +1,5 @@
+set_io clk    B1
+set_io led(0) C1
+set_io led(1) A1
+set_io led(2) H3
+set_io led(3) E3
