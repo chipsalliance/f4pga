@@ -36,7 +36,7 @@ struct WriteFasm : public Backend {
 	WriteFasm() : Backend("fasm", "Write out FASM features") {}
 
 
-	void help() YS_OVERRIDE {
+	void help() override {
 		//   |---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|
 		log("\n");
 		log("    write_fasm -part_json <part_json_filename> <filename>\n");
@@ -45,7 +45,7 @@ struct WriteFasm : public Backend {
 		log("\n");
 	}
 
-	void execute(std::ostream *&f, std::string filename,  std::vector<std::string> args, RTLIL::Design *design) YS_OVERRIDE {
+	void execute(std::ostream *&f, std::string filename,  std::vector<std::string> args, RTLIL::Design *design) override {
 		size_t argidx = 1;
 		std::string part_json;
 		if (args[argidx] == "-part_json" && argidx + 1 < args.size()) {
