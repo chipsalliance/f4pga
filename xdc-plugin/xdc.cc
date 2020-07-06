@@ -74,7 +74,7 @@ struct GetPorts : public Pass {
 		register_in_tcl_interpreter(pass_name);
 	}
 
-	void help() YS_OVERRIDE
+	void help() override
 	{
 		//   |---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|
 		log("\n");
@@ -86,7 +86,7 @@ struct GetPorts : public Pass {
 		log("\n");
 	}
 
-	void execute(std::vector<std::string> args, RTLIL::Design* design) YS_OVERRIDE
+	void execute(std::vector<std::string> args, RTLIL::Design* design) override
 	{
 		if (args.size() < 2) {
 			log_cmd_error("No port specified.\n");
@@ -127,7 +127,7 @@ struct GetIOBanks : public Pass {
 		register_in_tcl_interpreter(pass_name);
 	}
 
-	void help() YS_OVERRIDE	{
+	void help() override	{
 		//   |---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|
 		log("\n");
 		log("   get_iobanks <bank_number>\n");
@@ -136,7 +136,7 @@ struct GetIOBanks : public Pass {
 		log("\n");
 	}
 
-	void execute(std::vector<std::string> args, RTLIL::Design* ) YS_OVERRIDE {
+	void execute(std::vector<std::string> args, RTLIL::Design* ) override {
 		if (args.size() < 2) {
 			log_cmd_error("%s: Missing bank number.\n", pass_name.c_str());
 		}
@@ -160,7 +160,7 @@ struct SetProperty : public Pass {
 		register_in_tcl_interpreter(pass_name);
 	}
 
-	void help() YS_OVERRIDE	{
+	void help() override	{
 		//   |---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|
 		log("\n");
 		log("    set_property PROPERTY VALUE OBJECT\n");
@@ -169,7 +169,7 @@ struct SetProperty : public Pass {
 		log("\n");
 	}
 
-	void execute(std::vector<std::string> args, RTLIL::Design* design) YS_OVERRIDE {
+	void execute(std::vector<std::string> args, RTLIL::Design* design) override {
 		if (design->top_module() == nullptr) {
 			log_cmd_error("No top module detected\n");
 		}
@@ -375,7 +375,7 @@ struct ReadXdc : public Frontend {
 		, GetIOBanks(std::bind(&ReadXdc::get_bank_tiles, this))
 		, SetProperty(std::bind(&ReadXdc::get_bank_tiles, this)) {}
 
-	void help() YS_OVERRIDE {
+	void help() override {
 		//   |---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|
 		log("\n");
 		log("    read_xdc -part_json <part_json_filename> <filename>\n");
@@ -384,7 +384,7 @@ struct ReadXdc : public Frontend {
 		log("\n");
 	}
 
-	void execute(std::istream *&f, std::string filename, std::vector<std::string> args, RTLIL::Design*) YS_OVERRIDE {
+	void execute(std::istream *&f, std::string filename, std::vector<std::string> args, RTLIL::Design*) override {
                 if (args.size() < 2) {
                         log_cmd_error("Missing script file.\n");
 		}
@@ -444,7 +444,7 @@ struct GetBankTiles : public Pass {
 		register_in_tcl_interpreter(pass_name);
 	}
 
-	void help() YS_OVERRIDE
+	void help() override
 	{
 		//   |---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|
 		log("\n");
@@ -454,7 +454,7 @@ struct GetBankTiles : public Pass {
 		log("\n");
 	}
 
-	void execute(std::vector<std::string> args, RTLIL::Design* ) YS_OVERRIDE {
+	void execute(std::vector<std::string> args, RTLIL::Design* ) override {
                 if (args.size() < 2) {
                         log_cmd_error("Missing JSON file.\n");
 		}
