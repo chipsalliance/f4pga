@@ -4,7 +4,7 @@ PLUGINS_INSTALL := $(foreach plugin,$(PLUGIN_LIST),install_$(plugin))
 PLUGINS_CLEAN := $(foreach plugin,$(PLUGIN_LIST),clean_$(plugin))
 PLUGINS_TEST := $(foreach plugin,$(PLUGIN_LIST),test_$(plugin))
 
-all: install
+all: plugins
 
 define install_plugin =
 $(1).so:
