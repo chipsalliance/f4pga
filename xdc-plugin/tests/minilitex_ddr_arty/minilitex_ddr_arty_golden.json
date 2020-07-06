@@ -1,4 +1,16 @@
 {
+  "$iopadmap$top.cpu_reset": {
+    "IOSTANDARD": "LVCMOS33",
+    "IO_LOC_PAIRS": "cpu_reset:C2"
+  },
+  "$iopadmap$top.serial_rx": {
+    "IOSTANDARD": "LVCMOS33",
+    "IO_LOC_PAIRS": "serial_rx:A9"
+  },
+  "$iopadmap$top.serial_tx": {
+    "IOSTANDARD": "LVCMOS33",
+    "IO_LOC_PAIRS": "serial_tx:D10"
+  },
   "IOBUF": {
     "IN_TERM": "UNTUNED_SPLIT_40",
     "IOSTANDARD": "SSTL135",
