@@ -32,7 +32,7 @@ void register_in_tcl_interpreter(const std::string& command) {
 }
 
 struct GetParam : public Pass {
-	GetParam() : Pass("get_param", "get parameter on object") {
+	GetParam() : Pass("getparam", "get parameter on object") {
 		register_in_tcl_interpreter(pass_name);
 	}
 
@@ -40,7 +40,7 @@ struct GetParam : public Pass {
 	{
 		//   |---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|
 		log("\n");
-		log("   get_param name selection\n");
+		log("   getparam name selection\n");
 		log("\n");
 		log("Get the given parameter on the selected object. \n");
 		log("\n");
