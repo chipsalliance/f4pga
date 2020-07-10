@@ -52,14 +52,14 @@ struct GetParam : public Pass {
 			log_error("Incorrect number of arguments");
 		}
 
-		std::string param(args.at(1));
+		auto param = RTLIL::IdString(RTLIL::escape_id(args.at(1)));
 		std::string value;
 		extra_args(args, 2, design);
 
 		for (auto module : design->selected_modules()) {
 			for (auto cell : module->selected_cells()) {
 				auto params = cell->parameters;
-				auto it = params.find(RTLIL::IdString(RTLIL::escape_id(param)));
+				auto it = params.find(param);
 				if (it != params.end()) {
 					auto param_obj = it->second;
 					if (param_obj.flags & RTLIL::CONST_FLAG_STRING) {
