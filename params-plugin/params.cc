@@ -51,30 +51,30 @@ struct GetParam : public Pass {
 		if (args.size() == 1) {
 			log_error("Incorrect number of arguments");
 		}
+		extra_args(args, 2, design);
 
 		auto param = RTLIL::IdString(RTLIL::escape_id(args.at(1)));
-		std::string value;
-		extra_args(args, 2, design);
+		Tcl_Interp *interp = yosys_get_tcl_interp();
+		Tcl_Obj* tcl_list = Tcl_NewListObj(0, NULL);
 
 		for (auto module : design->selected_modules()) {
 			for (auto cell : module->selected_cells()) {
 				auto params = cell->parameters;
 				auto it = params.find(param);
 				if (it != params.end()) {
+					std::string value;
 					auto param_obj = it->second;
 					if (param_obj.flags & RTLIL::CONST_FLAG_STRING) {
 						value = param_obj.decode_string();
 					} else {
 						value = std::to_string(param_obj.as_int());
 					}
+					Tcl_Obj* value_obj = Tcl_NewStringObj(value.c_str(), value.size());
+					Tcl_ListObjAppendElement(interp, tcl_list, value_obj);
 				}
 			}
 		}
-
-		char* tcl_param = Tcl_Alloc(value.size() + 1);
-		strcpy(tcl_param, value.c_str());
-		Tcl_Interp *interp = yosys_get_tcl_interp();
-		Tcl_SetResult(interp, tcl_param, TCL_DYNAMIC);
+		Tcl_SetObjResult(interp, tcl_list);
 	}
 
 } GetParam;

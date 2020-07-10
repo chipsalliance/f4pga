@@ -7,10 +7,11 @@ yosys -import
 read_verilog -specify -lib -D_EXPLICIT_CARRY +/xilinx/cells_sim.v
 read_verilog -lib +/xilinx/cells_xtra.v
 hierarchy -check -auto-top
-set phase [getparam CLKOUT2_PHASE top/PLLE2_ADV]
+set phase [getparam CLKOUT2_PHASE top/PLLE2_ADV_0 top/PLLE2_ADV]
 puts "Phase before: $phase"
-setparam -set CLKOUT2_PHASE [expr $phase * 1000] top/PLLE2_ADV
-puts "Phase after: [getparam CLKOUT2_PHASE top/PLLE2_ADV]"
+setparam -set CLKOUT2_PHASE [expr [lindex $phase 0] * 1000] top/PLLE2_ADV
+puts "Phase after: [getparam CLKOUT2_PHASE top/PLLE2_ADV_0 top/PLLE2_ADV]"
+
 # Start flow after library reading
 synth_xilinx -vpr -flatten -abc9 -nosrl -noclkbuf -nodsp -iopad -run prepare:check
 
