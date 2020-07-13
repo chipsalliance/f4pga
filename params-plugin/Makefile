@@ -13,7 +13,7 @@ install_plugin: params.so
 	mkdir -p $(PLUGINS_DIR)
 	cp $< $(PLUGINS_DIR)/$<
 
-test: install_plugin
+test:
 	$(MAKE) -C tests all
 
 .PHONY: install
