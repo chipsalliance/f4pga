@@ -1,30 +1,38 @@
 yosys -import
 plugin -i xdc
 plugin -i params
-#Import the commands from the plugins to the tcl interpreter
+# Import the commands from the plugins to the tcl interpreter
 yosys -import
 
 read_verilog -specify -lib -D_EXPLICIT_CARRY +/xilinx/cells_sim.v
 read_verilog -lib +/xilinx/cells_xtra.v
 hierarchy -check -auto-top
+
+# Check phase parameter values on bith PLLE2_ADV instances
+set reference_phase [list 90 70]
 set phase [getparam CLKOUT2_PHASE top/PLLE2_ADV_0 top/PLLE2_ADV]
 if {[llength $phase] != 2} {
 	error "Getparam should return a list with 2 elements"
 }
 set fp [open "params.txt" "w"]
 puts -nonewline $fp "Phase before: "
-if {$phase == [list 90 70]} {
+if {$phase == $reference_phase} {
 	puts $fp "PASS"
 } else {
-	puts $fp "FAIL"
+	puts $fp "FAIL: $phase != $reference_phase"
 }
+
+# Modify the phase parameter value on one of the PLLE2_ADV instances
 setparam -set CLKOUT2_PHASE [expr [lindex $phase 0] * 1000] top/PLLE2_ADV
+
+# Verify that the parameter has been correctly updated on the chosen instance 
+set reference_phase [list 90000 70]
 set phase [getparam CLKOUT2_PHASE top/PLLE2_ADV_0 top/PLLE2_ADV]
 puts -nonewline $fp "Phase after: "
-if {$phase == [list 90000 70]} {
+if {$phase == $reference_phase} {
 	puts $fp "PASS"
 } else {
-	puts $fp "FAIL"
+	puts $fp "FAIL: $phase != $reference_phase"
 }
 close $fp
 
