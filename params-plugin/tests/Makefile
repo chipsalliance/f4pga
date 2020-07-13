@@ -1,6 +1,6 @@
 TESTS = pll
 
-pll_verify = $(call compare_json,pll)
+pll_verify = $(call compare_json,pll) && test $$(grep "PASS" pll/params.txt | wc -l) -eq 2
 
 all: $(TESTS)
 

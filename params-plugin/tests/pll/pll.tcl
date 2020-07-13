@@ -8,9 +8,25 @@ read_verilog -specify -lib -D_EXPLICIT_CARRY +/xilinx/cells_sim.v
 read_verilog -lib +/xilinx/cells_xtra.v
 hierarchy -check -auto-top
 set phase [getparam CLKOUT2_PHASE top/PLLE2_ADV_0 top/PLLE2_ADV]
-puts "Phase before: $phase"
+if {[llength $phase] != 2} {
+	error "Getparam should return a list with 2 elements"
+}
+set fp [open "params.txt" "w"]
+puts -nonewline $fp "Phase before: "
+if {$phase == [list 90 70]} {
+	puts $fp "PASS"
+} else {
+	puts $fp "FAIL"
+}
 setparam -set CLKOUT2_PHASE [expr [lindex $phase 0] * 1000] top/PLLE2_ADV
-puts "Phase after: [getparam CLKOUT2_PHASE top/PLLE2_ADV_0 top/PLLE2_ADV]"
+set phase [getparam CLKOUT2_PHASE top/PLLE2_ADV_0 top/PLLE2_ADV]
+puts -nonewline $fp "Phase after: "
+if {$phase == [list 90000 70]} {
+	puts $fp "PASS"
+} else {
+	puts $fp "FAIL"
+}
+close $fp
 
 # Start flow after library reading
 synth_xilinx -vpr -flatten -abc9 -nosrl -noclkbuf -nodsp -iopad -run prepare:check
