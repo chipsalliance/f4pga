@@ -1,7 +1,8 @@
-TESTS = base_litex counter
+TESTS = base_litex counter pll
 
 base_litex_verify = $(call compare_json,base_litex)
 counter_verify = $(call compare_json,counter)
+pll_verify = $(call compare_json,pll)
 
 all: $(TESTS)
 
