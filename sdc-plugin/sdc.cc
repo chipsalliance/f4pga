@@ -126,7 +126,8 @@ struct CreateClockCmd : public Pass {
 	if (name.empty()) {
 	    name = selected_wires.at(0)->name.str();
 	}
-	clocks_.AddClock(name, selected_wires, period, rising_edge, falling_edge);
+	clocks_.AddClock(name, selected_wires, period, rising_edge,
+	                 falling_edge);
 	log("Created clock %s with period %f, waveform %f,%f\n", name.c_str(),
 	    period, rising_edge, falling_edge);
     }
@@ -140,12 +141,46 @@ struct CreateClockCmd : public Pass {
     Clocks& clocks_;
 };
 
+struct GetClocksCmd : public Pass {
+    GetClocksCmd(Clocks& clocks)
+        : Pass("get_clocks", "Create clock object"), clocks_(clocks) {}
+
+    void help() override {
+	log("\n");
+	log("    get_clocks\n");
+	log("\n");
+	log("Returns all clocks in the design.\n");
+	log("\n");
+    }
+
+    void execute(std::vector<std::string> args,
+                 RTLIL::Design* design) override {
+
+	std::vector<std::string> clock_names(clocks_.GetClockNames());
+	if (clock_names.size() == 0) {
+	    log_warning("No clocks found in design\n");
+	}
+	Tcl_Interp *interp = yosys_get_tcl_interp();
+	Tcl_Obj* tcl_list = Tcl_NewListObj(0, NULL);
+	for (auto name : clock_names) {
+	    Tcl_Obj* name_obj = Tcl_NewStringObj(name.c_str(), name.size());
+	    Tcl_ListObjAppendElement(interp, tcl_list, name_obj);
+	}
+	Tcl_SetObjResult(interp, tcl_list);
+    }
+
+    Clocks& clocks_;
+};
+
 class SdcPlugin {
    public:
-    SdcPlugin() : create_clock_cmd_(clocks_) { log("Loaded SDC plugin\n"); }
+    SdcPlugin() : create_clock_cmd_(clocks_), get_clocks_cmd_(clocks_) {
+	log("Loaded SDC plugin\n");
+    }
 
     ReadSdcCmd read_sdc_cmd_;
     CreateClockCmd create_clock_cmd_;
+    GetClocksCmd get_clocks_cmd_;
 
    private:
     Clocks clocks_;

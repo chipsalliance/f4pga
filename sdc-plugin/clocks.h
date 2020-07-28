@@ -60,6 +60,7 @@ class Clocks {
     void AddClockWire(const std::string& name, RTLIL::Wire* wire, float period);
     void AddClockWire(const std::string& name, RTLIL::Wire* wire, float period,
                  float rising_edge, float falling_edge);
+    std::vector<std::string> GetClockNames();
 
    private:
     std::unordered_map<std::string, Clock> clocks_;

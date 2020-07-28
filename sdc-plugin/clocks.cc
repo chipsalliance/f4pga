@@ -45,6 +45,15 @@ void Clocks::AddClockWire(const std::string& name, RTLIL::Wire* wire,
     }
 }
 
+std::vector<std::string> Clocks::GetClockNames() {
+    std::vector<std::string> res;
+    for (auto clock : clocks_) {
+	res.push_back(clock.first);
+    }
+    return res;
+}
+
+
 Clock::Clock(const std::string& name, RTLIL::Wire* wire, float period,
              float rising_edge, float falling_edge)
     : Clock(name) {
