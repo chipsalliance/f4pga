@@ -16,6 +16,7 @@
  *  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 #include "clocks.h"
+#include "propagation.h"
 #include "kernel/log.h"
 #include "kernel/register.h"
 #include "kernel/rtlil.h"
@@ -153,9 +154,8 @@ struct GetClocksCmd : public Pass {
 	log("\n");
     }
 
-    void execute(std::vector<std::string> args,
+    void execute(__attribute__((unused)) std::vector<std::string> args,
                  RTLIL::Design* design) override {
-
 	std::vector<std::string> clock_names(clocks_.GetClockNames());
 	if (clock_names.size() == 0) {
 	    log_warning("No clocks found in design\n");
@@ -172,15 +172,42 @@ struct GetClocksCmd : public Pass {
     Clocks& clocks_;
 };
 
+struct PropagateClocksCmd : public Pass {
+    PropagateClocksCmd(Clocks& clocks)
+        : Pass("propagate_clocks", "Propagate clock information"), clocks_(clocks) {}
+
+    void help() override {
+	log("\n");
+	log("    propagate_clocks\n");
+	log("\n");
+	log("Propagate clock information throughout the design.\n");
+	log("\n");
+    }
+
+    void execute(__attribute__((unused)) std::vector<std::string> args,
+                 RTLIL::Design* design) override {
+	NaturalPropagation natural(design);
+	natural.RunPass(clocks_);
+	/* BufferPropagation buffer(design); */
+	/* buffer.RunPass(clocks_); */
+    }
+
+    Clocks& clocks_;
+};
+
 class SdcPlugin {
    public:
-    SdcPlugin() : create_clock_cmd_(clocks_), get_clocks_cmd_(clocks_) {
+    SdcPlugin()
+        : create_clock_cmd_(clocks_),
+          get_clocks_cmd_(clocks_),
+          propagate_clocks_cmd_(clocks_) {
 	log("Loaded SDC plugin\n");
     }
 
     ReadSdcCmd read_sdc_cmd_;
     CreateClockCmd create_clock_cmd_;
     GetClocksCmd get_clocks_cmd_;
+    PropagateClocksCmd propagate_clocks_cmd_;
 
    private:
     Clocks clocks_;

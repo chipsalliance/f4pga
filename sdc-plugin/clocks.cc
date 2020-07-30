@@ -15,8 +15,9 @@
  *  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  *  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#include "clocks.h"
 #include <algorithm>
+#include "clocks.h"
+#include "propagation.h"
 #include "kernel/log.h"
 #include "kernel/register.h"
 
@@ -53,6 +54,13 @@ std::vector<std::string> Clocks::GetClockNames() {
     return res;
 }
 
+void Clocks::Propagate(NaturalPropagation* pass) {
+    (void)pass;
+}
+
+void Clocks::Propagate(BufferPropagation* pass) {
+    (void)pass;
+}
 
 Clock::Clock(const std::string& name, RTLIL::Wire* wire, float period,
              float rising_edge, float falling_edge)

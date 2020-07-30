@@ -23,6 +23,10 @@
 #include "kernel/rtlil.h"
 
 USING_YOSYS_NAMESPACE
+
+class NaturalPropagation;
+class BufferPropagation;
+
 class ClockWire {
    public:
     ClockWire(RTLIL::Wire* wire, float period, float rising_edge,
@@ -61,6 +65,8 @@ class Clocks {
     void AddClockWire(const std::string& name, RTLIL::Wire* wire, float period,
                  float rising_edge, float falling_edge);
     std::vector<std::string> GetClockNames();
+    void Propagate(NaturalPropagation* pass);
+    void Propagate(BufferPropagation* pass);
 
    private:
     std::unordered_map<std::string, Clock> clocks_;
