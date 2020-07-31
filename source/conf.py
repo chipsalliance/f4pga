@@ -136,7 +136,7 @@ html_theme_options = {
     'header_links' : [
         ('Home', 'index', False, 'home'),
         ("Website", "https://symbiflow.github.io", True, 'launch'),
-        ("GitHub", "https://github.com/SymbiFlow", True, 'link')
+        ("GitHub", "https://github.com/SymbiFlow", True, 'code')
     ],
 
     # Customize css colors.
