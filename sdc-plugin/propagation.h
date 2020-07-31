@@ -18,7 +18,9 @@
 #ifndef _PROPAGATION_H_
 #define _PROPAGATION_H_
 
+#include <cassert>
 #include "kernel/rtlil.h"
+#include "kernel/register.h"
 #include "clocks.h"
 
 USING_YOSYS_NAMESPACE
@@ -28,7 +30,7 @@ class Propagation {
 	Propagation(RTLIL::Design* design)
 	    : design_(design) {}
 
-	virtual void RunPass(Clocks& clocks) = 0;
+	virtual void Run(Clocks& clocks) = 0;
 
     public:
 	RTLIL::Design* design_;
@@ -36,12 +38,30 @@ class Propagation {
 
 class NaturalPropagation : public Propagation {
     public:
-	NaturalPropagation(RTLIL::Design* design)
-	    : Propagation(design) {}
+	NaturalPropagation(RTLIL::Design* design, Pass* pass)
+	    : Propagation(design)
+       	    , pass_(pass) {}
 
-	void RunPass(Clocks& clocks) override {
+	void Run(Clocks& clocks) override {
 	    clocks.Propagate(this);
 	}
+	std::vector<RTLIL::Wire*> SelectAliases(RTLIL::Wire* wire) {
+	    RTLIL::Module* top_module = design_->top_module();
+	    assert(top_module);
+	    std::vector<RTLIL::Wire*> selected_wires;
+	    pass_->extra_args(std::vector<std::string>{top_module->name.str() + "/w:" + wire->name.str(), "%a"}, 0, design_);
+	    for (auto module : design_->selected_modules()) {
+		//log("Wires selected in module %s:\n", module->name.c_str());
+		for (auto wire : module->selected_wires()) {
+		    //log("%s\n", wire->name.c_str());
+		    selected_wires.push_back(wire);
+		}
+	    }
+	    return selected_wires;
+	}
+
+    private:
+	Pass* pass_;
 };
 
 class BufferPropagation : public Propagation {
@@ -49,7 +69,7 @@ class BufferPropagation : public Propagation {
 	BufferPropagation(RTLIL::Design* design)
 	    : Propagation(design) {}
 
-	void RunPass(Clocks& clocks) override {
+	void Run(Clocks& clocks) override {
 	    clocks.Propagate(this);
 	}
 };

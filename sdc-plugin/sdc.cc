@@ -127,7 +127,7 @@ struct CreateClockCmd : public Pass {
 	if (name.empty()) {
 	    name = selected_wires.at(0)->name.str();
 	}
-	clocks_.AddClock(name, selected_wires, period, rising_edge,
+	clocks_.AddClockWires(name, selected_wires, period, rising_edge,
 	                 falling_edge);
 	log("Created clock %s with period %f, waveform %f,%f\n", name.c_str(),
 	    period, rising_edge, falling_edge);
@@ -155,7 +155,7 @@ struct GetClocksCmd : public Pass {
     }
 
     void execute(__attribute__((unused)) std::vector<std::string> args,
-                 RTLIL::Design* design) override {
+                 __attribute__((unused)) RTLIL::Design* design) override {
 	std::vector<std::string> clock_names(clocks_.GetClockNames());
 	if (clock_names.size() == 0) {
 	    log_warning("No clocks found in design\n");
@@ -186,8 +186,12 @@ struct PropagateClocksCmd : public Pass {
 
     void execute(__attribute__((unused)) std::vector<std::string> args,
                  RTLIL::Design* design) override {
-	NaturalPropagation natural(design);
-	natural.RunPass(clocks_);
+
+	if (!design->top_module()) {
+	    log_cmd_error("No top module selected\n");
+	}
+	NaturalPropagation natural_propagation(design, this);
+	natural_propagation.Run(clocks_);
 	/* BufferPropagation buffer(design); */
 	/* buffer.RunPass(clocks_); */
     }
