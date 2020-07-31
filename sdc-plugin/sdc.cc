@@ -16,10 +16,10 @@
  *  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 #include "clocks.h"
-#include "propagation.h"
 #include "kernel/log.h"
 #include "kernel/register.h"
 #include "kernel/rtlil.h"
+#include "propagation.h"
 
 USING_YOSYS_NAMESPACE
 
@@ -128,7 +128,7 @@ struct CreateClockCmd : public Pass {
 	    name = selected_wires.at(0)->name.str();
 	}
 	clocks_.AddClockWires(name, selected_wires, period, rising_edge,
-	                 falling_edge);
+	                      falling_edge);
 	log("Created clock %s with period %f, waveform %f,%f\n", name.c_str(),
 	    period, rising_edge, falling_edge);
     }
@@ -160,7 +160,7 @@ struct GetClocksCmd : public Pass {
 	if (clock_names.size() == 0) {
 	    log_warning("No clocks found in design\n");
 	}
-	Tcl_Interp *interp = yosys_get_tcl_interp();
+	Tcl_Interp* interp = yosys_get_tcl_interp();
 	Tcl_Obj* tcl_list = Tcl_NewListObj(0, NULL);
 	for (auto name : clock_names) {
 	    Tcl_Obj* name_obj = Tcl_NewStringObj(name.c_str(), name.size());
@@ -174,7 +174,8 @@ struct GetClocksCmd : public Pass {
 
 struct PropagateClocksCmd : public Pass {
     PropagateClocksCmd(Clocks& clocks)
-        : Pass("propagate_clocks", "Propagate clock information"), clocks_(clocks) {}
+        : Pass("propagate_clocks", "Propagate clock information"),
+          clocks_(clocks) {}
 
     void help() override {
 	log("\n");
@@ -186,7 +187,6 @@ struct PropagateClocksCmd : public Pass {
 
     void execute(__attribute__((unused)) std::vector<std::string> args,
                  RTLIL::Design* design) override {
-
 	if (!design->top_module()) {
 	    log_cmd_error("No top module selected\n");
 	}

@@ -18,8 +18,8 @@
 #ifndef _CLOCKS_H_
 #define _CLOCKS_H_
 
-#include <vector>
 #include <unordered_map>
+#include <vector>
 #include "kernel/rtlil.h"
 
 USING_YOSYS_NAMESPACE
@@ -35,18 +35,10 @@ class ClockWire {
           period_(period),
           rising_edge_(rising_edge),
           falling_edge_(falling_edge) {}
-    RTLIL::Wire* Wire() {
-	return wire_;
-    }
-    float Period() {
-	return period_;
-    }
-    float RisingEdge() {
-	return rising_edge_;
-    }
-    float FallingEdge() {
-	return falling_edge_;
-    }
+    RTLIL::Wire* Wire() { return wire_; }
+    float Period() { return period_; }
+    float RisingEdge() { return rising_edge_; }
+    float FallingEdge() { return falling_edge_; }
 
    private:
     RTLIL::Wire* wire_;
@@ -62,9 +54,7 @@ class Clock {
           float rising_edge, float falling_edge);
     void AddClockWire(RTLIL::Wire* wire, float period, float rising_edge,
                       float falling_edge);
-    std::vector<ClockWire> GetClockWires() {
-	return clock_wires_;
-    }
+    std::vector<ClockWire> GetClockWires() { return clock_wires_; }
     ClockWire* RootWire() {
 	if (clock_wires_.size()) {
 	    return &clock_wires_[0];
@@ -81,11 +71,11 @@ class Clock {
 class Clocks {
    public:
     void AddClockWires(const std::string& name,
-             const std::vector<RTLIL::Wire*>& wires, float period,
-             float rising_edge, float falling_edge);
+                       const std::vector<RTLIL::Wire*>& wires, float period,
+                       float rising_edge, float falling_edge);
     void AddClockWire(const std::string& name, RTLIL::Wire* wire, float period);
     void AddClockWire(const std::string& name, RTLIL::Wire* wire, float period,
-                 float rising_edge, float falling_edge);
+                      float rising_edge, float falling_edge);
     std::vector<std::string> GetClockNames();
     std::vector<std::string> GetClockWireNames(const std::string& clock_name);
     void Propagate(NaturalPropagation* pass);

@@ -15,15 +15,15 @@
  *  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  *  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-#include <algorithm>
 #include "clocks.h"
-#include "propagation.h"
+#include <algorithm>
 #include "kernel/log.h"
 #include "kernel/register.h"
+#include "propagation.h"
 
 void Clocks::AddClockWires(const std::string& name,
-              const std::vector<RTLIL::Wire*>& wires, float period,
-              float rising_edge, float falling_edge) {
+                           const std::vector<RTLIL::Wire*>& wires, float period,
+                           float rising_edge, float falling_edge) {
     std::for_each(wires.begin(), wires.end(), [&, this](RTLIL::Wire* wire) {
 	AddClockWire(name, wire, period, rising_edge, falling_edge);
     });
@@ -56,7 +56,8 @@ std::vector<std::string> Clocks::GetClockNames() {
     return res;
 }
 
-std::vector<std::string> Clocks::GetClockWireNames(const std::string& clock_name) {
+std::vector<std::string> Clocks::GetClockWireNames(
+    const std::string& clock_name) {
     std::vector<std::string> res;
     auto clock = clocks_.find(clock_name);
     if (clock != clocks_.end()) {
@@ -74,14 +75,13 @@ void Clocks::Propagate(NaturalPropagation* pass) {
 	auto clock_wires = clock.second.GetClockWires();
 	for (auto clock_wire : clock_wires) {
 	    auto aliases = pass->SelectAliases(clock_wire.Wire());
-	    AddClockWires(clock.first, aliases, clock_wire.Period(), clock_wire.RisingEdge(), clock_wire.FallingEdge());
+	    AddClockWires(clock.first, aliases, clock_wire.Period(),
+	                  clock_wire.RisingEdge(), clock_wire.FallingEdge());
 	}
     }
 }
 
-void Clocks::Propagate(BufferPropagation* pass) {
-    (void)pass;
-}
+void Clocks::Propagate(BufferPropagation* pass) { (void)pass; }
 
 Clock::Clock(const std::string& name, RTLIL::Wire* wire, float period,
              float rising_edge, float falling_edge)
@@ -91,7 +91,10 @@ Clock::Clock(const std::string& name, RTLIL::Wire* wire, float period,
 
 void Clock::AddClockWire(RTLIL::Wire* wire, float period, float rising_edge,
                          float falling_edge) {
-    if (std::find_if(clock_wires_.begin(), clock_wires_.end(), [wire](ClockWire& clock_wire) {return clock_wire.Wire() == wire;}) == clock_wires_.end()) {
+    if (std::find_if(clock_wires_.begin(), clock_wires_.end(),
+                     [wire](ClockWire& clock_wire) {
+	                 return clock_wire.Wire() == wire;
+                     }) == clock_wires_.end()) {
 	clock_wires_.emplace_back(wire, period, rising_edge, falling_edge);
     }
 }
