@@ -190,10 +190,15 @@ struct PropagateClocksCmd : public Pass {
 	if (!design->top_module()) {
 	    log_cmd_error("No top module selected\n");
 	}
-	NaturalPropagation natural_propagation(design, this);
-	natural_propagation.Run(clocks_);
-	/* BufferPropagation buffer(design); */
-	/* buffer.RunPass(clocks_); */
+
+	std::array<std::unique_ptr<Propagation>, 2> passes{
+	    std::unique_ptr<NaturalPropagation>(
+	        new NaturalPropagation(design, this)),
+	    std::unique_ptr<BufferPropagation>(new BufferPropagation(design))};
+
+	for (auto& pass : passes) {
+	    pass->Run(clocks_);
+	}
     }
 
     Clocks& clocks_;
