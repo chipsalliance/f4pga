@@ -48,6 +48,8 @@ class BufferPropagation : public Propagation {
 
     void Run(Clocks& clocks) override { clocks.Propagate(this); }
     std::vector<RTLIL::Wire*> FindIBufWires(RTLIL::Wire* wire);
+    std::vector<RTLIL::Wire*> FindSinkWiresForCellType(RTLIL::Wire* driver_wire,
+                                             const std::string& type);
 
    private:
     RTLIL::Cell* FindSinkCell(RTLIL::Wire* wire, const std::string& type);

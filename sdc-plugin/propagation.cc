@@ -50,6 +50,21 @@ std::vector<RTLIL::Wire*> BufferPropagation::FindIBufWires(RTLIL::Wire* wire) {
     return wires;
 }
 
+std::vector<RTLIL::Wire*> BufferPropagation::FindSinkWiresForCellType(RTLIL::Wire* driver_wire,
+                                             const std::string& type) {
+    if (!driver_wire) {
+	return std::vector<RTLIL::Wire*>();
+    }
+    RTLIL::Module* top_module = design_->top_module();
+    assert(top_module);
+    std::string base_selection =
+        top_module->name.str() + "/w:" + driver_wire->name.str();
+    pass_->extra_args(std::vector<std::string>{base_selection, "%co*:+" + type,
+                                               base_selection, "%d"},
+                      0, design_);
+    return top_module->selected_wires();
+}
+
 RTLIL::Cell* BufferPropagation::FindSinkCell(RTLIL::Wire* wire,
                                              const std::string& type) {
     RTLIL::Cell* sink_cell = NULL;
@@ -68,7 +83,7 @@ RTLIL::Cell* BufferPropagation::FindSinkCell(RTLIL::Wire* wire,
     assert(selected_cells.size() <= 1);
     if (selected_cells.size() > 0) {
 	sink_cell = selected_cells.at(0);
-	log("Found cell: %s\n", sink_cell->name.c_str());
+	log("Found sink cell: %s\n", sink_cell->name.c_str());
     }
     return sink_cell;
 }
@@ -92,7 +107,7 @@ RTLIL::Wire* BufferPropagation::FindSinkWireOnPort(
     assert(selected_wires.size() <= 1);
     if (selected_wires.size() > 0) {
 	sink_wire = selected_wires.at(0);
-	log("Found wire: %s\n", sink_wire->name.c_str());
+	log("Found sink wire: %s\n", sink_wire->name.c_str());
     }
     return sink_wire;
 }

@@ -36,9 +36,12 @@ class ClockWire {
           rising_edge_(rising_edge),
           falling_edge_(falling_edge) {}
     RTLIL::Wire* Wire() { return wire_; }
+    std::string Name() { return RTLIL::unescape_id(wire_->name); }
     float Period() { return period_; }
     float RisingEdge() { return rising_edge_; }
     float FallingEdge() { return falling_edge_; }
+    void UpdatePeriod(float period);
+    void UpdateWaveform(float rising_edge, float falling_edge);
 
    private:
     RTLIL::Wire* wire_;
@@ -70,12 +73,12 @@ class Clocks {
     void AddClockWire(const std::string& name, RTLIL::Wire* wire, float period,
                       float rising_edge, float falling_edge);
     std::vector<std::string> GetClockNames();
-    std::vector<std::string> GetClockWireNames(const std::string& clock_name);
     void Propagate(NaturalPropagation* pass);
     void Propagate(BufferPropagation* pass);
 
    private:
     std::unordered_map<std::string, Clock> clocks_;
+    static int ibuf_delay;
 };
 
 #endif  // _CLOCKS_H_

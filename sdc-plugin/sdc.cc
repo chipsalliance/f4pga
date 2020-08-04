@@ -15,6 +15,7 @@
  *  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  *  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
+#include <algorithm>
 #include "clocks.h"
 #include "kernel/log.h"
 #include "kernel/register.h"
@@ -94,9 +95,12 @@ struct CreateClockCmd : public Pass {
 		period = std::stof(args[++argidx]);
 		continue;
 	    }
-	    if (arg == "-waveform" && argidx + 2 < args.size()) {
-		rising_edge = std::stof(args[++argidx]);
-		falling_edge = std::stof(args[++argidx]);
+	    if (arg == "-waveform" && argidx + 1 < args.size()) {
+		std::string edges(args[++argidx]);
+		std::copy_if(edges.begin(), edges.end(), edges.begin(),
+		             [](char c) { return c != '{' or c != '}'; });
+		std::stringstream ss(edges);
+		ss >> rising_edge >> falling_edge;
 		continue;
 	    }
 	    break;
