@@ -18,56 +18,40 @@
 #ifndef _PROPAGATION_H_
 #define _PROPAGATION_H_
 
-#include <cassert>
 #include "clocks.h"
-#include "kernel/register.h"
-#include "kernel/rtlil.h"
 
 USING_YOSYS_NAMESPACE
 
 class Propagation {
    public:
-    Propagation(RTLIL::Design* design) : design_(design) {}
+    Propagation(RTLIL::Design* design, Pass* pass) : design_(design), pass_(pass) {}
 
     virtual void Run(Clocks& clocks) = 0;
 
-   public:
+   protected:
     RTLIL::Design* design_;
+    Pass* pass_;
 };
 
 class NaturalPropagation : public Propagation {
    public:
     NaturalPropagation(RTLIL::Design* design, Pass* pass)
-        : Propagation(design), pass_(pass) {}
+        : Propagation(design, pass) {}
 
     void Run(Clocks& clocks) override { clocks.Propagate(this); }
-    std::vector<RTLIL::Wire*> SelectAliases(RTLIL::Wire* wire) {
-	RTLIL::Module* top_module = design_->top_module();
-	assert(top_module);
-	std::vector<RTLIL::Wire*> selected_wires;
-	pass_->extra_args(
-	    std::vector<std::string>{
-	        top_module->name.str() + "/w:" + wire->name.str(), "%a"},
-	    0, design_);
-	for (auto module : design_->selected_modules()) {
-	    // log("Wires selected in module %s:\n", module->name.c_str());
-	    for (auto wire : module->selected_wires()) {
-		// log("%s\n", wire->name.c_str());
-		selected_wires.push_back(wire);
-	    }
-	}
-	return selected_wires;
-    }
-
-   private:
-    Pass* pass_;
+    std::vector<RTLIL::Wire*> FindAliasWires(RTLIL::Wire* wire);
 };
 
 class BufferPropagation : public Propagation {
    public:
-    BufferPropagation(RTLIL::Design* design) : Propagation(design) {}
+    BufferPropagation(RTLIL::Design* design, Pass* pass) : Propagation(design, pass) {}
 
     void Run(Clocks& clocks) override { clocks.Propagate(this); }
+    std::vector<RTLIL::Wire*> FindIBufWires(RTLIL::Wire* wire);
+
+   private:
+    RTLIL::Cell* FindSinkCell(RTLIL::Wire* wire, const std::string& type);
+    RTLIL::Wire* FindSinkWireOnPort(RTLIL::Cell* cell, const std::string& port_name);
 };
 
 #endif  // PROPAGATION_H_

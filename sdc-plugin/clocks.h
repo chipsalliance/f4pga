@@ -55,13 +55,6 @@ class Clock {
     void AddClockWire(RTLIL::Wire* wire, float period, float rising_edge,
                       float falling_edge);
     std::vector<ClockWire> GetClockWires() { return clock_wires_; }
-    ClockWire* RootWire() {
-	if (clock_wires_.size()) {
-	    return &clock_wires_[0];
-	} else {
-	    return NULL;
-	}
-    }
 
    private:
     std::string name_;

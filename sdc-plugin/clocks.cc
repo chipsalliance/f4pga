@@ -74,14 +74,27 @@ void Clocks::Propagate(NaturalPropagation* pass) {
 	log("Processing clock %s\n", clock.first.c_str());
 	auto clock_wires = clock.second.GetClockWires();
 	for (auto clock_wire : clock_wires) {
-	    auto aliases = pass->SelectAliases(clock_wire.Wire());
+	    auto aliases = pass->FindAliasWires(clock_wire.Wire());
 	    AddClockWires(clock.first, aliases, clock_wire.Period(),
 	                  clock_wire.RisingEdge(), clock_wire.FallingEdge());
 	}
     }
 }
 
-void Clocks::Propagate(BufferPropagation* pass) { (void)pass; }
+void Clocks::Propagate(BufferPropagation* pass) {
+    for (auto clock : clocks_) {
+	log("Processing clock %s\n", clock.first.c_str());
+	auto clock_wires = clock.second.GetClockWires();
+	for (auto clock_wire : clock_wires) {
+	    log("Clock wire %s\n", clock_wire.Wire()->name.c_str());
+	    auto ibuf_wires = pass->FindIBufWires(clock_wire.Wire());
+	    for (auto wire : ibuf_wires) {
+		log("IBUF wire: %s\n", wire->name.c_str());
+	    }
+	}
+
+    }
+}
 
 Clock::Clock(const std::string& name, RTLIL::Wire* wire, float period,
              float rising_edge, float falling_edge)

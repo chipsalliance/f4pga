@@ -194,7 +194,7 @@ struct PropagateClocksCmd : public Pass {
 	std::array<std::unique_ptr<Propagation>, 2> passes{
 	    std::unique_ptr<NaturalPropagation>(
 	        new NaturalPropagation(design, this)),
-	    std::unique_ptr<BufferPropagation>(new BufferPropagation(design))};
+	    std::unique_ptr<BufferPropagation>(new BufferPropagation(design, this))};
 
 	for (auto& pass : passes) {
 	    pass->Run(clocks_);
