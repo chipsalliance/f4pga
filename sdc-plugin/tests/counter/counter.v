@@ -1,18 +1,22 @@
 module top(input clk,
 	input [1:0] in,
-	output [4:0] out);
+	output [4:0] out );
 
 reg [1:0] cnt = 0;
+//wire [4:1] out;
 wire clk_int_1, clk_int_2;
-
-assign clk_int_1 = clk;
+IBUF ibuf_proxy(.I(clk), .O(ibuf_proxy_out));
+IBUF ibuf_inst(.I(ibuf_proxy_out), .O(ibuf_out));
+//IBUF ibuf_inst_2(.I(ibuf_out_1), .O(ibuf_out_2));
+assign clk_int_1 = ibuf_out;
 assign clk_int_2 = clk_int_1;
+//assign do = out[0];
 
-always @(posedge clk_int) begin
+always @(posedge clk_int_2) begin
 	cnt <= cnt + 1;
 end
 
-middle middle_inst_1(.clk(clk_int_1), .out(out[2]));
+middle middle_inst_1(.clk(ibuf_out), .out(out[2]));
 middle middle_inst_2(.clk(clk_int_1), .out(out[3]));
 middle middle_inst_3(.clk(clk_int_2), .out(out[4]));
 

@@ -8,12 +8,16 @@ read_verilog counter.v
 read_verilog -specify -lib -D_EXPLICIT_CARRY +/xilinx/cells_sim.v
 read_verilog -lib +/xilinx/cells_xtra.v
 hierarchy -check -auto-top
-
 # Start flow after library reading
 synth_xilinx -vpr -flatten -abc9 -nosrl -nodsp -iopad -run prepare:check
-#
-##Read the design timing constraints
-#read_sdc $::env(INPUT_SDC_FILE)
+# Read the design's timing constraints
+set ::env(INPUT_SDC_FILE) counter.sdc
+read_sdc $::env(INPUT_SDC_FILE)
+set clocks [get_clocks]
+puts $clocks
+stop
+#select top/w:clk %a
+
 #return
 #
 ##Read the design constraints
@@ -25,12 +29,12 @@ synth_xilinx -vpr -flatten -abc9 -nosrl -nodsp -iopad -run prepare:check
 #
 ## opt_expr -undriven makes sure all nets are driven, if only by the $undef
 ## net.
-opt_expr -undriven
-opt_clean
+#opt_expr -undriven
+#opt_clean
 #
-setundef -zero -params
-stat
+#setundef -zero -params
+#stat
 #
 ## Write the design in JSON format.
-write_json $::env(OUT_JSON)
-write_blif -attr -param -cname -conn $::env(OUT_EBLIF)
+#write_json $::env(OUT_JSON)
+#write_blif -attr -param -cname -conn $::env(OUT_EBLIF)

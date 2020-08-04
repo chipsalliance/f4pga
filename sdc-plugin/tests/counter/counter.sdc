@@ -1,1 +1,2 @@
-create_clock -name clk -period 10.0 clk
+create_clock -period 10.0  -name clk2 -waveform {0.000 5.000} clk_int_1
+create_clock -period 10.0 -name clk -waveform {0.000 5.000} clk
