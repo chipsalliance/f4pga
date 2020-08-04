@@ -47,13 +47,14 @@ class BufferPropagation : public Propagation {
     BufferPropagation(RTLIL::Design* design, Pass* pass) : Propagation(design, pass) {}
 
     void Run(Clocks& clocks) override { clocks.Propagate(this); }
-    std::vector<RTLIL::Wire*> FindIBufWires(RTLIL::Wire* wire);
     std::vector<RTLIL::Wire*> FindSinkWiresForCellType(RTLIL::Wire* driver_wire,
-                                             const std::string& type);
+                                             const std::string& cell_type, const std::string& cell_port);
 
    private:
     RTLIL::Cell* FindSinkCell(RTLIL::Wire* wire, const std::string& type);
     RTLIL::Wire* FindSinkWireOnPort(RTLIL::Cell* cell, const std::string& port_name);
+    std::vector<RTLIL::Wire*> FindSinkWiresForCellType2(RTLIL::Wire* driver_wire,
+                                             const std::string& type);
 };
 
 #endif  // PROPAGATION_H_

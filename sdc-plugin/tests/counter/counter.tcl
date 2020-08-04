@@ -15,6 +15,8 @@ set ::env(INPUT_SDC_FILE) counter.sdc
 read_sdc $::env(INPUT_SDC_FILE)
 set clocks [get_clocks]
 puts $clocks
+propagate_clocks
+get_clocks
 stop
 #select top/w:clk %a
 

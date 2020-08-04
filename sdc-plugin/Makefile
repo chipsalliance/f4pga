@@ -1,5 +1,5 @@
 CXX = $(shell yosys-config --cxx)
-CXXFLAGS = $(shell yosys-config --cxxflags)
+CXXFLAGS = $(shell yosys-config --cxxflags) -DSDC_DEBUG
 LDFLAGS = $(shell yosys-config --ldflags)
 LDLIBS = $(shell yosys-config --ldlibs)
 PLUGINS_DIR = $(shell yosys-config --datdir)/plugins

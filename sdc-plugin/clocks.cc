@@ -21,8 +21,6 @@
 #include "kernel/register.h"
 #include "propagation.h"
 
-int Clocks::ibuf_delay = 1;
-
 void Clocks::AddClockWires(const std::string& name,
                            const std::vector<RTLIL::Wire*>& wires, float period,
                            float rising_edge, float falling_edge) {
@@ -77,20 +75,29 @@ void Clocks::Propagate(NaturalPropagation* pass) {
 
 void Clocks::Propagate(BufferPropagation* pass) {
     log("Start buffer clock propagation\n");
-    for (auto clock : clocks_) {
+    for (auto& clock : clocks_) {
 	log("Processing clock %s\n", clock.first.c_str());
-	auto clock_wires = clock.second.GetClockWires();
-	for (auto clock_wire : clock_wires) {
-	    auto ibuf_wires = pass->FindIBufWires(clock_wire.Wire());
-	    int path_delay(0);
-	    for (auto wire : ibuf_wires) {
-		log("IBUF wire: %s\n", wire->name.c_str());
-		path_delay += ibuf_delay;
-		AddClockWire(clock.first, wire, clock_wire.Period(), clock_wire.RisingEdge() + path_delay, clock_wire.FallingEdge() + path_delay);
-	    }
-	}
+	PropagateThroughBuffer(pass, clock, IBuf());
+	PropagateThroughBuffer(pass, clock, Bufg());
     }
     log("Finish buffer clock propagation\n");
+}
+
+void Clocks::PropagateThroughBuffer(BufferPropagation* pass, decltype(clocks_)::value_type clock,
+                                    Buffer buffer) {
+    auto clock_wires = clock.second.GetClockWires();
+    for (auto clock_wire : clock_wires) {
+	auto buf_wires = pass->FindSinkWiresForCellType(
+	    clock_wire.Wire(), buffer.name, buffer.output);
+	int path_delay(0);
+	for (auto wire : buf_wires) {
+	    log("%s wire: %s\n", buffer.name.c_str(), wire->name.c_str());
+	    path_delay += buffer.delay;
+	    AddClockWire(clock.first, wire, clock_wire.Period(),
+	                 clock_wire.RisingEdge() + path_delay,
+	                 clock_wire.FallingEdge() + path_delay);
+	}
+    }
 }
 
 Clock::Clock(const std::string& name, RTLIL::Wire* wire, float period,

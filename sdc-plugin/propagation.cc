@@ -37,20 +37,24 @@ std::vector<RTLIL::Wire*> NaturalPropagation::FindAliasWires(
     return alias_wires;
 }
 
-std::vector<RTLIL::Wire*> BufferPropagation::FindIBufWires(RTLIL::Wire* wire) {
+std::vector<RTLIL::Wire*> BufferPropagation::FindSinkWiresForCellType(RTLIL::Wire* driver_wire,
+                                             const std::string& cell_type, const std::string& cell_port) {
     std::vector<RTLIL::Wire*> wires;
-    auto ibuf_cell = FindSinkCell(wire, "IBUF");
-    RTLIL::Wire* ibuf_wire = FindSinkWireOnPort(ibuf_cell, "O");
-    if (ibuf_wire) {
-	wires.push_back(ibuf_wire);
-	auto ibuf_wires = FindIBufWires(ibuf_wire);
-	std::copy(ibuf_wires.begin(), ibuf_wires.end(),
+    if (!driver_wire) {
+	return wires;
+    }
+    auto cell = FindSinkCell(driver_wire, cell_type);
+    RTLIL::Wire* wire = FindSinkWireOnPort(cell, cell_port);
+    if (wire) {
+	wires.push_back(wire);
+	auto further_wires = FindSinkWiresForCellType(wire, cell_type, cell_port);
+	std::copy(further_wires.begin(), further_wires.end(),
 	          std::back_inserter(wires));
     }
     return wires;
 }
 
-std::vector<RTLIL::Wire*> BufferPropagation::FindSinkWiresForCellType(RTLIL::Wire* driver_wire,
+std::vector<RTLIL::Wire*> BufferPropagation::FindSinkWiresForCellType2(RTLIL::Wire* driver_wire,
                                              const std::string& type) {
     if (!driver_wire) {
 	return std::vector<RTLIL::Wire*>();

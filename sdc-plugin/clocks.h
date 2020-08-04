@@ -20,6 +20,7 @@
 
 #include <unordered_map>
 #include <vector>
+#include "buffers.h"
 #include "kernel/rtlil.h"
 
 USING_YOSYS_NAMESPACE
@@ -64,6 +65,7 @@ class Clock {
     std::vector<ClockWire> clock_wires_;
 };
 
+
 class Clocks {
    public:
     void AddClockWires(const std::string& name,
@@ -78,7 +80,7 @@ class Clocks {
 
    private:
     std::unordered_map<std::string, Clock> clocks_;
-    static int ibuf_delay;
+    void PropagateThroughBuffer(BufferPropagation* pass, decltype(clocks_)::value_type clock, Buffer buffer);
 };
 
 #endif  // _CLOCKS_H_
