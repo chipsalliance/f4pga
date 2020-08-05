@@ -27,10 +27,15 @@ class Propagation {
     Propagation(RTLIL::Design* design, Pass* pass) : design_(design), pass_(pass) {}
 
     virtual void Run(Clocks& clocks) = 0;
+    std::vector<RTLIL::Wire*> FindSinkWiresForCellType(RTLIL::Wire* driver_wire,
+                                             const std::string& cell_type, const std::string& cell_port);
 
    protected:
     RTLIL::Design* design_;
     Pass* pass_;
+
+    RTLIL::Cell* FindSinkCell(RTLIL::Wire* wire, const std::string& type);
+    RTLIL::Wire* FindSinkWireOnPort(RTLIL::Cell* cell, const std::string& port_name);
 };
 
 class NaturalPropagation : public Propagation {
@@ -47,14 +52,17 @@ class BufferPropagation : public Propagation {
     BufferPropagation(RTLIL::Design* design, Pass* pass) : Propagation(design, pass) {}
 
     void Run(Clocks& clocks) override { clocks.Propagate(this); }
-    std::vector<RTLIL::Wire*> FindSinkWiresForCellType(RTLIL::Wire* driver_wire,
-                                             const std::string& cell_type, const std::string& cell_port);
 
    private:
-    RTLIL::Cell* FindSinkCell(RTLIL::Wire* wire, const std::string& type);
-    RTLIL::Wire* FindSinkWireOnPort(RTLIL::Cell* cell, const std::string& port_name);
     std::vector<RTLIL::Wire*> FindSinkWiresForCellType2(RTLIL::Wire* driver_wire,
                                              const std::string& type);
 };
 
+class ClockDividerPropagation : public Propagation {
+    public:
+    ClockDividerPropagation(RTLIL::Design* design, Pass* pass)
+        : Propagation(design, pass) {}
+
+    void Run(Clocks& clocks) override { clocks.Propagate(this); }
+};
 #endif  // PROPAGATION_H_

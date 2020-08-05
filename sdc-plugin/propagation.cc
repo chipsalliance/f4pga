@@ -37,7 +37,7 @@ std::vector<RTLIL::Wire*> NaturalPropagation::FindAliasWires(
     return alias_wires;
 }
 
-std::vector<RTLIL::Wire*> BufferPropagation::FindSinkWiresForCellType(RTLIL::Wire* driver_wire,
+std::vector<RTLIL::Wire*> Propagation::FindSinkWiresForCellType(RTLIL::Wire* driver_wire,
                                              const std::string& cell_type, const std::string& cell_port) {
     std::vector<RTLIL::Wire*> wires;
     if (!driver_wire) {
@@ -69,7 +69,7 @@ std::vector<RTLIL::Wire*> BufferPropagation::FindSinkWiresForCellType2(RTLIL::Wi
     return top_module->selected_wires();
 }
 
-RTLIL::Cell* BufferPropagation::FindSinkCell(RTLIL::Wire* wire,
+RTLIL::Cell* Propagation::FindSinkCell(RTLIL::Wire* wire,
                                              const std::string& type) {
     RTLIL::Cell* sink_cell = NULL;
     if (!wire) {
@@ -92,7 +92,7 @@ RTLIL::Cell* BufferPropagation::FindSinkCell(RTLIL::Wire* wire,
     return sink_cell;
 }
 
-RTLIL::Wire* BufferPropagation::FindSinkWireOnPort(
+RTLIL::Wire* Propagation::FindSinkWireOnPort(
     RTLIL::Cell* cell, const std::string& port_name) {
     RTLIL::Wire* sink_wire = NULL;
     if (!cell) {

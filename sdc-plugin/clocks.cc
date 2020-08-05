@@ -83,6 +83,14 @@ void Clocks::Propagate(BufferPropagation* pass) {
     log("Finish buffer clock propagation\n");
 }
 
+void Clocks::Propagate(ClockDividerPropagation* pass) {
+    log("Start clock divider clock propagation\n");
+    for (auto& clock : clocks_) {
+	log("Processing clock %s\n", clock.first.c_str());
+    }
+    log("Finish clock divider clock propagation\n");
+}
+
 void Clocks::PropagateThroughBuffer(BufferPropagation* pass, decltype(clocks_)::value_type clock,
                                     Buffer buffer) {
     auto clock_wires = clock.second.GetClockWires();

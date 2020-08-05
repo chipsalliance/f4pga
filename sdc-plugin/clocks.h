@@ -27,6 +27,7 @@ USING_YOSYS_NAMESPACE
 
 class NaturalPropagation;
 class BufferPropagation;
+class ClockDividerPropagation;
 
 class ClockWire {
    public:
@@ -77,6 +78,7 @@ class Clocks {
     std::vector<std::string> GetClockNames();
     void Propagate(NaturalPropagation* pass);
     void Propagate(BufferPropagation* pass);
+    void Propagate(ClockDividerPropagation* pass);
 
    private:
     std::unordered_map<std::string, Clock> clocks_;
