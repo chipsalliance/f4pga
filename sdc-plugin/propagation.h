@@ -64,5 +64,7 @@ class ClockDividerPropagation : public Propagation {
         : Propagation(design, pass) {}
 
     void Run(Clocks& clocks) override { clocks.Propagate(this); }
+    std::vector<ClockWire> FindSinkWiresForCellType(ClockWire& driver_wire,
+                                             const std::string& cell_type, const std::string& cell_port);
 };
 #endif  // PROPAGATION_H_

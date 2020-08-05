@@ -37,6 +37,21 @@ std::vector<RTLIL::Wire*> NaturalPropagation::FindAliasWires(
     return alias_wires;
 }
 
+std::vector<ClockWire> ClockDividerPropagation::FindSinkWiresForCellType(ClockWire& driver_wire,
+                                             const std::string& cell_type, const std::string& cell_port) {
+    std::vector<ClockWire> wires;
+    //CLKOUT[0-5]_PERIOD = CLKIN1_PERIOD * CLKOUT[0-5]_DIVIDE / CLKFBOUT_MULT
+    /* auto cell = FindSinkCell(driver_wire, cell_type); */
+    /* RTLIL::Wire* wire = FindSinkWireOnPort(cell, cell_port); */
+    /* if (wire) { */
+	/* wires.push_back(wire); */
+	/* auto further_wires = FindSinkWiresForCellType(wire, cell_type, cell_port); */
+	/* std::copy(further_wires.begin(), further_wires.end(), */
+	          /* std::back_inserter(wires)); */
+    /* } */
+    return wires;
+}
+
 std::vector<RTLIL::Wire*> Propagation::FindSinkWiresForCellType(RTLIL::Wire* driver_wire,
                                              const std::string& cell_type, const std::string& cell_port) {
     std::vector<RTLIL::Wire*> wires;

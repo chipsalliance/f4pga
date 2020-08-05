@@ -18,11 +18,18 @@
 #ifndef _BUFFERS_H_
 #define _BUFFERS_H_
 
+#include <unordered_map>
+#include <initializer_list>
+#include <vector>
+#include <string>
+
 struct Buffer {
      Buffer(float delay, const std::string& name, const std::string& output) : delay(delay), name(name), output(output) {}
+     Buffer(float delay, const std::string& name, const std::initializer_list<std::string>& outputs) : delay(delay), name(name), outputs(outputs.begin(), outputs.end()) {}
      float delay;
      std::string name;
      std::string output;
+     std::vector<std::string> outputs;
 };
 
 struct IBuf : Buffer {
@@ -33,4 +40,7 @@ struct Bufg : Buffer {
     Bufg() : Buffer(1, "BUFG", "O") {};
 };
 
+struct Pll : Buffer {
+    Pll() : Buffer(1, "PLLE2_ADV", {"CLKOUT0", "CLKOUT1", "CLKOUT2", "CLKOUT3", "CLKOUT4", "CLKOUT5"}) {};
+};
 #endif  // _BUFFERS_H_

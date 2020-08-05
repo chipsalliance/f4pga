@@ -52,7 +52,10 @@ std::vector<std::string> Clocks::GetClockNames() {
 	// FIXME this is just for debugging
 	log("Wires in clock %s:\n", clock.first.c_str());
 	for (auto clock_wire : clock.second.GetClockWires()) {
-	    log("create_clock -period %f -name %s -waveform {%f %f} %s\n", clock_wire.Period(), clock.first.c_str(), clock_wire.RisingEdge(), clock_wire.FallingEdge(), clock_wire.Name().c_str());
+	    log("create_clock -period %f -name %s -waveform {%f %f} %s\n",
+	        clock_wire.Period(), clock.first.c_str(),
+	        clock_wire.RisingEdge(), clock_wire.FallingEdge(),
+	        clock_wire.Name().c_str());
 	}
 #endif
     }
@@ -87,11 +90,26 @@ void Clocks::Propagate(ClockDividerPropagation* pass) {
     log("Start clock divider clock propagation\n");
     for (auto& clock : clocks_) {
 	log("Processing clock %s\n", clock.first.c_str());
+	auto clock_wires = clock.second.GetClockWires();
+	for (auto clock_wire : clock_wires) {
+	    Pll pll;
+	    for (auto output : pll.outputs) {
+		auto pll_wires = pass->FindSinkWiresForCellType(
+		    clock_wire, "PLLE2_ADV", output);
+		for (auto wire : pll_wires) {
+		    log("%s wire on output %s: %s\n", pll.name.c_str(),
+		        output.c_str(), wire.Name().c_str());
+		    //CLKOUT[0-5]_PERIOD = CLKIN1_PERIOD * CLKOUT[0-5]_DIVIDE / CLKFBOUT_MULT
+		    //AddClockWire(wire);
+		}
+	    }
+	}
     }
     log("Finish clock divider clock propagation\n");
 }
 
-void Clocks::PropagateThroughBuffer(BufferPropagation* pass, decltype(clocks_)::value_type clock,
+void Clocks::PropagateThroughBuffer(BufferPropagation* pass,
+                                    decltype(clocks_)::value_type clock,
                                     Buffer buffer) {
     auto clock_wires = clock.second.GetClockWires();
     for (auto clock_wire : clock_wires) {
