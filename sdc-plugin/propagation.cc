@@ -38,17 +38,25 @@ std::vector<RTLIL::Wire*> NaturalPropagation::FindAliasWires(
 }
 
 std::vector<ClockWire> ClockDividerPropagation::FindSinkWiresForCellType(ClockWire& driver_wire,
-                                             const std::string& cell_type, const std::string& cell_port) {
+                                             const std::string& cell_type) {
     std::vector<ClockWire> wires;
+    auto cell = FindSinkCell(driver_wire.Wire(), cell_type);
+    if (!cell) {
+	return wires;
+    }
+    if (cell_type == "PLLE2_ADV") {
     //CLKOUT[0-5]_PERIOD = CLKIN1_PERIOD * CLKOUT[0-5]_DIVIDE / CLKFBOUT_MULT
-    /* auto cell = FindSinkCell(driver_wire, cell_type); */
-    /* RTLIL::Wire* wire = FindSinkWireOnPort(cell, cell_port); */
-    /* if (wire) { */
-	/* wires.push_back(wire); */
-	/* auto further_wires = FindSinkWiresForCellType(wire, cell_type, cell_port); */
-	/* std::copy(further_wires.begin(), further_wires.end(), */
-	          /* std::back_inserter(wires)); */
-    /* } */
+	Pll pll(cell);
+	log("c1: %f, c2: %f", pll.clkin1_period, pll.clkin2_period);
+	/* for (auto output : pll.outputs) { */
+	/*     RTLIL::Wire* wire = FindSinkWireOnPort(pll.cell, output); */
+	/*     if (wire) { */
+	/*     wires.push_back(wire); */
+	/*     auto further_wires = FindSinkWiresForCellType(wire, cell_type, cell_port); */
+	/*     std::copy(further_wires.begin(), further_wires.end(), */
+	/* 	    std::back_inserter(wires)); */
+	/* } */
+    }
     return wires;
 }
 

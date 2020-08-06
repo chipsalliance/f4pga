@@ -92,16 +92,10 @@ void Clocks::Propagate(ClockDividerPropagation* pass) {
 	log("Processing clock %s\n", clock.first.c_str());
 	auto clock_wires = clock.second.GetClockWires();
 	for (auto clock_wire : clock_wires) {
-	    Pll pll;
-	    for (auto output : pll.outputs) {
-		auto pll_wires = pass->FindSinkWiresForCellType(
-		    clock_wire, "PLLE2_ADV", output);
-		for (auto wire : pll_wires) {
-		    log("%s wire on output %s: %s\n", pll.name.c_str(),
-		        output.c_str(), wire.Name().c_str());
-		    //CLKOUT[0-5]_PERIOD = CLKIN1_PERIOD * CLKOUT[0-5]_DIVIDE / CLKFBOUT_MULT
-		    //AddClockWire(wire);
-		}
+	    auto pll_wires = pass->FindSinkWiresForCellType(
+		    clock_wire, "PLLE2_ADV");
+	    for (auto wire : pll_wires) {
+		//AddClockWire(wire);
 	    }
 	}
     }
