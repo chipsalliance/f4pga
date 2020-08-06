@@ -54,15 +54,40 @@ struct Pll {
 	    clkin2_period =
 	        std::stof(cell->getParam(ID(CLKIN2_PERIOD)).decode_string());
 	}
+	if (cell->hasParam(ID(CLKFBOUT_MULT))) {
+	    clk_mult = cell->getParam(ID(CLKFBOUT_MULT)).as_int();
+	}
+	if (cell->hasParam(ID(DIVCLK_DIVIDE))) {
+	    divclk_divisor = cell->getParam(ID(DIVCLK_DIVIDE)).as_int();
+	}
+	for (auto clk_output : outputs) {
+	    RTLIL::IdString param(RTLIL::escape_id(clk_output + "_DIVIDE"));
+	    if (cell->hasParam(param)) {
+		clkout_divisors[clk_output] = cell->getParam(param).as_int();
+	    } else {
+		clkout_divisors[clk_output] = 1;
+	    }
+	}
     };
+
+    // CLKOUT[0-5]_PERIOD = CLKIN1_PERIOD * CLKOUT[0-5]_DIVIDE * DIVCLK_DIVIDE /
+    // CLKFBOUT_MULT
+    // TODO Check the value on CLKINSEL
+    float CalculatePeriod(const std::string& output) {
+	return clkin1_period * clkout_divisors.at(output) / clk_mult *
+	       divclk_divisor;
+    }
 
     static const float delay;
     static const std::string name;
     static const std::vector<std::string> inputs;
     static const std::vector<std::string> outputs;
     RTLIL::Cell* cell;
-    float clkin1_period;
-    float clkin2_period;
+    float clkin1_period = 0;
+    float clkin2_period = 0;
+    std::unordered_map<std::string, int> clkout_divisors;
+    int divclk_divisor = 1;
+    int clk_mult = 5;
 };
 
 #endif  // _BUFFERS_H_

@@ -52,11 +52,11 @@ std::vector<ClockWire> ClockDividerPropagation::FindSinkClockWiresForCellType(Cl
 	    return wires;
 	}
 	Pll pll(cell);
-    //CLKOUT[0-5]_PERIOD = CLKIN1_PERIOD * CLKOUT[0-5]_DIVIDE / CLKFBOUT_MULT
 	for (auto output : Pll::outputs) {
 	    RTLIL::Wire* wire = FindSinkWireOnPort(cell, output);
 	    if (wire) {
-		ClockWire clock_wire(wire, 10, 0, 5);
+		float period(pll.CalculatePeriod(output));
+		ClockWire clock_wire(wire, period, 0, period / 2);
 		wires.push_back(clock_wire);
 		auto further_wires = FindSinkClockWiresForCellType(clock_wire, cell_type);
 		std::copy(further_wires.begin(), further_wires.end(),
