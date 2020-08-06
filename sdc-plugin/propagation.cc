@@ -40,22 +40,29 @@ std::vector<RTLIL::Wire*> NaturalPropagation::FindAliasWires(
 std::vector<ClockWire> ClockDividerPropagation::FindSinkWiresForCellType(ClockWire& driver_wire,
                                              const std::string& cell_type) {
     std::vector<ClockWire> wires;
-    auto cell = FindSinkCell(driver_wire.Wire(), cell_type);
-    if (!cell) {
-	return wires;
-    }
     if (cell_type == "PLLE2_ADV") {
-    //CLKOUT[0-5]_PERIOD = CLKIN1_PERIOD * CLKOUT[0-5]_DIVIDE / CLKFBOUT_MULT
+	RTLIL::Cell* cell;
+	for (auto input : Pll::inputs) {
+	    cell = FindSinkCellOnPort(driver_wire.Wire(), input);
+	    if (cell and RTLIL::unescape_id(cell->type) == cell_type) {
+		break;
+	    }
+	}
+	if (!cell) {
+	    return wires;
+	}
 	Pll pll(cell);
-	log("c1: %f, c2: %f", pll.clkin1_period, pll.clkin2_period);
-	/* for (auto output : pll.outputs) { */
-	/*     RTLIL::Wire* wire = FindSinkWireOnPort(pll.cell, output); */
-	/*     if (wire) { */
-	/*     wires.push_back(wire); */
-	/*     auto further_wires = FindSinkWiresForCellType(wire, cell_type, cell_port); */
-	/*     std::copy(further_wires.begin(), further_wires.end(), */
-	/* 	    std::back_inserter(wires)); */
-	/* } */
+    //CLKOUT[0-5]_PERIOD = CLKIN1_PERIOD * CLKOUT[0-5]_DIVIDE / CLKFBOUT_MULT
+	for (auto output : Pll::outputs) {
+	    RTLIL::Wire* wire = FindSinkWireOnPort(cell, output);
+	    if (wire) {
+		ClockWire clock_wire(wire, 10, 0, 2.5);
+		wires.push_back(clock_wire);
+		auto further_wires = FindSinkWiresForCellType(clock_wire, cell_type);
+		std::copy(further_wires.begin(), further_wires.end(),
+			std::back_inserter(wires));
+	    }
+	}
     }
     return wires;
 }
@@ -66,7 +73,7 @@ std::vector<RTLIL::Wire*> Propagation::FindSinkWiresForCellType(RTLIL::Wire* dri
     if (!driver_wire) {
 	return wires;
     }
-    auto cell = FindSinkCell(driver_wire, cell_type);
+    auto cell = FindSinkCellOfType(driver_wire, cell_type);
     RTLIL::Wire* wire = FindSinkWireOnPort(cell, cell_port);
     if (wire) {
 	wires.push_back(wire);
@@ -92,7 +99,7 @@ std::vector<RTLIL::Wire*> BufferPropagation::FindSinkWiresForCellType2(RTLIL::Wi
     return top_module->selected_wires();
 }
 
-RTLIL::Cell* Propagation::FindSinkCell(RTLIL::Wire* wire,
+RTLIL::Cell* Propagation::FindSinkCellOfType(RTLIL::Wire* wire,
                                              const std::string& type) {
     RTLIL::Cell* sink_cell = NULL;
     if (!wire) {
@@ -103,6 +110,29 @@ RTLIL::Cell* Propagation::FindSinkCell(RTLIL::Wire* wire,
     std::string base_selection =
         top_module->name.str() + "/w:" + wire->name.str();
     pass_->extra_args(std::vector<std::string>{base_selection, "%co:+" + type,
+                                               base_selection, "%d"},
+                      0, design_);
+    auto selected_cells = top_module->selected_cells();
+    // FIXME Handle more than one sink
+    assert(selected_cells.size() <= 1);
+    if (selected_cells.size() > 0) {
+	sink_cell = selected_cells.at(0);
+	log("Found sink cell: %s\n", sink_cell->name.c_str());
+    }
+    return sink_cell;
+}
+
+RTLIL::Cell* Propagation::FindSinkCellOnPort(RTLIL::Wire* wire,
+                                             const std::string& port) {
+    RTLIL::Cell* sink_cell;
+    if (!wire) {
+	return sink_cell;
+    }
+    RTLIL::Module* top_module = design_->top_module();
+    assert(top_module);
+    std::string base_selection =
+        top_module->name.str() + "/w:" + wire->name.str();
+    pass_->extra_args(std::vector<std::string>{base_selection, "%co:+[" + port +"]",
                                                base_selection, "%d"},
                       0, design_);
     auto selected_cells = top_module->selected_cells();

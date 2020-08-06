@@ -4,7 +4,7 @@ LDFLAGS = $(shell yosys-config --ldflags)
 LDLIBS = $(shell yosys-config --ldlibs)
 PLUGINS_DIR = $(shell yosys-config --datdir)/plugins
 
-OBJS = clocks.o propagation.o sdc.o
+OBJS = buffers.o clocks.o propagation.o sdc.o
 
 sdc.so: $(OBJS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared -o $@ $^ $(LDLIBS)

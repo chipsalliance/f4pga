@@ -18,11 +18,11 @@
 #ifndef _BUFFERS_H_
 #define _BUFFERS_H_
 
+#include <cassert>
 #include <initializer_list>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <cassert>
 #include "kernel/rtlil.h"
 
 USING_YOSYS_NAMESPACE
@@ -44,14 +44,7 @@ struct Bufg : Buffer {
 };
 
 struct Pll {
-    Pll(float delay, const std::string& name,
-        const std::initializer_list<std::string>& outputs)
-        : delay(delay), name(name), outputs(outputs.begin(), outputs.end()) {}
-    Pll(RTLIL::Cell* cell)
-        : Pll(1, "PLLE2_ADV",
-              {"CLKOUT0", "CLKOUT1", "CLKOUT2", "CLKOUT3", "CLKOUT4",
-               "CLKOUT5"})
-          {
+    Pll(RTLIL::Cell* cell) : cell(cell) {
 	assert(RTLIL::unescape_id(cell->type) == "PLLE2_ADV");
 	if (cell->hasParam(ID(CLKIN1_PERIOD))) {
 	    clkin1_period =
@@ -63,9 +56,10 @@ struct Pll {
 	}
     };
 
-    float delay;
-    std::string name;
-    std::vector<std::string> outputs;
+    static const float delay;
+    static const std::string name;
+    static const std::vector<std::string> inputs;
+    static const std::vector<std::string> outputs;
     RTLIL::Cell* cell;
     float clkin1_period;
     float clkin2_period;

@@ -36,7 +36,8 @@ class Propagation {
     RTLIL::Design* design_;
     Pass* pass_;
 
-    RTLIL::Cell* FindSinkCell(RTLIL::Wire* wire, const std::string& type);
+    RTLIL::Cell* FindSinkCellOfType(RTLIL::Wire* wire, const std::string& type);
+    RTLIL::Cell* FindSinkCellOnPort(RTLIL::Wire* wire, const std::string& port);
     RTLIL::Wire* FindSinkWireOnPort(RTLIL::Cell* cell,
                                     const std::string& port_name);
 };
