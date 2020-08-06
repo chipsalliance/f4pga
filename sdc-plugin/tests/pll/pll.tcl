@@ -15,6 +15,8 @@ synth_xilinx -vpr -flatten -abc9 -nosrl -nodsp -iopad -run prepare:check
 #Read the design timing constraints
 set ::env(INPUT_SDC_FILE) pll.sdc
 read_sdc $::env(INPUT_SDC_FILE)
+propagate_clocks
+get_clocks
 #return
 #
 ##Read the design constraints
