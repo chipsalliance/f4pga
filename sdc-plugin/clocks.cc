@@ -44,6 +44,10 @@ void Clocks::AddClockWire(const std::string& name, RTLIL::Wire* wire,
     clock->second.AddClockWire(wire, period, rising_edge, falling_edge);
 }
 
+void Clocks::AddClockWire(const std::string& name, ClockWire& clock_wire) {
+    AddClockWire(name, clock_wire.Wire(), clock_wire.Period(), clock_wire.RisingEdge(), clock_wire.FallingEdge());
+}
+
 std::vector<std::string> Clocks::GetClockNames() {
     std::vector<std::string> res;
     for (auto clock : clocks_) {
@@ -92,10 +96,11 @@ void Clocks::Propagate(ClockDividerPropagation* pass) {
 	log("Processing clock %s\n", clock.first.c_str());
 	auto clock_wires = clock.second.GetClockWires();
 	for (auto clock_wire : clock_wires) {
-	    auto pll_wires = pass->FindSinkWiresForCellType(
+	    auto pll_clock_wires = pass->FindSinkClockWiresForCellType(
 		    clock_wire, "PLLE2_ADV");
-	    for (auto wire : pll_wires) {
-		//AddClockWire(wire);
+	    for (auto pll_clock_wire : pll_clock_wires) {
+		log("PLL wire: %s\n", pll_clock_wire.Name().c_str());
+		AddClockWire(clock.first, pll_clock_wire);
 	    }
 	}
     }

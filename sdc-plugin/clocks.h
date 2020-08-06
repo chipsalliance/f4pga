@@ -75,6 +75,7 @@ class Clocks {
     void AddClockWire(const std::string& name, RTLIL::Wire* wire, float period);
     void AddClockWire(const std::string& name, RTLIL::Wire* wire, float period,
                       float rising_edge, float falling_edge);
+    void AddClockWire(const std::string& name, ClockWire& clock_wire);
     std::vector<std::string> GetClockNames();
     void Propagate(NaturalPropagation* pass);
     void Propagate(BufferPropagation* pass);
