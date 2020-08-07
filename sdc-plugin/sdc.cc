@@ -43,6 +43,7 @@ struct ReadSdcCmd : public Frontend {
 	if (args.size() < 2) {
 	    log_cmd_error("Missing script file.\n");
 	}
+	log("\nReading clock constraints file(SDC)\n\n");
 	size_t argidx = 1;
 	extra_args(f, filename, args, argidx);
 	std::string content{std::istreambuf_iterator<char>(*f),
@@ -120,7 +121,9 @@ struct CreateClockCmd : public Pass {
 	    }
 	    for (auto wire : module->wires()) {
 		if (design->selected(module, wire)) {
-		    log("Selected wire %s\n", wire->name.c_str());
+#ifdef SDC_DEBUG
+		    log("Selected wire %s\n", RTLIL::unescape_id(wire->name).c_str());
+#endif
 		    selected_wires.push_back(wire);
 		}
 	    }
@@ -129,11 +132,11 @@ struct CreateClockCmd : public Pass {
 	    log_cmd_error("Target selection is empty\n");
 	}
 	if (name.empty()) {
-	    name = selected_wires.at(0)->name.str();
+	    name = RTLIL::unescape_id(selected_wires.at(0)->name);
 	}
 	clocks_.AddClockWires(name, selected_wires, period, rising_edge,
 	                      falling_edge);
-	log("Created clock %s with period %f, waveform %f,%f\n", name.c_str(),
+	log("Created clock %s with period %f, waveform {%f %f}\n", name.c_str(),
 	    period, rising_edge, falling_edge);
     }
 
