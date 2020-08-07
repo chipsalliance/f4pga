@@ -59,7 +59,7 @@ std::vector<std::string> Clocks::GetClockNames() {
 	    log("create_clock -period %f -name %s -waveform {%f %f} %s\n",
 	        clock_wire.Period(), clock.first.c_str(),
 	        clock_wire.RisingEdge(), clock_wire.FallingEdge(),
-	        clock_wire.Name().c_str());
+	        clock_wire.WireName().c_str());
 	}
 #endif
     }
@@ -99,8 +99,8 @@ void Clocks::Propagate(ClockDividerPropagation* pass) {
 	    auto pll_clock_wires = pass->FindSinkClockWiresForCellType(
 		    clock_wire, "PLLE2_ADV");
 	    for (auto pll_clock_wire : pll_clock_wires) {
-		log("PLL wire: %s\n", pll_clock_wire.Name().c_str());
-		AddClockWire(clock.first, pll_clock_wire);
+		log("PLL wire: %s\n", pll_clock_wire.WireName().c_str());
+		AddClockWire(pll_clock_wire.WireName(), pll_clock_wire);
 	    }
 	}
     }
@@ -118,7 +118,7 @@ void Clocks::PropagateThroughBuffer(BufferPropagation* pass,
 	for (auto wire : buf_wires) {
 	    log("%s wire: %s\n", buffer.name.c_str(), wire->name.c_str());
 	    path_delay += buffer.delay;
-	    AddClockWire(clock.first, wire, clock_wire.Period(),
+	    AddClockWire(wire->name.str(), wire, clock_wire.Period(),
 	                 clock_wire.RisingEdge() + path_delay,
 	                 clock_wire.FallingEdge() + path_delay);
 	}
