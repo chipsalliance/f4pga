@@ -30,18 +30,13 @@ void Clocks::AddClockWires(const std::string& name,
 }
 
 void Clocks::AddClockWire(const std::string& name, RTLIL::Wire* wire,
-                          float period) {
-    // Set default duty cycle 50%
-    AddClockWire(name, wire, period, 0, period / 2);
-}
-
-void Clocks::AddClockWire(const std::string& name, RTLIL::Wire* wire,
                           float period, float rising_edge, float falling_edge) {
     auto clock = clocks_.find(name);
     if (clock == clocks_.end()) {
-	clock = clocks_.emplace(std::make_pair(name, Clock(name))).first;
+	clocks_.emplace(std::make_pair(name, Clock(name, wire, period, rising_edge, falling_edge)));
+    } else {
+    	clock->second.AddClockWire(wire, period, rising_edge, falling_edge);
     }
-    clock->second.AddClockWire(wire, period, rising_edge, falling_edge);
 }
 
 void Clocks::AddClockWire(const std::string& name, ClockWire& clock_wire) {
@@ -148,7 +143,7 @@ void Clocks::PropagateThroughBuffer(BufferPropagation* pass,
 
 Clock::Clock(const std::string& name, RTLIL::Wire* wire, float period,
              float rising_edge, float falling_edge)
-    : Clock(name) {
+    : name_(name) {
     AddClockWire(wire, period, rising_edge, falling_edge);
 }
 

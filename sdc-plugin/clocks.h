@@ -54,7 +54,6 @@ class ClockWire {
 
 class Clock {
    public:
-    Clock(const std::string& name) : name_(name) {}
     Clock(const std::string& name, RTLIL::Wire* wire, float period,
           float rising_edge, float falling_edge);
     void AddClockWire(RTLIL::Wire* wire, float period, float rising_edge,
@@ -72,7 +71,6 @@ class Clocks {
     void AddClockWires(const std::string& name,
                        const std::vector<RTLIL::Wire*>& wires, float period,
                        float rising_edge, float falling_edge);
-    void AddClockWire(const std::string& name, RTLIL::Wire* wire, float period);
     void AddClockWire(const std::string& name, RTLIL::Wire* wire, float period,
                       float rising_edge, float falling_edge);
     void AddClockWire(const std::string& name, ClockWire& clock_wire);
