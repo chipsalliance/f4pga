@@ -85,7 +85,9 @@ RTLIL::Cell* Propagation::FindSinkCellOfType(RTLIL::Wire* wire,
     assert(selected_cells.size() <= 1);
     if (selected_cells.size() > 0) {
 	sink_cell = selected_cells.at(0);
+#ifdef SDC_DEBUG
 	log("Found sink cell: %s\n", sink_cell->name.c_str());
+#endif
     }
     return sink_cell;
 }
@@ -125,7 +127,9 @@ RTLIL::Cell* Propagation::FindSinkCellOnPort(RTLIL::Wire* wire,
     assert(selected_cells.size() <= 1);
     if (selected_cells.size() > 0) {
 	sink_cell = selected_cells.at(0);
+#ifdef SDC_DEBUG
 	log("Found sink cell: %s\n", sink_cell->name.c_str());
+#endif
     }
     return sink_cell;
 }
@@ -149,7 +153,9 @@ RTLIL::Wire* Propagation::FindSinkWireOnPort(
     assert(selected_wires.size() <= 1);
     if (selected_wires.size() > 0) {
 	sink_wire = selected_wires.at(0);
+#ifdef SDC_DEBUG
 	log("Found sink wire: %s\n", sink_wire->name.c_str());
+#endif
     }
     return sink_wire;
 }

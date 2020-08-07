@@ -53,7 +53,6 @@ std::vector<std::string> Clocks::GetClockNames() {
     for (auto clock : clocks_) {
 	res.push_back(clock.first);
 #ifdef SDC_DEBUG
-	// FIXME this is just for debugging
 	log("Wires in clock %s:\n", clock.first.c_str());
 	for (auto clock_wire : clock.second.GetClockWires()) {
 	    log("create_clock -period %f -name %s -waveform {%f %f} %s\n",
@@ -67,9 +66,13 @@ std::vector<std::string> Clocks::GetClockNames() {
 }
 
 void Clocks::Propagate(NaturalPropagation* pass) {
+#ifdef SDC_DEBUG
     log("Start natural clock propagation\n");
+#endif
     for (auto clock : clocks_) {
+#ifdef SDC_DEBUG
 	log("Processing clock %s\n", clock.first.c_str());
+#endif
 	auto clock_wires = clock.second.GetClockWires();
 	for (auto clock_wire : clock_wires) {
 	    auto aliases = pass->FindAliasWires(clock_wire.Wire());
@@ -77,34 +80,50 @@ void Clocks::Propagate(NaturalPropagation* pass) {
 	                  clock_wire.RisingEdge(), clock_wire.FallingEdge());
 	}
     }
-    log("Finish natural clock propagation\n");
+#ifdef SDC_DEBUG
+    log("Finish natural clock propagation\n\n");
+#endif
 }
 
 void Clocks::Propagate(BufferPropagation* pass) {
+#ifdef SDC_DEBUG
     log("Start buffer clock propagation\n");
+#endif
     for (auto& clock : clocks_) {
+#ifdef SDC_DEBUG
 	log("Processing clock %s\n", clock.first.c_str());
+#endif
 	PropagateThroughBuffer(pass, clock, IBuf());
 	PropagateThroughBuffer(pass, clock, Bufg());
     }
-    log("Finish buffer clock propagation\n");
+#ifdef SDC_DEBUG
+    log("Finish buffer clock propagation\n\n");
+#endif
 }
 
 void Clocks::Propagate(ClockDividerPropagation* pass) {
+#ifdef SDC_DEBUG
     log("Start clock divider clock propagation\n");
+#endif
     for (auto& clock : clocks_) {
+#ifdef SDC_DEBUG
 	log("Processing clock %s\n", clock.first.c_str());
+#endif
 	auto clock_wires = clock.second.GetClockWires();
 	for (auto clock_wire : clock_wires) {
 	    auto pll_clock_wires = pass->FindSinkClockWiresForCellType(
 		    clock_wire, "PLLE2_ADV");
 	    for (auto pll_clock_wire : pll_clock_wires) {
+#ifdef SDC_DEBUG
 		log("PLL wire: %s\n", pll_clock_wire.WireName().c_str());
+#endif
 		AddClockWire(pll_clock_wire.WireName(), pll_clock_wire);
 	    }
 	}
     }
-    log("Finish clock divider clock propagation\n");
+#ifdef SDC_DEBUG
+    log("Finish clock divider clock propagation\n\n");
+#endif
 }
 
 void Clocks::PropagateThroughBuffer(BufferPropagation* pass,
@@ -116,7 +135,9 @@ void Clocks::PropagateThroughBuffer(BufferPropagation* pass,
 	    clock_wire.Wire(), buffer.name, buffer.output);
 	int path_delay(0);
 	for (auto wire : buf_wires) {
+#ifdef SDC_DEBUG
 	    log("%s wire: %s\n", buffer.name.c_str(), wire->name.c_str());
+#endif
 	    path_delay += buffer.delay;
 	    AddClockWire(wire->name.str(), wire, clock_wire.Period(),
 	                 clock_wire.RisingEdge() + path_delay,
