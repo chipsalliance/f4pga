@@ -78,6 +78,7 @@ class Clocks {
     void Propagate(NaturalPropagation* pass);
     void Propagate(BufferPropagation* pass);
     void Propagate(ClockDividerPropagation* pass);
+    void WriteSdc(std::ostream& file);
 
    private:
     std::unordered_map<std::string, Clock> clocks_;

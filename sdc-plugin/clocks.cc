@@ -141,6 +141,23 @@ void Clocks::PropagateThroughBuffer(BufferPropagation* pass,
     }
 }
 
+void Clocks::WriteSdc(std::ostream& file) {
+    for (auto& clock : clocks_) {
+	auto clock_wires = clock.second.GetClockWires();
+	file << "create_clock";
+	for (auto clock_wire : clock_wires) {
+	   file << " -period " << clock_wire.Period();
+	   if (clock_wires.size() > 1) {
+	       file << " -name " << clock.first;
+	   }
+	}
+	    /* log("create_clock -period %f -name %s -waveform {%f %f} %s\n", */
+	    /*     clock_wire.Period(), clock.first.c_str(), */
+	    /*     clock_wire.RisingEdge(), clock_wire.FallingEdge(), */
+	    /*     clock_wire.WireName().c_str()); */
+    }
+}
+
 Clock::Clock(const std::string& name, RTLIL::Wire* wire, float period,
              float rising_edge, float falling_edge)
     : name_(name) {

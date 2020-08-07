@@ -30,7 +30,6 @@ struct ReadSdcCmd : public Frontend {
     ReadSdcCmd() : Frontend("sdc", "Read SDC file") {}
 
     void help() override {
-	//   |---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|
 	log("\n");
 	log("    read_sdc <filename>\n");
 	log("\n");
@@ -55,6 +54,31 @@ struct ReadSdcCmd : public Frontend {
 	                  Tcl_GetStringResult(interp));
 	}
     }
+};
+
+struct WriteSdcCmd : public Backend {
+    WriteSdcCmd(Clocks& clocks)
+        : Backend("sdc", "Write SDC file"), clocks_(clocks) {}
+
+    void help() override {
+	log("\n");
+	log("    write_sdc <filename>\n");
+	log("\n");
+	log("Write SDC file.\n");
+	log("\n");
+    }
+
+    void execute(std::ostream*& f, std::string filename,
+                 std::vector<std::string> args, RTLIL::Design*) override {
+	if (args.size() < 2) {
+	    log_cmd_error("Missing output file.\n");
+	}
+	log("\nWriting out clock constraints file(SDC)\n\n");
+	extra_args(f, filename, args, 1);
+	clocks_.WriteSdc(*f);
+    }
+
+    Clocks& clocks_;
 };
 
 struct CreateClockCmd : public Pass {
@@ -215,13 +239,15 @@ struct PropagateClocksCmd : public Pass {
 class SdcPlugin {
    public:
     SdcPlugin()
-        : create_clock_cmd_(clocks_),
+        : write_sdc_cmd_(clocks_),
+	  create_clock_cmd_(clocks_),
           get_clocks_cmd_(clocks_),
           propagate_clocks_cmd_(clocks_) {
 	log("Loaded SDC plugin\n");
     }
 
     ReadSdcCmd read_sdc_cmd_;
+    WriteSdcCmd write_sdc_cmd_;
     CreateClockCmd create_clock_cmd_;
     GetClocksCmd get_clocks_cmd_;
     PropagateClocksCmd propagate_clocks_cmd_;
