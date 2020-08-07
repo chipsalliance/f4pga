@@ -73,7 +73,7 @@ struct WriteSdcCmd : public Backend {
 	if (args.size() < 2) {
 	    log_cmd_error("Missing output file.\n");
 	}
-	log("\nWriting out clock constraints file(SDC)\n\n");
+	log("\nWriting out clock constraints file(SDC)\n");
 	extra_args(f, filename, args, 1);
 	clocks_.WriteSdc(*f);
     }
@@ -158,7 +158,7 @@ struct CreateClockCmd : public Pass {
 	if (name.empty()) {
 	    name = RTLIL::unescape_id(selected_wires.at(0)->name);
 	}
-	clocks_.AddClockWires(name, selected_wires, period, rising_edge,
+	clocks_.AddClock(name, selected_wires, period, rising_edge,
 	                      falling_edge);
 	log("Created clock %s with period %f, waveform {%f %f}\n", name.c_str(),
 	    period, rising_edge, falling_edge);

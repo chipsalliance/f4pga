@@ -21,8 +21,29 @@
 #include "kernel/register.h"
 #include "propagation.h"
 
+void Clocks::AddClock(const std::string& name,
+                           std::vector<RTLIL::Wire*> wires, float period,
+                           float rising_edge, float falling_edge) {
+    AddClockWires(name, wires, period, rising_edge, falling_edge);
+}
+
+void Clocks::AddClock(const std::string& name,
+                           RTLIL::Wire* wire, float period,
+                           float rising_edge, float falling_edge) {
+    auto clock = std::find_if(clocks_.begin(), clocks_.end(), [&](Clock& clock) { return clock.Name() == name; });
+    if (clock != clocks_.end()) {
+	log("Clock %s already exists and will be overwritten\n", name.c_str());
+	clocks_.erase(clock);
+    }
+    clocks_.emplace_back(name, wire, period, rising_edge, falling_edge);
+}
+
+void Clocks::AddClock(Clock& clock) {
+    AddClock(clock.Name(), clock.GetClockWires(), clock.Period(), clock.RisingEdge(), clock.FallingEdge());
+}
+
 void Clocks::AddClockWires(const std::string& name,
-                           const std::vector<RTLIL::Wire*>& wires, float period,
+                           std::vector<RTLIL::Wire*> wires, float period,
                            float rising_edge, float falling_edge) {
     std::for_each(wires.begin(), wires.end(), [&, this](RTLIL::Wire* wire) {
 	AddClockWire(name, wire, period, rising_edge, falling_edge);
@@ -31,32 +52,28 @@ void Clocks::AddClockWires(const std::string& name,
 
 void Clocks::AddClockWire(const std::string& name, RTLIL::Wire* wire,
                           float period, float rising_edge, float falling_edge) {
-    auto clock = clocks_.find(name);
+    auto clock = std::find_if(clocks_.begin(), clocks_.end(), [&](Clock& clock) { return clock.Name() == name; });
     if (clock == clocks_.end()) {
-	clocks_.emplace(std::make_pair(name, Clock(name, wire, period, rising_edge, falling_edge)));
+	AddClock(name, wire, period, rising_edge, falling_edge);
     } else {
-    	clock->second.AddClockWire(wire, period, rising_edge, falling_edge);
+    	clock->AddWire(wire);
     }
-}
-
-void Clocks::AddClockWire(const std::string& name, ClockWire& clock_wire) {
-    AddClockWire(name, clock_wire.Wire(), clock_wire.Period(), clock_wire.RisingEdge(), clock_wire.FallingEdge());
 }
 
 std::vector<std::string> Clocks::GetClockNames() {
     std::vector<std::string> res;
     for (auto clock : clocks_) {
-	res.push_back(clock.first);
+	res.push_back(clock.Name());
 #ifdef SDC_DEBUG
-	log("Wires in clock %s:\n", clock.first.c_str());
-	for (auto clock_wire : clock.second.GetClockWires()) {
-	    log("create_clock -period %f -name %s -waveform {%f %f} %s\n",
-	        clock_wire.Period(), clock.first.c_str(),
-	        clock_wire.RisingEdge(), clock_wire.FallingEdge(),
-	        clock_wire.WireName().c_str());
+	std::stringstream ss;
+	for (auto clock_wire : clock.GetClockWires()) {
+	    ss << RTLIL::unescape_id(clock_wire->name) << " ";
 	}
-#endif
+	log("create_clock -period %f -name %s -waveform {%f %f} %s\n",
+	        clock.Period(), clock.Name().c_str(),
+	        clock.RisingEdge(), clock.FallingEdge(), ss.str().c_str());
     }
+#endif
     return res;
 }
 
@@ -66,13 +83,13 @@ void Clocks::Propagate(NaturalPropagation* pass) {
 #endif
     for (auto clock : clocks_) {
 #ifdef SDC_DEBUG
-	log("Processing clock %s\n", clock.first.c_str());
+	log("Processing clock %s\n", clock.Name().c_str());
 #endif
-	auto clock_wires = clock.second.GetClockWires();
+	auto clock_wires = clock.GetClockWires();
 	for (auto clock_wire : clock_wires) {
-	    auto aliases = pass->FindAliasWires(clock_wire.Wire());
-	    AddClockWires(clock.first, aliases, clock_wire.Period(),
-	                  clock_wire.RisingEdge(), clock_wire.FallingEdge());
+	    auto aliases = pass->FindAliasWires(clock_wire);
+	    AddClockWires(clock.Name(), aliases, clock.Period(),
+	                  clock.RisingEdge(), clock.FallingEdge());
 	}
     }
 #ifdef SDC_DEBUG
@@ -84,9 +101,9 @@ void Clocks::Propagate(BufferPropagation* pass) {
 #ifdef SDC_DEBUG
     log("Start buffer clock propagation\n");
 #endif
-    for (auto& clock : clocks_) {
+    for (auto clock : clocks_) {
 #ifdef SDC_DEBUG
-	log("Processing clock %s\n", clock.first.c_str());
+	log("Processing clock %s\n", clock.Name().c_str());
 #endif
 	PropagateThroughBuffer(pass, clock, IBuf());
 	PropagateThroughBuffer(pass, clock, Bufg());
@@ -100,19 +117,19 @@ void Clocks::Propagate(ClockDividerPropagation* pass) {
 #ifdef SDC_DEBUG
     log("Start clock divider clock propagation\n");
 #endif
-    for (auto& clock : clocks_) {
+    for (auto clock : clocks_) {
 #ifdef SDC_DEBUG
-	log("Processing clock %s\n", clock.first.c_str());
+	log("Processing clock %s\n", clock.Name().c_str());
 #endif
-	auto clock_wires = clock.second.GetClockWires();
+	auto clock_wires = clock.GetClockWires();
 	for (auto clock_wire : clock_wires) {
-	    auto pll_clock_wires = pass->FindSinkClockWiresForCellType(
+	    auto pll_clocks = pass->FindSinkClocksForCellType(
 		    clock_wire, "PLLE2_ADV");
-	    for (auto pll_clock_wire : pll_clock_wires) {
+	    for (auto pll_clock : pll_clocks) {
 #ifdef SDC_DEBUG
-		log("PLL wire: %s\n", pll_clock_wire.WireName().c_str());
+		log("PLL clock: %s\n", pll_clock.Name().c_str());
 #endif
-		AddClockWire(pll_clock_wire.WireName(), pll_clock_wire);
+		AddClock(pll_clock);
 	    }
 	}
     }
@@ -122,68 +139,76 @@ void Clocks::Propagate(ClockDividerPropagation* pass) {
 }
 
 void Clocks::PropagateThroughBuffer(BufferPropagation* pass,
-                                    decltype(clocks_)::value_type clock,
+                                    Clock& clock,
                                     Buffer buffer) {
-    auto clock_wires = clock.second.GetClockWires();
+    auto clock_wires = clock.GetClockWires();
     for (auto clock_wire : clock_wires) {
+	log("%s\n", clock_wire->name.c_str());
 	auto buf_wires = pass->FindSinkWiresForCellType(
-	    clock_wire.Wire(), buffer.name, buffer.output);
+	    clock_wire, buffer.name, buffer.output);
 	int path_delay(0);
 	for (auto wire : buf_wires) {
 #ifdef SDC_DEBUG
-	    log("%s wire: %s\n", buffer.name.c_str(), wire->name.c_str());
+	    log("%s wire: %s\n", buffer.name.c_str(), RTLIL::unescape_id(wire->name).c_str());
 #endif
 	    path_delay += buffer.delay;
-	    AddClockWire(wire->name.str(), wire, clock_wire.Period(),
-	                 clock_wire.RisingEdge() + path_delay,
-	                 clock_wire.FallingEdge() + path_delay);
+	    AddClock(RTLIL::unescape_id(wire->name), wire, clock.Period(),
+	                 clock.RisingEdge() + path_delay,
+	                 clock.FallingEdge() + path_delay);
 	}
     }
 }
 
 void Clocks::WriteSdc(std::ostream& file) {
     for (auto& clock : clocks_) {
-	auto clock_wires = clock.second.GetClockWires();
-	file << "create_clock";
-	for (auto clock_wire : clock_wires) {
-	   file << " -period " << clock_wire.Period();
-	   if (clock_wires.size() > 1) {
-	       file << " -name " << clock.first;
-	   }
+	auto clock_wires = clock.GetClockWires();
+	file << "create_clock -period " << clock.Period();
+	if (clock_wires.size() > 1) {
+	    file << " -name " << clock.Name();
 	}
-	    /* log("create_clock -period %f -name %s -waveform {%f %f} %s\n", */
-	    /*     clock_wire.Period(), clock.first.c_str(), */
-	    /*     clock_wire.RisingEdge(), clock_wire.FallingEdge(), */
-	    /*     clock_wire.WireName().c_str()); */
+	file << " -waveform {" << clock.RisingEdge() << " " << clock.FallingEdge() << "}";
+	for (auto clock_wire : clock_wires) {
+	   file << " " << RTLIL::unescape_id(clock_wire->name) << std::endl;
+	}
     }
 }
 
 Clock::Clock(const std::string& name, RTLIL::Wire* wire, float period,
              float rising_edge, float falling_edge)
-    : name_(name) {
-    AddClockWire(wire, period, rising_edge, falling_edge);
+    : name_(name),
+      period_(period),
+      rising_edge_(rising_edge),
+      falling_edge_(falling_edge) {
+    AddWire(wire);
 }
 
-void Clock::AddClockWire(RTLIL::Wire* wire, float period, float rising_edge,
-                         float falling_edge) {
-    auto clock_wire = std::find_if(
+Clock::Clock(const std::string& name, std::vector<RTLIL::Wire*> wires,
+             float period, float rising_edge, float falling_edge)
+    : name_(name),
+      period_(period),
+      rising_edge_(rising_edge),
+      falling_edge_(falling_edge) {
+    std::for_each(wires.begin(), wires.end(), [&, this](RTLIL::Wire* wire) {
+	AddWire(wire);
+    });
+}
+
+void Clock::AddWire(RTLIL::Wire* wire) {
+    auto clock_wire = std::find(
         clock_wires_.begin(), clock_wires_.end(),
-        [wire](ClockWire& clock_wire) { return clock_wire.Wire() == wire; });
+        wire);
     if (clock_wire == clock_wires_.end()) {
-	clock_wires_.emplace_back(wire, period, rising_edge, falling_edge);
-    } else {
-	clock_wire->UpdatePeriod(period);
-	clock_wire->UpdateWaveform(rising_edge, falling_edge);
+	clock_wires_.push_back(wire);
     }
 }
 
-void ClockWire::UpdatePeriod(float period) {
+void Clock::UpdatePeriod(float period) {
     period_ = period;
     rising_edge_ = 0;
     falling_edge_ = period / 2;
 }
 
-void ClockWire::UpdateWaveform(float rising_edge, float falling_edge) {
+void Clock::UpdateWaveform(float rising_edge, float falling_edge) {
     rising_edge_ = rising_edge;
     falling_edge_ = falling_edge;
     assert(falling_edge - rising_edge == period_ / 2);

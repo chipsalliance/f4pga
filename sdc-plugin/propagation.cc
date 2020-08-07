@@ -37,34 +37,34 @@ std::vector<RTLIL::Wire*> NaturalPropagation::FindAliasWires(
     return alias_wires;
 }
 
-std::vector<ClockWire> ClockDividerPropagation::FindSinkClockWiresForCellType(ClockWire& driver_wire,
+std::vector<Clock> ClockDividerPropagation::FindSinkClocksForCellType(RTLIL::Wire* driver_wire,
                                              const std::string& cell_type) {
-    std::vector<ClockWire> wires;
+    std::vector<Clock> clocks;
     if (cell_type == "PLLE2_ADV") {
 	RTLIL::Cell* cell = NULL;
 	for (auto input : Pll::inputs) {
-	    cell = FindSinkCellOnPort(driver_wire.Wire(), input);
+	    cell = FindSinkCellOnPort(driver_wire, input);
 	    if (cell and RTLIL::unescape_id(cell->type) == cell_type) {
 		break;
 	    }
 	}
 	if (!cell) {
-	    return wires;
+	    return clocks;
 	}
 	Pll pll(cell);
 	for (auto output : Pll::outputs) {
 	    RTLIL::Wire* wire = FindSinkWireOnPort(cell, output);
 	    if (wire) {
 		float period(pll.CalculatePeriod(output));
-		ClockWire clock_wire(wire, period, 0, period / 2);
-		wires.push_back(clock_wire);
-		auto further_wires = FindSinkClockWiresForCellType(clock_wire, cell_type);
-		std::copy(further_wires.begin(), further_wires.end(),
-			std::back_inserter(wires));
+		Clock clock(RTLIL::unescape_id(wire->name), wire, period, 0, period / 2);
+		clocks.push_back(clock);
+		auto further_clocks = FindSinkClocksForCellType(wire, cell_type);
+		std::copy(further_clocks.begin(), further_clocks.end(),
+			std::back_inserter(clocks));
 	    }
 	}
     }
-    return wires;
+    return clocks;
 }
 
 RTLIL::Cell* Propagation::FindSinkCellOfType(RTLIL::Wire* wire,
@@ -86,7 +86,7 @@ RTLIL::Cell* Propagation::FindSinkCellOfType(RTLIL::Wire* wire,
     if (selected_cells.size() > 0) {
 	sink_cell = selected_cells.at(0);
 #ifdef SDC_DEBUG
-	log("Found sink cell: %s\n", sink_cell->name.c_str());
+	log("Found sink cell: %s\n", RTLIL::unescape_id(sink_cell->name).c_str());
 #endif
     }
     return sink_cell;
@@ -128,7 +128,7 @@ RTLIL::Cell* Propagation::FindSinkCellOnPort(RTLIL::Wire* wire,
     if (selected_cells.size() > 0) {
 	sink_cell = selected_cells.at(0);
 #ifdef SDC_DEBUG
-	log("Found sink cell: %s\n", sink_cell->name.c_str());
+	log("Found sink cell: %s\n", RTLIL::unescape_id(sink_cell->name).c_str());
 #endif
     }
     return sink_cell;
@@ -154,7 +154,7 @@ RTLIL::Wire* Propagation::FindSinkWireOnPort(
     if (selected_wires.size() > 0) {
 	sink_wire = selected_wires.at(0);
 #ifdef SDC_DEBUG
-	log("Found sink wire: %s\n", sink_wire->name.c_str());
+	log("Found sink wire: %s\n", RTLIL::unescape_id(sink_wire->name).c_str());
 #endif
     }
     return sink_wire;
