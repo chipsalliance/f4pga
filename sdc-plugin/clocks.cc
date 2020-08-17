@@ -168,8 +168,9 @@ void Clocks::WriteSdc(std::ostream& file) {
 	}
 	file << " -waveform {" << clock.RisingEdge() << " " << clock.FallingEdge() << "}";
 	for (auto clock_wire : clock_wires) {
-	   file << " " << RTLIL::unescape_id(clock_wire->name) << std::endl;
+	   file << " " << RTLIL::unescape_id(clock_wire->name);
 	}
+	file << std::endl;
     }
 }
 
