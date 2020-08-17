@@ -1,15 +1,14 @@
-TESTS = base_litex counter pll
+TESTS = counter pll
+.PHONY: $(TESTS)
 
-base_litex_verify = $(call compare_json,base_litex)
-counter_verify = $(call compare_json,counter)
-pll_verify = $(call compare_json,pll)
+counter_verify = $(call compare,counter,sdc) && $(call compare,counter,txt)
+pll_verify = $(call compare,pll,sdc)
 
 all: $(TESTS)
-
-compare_json = python compare_output_json.py --json $(1)/$(1).json --golden $(1)/$(1).golden.json
+compare = diff $(1)/$(1).golden.$(2) $(1)/$(1).$(2)
 
 define test_tpl =
-$(1): $(1)/$(1).json
+$(1): $(1)/$(1).sdc
 	$$($(1)_verify)
 	RETVAL=$$$$? ; \
 	if [ $$$$RETVAL -eq 0 ]; then \
@@ -20,24 +19,15 @@ $(1): $(1)/$(1).json
 		false; \
 	fi
 
-$(1)/$(1).json: $(1)/$(1).v
+$(1)/$(1).sdc: $(1)/$(1).v
 	cd $(1); \
-	PART_JSON=../xc7a35tcsg324-1.json \
-	OUT_JSON=$(1).json \
-	OUT_EBLIF=$(1).eblif \
-	INPUT_XDC_FILE=$(1).xdc \
-	INPUT_SDC_FILE=$(1).sdc \
+	INPUT_SDC_FILE=$(1).input.sdc \
+	OUTPUT_SDC_FILE=$(1).sdc \
 	yosys -p "tcl $(1).tcl" -l yosys.log
-
-update_$(1): $(1)/$(1).json
-	@python compare_output_json.py --json $$< --golden $(1)/$(1).golden.json --update
 
 endef
 
 $(foreach test,$(TESTS),$(eval $(call test_tpl,$(test))))
 
-update: $(foreach test,$(TESTS),update_$(test))
-
-
 clean:
-	rm -rf $(foreach test,$(TESTS),$(test)/$(test).json $(test)/$(test).eblif $(test)/$(test).txt $(test)/yosys.log)
+	rm -rf $(foreach test,$(TESTS),$(test)/$(test).sdc $(test)/$(test).txt $(test)/yosys.log)
