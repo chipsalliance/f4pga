@@ -146,7 +146,8 @@ struct CreateClockCmd : public Pass {
 	    for (auto wire : module->wires()) {
 		if (design->selected(module, wire)) {
 #ifdef SDC_DEBUG
-		    log("Selected wire %s\n", RTLIL::unescape_id(wire->name).c_str());
+		    log("Selected wire %s\n",
+		        RTLIL::unescape_id(wire->name).c_str());
 #endif
 		    selected_wires.push_back(wire);
 		}
@@ -159,7 +160,7 @@ struct CreateClockCmd : public Pass {
 	    name = RTLIL::unescape_id(selected_wires.at(0)->name);
 	}
 	clocks_.AddClock(name, selected_wires, period, rising_edge,
-	                      falling_edge);
+	                 falling_edge);
 	log("Created clock %s with period %f, waveform {%f %f}\n", name.c_str(),
 	    period, rising_edge, falling_edge);
     }
@@ -225,8 +226,10 @@ struct PropagateClocksCmd : public Pass {
 	std::array<std::unique_ptr<Propagation>, 3> passes{
 	    std::unique_ptr<NaturalPropagation>(
 	        new NaturalPropagation(design, this)),
-	    std::unique_ptr<BufferPropagation>(new BufferPropagation(design, this)),
-	    std::unique_ptr<ClockDividerPropagation>(new ClockDividerPropagation(design, this))};
+	    std::unique_ptr<BufferPropagation>(
+	        new BufferPropagation(design, this)),
+	    std::unique_ptr<ClockDividerPropagation>(
+	        new ClockDividerPropagation(design, this))};
 
 	for (auto& pass : passes) {
 	    pass->Run(clocks_);
@@ -240,7 +243,7 @@ class SdcPlugin {
    public:
     SdcPlugin()
         : write_sdc_cmd_(clocks_),
-	  create_clock_cmd_(clocks_),
+          create_clock_cmd_(clocks_),
           get_clocks_cmd_(clocks_),
           propagate_clocks_cmd_(clocks_) {
 	log("Loaded SDC plugin\n");
