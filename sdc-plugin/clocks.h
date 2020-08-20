@@ -33,15 +33,16 @@ class Clock {
    public:
     Clock(const std::string& name, RTLIL::Wire* wire, float period,
           float rising_edge, float falling_edge);
-    Clock(const std::string& name, std::vector<RTLIL::Wire*> wires, float period,
-          float rising_edge, float falling_edge);
+    Clock(const std::string& name, std::vector<RTLIL::Wire*> wires,
+          float period, float rising_edge, float falling_edge);
     void AddWire(RTLIL::Wire* wire);
     std::vector<RTLIL::Wire*> GetClockWires() { return clock_wires_; }
     const std::string& Name() const { return name_; }
     float Period() { return period_; }
     float RisingEdge() { return rising_edge_; }
     float FallingEdge() { return falling_edge_; }
-    void UpdateClock(RTLIL::Wire* wire, float period, float rising_edge, float falling_edge);
+    void UpdateClock(RTLIL::Wire* wire, float period, float rising_edge,
+                     float falling_edge);
     static std::string ClockWireName(RTLIL::Wire* wire);
 
    private:
@@ -58,15 +59,13 @@ class Clock {
 
 class Clocks {
    public:
-    void AddClock(const std::string& name,
-                  std::vector<RTLIL::Wire*> wires, float period,
-                  float rising_edge, float falling_edge);
+    void AddClock(const std::string& name, std::vector<RTLIL::Wire*> wires,
+                  float period, float rising_edge, float falling_edge);
     void AddClock(const std::string& name, RTLIL::Wire* wire, float period,
                   float rising_edge, float falling_edge);
     void AddClock(Clock& clock);
-    void AddClockWires(const std::string& name,
-                       std::vector<RTLIL::Wire*> wires, float period,
-                       float rising_edge, float falling_edge);
+    void AddClockWires(const std::string& name, std::vector<RTLIL::Wire*> wires,
+                       float period, float rising_edge, float falling_edge);
     void AddClockWire(const std::string& name, RTLIL::Wire* wire, float period,
                       float rising_edge, float falling_edge);
     std::vector<std::string> GetClockNames();
@@ -77,7 +76,8 @@ class Clocks {
 
    private:
     std::vector<Clock> clocks_;
-    void PropagateThroughBuffer(BufferPropagation* pass, Clock& clock, Buffer buffer);
+    void PropagateThroughBuffer(BufferPropagation* pass, Clock& clock,
+                                Buffer buffer);
 };
 
 #endif  // _CLOCKS_H_

@@ -35,7 +35,8 @@ void Clocks::AddClock(const std::string& name, RTLIL::Wire* wire, float period,
 	log("Clock %s already exists and will be overwritten\n", name.c_str());
 	clock->UpdateClock(wire, period, rising_edge, falling_edge);
     } else {
-	log("Inserting clock %s with period %f, r:%f, f:%f\n", name.c_str(), period, rising_edge, falling_edge);
+	log("Inserting clock %s with period %f, r:%f, f:%f\n", name.c_str(),
+	    period, rising_edge, falling_edge);
 	clocks_.emplace_back(name, wire, period, rising_edge, falling_edge);
     }
 }
@@ -150,8 +151,8 @@ void Clocks::PropagateThroughBuffer(BufferPropagation* pass, Clock& clock,
 #ifdef SDC_DEBUG
 	log("Clock wire %s\n", RTLIL::unescape_id(clock_wire->name).c_str());
 #endif
-	auto buf_wires = pass->FindSinkWiresForCellType(
-	    clock_wire, buffer.name, buffer.output);
+	auto buf_wires = pass->FindSinkWiresForCellType(clock_wire, buffer.name,
+	                                                buffer.output);
 	int path_delay(0);
 	for (auto wire : buf_wires) {
 #ifdef SDC_DEBUG
@@ -170,7 +171,8 @@ void Clocks::WriteSdc(std::ostream& file) {
     for (auto& clock : clocks_) {
 	auto clock_wires = clock.GetClockWires();
 	file << "create_clock -period " << clock.Period();
-	file << " -waveform {" << clock.RisingEdge() << " " << clock.FallingEdge() << "}";
+	file << " -waveform {" << clock.RisingEdge() << " "
+	     << clock.FallingEdge() << "}";
 	file << " " << Clock::ClockWireName(clock_wires.at(0));
 	file << std::endl;
     }
@@ -202,14 +204,16 @@ void Clock::AddWire(RTLIL::Wire* wire) {
     }
 }
 
-void Clock::UpdateClock(RTLIL::Wire* wire, float period, float rising_edge, float falling_edge) {
+void Clock::UpdateClock(RTLIL::Wire* wire, float period, float rising_edge,
+                        float falling_edge) {
     UpdateWires(wire);
     UpdatePeriod(period);
     UpdateWaveform(rising_edge, falling_edge);
 }
 
 void Clock::UpdateWires(RTLIL::Wire* wire) {
-    if (std::find(clock_wires_.begin(), clock_wires_.end(), wire) == clock_wires_.end()) {
+    if (std::find(clock_wires_.begin(), clock_wires_.end(), wire) ==
+        clock_wires_.end()) {
 	clock_wires_.push_back(wire);
     }
 }
