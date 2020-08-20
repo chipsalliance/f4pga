@@ -170,14 +170,8 @@ void Clocks::WriteSdc(std::ostream& file) {
     for (auto& clock : clocks_) {
 	auto clock_wires = clock.GetClockWires();
 	file << "create_clock -period " << clock.Period();
-	if (clock_wires.size() > 1) {
-	    file << " -name " << clock.Name();
-	}
-	file << " -waveform {" << clock.RisingEdge() << " "
-	     << clock.FallingEdge() << "}";
-	for (auto clock_wire : clock_wires) {
-	    file << " " << RTLIL::unescape_id(clock_wire->name);
-	}
+	file << " -waveform {" << clock.RisingEdge() << " " << clock.FallingEdge() << "}";
+	file << " " << Clock::ClockWireName(clock_wires.at(0));
 	file << std::endl;
     }
 }
@@ -230,4 +224,12 @@ void Clock::UpdateWaveform(float rising_edge, float falling_edge) {
     rising_edge_ = rising_edge;
     falling_edge_ = falling_edge;
     assert(falling_edge - rising_edge == period_ / 2);
+}
+
+std::string Clock::ClockWireName(RTLIL::Wire* wire) {
+    if (!wire) {
+	return std::string();
+    }
+    std::string wire_name(RTLIL::unescape_id(wire->name));
+    return std::regex_replace(wire_name, std::regex{"\\$"}, "\\$");
 }

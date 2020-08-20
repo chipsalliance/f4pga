@@ -42,6 +42,7 @@ class Clock {
     float RisingEdge() { return rising_edge_; }
     float FallingEdge() { return falling_edge_; }
     void UpdateClock(RTLIL::Wire* wire, float period, float rising_edge, float falling_edge);
+    static std::string ClockWireName(RTLIL::Wire* wire);
 
    private:
     std::string name_;
