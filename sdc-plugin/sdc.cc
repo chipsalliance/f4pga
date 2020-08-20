@@ -104,6 +104,7 @@ struct CreateClockCmd : public Pass {
                  RTLIL::Design* design) override {
 	size_t argidx;
 	std::string name;
+	bool is_waveform_specified(false);
 	float rising_edge(0);
 	float falling_edge(0);
 	float period(0);
@@ -126,6 +127,7 @@ struct CreateClockCmd : public Pass {
 		             [](char c) { return c != '{' or c != '}'; });
 		std::stringstream ss(edges);
 		ss >> rising_edge >> falling_edge;
+		is_waveform_specified = true;
 		continue;
 	    }
 	    break;
@@ -158,6 +160,10 @@ struct CreateClockCmd : public Pass {
 	}
 	if (name.empty()) {
 	    name = RTLIL::unescape_id(selected_wires.at(0)->name);
+	}
+	if (!is_waveform_specified) {
+	    rising_edge = 0;
+	    falling_edge = period / 2;
 	}
 	clocks_.AddClock(name, selected_wires, period, rising_edge,
 	                 falling_edge);

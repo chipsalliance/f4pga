@@ -41,8 +41,7 @@ class Clock {
     float Period() { return period_; }
     float RisingEdge() { return rising_edge_; }
     float FallingEdge() { return falling_edge_; }
-    void UpdatePeriod(float period);
-    void UpdateWaveform(float rising_edge, float falling_edge);
+    void UpdateClock(RTLIL::Wire* wire, float period, float rising_edge, float falling_edge);
 
    private:
     std::string name_;
@@ -50,6 +49,10 @@ class Clock {
     float period_;
     float rising_edge_;
     float falling_edge_;
+
+    void UpdateWires(RTLIL::Wire* wire);
+    void UpdatePeriod(float period);
+    void UpdateWaveform(float rising_edge, float falling_edge);
 };
 
 class Clocks {

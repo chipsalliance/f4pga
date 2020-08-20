@@ -33,9 +33,11 @@ void Clocks::AddClock(const std::string& name, RTLIL::Wire* wire, float period,
                      [&](Clock& clock) { return clock.Name() == name; });
     if (clock != clocks_.end()) {
 	log("Clock %s already exists and will be overwritten\n", name.c_str());
-	clocks_.erase(clock);
+	clock->UpdateClock(wire, period, rising_edge, falling_edge);
+    } else {
+	log("Inserting clock %s with period %f, r:%f, f:%f\n", name.c_str(), period, rising_edge, falling_edge);
+	clocks_.emplace_back(name, wire, period, rising_edge, falling_edge);
     }
-    clocks_.emplace_back(name, wire, period, rising_edge, falling_edge);
 }
 
 void Clocks::AddClock(Clock& clock) {
@@ -145,9 +147,11 @@ void Clocks::PropagateThroughBuffer(BufferPropagation* pass, Clock& clock,
                                     Buffer buffer) {
     auto clock_wires = clock.GetClockWires();
     for (auto clock_wire : clock_wires) {
-	log("%s\n", clock_wire->name.c_str());
-	auto buf_wires = pass->FindSinkWiresForCellType(clock_wire, buffer.name,
-	                                                buffer.output);
+#ifdef SDC_DEBUG
+	log("Clock wire %s\n", RTLIL::unescape_id(clock_wire->name).c_str());
+#endif
+	auto buf_wires = pass->FindSinkWiresForCellType(
+	    clock_wire, buffer.name, buffer.output);
 	int path_delay(0);
 	for (auto wire : buf_wires) {
 #ifdef SDC_DEBUG
@@ -200,6 +204,18 @@ Clock::Clock(const std::string& name, std::vector<RTLIL::Wire*> wires,
 void Clock::AddWire(RTLIL::Wire* wire) {
     auto clock_wire = std::find(clock_wires_.begin(), clock_wires_.end(), wire);
     if (clock_wire == clock_wires_.end()) {
+	clock_wires_.push_back(wire);
+    }
+}
+
+void Clock::UpdateClock(RTLIL::Wire* wire, float period, float rising_edge, float falling_edge) {
+    UpdateWires(wire);
+    UpdatePeriod(period);
+    UpdateWaveform(rising_edge, falling_edge);
+}
+
+void Clock::UpdateWires(RTLIL::Wire* wire) {
+    if (std::find(clock_wires_.begin(), clock_wires_.end(), wire) == clock_wires_.end()) {
 	clock_wires_.push_back(wire);
     }
 }
