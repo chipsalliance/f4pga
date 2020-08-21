@@ -170,10 +170,20 @@ void Clocks::PropagateThroughBuffer(BufferPropagation* pass, Clock& clock,
 void Clocks::WriteSdc(std::ostream& file) {
     for (auto& clock : clocks_) {
 	auto clock_wires = clock.GetClockWires();
+	// FIXME: Input port nets are not found in VPR
+	if (std::all_of(clock_wires.begin(), clock_wires.end(),
+	                [&](RTLIL::Wire* wire) { return wire->port_input; })) {
+	    continue;
+	}
 	file << "create_clock -period " << clock.Period();
 	file << " -waveform {" << clock.RisingEdge() << " "
 	     << clock.FallingEdge() << "}";
-	file << " " << Clock::ClockWireName(clock_wires.at(0));
+	for (auto clock_wire : clock_wires) {
+	    if (clock_wire->port_input) {
+		continue;
+	    }
+	    file << " " << Clock::ClockWireName(clock_wire);
+	}
 	file << std::endl;
     }
 }
