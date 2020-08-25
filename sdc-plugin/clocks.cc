@@ -78,8 +78,8 @@ std::vector<std::string> Clocks::GetClockNames() {
 	log("create_clock -period %f -name %s -waveform {%f %f} %s\n",
 	    clock.Period(), clock.Name().c_str(), clock.RisingEdge(),
 	    clock.FallingEdge(), ss.str().c_str());
-    }
 #endif
+    }
     return res;
 }
 
