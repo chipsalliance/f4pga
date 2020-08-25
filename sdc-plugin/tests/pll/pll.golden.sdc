@@ -1,4 +1,3 @@
-create_clock -period 10 -waveform {0 5} clk
 create_clock -period 10 -waveform {1 6} \$auto\$clkbufmap.cc:247:execute\$1827
 create_clock -period 10 -waveform {2 7} \$techmap1716\FDCE_0.C
 create_clock -period 10 -waveform {0 5} \$auto\$clkbufmap.cc:247:execute\$1829
