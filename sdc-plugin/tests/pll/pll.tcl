@@ -16,8 +16,6 @@ read_sdc $::env(INPUT_SDC_FILE)
 
 # Propagate the clocks
 propagate_clocks
-propagate_clocks
-propagate_clocks
 
 # Write out the SDC file after the clock propagation step
 write_sdc $::env(OUTPUT_SDC_FILE)
