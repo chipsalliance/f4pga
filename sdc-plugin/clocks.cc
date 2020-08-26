@@ -112,6 +112,11 @@ void Clocks::Propagate(BufferPropagation* pass) {
 	log("Processing clock %s\n", clock.Name().c_str());
 #endif
 	PropagateThroughBuffer(pass, clock, IBuf());
+    }
+    for (auto clock : clocks_) {
+#ifdef SDC_DEBUG
+	log("Processing clock %s\n", clock.Name().c_str());
+#endif
 	PropagateThroughBuffer(pass, clock, Bufg());
     }
 #ifdef SDC_DEBUG
