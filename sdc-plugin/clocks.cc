@@ -141,6 +141,7 @@ void Clocks::Propagate(ClockDividerPropagation* pass) {
 		log("PLL clock: %s\n", pll_clock.Name().c_str());
 #endif
 		AddClock(pll_clock);
+		PropagateThroughBuffer(pass, pll_clock, Bufg());
 	    }
 	}
     }
@@ -149,7 +150,7 @@ void Clocks::Propagate(ClockDividerPropagation* pass) {
 #endif
 }
 
-void Clocks::PropagateThroughBuffer(BufferPropagation* pass, Clock& clock,
+void Clocks::PropagateThroughBuffer(Propagation* pass, Clock& clock,
                                     Buffer buffer) {
     auto clock_wires = clock.GetClockWires();
     for (auto clock_wire : clock_wires) {

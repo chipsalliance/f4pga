@@ -28,6 +28,7 @@ USING_YOSYS_NAMESPACE
 class NaturalPropagation;
 class BufferPropagation;
 class ClockDividerPropagation;
+class Propagation;
 
 class Clock {
    public:
@@ -76,7 +77,7 @@ class Clocks {
 
    private:
     std::vector<Clock> clocks_;
-    void PropagateThroughBuffer(BufferPropagation* pass, Clock& clock,
+    void PropagateThroughBuffer(Propagation* pass, Clock& clock,
                                 Buffer buffer);
 };
 
