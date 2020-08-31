@@ -4,9 +4,9 @@ plugin -i selection
 # Import the commands from the plugins to the tcl interpreter
 yosys -import
 
-proc selection_to_tcl_list_through_file { expression } {
+proc selection_to_tcl_list_through_file { selection } {
     set file_name "[pid].txt"
-    select $expression -write $file_name
+    select $selection -write $file_name
     set fh [open $file_name r]
     set result [list]
     while {[gets $fh line] >= 0} {
@@ -17,12 +17,14 @@ proc selection_to_tcl_list_through_file { expression } {
     return $result
 }
 
-proc test_selection { expression {debug 0} } {
-    if {$debug} {
-    	puts "List from file: [selection_to_tcl_list_through_file $expression]"
-    	puts "List in selection: [selection_to_tcl_list $expression]"
+proc test_selection { rfh selection } {
+    if {[expr {[selection_to_tcl_list_through_file $selection] != [selection_to_tcl_list $selection]}]} {
+    	puts "List from file: [selection_to_tcl_list_through_file $selection]"
+    	puts "List in selection: [selection_to_tcl_list $selection]"
+	error "Test with selection: $selection failed"
+    } else {
+	puts $rfh [selection_to_tcl_list $selection]
     }
-    return [expr {[selection_to_tcl_list_through_file $expression] == [selection_to_tcl_list $expression]}]
 }
 
 read_verilog counter.v
@@ -33,8 +35,9 @@ hierarchy -check -auto-top
 # Test the selection command and write results to file
 set rfh [open counter.txt w]
 
-puts $rfh [test_selection "t:*"]
-puts $rfh [test_selection "w:*"]
-puts $rfh [test_selection "*"]
+set selection_tests [list "t:*" "w:*" "*"]
+foreach test $selection_tests {
+    test_selection $rfh $test
+}
 
 close $rfh
