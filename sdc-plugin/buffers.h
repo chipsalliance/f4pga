@@ -36,7 +36,7 @@ struct Buffer {
 };
 
 struct IBuf : Buffer {
-    IBuf() : Buffer(1, "IBUF", "O"){};
+    IBuf() : Buffer(0, "IBUF", "O"){};
 };
 
 struct Bufg : Buffer {
