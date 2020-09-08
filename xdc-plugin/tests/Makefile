@@ -2,16 +2,19 @@
 # port_indexes - like counter but bus port indices are passes without curly braces
 # io_loc_pairs - test for LOC property being set on IOBUFs as the IO_LOC_PAIRS parameter
 # minilitex_ddr_arty - litex design with more types of IOBUFS including differential
+# package_pins - test for PACKAGE_PIN property being set on IOBUFs as the IO_LOC_PAIRS parameter
 
 TESTS = counter \
 	port_indexes \
 	io_loc_pairs \
-	minilitex_ddr_arty
+	minilitex_ddr_arty \
+	package_pins
 
 counter_verify = $(call compare_json,counter)
 port_indexes_verify = $(call compare_json,port_indexes) && test $$(grep "'unknown' proc command handler" port_indexes/port_indexes.txt | wc -l) -eq 2
 io_loc_pairs_verify = $(call compare_json,io_loc_pairs)
 minilitex_ddr_arty_verify = $(call compare_json,minilitex_ddr_arty)
+package_pins_verify = $(call compare_json,package_pins)
 
 all: $(TESTS)
 

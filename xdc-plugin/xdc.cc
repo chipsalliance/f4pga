@@ -52,7 +52,8 @@ const std::unordered_map<std::string, SetPropertyOptions> set_property_options_m
 	{"SLEW", SetPropertyOptions::SLEW},
 	{"DRIVE", SetPropertyOptions::DRIVE},
 	{"IN_TERM", SetPropertyOptions::IN_TERM},
-	{"LOC", SetPropertyOptions::IO_LOC_PAIRS}
+	{"LOC", SetPropertyOptions::IO_LOC_PAIRS},
+	{"PACKAGE_PIN", SetPropertyOptions::IO_LOC_PAIRS}
 };
 
 const std::unordered_map<std::string, std::vector<std::string>> supported_primitive_parameters  = {
