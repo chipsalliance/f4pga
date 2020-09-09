@@ -217,14 +217,11 @@ void Clock::UpdateWires(RTLIL::Wire* wire) {
 
 void Clock::UpdatePeriod(float period) {
     period_ = period;
-    rising_edge_ = 0;
-    falling_edge_ = period / 2;
 }
 
 void Clock::UpdateWaveform(float rising_edge, float falling_edge) {
     rising_edge_ = rising_edge;
     falling_edge_ = falling_edge;
-    assert(falling_edge - rising_edge == period_ / 2);
 }
 
 std::string Clock::ClockWireName(RTLIL::Wire* wire) {
