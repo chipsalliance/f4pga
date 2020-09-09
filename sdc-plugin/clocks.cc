@@ -23,7 +23,9 @@
 
 void Clocks::AddClock(const std::string& name, std::vector<RTLIL::Wire*> wires,
                       float period, float rising_edge, float falling_edge) {
-    AddClockWires(name, wires, period, rising_edge, falling_edge);
+    std::for_each(wires.begin(), wires.end(), [&, this](RTLIL::Wire* wire) {
+	AddClock(name, wire, period, rising_edge, falling_edge);
+    });
 }
 
 void Clocks::AddClock(const std::string& name, RTLIL::Wire* wire, float period,
@@ -44,26 +46,6 @@ void Clocks::AddClock(const std::string& name, RTLIL::Wire* wire, float period,
 void Clocks::AddClock(Clock& clock) {
     AddClock(clock.Name(), clock.GetClockWires(), clock.Period(),
              clock.RisingEdge(), clock.FallingEdge());
-}
-
-void Clocks::AddClockWires(const std::string& name,
-                           std::vector<RTLIL::Wire*> wires, float period,
-                           float rising_edge, float falling_edge) {
-    std::for_each(wires.begin(), wires.end(), [&, this](RTLIL::Wire* wire) {
-	AddClockWire(name, wire, period, rising_edge, falling_edge);
-    });
-}
-
-void Clocks::AddClockWire(const std::string& name, RTLIL::Wire* wire,
-                          float period, float rising_edge, float falling_edge) {
-    auto clock =
-        std::find_if(clocks_.begin(), clocks_.end(),
-                     [&](Clock& clock) { return clock.Name() == name; });
-    if (clock == clocks_.end()) {
-	AddClock(name, wire, period, rising_edge, falling_edge);
-    } else {
-	clock->AddWire(wire);
-    }
 }
 
 std::vector<std::string> Clocks::GetClockNames() {
@@ -94,7 +76,7 @@ void Clocks::Propagate(NaturalPropagation* pass) {
 	auto clock_wires = clock.GetClockWires();
 	for (auto clock_wire : clock_wires) {
 	    auto aliases = pass->FindAliasWires(clock_wire);
-	    AddClockWires(clock.Name(), aliases, clock.Period(),
+	    AddClock(clock.Name(), aliases, clock.Period(),
 	                  clock.RisingEdge(), clock.FallingEdge());
 	}
     }
@@ -106,14 +88,20 @@ void Clocks::Propagate(NaturalPropagation* pass) {
 void Clocks::Propagate(BufferPropagation* pass) {
 #ifdef SDC_DEBUG
     log("Start buffer clock propagation\n");
+    log("IBUF pass\n");
 #endif
-    for (auto clock : clocks_) {
+    std::vector<Clock> clocks(clocks_);
+    for (auto clock : clocks) {
 #ifdef SDC_DEBUG
 	log("Processing clock %s\n", clock.Name().c_str());
 #endif
 	PropagateThroughBuffer(pass, clock, IBuf());
     }
-    for (auto clock : clocks_) {
+#ifdef SDC_DEBUG
+    log("BUFG pass\n");
+#endif
+    clocks = clocks_;
+    for (auto clock : clocks) {
 #ifdef SDC_DEBUG
 	log("Processing clock %s\n", clock.Name().c_str());
 #endif
@@ -200,7 +188,7 @@ Clock::Clock(const std::string& name, RTLIL::Wire* wire, float period,
       period_(period),
       rising_edge_(rising_edge),
       falling_edge_(falling_edge) {
-    AddWire(wire);
+    UpdateWires(wire);
 }
 
 Clock::Clock(const std::string& name, std::vector<RTLIL::Wire*> wires,
@@ -210,14 +198,7 @@ Clock::Clock(const std::string& name, std::vector<RTLIL::Wire*> wires,
       rising_edge_(rising_edge),
       falling_edge_(falling_edge) {
     std::for_each(wires.begin(), wires.end(),
-                  [&, this](RTLIL::Wire* wire) { AddWire(wire); });
-}
-
-void Clock::AddWire(RTLIL::Wire* wire) {
-    auto clock_wire = std::find(clock_wires_.begin(), clock_wires_.end(), wire);
-    if (clock_wire == clock_wires_.end()) {
-	clock_wires_.push_back(wire);
-    }
+                  [&, this](RTLIL::Wire* wire) { UpdateWires(wire); });
 }
 
 void Clock::UpdateClock(RTLIL::Wire* wire, float period, float rising_edge,

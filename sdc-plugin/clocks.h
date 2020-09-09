@@ -36,7 +36,6 @@ class Clock {
           float rising_edge, float falling_edge);
     Clock(const std::string& name, std::vector<RTLIL::Wire*> wires,
           float period, float rising_edge, float falling_edge);
-    void AddWire(RTLIL::Wire* wire);
     std::vector<RTLIL::Wire*> GetClockWires() { return clock_wires_; }
     const std::string& Name() const { return name_; }
     float Period() { return period_; }
@@ -65,10 +64,6 @@ class Clocks {
     void AddClock(const std::string& name, RTLIL::Wire* wire, float period,
                   float rising_edge, float falling_edge);
     void AddClock(Clock& clock);
-    void AddClockWires(const std::string& name, std::vector<RTLIL::Wire*> wires,
-                       float period, float rising_edge, float falling_edge);
-    void AddClockWire(const std::string& name, RTLIL::Wire* wire, float period,
-                      float rising_edge, float falling_edge);
     std::vector<std::string> GetClockNames();
     void Propagate(NaturalPropagation* pass);
     void Propagate(BufferPropagation* pass);
