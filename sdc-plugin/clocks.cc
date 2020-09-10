@@ -128,6 +128,7 @@ void Clocks::Propagate(ClockDividerPropagation* pass) {
 #ifdef SDC_DEBUG
 		log("PLL clock: %s\n", pll_clock.Name().c_str());
 #endif
+		pll_clock.ApplyShift(clock.RisingEdge());
 		AddClock(pll_clock);
 		PropagateThroughBuffer(pass, pll_clock, Bufg());
 	    }
@@ -222,6 +223,14 @@ void Clock::UpdatePeriod(float period) {
 void Clock::UpdateWaveform(float rising_edge, float falling_edge) {
     rising_edge_ = rising_edge;
     falling_edge_ = falling_edge;
+}
+
+void Clock::ApplyShift(float rising_edge) {
+    rising_edge_ += rising_edge;
+    falling_edge_ += rising_edge;
+    if (falling_edge_ > period_) {
+	log_error("Phase shift exceeds 360 degrees\n");
+    }
 }
 
 std::string Clock::ClockWireName(RTLIL::Wire* wire) {

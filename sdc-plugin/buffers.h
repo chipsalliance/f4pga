@@ -61,11 +61,31 @@ struct Pll {
 	    divclk_divisor = cell->getParam(ID(DIVCLK_DIVIDE)).as_int();
 	}
 	for (auto clk_output : outputs) {
+	    // CLKOUT[0-5]_DIVIDE
 	    RTLIL::IdString param(RTLIL::escape_id(clk_output + "_DIVIDE"));
 	    if (cell->hasParam(param)) {
 		clkout_divisors[clk_output] = cell->getParam(param).as_int();
 	    } else {
 		clkout_divisors[clk_output] = 1;
+	    }
+	    clkout_period[clk_output] = CalculatePeriod(clk_output);
+
+	    // CLKOUT[0-5]_PHASE
+	    param = RTLIL::escape_id(clk_output + "_PHASE");
+	    if (cell->hasParam(param)) {
+		clkout_phase[clk_output] = std::stof(cell->getParam(param).decode_string());
+	    } else {
+		clkout_phase[clk_output] = 0.0;
+	    }
+	    // Take the delay off the PLL into account
+	    clkout_shift[clk_output] = CalculateShift(clk_output) + delay;
+
+	    // CLKOUT[0-5]_DUTY_CYCLE
+	    param = RTLIL::escape_id(clk_output + "_DUTY_CYCLE");
+	    if (cell->hasParam(param)) {
+		clkout_duty_cycle[clk_output] = std::stof(cell->getParam(param).decode_string());
+	    } else {
+		clkout_duty_cycle[clk_output] = 0.5;
 	    }
 	}
     };
@@ -78,6 +98,10 @@ struct Pll {
 	       divclk_divisor;
     }
 
+    float CalculateShift(const std::string& output) {
+	return clkout_period.at(output) * clkout_phase.at(output) / 360.0;
+    }
+
     static const float delay;
     static const std::string name;
     static const std::vector<std::string> inputs;
@@ -85,6 +109,10 @@ struct Pll {
     RTLIL::Cell* cell;
     float clkin1_period = 0;
     float clkin2_period = 0;
+    std::unordered_map<std::string, float> clkout_period;
+    std::unordered_map<std::string, float> clkout_duty_cycle;
+    std::unordered_map<std::string, float> clkout_phase;
+    std::unordered_map<std::string, float> clkout_shift;
     std::unordered_map<std::string, int> clkout_divisors;
     int divclk_divisor = 1;
     int clk_mult = 5;

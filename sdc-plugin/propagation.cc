@@ -55,9 +55,11 @@ std::vector<Clock> ClockDividerPropagation::FindSinkClocksForCellType(
 	for (auto output : Pll::outputs) {
 	    RTLIL::Wire* wire = FindSinkWireOnPort(cell, output);
 	    if (wire) {
-		float period(pll.CalculatePeriod(output));
-		Clock clock(RTLIL::unescape_id(wire->name), wire, period, 0,
-		            period / 2);
+		float clkout_period(pll.clkout_period.at(output));
+		float clkout_shift(pll.clkout_shift.at(output));
+		float clkout_duty_cycle(pll.clkout_duty_cycle.at(output));
+		Clock clock(RTLIL::unescape_id(wire->name), wire, clkout_period, clkout_shift,
+		            clkout_shift + clkout_duty_cycle * clkout_period);
 		clocks.push_back(clock);
 		auto further_clocks =
 		    FindSinkClocksForCellType(wire, cell_type);
