@@ -36,7 +36,8 @@ extensions = [
     'sdcdomain',
     'archdomain',
     'rrgraphdomain',
-    'recommonmark'
+    'recommonmark',
+    'sphinx_verilog_domain'
 ]
 
 numfig = True
