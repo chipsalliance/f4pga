@@ -1,0 +1,1 @@
+clk_int_1 clk ibuf_proxy_out {$auto$clkbufmap.cc:247:execute$1918} {$auto$clkbufmap.cc:247:execute$1920} middle_inst_1.clk_int middle_inst_4.clk
