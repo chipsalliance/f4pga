@@ -1,7 +1,8 @@
-TESTS = counter pll
+TESTS = counter counter2 pll
 .PHONY: $(TESTS)
 
 counter_verify = $(call compare,counter,sdc) && $(call compare,counter,txt)
+counter2_verify = $(call compare,counter2,sdc) && $(call compare,counter2,txt)
 pll_verify = $(call compare,pll,sdc)
 
 all: $(TESTS)
