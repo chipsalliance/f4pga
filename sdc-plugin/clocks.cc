@@ -39,6 +39,9 @@ void Clocks::AddClock(const std::string& name, RTLIL::Wire* wire, float period,
     } else {
 	log("Inserting clock %s with period %f, r:%f, f:%f\n", name.c_str(),
 	    period, rising_edge, falling_edge);
+	if (falling_edge > period) {
+	    log_error("Phase shift on clock %s exceeds 360 degrees\nRising edge: %f, Falling edge: %f, Clock period:%f\n", name.c_str(), rising_edge, falling_edge, period);
+	}
 	clocks_.emplace_back(name, wire, period, rising_edge, falling_edge);
     }
 }
@@ -223,14 +226,15 @@ void Clock::UpdatePeriod(float period) {
 void Clock::UpdateWaveform(float rising_edge, float falling_edge) {
     rising_edge_ = rising_edge;
     falling_edge_ = falling_edge;
+    if (falling_edge_ > period_) {
+	log_error("Phase shift on clock %s exceeds 360 degrees\nRising edge: %f, Falling edge: %f, Clock period:%f\n", name_.c_str(), rising_edge_, falling_edge_, period_);
+    }
 }
 
 void Clock::ApplyShift(float rising_edge) {
-    rising_edge_ += rising_edge;
-    falling_edge_ += rising_edge;
-    if (falling_edge_ > period_) {
-	log_error("Phase shift exceeds 360 degrees\n");
-    }
+    float new_rising_edge = rising_edge_ + rising_edge;
+    float new_falling_edge = falling_edge_ + rising_edge;
+    UpdateWaveform(new_rising_edge, new_falling_edge);
 }
 
 std::string Clock::ClockWireName(RTLIL::Wire* wire) {
