@@ -1,5 +1,18 @@
-# Makefile for Sphinx documentation
+# make-env setup -------------------------------------------------------------
+
+TOP_DIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
+
+# A pip `requirements.txt` file.
+# https://pip.pypa.io/en/stable/reference/pip_install/#requirements-file-format
+REQUIREMENTS_FILE := requirements.txt
 #
+# A conda `environment.yml` file.
+# https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html
+ENVIRONMENT_FILE := environment.yml
+
+include third_party/make-env/conda.mk
+
+# Makefile for Sphinx documentation ------------------------------------------
 
 # You can set these variables from the command line.
 SPHINXOPTS    =
@@ -11,9 +24,6 @@ BUILDDIR      = build/sphinx
 PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
 ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) source
-
-CONDA_DIR       = build/conda
-CONDA_ENV_FILE  = environment.yml
 
 DOXYGEN_DIR     = build/doxygen
 
@@ -36,9 +46,8 @@ help:
 	@echo "  linkcheck  to check all external links for integrity"
 	@echo "  doctest    to run all doctests embedded in the documentation (if enabled)"
 	@echo "  env        to create a conda environment with the needed packages"
-	@echo "  env-clean  to remove the conda environment"
 
-clean:
+clean::
 	-rm -rf $(BUILDDIR)/
 	-rm -rf $(DOXYGEN_DIR)/
 
@@ -118,17 +127,3 @@ doctest:
 	$(SPHINXBUILD) -b doctest $(ALLSPHINXOPTS) $(BUILDDIR)/doctest
 	@echo "Testing of doctests in the sources finished, look at the " \
 	      "results in $(BUILDDIR)/doctest/output.txt."
-
-env:
-	@rm -rf $(CONDA_DIR)
-	@mkdir -p $(CONDA_DIR)
-	@wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh\
-		-O $(CONDA_DIR)/miniconda.sh
-	@bash $(CONDA_DIR)/miniconda.sh -f -b -p  $(CONDA_DIR) > /dev/null &&\
-		echo "Conda environment created successfully..."
-	@./$(CONDA_DIR)/bin/conda env create -q -f $(CONDA_ENV_FILE) > /dev/null &&\
-		echo "Conda packages installed successfully..."
-	@echo "To use conda environment type:\nsource enter-env.sh"
-
-env-clean:
-	@rm -rf $(CONDA_DIR)

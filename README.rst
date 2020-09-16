@@ -8,7 +8,7 @@ Building documentation
 Activate the virtual environment and install dependencies::
 
     make env
-    source enter-env.sh
+    make enter
 
 Build the whole documentation::
 

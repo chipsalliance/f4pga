@@ -1,4 +1,4 @@
-name: SymbiFlow-docs
+name: symbiflow-docs
 channels:
   - symbiflow
   - conda-forge
