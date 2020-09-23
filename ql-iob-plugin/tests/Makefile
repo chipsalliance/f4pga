@@ -1,6 +1,6 @@
 TESTS = sdiomux ckpad
 
-all: $(addsuffix /ok,$(TESTS))
+all: clean $(addsuffix /ok,$(TESTS))
 
 clean:
 	@find . -name "ok" | xargs rm -rf

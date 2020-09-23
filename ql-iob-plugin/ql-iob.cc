@@ -27,8 +27,8 @@
 #include <regex>
 #include <sstream>
 
-#ifndef YOSYS_OVERRIDE
-#define YOSYS_OVERRIDE override
+#ifndef YS_OVERRIDE
+#define YS_OVERRIDE override
 #endif
 
 USING_YOSYS_NAMESPACE
