@@ -27,6 +27,10 @@
 #include <regex>
 #include <sstream>
 
+#ifndef YOSYS_OVERRIDE
+#define YOSYS_OVERRIDE override
+#endif
+
 USING_YOSYS_NAMESPACE
 PRIVATE_NAMESPACE_BEGIN
 
@@ -213,31 +217,41 @@ struct QuicklogicIob : public Pass {
                 auto sigspec = cell->connections().at(port);
 
                 // Get the connected wire
-                // FIXME: This assumes that the cell is directly connected to a
-                // top-level port.
-                if (sigspec.is_wire()) {
-                    auto wire = sigspec.as_wire();
+                for (auto sigbit : sigspec.bits()) {
+                    if (sigbit.wire != nullptr) {
+                        auto wire = sigbit.wire;
 
-                    // Has to be top level wire
-                    if (wire->port_input || wire->port_output) {
+                        // Has to be top level wire
+                        if (wire->port_input || wire->port_output) {
 
-                        // Check if the wire is constrained
-                        netName = RTLIL::unescape_id(wire->name);
-                        if (constraintMap.count(netName)) {
+                            // Check if the wire is constrained. Get pad name.
+                            std::string baseName = RTLIL::unescape_id(wire->name);
+                            std::string netNames[] = {
+                                baseName,
+                                stringf("%s[%d]", baseName.c_str(), sigbit.offset),
+                                stringf("%s(%d)", baseName.c_str(), sigbit.offset),
+                            };
 
-                            // Get the constraint
-                            auto constraint = constraintMap.at(netName);
+                            padName = "";
+                            netName = "";
+
+                            for (auto& name : netNames) {                       
+                                if (constraintMap.count(name)) {
+                                    auto constraint = constraintMap.at(name);
+                                    padName = constraint.padName;
+                                    netName = name;
+                                    break;
+                                }
+                            }
 
                             // Check if there is an entry in the pinmap for this pad name
-                            if (pinmapMap.count(constraint.padName)) {
+                            if (pinmapMap.count(padName)) {
 
                                 // Choose a correct entry for the cell
                                 auto entry = choosePinmapEntry(
-                                    pinmapMap.at(constraint.padName),
+                                    pinmapMap.at(padName),
                                     ioCellType
                                 );
-
-                                padName = constraint.padName;
 
                                 // Location string
                                 if (entry.count("x") && entry.count("y")) {
