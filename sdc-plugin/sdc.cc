@@ -167,8 +167,6 @@ struct CreateClockCmd : public Pass {
 	}
 	clocks_.AddClock(name, selected_wires, period, rising_edge,
 	                 falling_edge);
-	log("Created clock %s with period %f, waveform {%f %f}\n", name.c_str(),
-	    period, rising_edge, falling_edge);
     }
 
     void AddWirePrefix(std::vector<std::string>& args, size_t argidx) {
@@ -234,6 +232,8 @@ struct PropagateClocksCmd : public Pass {
 	        new BufferPropagation(design, this)),
 	    std::unique_ptr<ClockDividerPropagation>(
 	        new ClockDividerPropagation(design, this))};
+
+	log("Perform clock propagation\n");
 
 	for (auto& pass : passes) {
 	    pass->Run(clocks_);
