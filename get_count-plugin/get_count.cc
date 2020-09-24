@@ -21,6 +21,10 @@
 #include "kernel/register.h"
 #include "kernel/rtlil.h"
 
+#ifndef YS_OVERRIDE
+#define YS_OVERRIDE override
+#endif
+
 USING_YOSYS_NAMESPACE
 PRIVATE_NAMESPACE_BEGIN
 
