@@ -28,12 +28,6 @@
 USING_YOSYS_NAMESPACE
 PRIVATE_NAMESPACE_BEGIN
 
-void register_in_tcl_interpreter(const std::string& command) {
-    Tcl_Interp* interp = yosys_get_tcl_interp();
-    std::string tcl_script = stringf("proc %s args { return [yosys %s {*}$args] }", command.c_str(), command.c_str());
-    Tcl_Eval(interp, tcl_script.c_str());
-}
-
 struct GetCount : public Pass {
 
     enum class ObjectType {
@@ -45,7 +39,6 @@ struct GetCount : public Pass {
 
     GetCount () :
         Pass("get_count", "Returns count of various selected object types to the TCL interpreter") {
-            register_in_tcl_interpreter(pass_name);
         }    
 
     void help() YS_OVERRIDE {
@@ -95,7 +88,6 @@ struct GetCount : public Pass {
 
         // Get the TCL interpreter
         Tcl_Interp* tclInterp = yosys_get_tcl_interp();
-        Tcl_Obj*    tclList = Tcl_NewListObj(0, NULL);
 
         // Count objects
         size_t moduleCount = 0;
@@ -128,8 +120,7 @@ struct GetCount : public Pass {
         std::string value = std::to_string(count);
 
         Tcl_Obj* tclStr = Tcl_NewStringObj(value.c_str(), value.size());
-        Tcl_ListObjAppendElement(tclInterp, tclList, tclStr);
-        Tcl_SetObjResult(tclInterp, tclList);
+        Tcl_SetObjResult(tclInterp, tclStr);
     }
 
 } GetCount;
