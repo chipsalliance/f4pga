@@ -29,6 +29,13 @@ Pll::Pll(RTLIL::Cell* cell, float input_clock_period, float input_clock_shift) {
     assert(RTLIL::unescape_id(cell->type) == "PLLE2_ADV");
 
     FetchParams(cell);
+    if (clkin1_period != input_clock_period) {
+	log_cmd_error(
+	    "CLKIN1_PERIOD doesn't match the virtual clock constraint "
+	    "propagated to the CLKIN1 input of the clock divider cell: "
+	    "%s.\nInput clock period: %f, CLKIN1_PERIOD: %f\n",
+	    RTLIL::id2cstr(cell->name), input_clock_period, clkin1_period);
+    }
     CalculateOutputClockPeriods();
     CalculateOutputClockWaveforms(input_clock_period, input_clock_shift);
 }
