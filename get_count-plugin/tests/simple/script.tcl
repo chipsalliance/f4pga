@@ -1,4 +1,4 @@
-yosys plugin -i ../../get_count.so
+yosys plugin -i get_count
 yosys -import
 
 read_verilog -icells design.v

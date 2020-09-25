@@ -12,7 +12,7 @@ $(NAME).so: $(OBJS)
 
 .PHONY: install test
 
-install: test
+install: $(NAME).so
 	mkdir -p $(PLUGINS_DIR)
 	cp $(NAME).so $(PLUGINS_DIR)/$(NAME).so
 
