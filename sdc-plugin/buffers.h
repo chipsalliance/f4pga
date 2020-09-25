@@ -61,8 +61,7 @@ struct Pll {
 
    private:
     // Approximate equality check of the input clock period and specified in
-    // CLKIN[1/2]_PERIOD parameter kApproxEqualFactor specifies the percentage
-    // of the maximum accepted difference
+    // CLKIN[1/2]_PERIOD parameter
     void CheckInputClockPeriod(RTLIL::Cell* cell, float input_clock_period);
 
     // Fetch cell's parameters needed for further calculations
@@ -83,8 +82,6 @@ struct Pll {
     float divclk_divisor;
     float clk_mult;
     float clk_fbout_phase;
-    // Approximate equality factor of 1%
-    const float kApproxEqualFactor = 0.01;
 };
 
 #endif  // _BUFFERS_H_
