@@ -1,4 +1,4 @@
-plugin -i ../../ql-iob.so
+plugin -i ql-iob
 read_verilog design.v
 
 # Generic synthesis
