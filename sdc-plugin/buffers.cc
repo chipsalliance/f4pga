@@ -27,17 +27,22 @@ const std::string Pll::name = "PLLE2_ADV";
 
 Pll::Pll(RTLIL::Cell* cell, float input_clock_period, float input_clock_shift) {
     assert(RTLIL::unescape_id(cell->type) == "PLLE2_ADV");
-
     FetchParams(cell);
-    if (clkin1_period != input_clock_period) {
-	log_cmd_error(
-	    "CLKIN1_PERIOD doesn't match the virtual clock constraint "
-	    "propagated to the CLKIN1 input of the clock divider cell: "
-	    "%s.\nInput clock period: %f, CLKIN1_PERIOD: %f\n",
-	    RTLIL::id2cstr(cell->name), input_clock_period, clkin1_period);
-    }
+    CheckInputClockPeriod(cell, input_clock_period);
     CalculateOutputClockPeriods();
-    CalculateOutputClockWaveforms(input_clock_period, input_clock_shift);
+    CalculateOutputClockWaveforms(input_clock_shift);
+}
+
+void Pll::CheckInputClockPeriod(RTLIL::Cell* cell, float input_clock_period) {
+    float abs_diff = fabs(ClkinPeriod() - input_clock_period);
+    bool approx_equal = abs_diff < max(ClkinPeriod(), input_clock_period) * kApproxEqualFactor;
+    if (!approx_equal) {
+	log_cmd_error(
+	    "CLKIN[1/2]_PERIOD isn't approximately equal (+/-%.2f%%) to the virtual clock constraint "
+	    "propagated to the CLKIN[1/2] input of the clock divider cell: "
+	    "%s.\nInput clock period: %f, CLKIN[1/2]_PERIOD: %f\n",
+	    kApproxEqualFactor * 100, RTLIL::id2cstr(cell->name), input_clock_period, ClkinPeriod());
+    }
 }
 
 void Pll::FetchParams(RTLIL::Cell* cell) {
@@ -60,15 +65,15 @@ void Pll::CalculateOutputClockPeriods() {
     for (auto output : outputs) {
 	// CLKOUT[0-5]_PERIOD = CLKIN1_PERIOD * CLKOUT[0-5]_DIVIDE * DIVCLK_DIVIDE /
 	// CLKFBOUT_MULT
-	clkout_period[output] = clkin1_period * clkout_divisor.at(output) / clk_mult *
+	clkout_period[output] = ClkinPeriod() * clkout_divisor.at(output) / clk_mult *
 	    divclk_divisor;
     }
 }
 
-void Pll::CalculateOutputClockWaveforms(float input_clock_period, float input_clock_shift) {
+void Pll::CalculateOutputClockWaveforms(float input_clock_shift) {
     for (auto output : outputs) {
 	float output_clock_period = clkout_period.at(output);
-	clkout_rising_edge[output] = fmod(input_clock_shift - (clk_fbout_phase / 360.0) * input_clock_period + output_clock_period * (clkout_phase[output] / 360.0), output_clock_period);
+	clkout_rising_edge[output] = fmod(input_clock_shift - (clk_fbout_phase / 360.0) * ClkinPeriod() + output_clock_period * (clkout_phase[output] / 360.0), output_clock_period);
 	clkout_falling_edge[output] = fmod(clkout_rising_edge[output] + clkout_duty_cycle[output] * output_clock_period, output_clock_period);
     }
 }

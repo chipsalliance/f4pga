@@ -44,6 +44,10 @@ struct Bufg : Buffer {
 struct Pll {
     Pll(RTLIL::Cell* cell, float input_clock_period, float input_clock_shift);
 
+    // Approximate equality check of the input clock period and specified in CLKIN[1/2]_PERIOD parameter
+    // kApproxEqualFactor specifies the percentage of the maximum accepted difference
+    void CheckInputClockPeriod(RTLIL::Cell* cell, float input_clock_period);
+
     // Fetch cell's parameters needed for further calculations
     void FetchParams(RTLIL::Cell* cell);
 
@@ -51,10 +55,14 @@ struct Pll {
     void CalculateOutputClockPeriods();
 
     // Calculate the rising and falling edges of the output clocks
-    void CalculateOutputClockWaveforms(float input_clock_period, float input_clock_shift);
+    void CalculateOutputClockWaveforms(float input_clock_shift);
 
     // Helper function to fetch a cell parameter or return a default value
     static float FetchParam(RTLIL::Cell* cell, std::string&& param_name, float default_value);
+
+    // Get the period of the input clock
+    // TODO Add support for CLKINSEL
+    float ClkinPeriod() { return clkin1_period; }
 
     static const float delay;
     static const std::string name;
@@ -71,6 +79,8 @@ struct Pll {
     float divclk_divisor;
     float clk_mult;
     float clk_fbout_phase;
+    // Approximate equality factor of 1%
+    const float kApproxEqualFactor = 0.01;
 };
 
 #endif  // _BUFFERS_H_
