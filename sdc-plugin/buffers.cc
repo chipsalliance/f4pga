@@ -25,12 +25,12 @@ const std::vector<std::string> Pll::outputs = {"CLKOUT0", "CLKOUT1", "CLKOUT2",
 const float Pll::delay = 0;
 const std::string Pll::name = "PLLE2_ADV";
 
-Pll::Pll(RTLIL::Cell* cell, float input_clock_period, float input_clock_shift) {
+Pll::Pll(RTLIL::Cell* cell, float input_clock_period, float input_clock_rising_edge) {
     assert(RTLIL::unescape_id(cell->type) == "PLLE2_ADV");
     FetchParams(cell);
     CheckInputClockPeriod(cell, input_clock_period);
     CalculateOutputClockPeriods();
-    CalculateOutputClockWaveforms(input_clock_shift);
+    CalculateOutputClockWaveforms(input_clock_rising_edge);
 }
 
 void Pll::CheckInputClockPeriod(RTLIL::Cell* cell, float input_clock_period) {
@@ -70,10 +70,10 @@ void Pll::CalculateOutputClockPeriods() {
     }
 }
 
-void Pll::CalculateOutputClockWaveforms(float input_clock_shift) {
+void Pll::CalculateOutputClockWaveforms(float input_clock_rising_edge) {
     for (auto output : outputs) {
 	float output_clock_period = clkout_period.at(output);
-	clkout_rising_edge[output] = fmod(input_clock_shift - (clk_fbout_phase / 360.0) * ClkinPeriod() + output_clock_period * (clkout_phase[output] / 360.0), output_clock_period);
+	clkout_rising_edge[output] = fmod(input_clock_rising_edge - (clk_fbout_phase / 360.0) * ClkinPeriod() + output_clock_period * (clkout_phase[output] / 360.0), output_clock_period);
 	clkout_falling_edge[output] = fmod(clkout_rising_edge[output] + clkout_duty_cycle[output] * output_clock_period, output_clock_period);
     }
 }

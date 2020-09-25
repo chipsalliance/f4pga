@@ -42,7 +42,7 @@ struct Bufg : Buffer {
 };
 
 struct Pll {
-    Pll(RTLIL::Cell* cell, float input_clock_period, float input_clock_shift);
+    Pll(RTLIL::Cell* cell, float input_clock_period, float input_clock_rising_edge);
 
     // Helper function to fetch a cell parameter or return a default value
     static float FetchParam(RTLIL::Cell* cell, std::string&& param_name,
@@ -72,7 +72,7 @@ struct Pll {
     void CalculateOutputClockPeriods();
 
     // Calculate the rising and falling edges of the output clocks
-    void CalculateOutputClockWaveforms(float input_clock_shift);
+    void CalculateOutputClockWaveforms(float input_clock_rising_edge);
 
     static const float delay;
     static const std::string name;
