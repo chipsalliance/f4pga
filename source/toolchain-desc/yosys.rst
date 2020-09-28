@@ -360,6 +360,15 @@ the ``BUFGCTRL_VPR``:
 
     endmodule
 
+.. note::
+
+   All SymbiFlow techmaps for Xilinx 7-Series devices use special inverter
+   logic that converts constant 0 signals at the BEL to constant-1 signals
+   at the site. This behavior is desired since VCC is the default signal in
+   7-Series and US/US+ devices. The presented solution matches the conventions
+   used by the vendor tools and gives the opportunity to validate generated
+   bitstreams with fasm2bels and Vivado.
+
 Yosys provides special techmapping naming conventions for wires,
 parameters, and modules. The special names that start with ``_TECHMAP_``
 can be used to force certain behavior during the techmapping process.
