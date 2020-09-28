@@ -20,7 +20,7 @@
 #ifndef PCF_PARSER_HH
 #define PCF_PARSER_HH
 
-#include <istream>
+#include <fstream>
 #include <string>
 #include <vector>
 
@@ -51,12 +51,12 @@ public:
     /// Parses a PCF file and stores constraint within the class instance.
     /// Returns false in case of error
     bool parse (const std::string& a_FileName);
-    bool parse (std::istream*& a_Stream);
+    bool parse (std::ifstream& a_Stream);
 
     /// Returns the constraint list
     const std::vector<Constraint> getConstraints () const;
 
-protected:
+private:
 
     /// A list of constraints
     std::vector<Constraint> m_Constraints;

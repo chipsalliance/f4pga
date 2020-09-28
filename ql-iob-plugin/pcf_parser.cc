@@ -19,7 +19,6 @@
  */
 #include "pcf_parser.hh"
 
-#include <fstream>
 #include <regex>
 
 // ============================================================================
@@ -27,11 +26,10 @@
 bool PcfParser::parse (const std::string& a_FileName) {
 
     // Open the file
-    std::fstream file(a_FileName.c_str(), std::ifstream::in);
+    std::ifstream file(a_FileName.c_str());
 
     // Parse it
-    std::istream* stream = &file;
-    return parse(stream);
+    return parse(file);
 }
 
 const std::vector<PcfParser::Constraint> PcfParser::getConstraints () const {
@@ -41,9 +39,9 @@ const std::vector<PcfParser::Constraint> PcfParser::getConstraints () const {
 
 // ============================================================================
 
-bool PcfParser::parse (std::istream*& a_Stream) {
+bool PcfParser::parse (std::ifstream& a_Stream) {
 
-    if (a_Stream == nullptr) {
+    if (!a_Stream.good()) {
         return false;
     }
 
@@ -53,9 +51,9 @@ bool PcfParser::parse (std::istream*& a_Stream) {
     // Parse PCF lines
     std::regex re("^\\s*set_io\\s+([^#\\s]+)\\s+([^#\\s]+)(?:\\s+#(.*))?");
 
-    while (a_Stream->good()) {
+    while (a_Stream.good()) {
         std::string line;
-        std::getline(*a_Stream, line);
+        std::getline(a_Stream, line);
 
         // Match against regex
         std::cmatch cm;

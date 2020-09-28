@@ -19,7 +19,6 @@
  */
 #include "pinmap_parser.hh"
 
-#include <fstream>
 #include <sstream>
 
 // ============================================================================
@@ -27,11 +26,10 @@
 bool PinmapParser::parse (const std::string& a_FileName) {
 
     // Open the file
-    std::fstream file(a_FileName.c_str(), std::ifstream::in);
+    std::ifstream file(a_FileName.c_str());
 
     // Parse it
-    std::istream* stream = &file;
-    return parse(stream);
+    return parse(file);
 }
 
 const std::vector<PinmapParser::Entry> PinmapParser::getEntries() const {
@@ -55,23 +53,27 @@ std::vector<std::string> PinmapParser::getFields (const std::string& a_String) {
     return fields;
 }
 
-bool PinmapParser::parseHeader (std::istream*& a_Stream) {
+bool PinmapParser::parseHeader (std::ifstream& a_Stream) {
 
     // Get the header line
     std::string header;
-    std::getline(*a_Stream, header);
+    std::getline(a_Stream, header);
 
     // Parse fields
     m_Fields = getFields(header);
+    if (m_Fields.empty()) {
+        return false;
+    }
+
     return true;
 }
 
-bool PinmapParser::parseData (std::istream*& a_Stream) {
+bool PinmapParser::parseData (std::ifstream& a_Stream) {
 
     // Parse lines as they come
-    while (a_Stream->good()) {
+    while (a_Stream.good()) {
         std::string line;
-        std::getline(*a_Stream, line);
+        std::getline(a_Stream, line);
 
         if (line.empty()) {
             continue;
@@ -83,6 +85,11 @@ bool PinmapParser::parseData (std::istream*& a_Stream) {
         // Assign data fields to columns
         Entry entry;
         for (size_t i=0; i<data.size(); ++i) {
+
+            if (i >= m_Fields.size()) {
+                return false;
+            }
+
             entry[m_Fields[i]] = data[i];
         }
 
@@ -92,9 +99,9 @@ bool PinmapParser::parseData (std::istream*& a_Stream) {
     return true;
 }
 
-bool PinmapParser::parse (std::istream*& a_Stream) {
+bool PinmapParser::parse (std::ifstream& a_Stream) {
 
-    if (a_Stream == nullptr) {
+    if (!a_Stream.good()) {
         return false;
     }
 
