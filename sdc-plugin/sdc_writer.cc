@@ -23,9 +23,14 @@ void SdcWriter::AddFalsePath(FalsePath false_path) {
     false_paths_.push_back(false_path);
 }
 
+void SdcWriter::SetMaxDelay(TimingPath timing_path) {
+    timing_paths_.push_back(timing_path);
+}
+
 void SdcWriter::WriteSdc(Clocks& clocks, std::ostream& file) {
     WriteClocks(clocks, file);
     WriteFalsePaths(file);
+    WriteMaxDelay(file);
 }
 
 void SdcWriter::WriteClocks(Clocks& clocks, std::ostream& file) {
@@ -52,6 +57,19 @@ void SdcWriter::WriteClocks(Clocks& clocks, std::ostream& file) {
 void SdcWriter::WriteFalsePaths(std::ostream& file) {
     for (auto path : false_paths_) {
 	file << "set_false_path";
+	if (!path.from_pin.empty()) {
+	    file << " -from " << path.from_pin;
+	}
+	if (!path.to_pin.empty()) {
+	    file << " -to " << path.to_pin;
+	}
+	file << std::endl;
+    }
+}
+
+void SdcWriter::WriteMaxDelay(std::ostream& file) {
+    for (auto path : timing_paths_) {
+	file << "set_max_delay " << path.max_delay;
 	if (!path.from_pin.empty()) {
 	    file << " -from " << path.from_pin;
 	}

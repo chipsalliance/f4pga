@@ -26,16 +26,25 @@ struct FalsePath {
     std::string to_pin;
 };
 
+struct TimingPath {
+    std::string from_pin;
+    std::string to_pin;
+    float max_delay;
+};
+
 class SdcWriter {
    public:
     void AddFalsePath(FalsePath false_path);
+    void SetMaxDelay(TimingPath timing_path);
     void WriteSdc(Clocks& clocks, std::ostream& file);
 
    private:
     void WriteClocks(Clocks& clocks, std::ostream& file);
     void WriteFalsePaths(std::ostream& file);
+    void WriteMaxDelay(std::ostream& file);
 
     std::vector<FalsePath> false_paths_;
+    std::vector<TimingPath> timing_paths_;
 };
 
 #endif  // _SDC_WRITER_H_

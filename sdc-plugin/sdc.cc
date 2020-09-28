@@ -22,6 +22,7 @@
 #include "kernel/rtlil.h"
 #include "propagation.h"
 #include "set_false_path.h"
+#include "set_max_delay.h"
 #include "sdc_writer.h"
 
 USING_YOSYS_NAMESPACE
@@ -253,7 +254,8 @@ class SdcPlugin {
           create_clock_cmd_(clocks_),
           get_clocks_cmd_(clocks_),
           propagate_clocks_cmd_(clocks_),
-          set_false_path_cmd_(sdc_writer_) {
+          set_false_path_cmd_(sdc_writer_),
+          set_max_delay_cmd_(sdc_writer_) {
 	log("Loaded SDC plugin\n");
     }
 
@@ -263,6 +265,7 @@ class SdcPlugin {
     GetClocksCmd get_clocks_cmd_;
     PropagateClocksCmd propagate_clocks_cmd_;
     SetFalsePath set_false_path_cmd_;
+    SetMaxDelay set_max_delay_cmd_;
 
    private:
     Clocks clocks_;
