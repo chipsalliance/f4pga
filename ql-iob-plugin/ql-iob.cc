@@ -34,12 +34,6 @@
 USING_YOSYS_NAMESPACE
 PRIVATE_NAMESPACE_BEGIN
 
-void register_in_tcl_interpreter(const std::string& command) {
-    Tcl_Interp* interp = yosys_get_tcl_interp();
-    std::string tcl_script = stringf("proc %s args { return [yosys %s {*}$args] }", command.c_str(), command.c_str());
-    Tcl_Eval(interp, tcl_script.c_str());
-}
-
 struct QuicklogicIob : public Pass {
 
     struct IoCellType {
@@ -56,7 +50,6 @@ struct QuicklogicIob : public Pass {
 
     QuicklogicIob () :
         Pass("quicklogic_iob", "Map IO buffers to cells that correspond to their assigned locations") {
-            register_in_tcl_interpreter(pass_name);
         }    
 
     void help() YS_OVERRIDE {
