@@ -1,4 +1,5 @@
 yosys -import
+plugin -i design_introspection
 plugin -i xdc
 #Import the commands from the plugins to the tcl interpreter
 yosys -import
