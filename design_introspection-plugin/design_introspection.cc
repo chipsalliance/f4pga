@@ -19,6 +19,7 @@
  */
 
 #include "get_nets.h"
+#include "get_ports.h"
 
 USING_YOSYS_NAMESPACE
 
@@ -27,6 +28,7 @@ PRIVATE_NAMESPACE_BEGIN
 struct DesignIntrospection {
     DesignIntrospection(){}
     GetNets get_nets_cmd;
+    GetPorts get_ports_cmd;
 } DesignIntrospection;
 
 

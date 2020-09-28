@@ -71,57 +71,6 @@ void register_in_tcl_interpreter(const std::string& command) {
 	Tcl_Eval(interp, tcl_script.c_str());
 }
 
-struct GetPorts : public Pass {
-	GetPorts() : Pass("get_ports", "Print matching ports") {
-		register_in_tcl_interpreter(pass_name);
-	}
-
-	void help() override
-	{
-		//   |---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|
-		log("\n");
-		log("   get_ports <port_name> \n");
-		log("\n");
-		log("Get matching ports\n");
-		log("\n");
-		log("Print the output to stdout too. This is useful when all Yosys is executed\n");
-		log("\n");
-	}
-
-	void execute(std::vector<std::string> args, RTLIL::Design* design) override
-	{
-		if (args.size() < 2) {
-			log_cmd_error("No port specified.\n");
-		}
-		RTLIL::Module* top_module = design->top_module();
-		if (top_module == nullptr) {
-			log_cmd_error("No top module detected\n");
-		}
-		// TODO handle more than one port
-		port_name = args.at(1);
-		std::string port_str(port_name.size(), '\0');
-		int bit(0);
-		if (!sscanf(port_name.c_str(), "%[^[][%d]", &port_str[0], &bit)) {
-			log_error("Couldn't find port %s\n", port_name.c_str());
-		}
-
-		port_str.resize(strlen(port_str.c_str()));
-		RTLIL::IdString port_id(RTLIL::escape_id(port_str));
-		if (auto wire = top_module->wire(port_id)) {
-			if (isInputPort(wire) || isOutputPort(wire)) {
-				if (bit >= wire->start_offset && bit < wire->start_offset + wire->width) {
-					Tcl_Interp *interp = yosys_get_tcl_interp();
-					Tcl_SetResult(interp, const_cast<char*>(port_name.c_str()), NULL);
-					log("Found port %s\n", port_name.c_str());
-					return;
-				}
-			}
-		}
-		log_error("Couldn't find port %s\n", port_name.c_str());
-	}
-	std::string port_name;
-};
-
 struct GetIOBanks : public Pass {
 	GetIOBanks(std::function<const BankTilesMap&()> get_bank_tiles)
 		: Pass("get_iobanks", "Set IO Bank number")
@@ -435,7 +384,6 @@ struct ReadXdc : public Frontend {
 	}
 
 	BankTilesMap bank_tiles;
-	struct GetPorts GetPorts;
 	struct GetIOBanks GetIOBanks;
 	struct SetProperty SetProperty;
 } ReadXdc;
