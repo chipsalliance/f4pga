@@ -37,9 +37,8 @@ void GetCmd::execute(std::vector<std::string> args, RTLIL::Design* design) {
     }
 
     size_t argidx;
-    std::vector<std::pair<std::string, std::string>> filters;
+    Filters filters;
     bool is_quiet = false;
-    bool has_filter = false;
 
     // Parse command arguments
     for (argidx = 1; argidx < args.size(); argidx++) {
@@ -79,9 +78,7 @@ void GetCmd::execute(std::vector<std::string> args, RTLIL::Design* design) {
 		filters.emplace_back(filter.substr(0, separator),
 		                     filter.substr(separator + 2));
 	    }
-	    size_t filter_cnt = filters.size();
-	    has_filter = filter_cnt > 0;
-	    if (filter_cnt > 1) {
+	    if (filters.size() > 1) {
 		log_warning(
 		    "Currently -filter switch supports only a single "
 		    "'equal(==)' condition expression, the rest will be "
@@ -100,16 +97,16 @@ void GetCmd::execute(std::vector<std::string> args, RTLIL::Design* design) {
     // Add name of top module to selection string
     std::vector<std::string> selection_args;
     std::transform(args.begin() + argidx, args.end(),
-                   std::back_inserter(selection_args), [&](std::string& net) {
+                   std::back_inserter(selection_args), [&](std::string& obj) {
 	               return RTLIL::unescape_id(top_module->name) +
-	                      "/w:" + net;
+	                      "/" + SelectionType() + ":" + obj;
                    });
 
     // Execute the selection
     extra_args(selection_args, 0, design);
     if (design->selected_modules().empty()) {
 	if (!is_quiet) {
-	    log_warning("Specified net not found in design\n");
+	    log_warning("Specified %s not found in design\n", TypeName().c_str());
 	}
     }
 
@@ -117,26 +114,10 @@ void GetCmd::execute(std::vector<std::string> args, RTLIL::Design* design) {
     Tcl_Interp* interp = yosys_get_tcl_interp();
     Tcl_Obj* tcl_list = Tcl_NewListObj(0, NULL);
     for (auto module : design->selected_modules()) {
-	for (auto wire : module->selected_wires()) {
-	    if (has_filter) {
-		std::pair<std::string, std::string> filter = filters.at(0);
-		std::string attr_value = wire->get_string_attribute(
-		    RTLIL::IdString(RTLIL::escape_id(filter.first)));
-		if (attr_value.compare(filter.second)) {
-		    continue;
-		}
-	    }
-	    if (!is_quiet) {
-		log("%s ", id2cstr(wire->name));
-	    }
-	    Tcl_Obj* value_obj = Tcl_NewStringObj(id2cstr(wire->name), -1);
-	    Tcl_ListObjAppendElement(interp, tcl_list, value_obj);
-	}
+	ExtractSelection(tcl_list, module, filters, is_quiet);
     }
     if (!is_quiet) {
 	log("\n");
     }
     Tcl_SetObjResult(interp, tcl_list);
 }
-/* void execute(std::vector<std::string> args, RTLIL::Design* design) override;
- */
