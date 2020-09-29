@@ -1,10 +1,6 @@
-signal_* ports quiet
-signal_n signal_p
-signal_* ports
-signal_n signal_p
-led ports with filter expression
-led
-Filtered ports
+signal_p port
+signal_p
+clk port
 clk
-All ports
-clk led out_a out_b signal_n signal_p
+led[0] port
+led[0]
