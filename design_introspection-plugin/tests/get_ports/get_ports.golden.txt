@@ -1,0 +1,10 @@
+signal_* ports quiet
+signal_n signal_p
+signal_* ports
+signal_n signal_p
+led ports with filter expression
+led
+Filtered ports
+clk
+All ports
+clk led out_a out_b signal_n signal_p
