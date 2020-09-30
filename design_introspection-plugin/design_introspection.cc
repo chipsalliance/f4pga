@@ -20,6 +20,7 @@
 
 #include "get_nets.h"
 #include "get_ports.h"
+#include "get_cells.h"
 
 USING_YOSYS_NAMESPACE
 
@@ -29,6 +30,7 @@ struct DesignIntrospection {
     DesignIntrospection(){}
     GetNets get_nets_cmd;
     GetPorts get_ports_cmd;
+    GetCells get_cells_cmd;
 } DesignIntrospection;
 
 
