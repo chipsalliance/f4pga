@@ -1,5 +1,6 @@
 Sphinx==3.0.4
 git+http://github.com/SymbiFlow/sphinx_materialdesign_theme.git@master#egg=sphinx_symbiflow_theme
+git+http://github.com/SymbiFlow/sphinx-verilog-domain
 sphinx-markdown-tables==0.0.12
 breathe==4.18.1
 symbolator==1.0.2
