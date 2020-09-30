@@ -1,8 +1,9 @@
-TESTS = get_nets get_ports
+TESTS = get_nets get_ports get_cells
 .PHONY: $(TESTS)
 
 get_nets_verify = $(call compare,get_nets,txt)
 get_ports_verify = $(call compare,get_ports,txt)
+get_cells_verify = $(call compare,get_cells,txt)
 
 all: $(TESTS)
 compare = diff $(1)/$(1).golden.$(2) $(1)/$(1).$(2)
