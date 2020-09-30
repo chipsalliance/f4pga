@@ -1,0 +1,24 @@
+plugin -i ql-iob
+read_verilog design.v
+
+# Generic synthesis
+synth -lut 4 -flatten -auto-top
+
+# Techmap
+read_verilog -lib ../common/pp3_cells_sim.v
+techmap -map ../common/pp3_cells_map.v
+
+# Insert QuickLogic specific IOBs and clock buffers
+clkbufmap -buf $_BUF_ Y:A -inpad ckpad Q:P
+iopadmap -bits -outpad outpad A:P -inpad inpad Q:P -tinoutpad bipad EN:Q:A:P A:top
+opt_clean
+
+stat
+
+quicklogic_iob design.pcf ../pinmap.csv
+
+select r:IO_TYPE=BIDIR   -assert-count 3
+select r:IO_TYPE=SDIOMUX -assert-count 2
+select r:IO_TYPE=        -assert-count 1
+
+write_blif -attr -param -cname design.eblif
