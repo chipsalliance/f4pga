@@ -30,9 +30,24 @@ void GetCmd::help() {
     log("\n");
 }
 
+void GetCmd::ExecuteSelection(RTLIL::Design* design, std::vector<std::string>& args, size_t argidx, bool is_quiet) {
+    std::vector<std::string> selection_args;
+    // Add name of top module to selection string
+    std::transform(args.begin() + argidx, args.end(),
+                   std::back_inserter(selection_args), [&](std::string& obj) {
+	               return RTLIL::unescape_id(design->top_module()->name) + "/" +
+	                      SelectionType() + ":" + obj;
+                   });
+    extra_args(selection_args, 0, design);
+    if (design->selected_modules().empty()) {
+	if (!is_quiet) {
+	    log_warning("Specified %s not found in design\n", TypeName().c_str());
+	}
+    }
+}
+
 void GetCmd::execute(std::vector<std::string> args, RTLIL::Design* design) {
-    RTLIL::Module* top_module = design->top_module();
-    if (top_module == nullptr) {
+    if (design->top_module() == nullptr) {
 	log_cmd_error("No top module detected\n");
     }
 
@@ -94,21 +109,7 @@ void GetCmd::execute(std::vector<std::string> args, RTLIL::Design* design) {
 	break;
     }
 
-    // Add name of top module to selection string
-    std::vector<std::string> selection_args;
-    std::transform(args.begin() + argidx, args.end(),
-                   std::back_inserter(selection_args), [&](std::string& obj) {
-	               return RTLIL::unescape_id(top_module->name) +
-	                      "/" + SelectionType() + ":" + obj;
-                   });
-
-    // Execute the selection
-    extra_args(selection_args, 0, design);
-    if (design->selected_modules().empty()) {
-	if (!is_quiet) {
-	    log_warning("Specified %s not found in design\n", TypeName().c_str());
-	}
-    }
+    ExecuteSelection(design, args, argidx, is_quiet);
 
     // Pack the selected nets into Tcl List
     Tcl_Interp* interp = yosys_get_tcl_interp();
