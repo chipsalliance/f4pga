@@ -38,33 +38,31 @@ std::vector<RTLIL::Wire*> NaturalPropagation::FindAliasWires(
 }
 
 std::vector<Clock> ClockDividerPropagation::FindSinkClocksForCellType(
-    RTLIL::Wire* driver_wire, const std::string& cell_type) {
+    Clock driving_clock, const std::string& cell_type) {
     std::vector<Clock> clocks;
-    if (cell_type == "PLLE2_ADV") {
-	RTLIL::Cell* cell = NULL;
-	for (auto input : Pll::inputs) {
-	    cell = FindSinkCellOnPort(driver_wire, input);
-	    if (cell and RTLIL::unescape_id(cell->type) == cell_type) {
-		break;
+    auto clock_wires = driving_clock.GetClockWires();
+    for (auto clock_wire : clock_wires) {
+	if (cell_type == "PLLE2_ADV") {
+	    RTLIL::Cell* cell = NULL;
+	    for (auto input : Pll::inputs) {
+		cell = FindSinkCellOnPort(clock_wire, input);
+		if (cell and RTLIL::unescape_id(cell->type) == cell_type) {
+		    break;
+		}
 	    }
-	}
-	if (!cell) {
-	    return clocks;
-	}
-	Pll pll(cell);
-	for (auto output : Pll::outputs) {
-	    RTLIL::Wire* wire = FindSinkWireOnPort(cell, output);
-	    if (wire) {
-		float clkout_period(pll.clkout_period.at(output));
-		float clkout_shift(pll.clkout_shift.at(output));
-		float clkout_duty_cycle(pll.clkout_duty_cycle.at(output));
-		Clock clock(RTLIL::unescape_id(wire->name), wire, clkout_period, clkout_shift,
-		            clkout_shift + clkout_duty_cycle * clkout_period);
-		clocks.push_back(clock);
-		auto further_clocks =
-		    FindSinkClocksForCellType(wire, cell_type);
-		std::copy(further_clocks.begin(), further_clocks.end(),
-		          std::back_inserter(clocks));
+	    if (!cell) {
+		return clocks;
+	    }
+	    Pll pll(cell, driving_clock.Period(), driving_clock.RisingEdge());
+	    for (auto output : Pll::outputs) {
+		RTLIL::Wire* wire = FindSinkWireOnPort(cell, output);
+		if (wire) {
+		    float clkout_period(pll.clkout_period.at(output));
+		    float clkout_rising_edge(pll.clkout_rising_edge.at(output));
+		    float clkout_falling_edge(pll.clkout_falling_edge.at(output));
+		    Clock clock(wire, clkout_period, clkout_rising_edge, clkout_falling_edge);
+		    clocks.push_back(clock);
+		}
 	    }
 	}
     }

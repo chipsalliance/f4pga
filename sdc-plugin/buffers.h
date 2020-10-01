@@ -18,8 +18,6 @@
 #ifndef _BUFFERS_H_
 #define _BUFFERS_H_
 
-#include <cassert>
-#include <initializer_list>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -40,73 +38,50 @@ struct IBuf : Buffer {
 };
 
 struct Bufg : Buffer {
-    Bufg() : Buffer(1, "BUFG", "O"){};
+    Bufg() : Buffer(0, "BUFG", "O"){};
 };
 
 struct Pll {
-    Pll(RTLIL::Cell* cell) : cell(cell) {
-	assert(RTLIL::unescape_id(cell->type) == "PLLE2_ADV");
-	clkin1_period = FetchParam(cell, "CLKIN1_PERIOD", 0.0);
-	clkin2_period = FetchParam(cell, "CLKIN2_PERIOD", 0.0);
-	clk_mult = FetchParam(cell, "CLKFBOUT_MULT", 5.0);
-	divclk_divisor = FetchParam(cell, "DIVCLK_DIVIDE", 1.0);
-	for (auto clk_output : outputs) {
-	    // CLKOUT[0-5]_DIVIDE
-	    clkout_divisors[clk_output] = FetchParam(cell, clk_output + "_DIVIDE", 1.0);
-	    clkout_period[clk_output] = CalculatePeriod(clk_output);
+    Pll(RTLIL::Cell* cell, float input_clock_period, float input_clock_rising_edge);
 
-	    // CLKOUT[0-5]_PHASE
-	    clkout_phase[clk_output] = FetchParam(cell, clk_output + "_PHASE", 0.0);
+    // Helper function to fetch a cell parameter or return a default value
+    static float FetchParam(RTLIL::Cell* cell, std::string&& param_name,
+                            float default_value);
 
-	    // Take the delay off the PLL into account
-	    clkout_shift[clk_output] = CalculateShift(clk_output) + delay;
+    // Get the period of the input clock
+    // TODO Add support for CLKINSEL
+    float ClkinPeriod() { return clkin1_period; }
 
-	    // CLKOUT[0-5]_DUTY_CYCLE
-	    clkout_duty_cycle[clk_output] = FetchParam(cell, clk_output + "_DUTY_CYCLE", 0.5);
-	}
-    };
+    static const std::vector<std::string> inputs;
+    static const std::vector<std::string> outputs;
+    std::unordered_map<std::string, float> clkout_period;
+    std::unordered_map<std::string, float> clkout_duty_cycle;
+    std::unordered_map<std::string, float> clkout_rising_edge;
+    std::unordered_map<std::string, float> clkout_falling_edge;
 
-    // CLKOUT[0-5]_PERIOD = CLKIN1_PERIOD * CLKOUT[0-5]_DIVIDE * DIVCLK_DIVIDE /
-    // CLKFBOUT_MULT
-    // TODO Check the value on CLKINSEL
-    float CalculatePeriod(const std::string& output) {
-	return clkin1_period * clkout_divisors.at(output) / clk_mult *
-	       divclk_divisor;
-    }
+   private:
+    // Approximate equality check of the input clock period and specified in
+    // CLKIN[1/2]_PERIOD parameter
+    void CheckInputClockPeriod(RTLIL::Cell* cell, float input_clock_period);
 
-    float CalculateShift(const std::string& output) {
-	return clkout_period.at(output) * clkout_phase.at(output) / 360.0;
-    }
+    // Fetch cell's parameters needed for further calculations
+    void FetchParams(RTLIL::Cell* cell);
 
-    float FetchParam(RTLIL::Cell* cell, std::string&& param_name, float default_value) {
-	    RTLIL::IdString param(RTLIL::escape_id(param_name));
-	    if (cell->hasParam(param)) {
-		auto param_obj = cell->parameters.at(param);
-		std::string value;
-		if (param_obj.flags & RTLIL::CONST_FLAG_STRING) {
-		    value = param_obj.decode_string();
-		} else {
-		    value = std::to_string(param_obj.as_int());
-		}
-		return std::stof(value);
-	    }
-	    return default_value;
-    }
+    // Calculate the period on the output clocks
+    void CalculateOutputClockPeriods();
+
+    // Calculate the rising and falling edges of the output clocks
+    void CalculateOutputClockWaveforms(float input_clock_rising_edge);
 
     static const float delay;
     static const std::string name;
-    static const std::vector<std::string> inputs;
-    static const std::vector<std::string> outputs;
-    RTLIL::Cell* cell;
-    std::unordered_map<std::string, float> clkout_period;
-    std::unordered_map<std::string, float> clkout_duty_cycle;
+    std::unordered_map<std::string, float> clkout_divisor;
     std::unordered_map<std::string, float> clkout_phase;
-    std::unordered_map<std::string, float> clkout_shift;
-    std::unordered_map<std::string, float> clkout_divisors;
     float clkin1_period;
     float clkin2_period;
     float divclk_divisor;
     float clk_mult;
+    float clk_fbout_phase;
 };
 
 #endif  // _BUFFERS_H_

@@ -1,9 +1,12 @@
-TESTS = counter counter2 pll
+TESTS = counter counter2 pll pll_div pll_fbout_phase pll_approx_equal
 .PHONY: $(TESTS)
 
 counter_verify = $(call compare,counter,sdc) && $(call compare,counter,txt)
 counter2_verify = $(call compare,counter2,sdc) && $(call compare,counter2,txt)
 pll_verify = $(call compare,pll,sdc)
+pll_div_verify = $(call compare,pll_div,sdc)
+pll_fbout_phase_verify = $(call compare,pll_fbout_phase,sdc)
+pll_approx_equal_verify = $(call compare,pll_approx_equal,sdc)
 
 all: $(TESTS)
 compare = diff $(1)/$(1).golden.$(2) $(1)/$(1).$(2)

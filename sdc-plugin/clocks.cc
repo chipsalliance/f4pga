@@ -17,6 +17,7 @@
  */
 #include "clocks.h"
 #include <cassert>
+#include <cmath>
 #include "kernel/log.h"
 #include "kernel/register.h"
 #include "propagation.h"
@@ -37,12 +38,11 @@ void Clocks::AddClock(const std::string& name, RTLIL::Wire* wire, float period,
 	log("Clock %s already exists and will be overwritten\n", name.c_str());
 	clock->UpdateClock(wire, period, rising_edge, falling_edge);
     } else {
-	log("Inserting clock %s with period %f, r:%f, f:%f\n", name.c_str(),
-	    period, rising_edge, falling_edge);
-	if (falling_edge > period) {
-	    log_error("Phase shift on clock %s exceeds 360 degrees\nRising edge: %f, Falling edge: %f, Clock period:%f\n", name.c_str(), rising_edge, falling_edge, period);
-	}
+	rising_edge = fmod(rising_edge, period);
+	falling_edge = fmod(falling_edge, period);
 	clocks_.emplace_back(name, wire, period, rising_edge, falling_edge);
+	log("Added clock %s with period %f, rising_edge:%f, falling_edge:%f\n", name.c_str(),
+	    period, rising_edge, falling_edge);
     }
 }
 
@@ -123,18 +123,14 @@ void Clocks::Propagate(ClockDividerPropagation* pass) {
 #ifdef SDC_DEBUG
 	log("Processing clock %s\n", clock.Name().c_str());
 #endif
-	auto clock_wires = clock.GetClockWires();
-	for (auto clock_wire : clock_wires) {
-	    auto pll_clocks =
-	        pass->FindSinkClocksForCellType(clock_wire, "PLLE2_ADV");
-	    for (auto pll_clock : pll_clocks) {
+	auto pll_clocks =
+	    pass->FindSinkClocksForCellType(clock, "PLLE2_ADV");
+	for (auto pll_clock : pll_clocks) {
 #ifdef SDC_DEBUG
-		log("PLL clock: %s\n", pll_clock.Name().c_str());
+	    log("PLL clock: %s\n", pll_clock.Name().c_str());
 #endif
-		pll_clock.ApplyShift(clock.RisingEdge());
-		AddClock(pll_clock);
-		PropagateThroughBuffer(pass, pll_clock, Bufg());
-	    }
+	    AddClock(pll_clock);
+	    PropagateThroughBuffer(pass, pll_clock, Bufg());
 	}
     }
 #ifdef SDC_DEBUG
@@ -205,6 +201,10 @@ Clock::Clock(const std::string& name, std::vector<RTLIL::Wire*> wires,
                   [&, this](RTLIL::Wire* wire) { UpdateWires(wire); });
 }
 
+Clock::Clock(RTLIL::Wire* wire, float period,
+             float rising_edge, float falling_edge)
+    : Clock(RTLIL::id2cstr(wire->name), wire, period, rising_edge, falling_edge) {}
+
 void Clock::UpdateClock(RTLIL::Wire* wire, float period, float rising_edge,
                         float falling_edge) {
     UpdateWires(wire);
@@ -224,17 +224,8 @@ void Clock::UpdatePeriod(float period) {
 }
 
 void Clock::UpdateWaveform(float rising_edge, float falling_edge) {
-    rising_edge_ = rising_edge;
-    falling_edge_ = falling_edge;
-    if (falling_edge_ > period_) {
-	log_error("Phase shift on clock %s exceeds 360 degrees\nRising edge: %f, Falling edge: %f, Clock period:%f\n", name_.c_str(), rising_edge_, falling_edge_, period_);
-    }
-}
-
-void Clock::ApplyShift(float rising_edge) {
-    float new_rising_edge = rising_edge_ + rising_edge;
-    float new_falling_edge = falling_edge_ + rising_edge;
-    UpdateWaveform(new_rising_edge, new_falling_edge);
+    rising_edge_ = fmod(rising_edge, period_);
+    falling_edge_ = fmod(falling_edge, period_);
 }
 
 std::string Clock::ClockWireName(RTLIL::Wire* wire) {
