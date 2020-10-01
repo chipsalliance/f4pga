@@ -71,6 +71,9 @@ class Clocks {
     void Propagate(BufferPropagation* pass);
     void Propagate(ClockDividerPropagation* pass);
     void WriteSdc(std::ostream& file);
+    const std::vector<Clock> GetClocks() {
+	return clocks_;
+    }
 
    private:
     std::vector<Clock> clocks_;

@@ -21,6 +21,9 @@
 #include "kernel/register.h"
 #include "kernel/rtlil.h"
 #include "propagation.h"
+#include "set_false_path.h"
+#include "set_max_delay.h"
+#include "sdc_writer.h"
 
 USING_YOSYS_NAMESPACE
 
@@ -57,8 +60,8 @@ struct ReadSdcCmd : public Frontend {
 };
 
 struct WriteSdcCmd : public Backend {
-    WriteSdcCmd(Clocks& clocks)
-        : Backend("sdc", "Write SDC file"), clocks_(clocks) {}
+    WriteSdcCmd(Clocks& clocks, SdcWriter& sdc_writer)
+        : Backend("sdc", "Write SDC file"), clocks_(clocks), sdc_writer_(sdc_writer) {}
 
     void help() override {
 	log("\n");
@@ -75,10 +78,11 @@ struct WriteSdcCmd : public Backend {
 	}
 	log("\nWriting out clock constraints file(SDC)\n");
 	extra_args(f, filename, args, 1);
-	clocks_.WriteSdc(*f);
+	sdc_writer_.WriteSdc(clocks_, *f);
     }
 
     Clocks& clocks_;
+    SdcWriter& sdc_writer_;
 };
 
 struct CreateClockCmd : public Pass {
@@ -246,10 +250,12 @@ struct PropagateClocksCmd : public Pass {
 class SdcPlugin {
    public:
     SdcPlugin()
-        : write_sdc_cmd_(clocks_),
+        : write_sdc_cmd_(clocks_, sdc_writer_),
           create_clock_cmd_(clocks_),
           get_clocks_cmd_(clocks_),
-          propagate_clocks_cmd_(clocks_) {
+          propagate_clocks_cmd_(clocks_),
+          set_false_path_cmd_(sdc_writer_),
+          set_max_delay_cmd_(sdc_writer_) {
 	log("Loaded SDC plugin\n");
     }
 
@@ -258,9 +264,12 @@ class SdcPlugin {
     CreateClockCmd create_clock_cmd_;
     GetClocksCmd get_clocks_cmd_;
     PropagateClocksCmd propagate_clocks_cmd_;
+    SetFalsePath set_false_path_cmd_;
+    SetMaxDelay set_max_delay_cmd_;
 
    private:
     Clocks clocks_;
+    SdcWriter sdc_writer_;
 } SdcPlugin;
 
 PRIVATE_NAMESPACE_END
