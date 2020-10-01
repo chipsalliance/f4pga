@@ -8,6 +8,13 @@ USING_YOSYS_NAMESPACE
 struct GetCmd : public Pass {
     using Filter = std::pair<std::string, std::string>;
     using Filters = std::vector<Filter>;
+    using SelectionObjects = std::vector<std::string>;
+    struct CommandArgs {
+	size_t current_args_idx;
+	Filters filters;
+	bool is_quiet;
+	SelectionObjects selection_objects;
+    };
 
     GetCmd(const std::string& name, const std::string& description)
         : Pass(name, description) {}
@@ -15,13 +22,14 @@ struct GetCmd : public Pass {
     void help() override;
     void execute(std::vector<std::string> args, RTLIL::Design* design) override;
 
-   private:
+   protected:
     virtual std::string TypeName() = 0;
     virtual std::string SelectionType() = 0;
-    virtual void ExtractSelection(Tcl_Obj*, RTLIL::Module*, Filters&, bool) = 0;
+    CommandArgs ParseCommand(const std::vector<std::string>& args);
+    virtual void ExtractSelection(Tcl_Obj*, RTLIL::Module*, const CommandArgs& args) {}
     virtual void ExecuteSelection(RTLIL::Design* design,
-                                  std::vector<std::string>& args, size_t argidx,
-                                  bool is_quiet);
+                                  std::vector<std::string>& raw_args, const CommandArgs& args);
+    virtual void PackSelectionToTcl(RTLIL::Design* design, const CommandArgs& args);
 };
 
 #endif  // GET_CMD_H_

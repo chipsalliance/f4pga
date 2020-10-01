@@ -30,36 +30,44 @@ void GetCmd::help() {
     log("\n");
 }
 
-void GetCmd::ExecuteSelection(RTLIL::Design* design, std::vector<std::string>& args, size_t argidx, bool is_quiet) {
+void GetCmd::ExecuteSelection(RTLIL::Design* design, std::vector<std::string>& raw_args, const CommandArgs& args) {
     std::vector<std::string> selection_args;
     // Add name of top module to selection string
-    std::transform(args.begin() + argidx, args.end(),
+    std::transform(raw_args.begin() + args.current_args_idx, raw_args.end(),
                    std::back_inserter(selection_args), [&](std::string& obj) {
 	               return RTLIL::unescape_id(design->top_module()->name) + "/" +
 	                      SelectionType() + ":" + obj;
                    });
     extra_args(selection_args, 0, design);
     if (design->selected_modules().empty()) {
-	if (!is_quiet) {
+	if (!args.is_quiet) {
 	    log_warning("Specified %s not found in design\n", TypeName().c_str());
 	}
     }
 }
 
-void GetCmd::execute(std::vector<std::string> args, RTLIL::Design* design) {
-    if (design->top_module() == nullptr) {
-	log_cmd_error("No top module detected\n");
+void GetCmd::PackSelectionToTcl(RTLIL::Design* design, const CommandArgs& args) {
+    // Pack the selected nets into Tcl List
+    Tcl_Obj* tcl_list = Tcl_NewListObj(0, NULL);
+    for (auto module : design->selected_modules()) {
+	ExtractSelection(tcl_list, module, args);
     }
+    if (!args.is_quiet) {
+	log("\n");
+    }
+    Tcl_SetObjResult(yosys_get_tcl_interp(), tcl_list);
+}
 
+GetCmd::CommandArgs GetCmd::ParseCommand(const std::vector<std::string>& args) {
+    CommandArgs parsed_args{.current_args_idx = 0,
+                            .filters = Filters(),
+                            .is_quiet = false,
+                            .selection_objects = SelectionObjects()};
     size_t argidx;
-    Filters filters;
-    bool is_quiet = false;
-
-    // Parse command arguments
     for (argidx = 1; argidx < args.size(); argidx++) {
 	std::string arg = args[argidx];
 	if (arg == "-quiet") {
-	    is_quiet = true;
+	    parsed_args.is_quiet = true;
 	    continue;
 	}
 
@@ -90,10 +98,10 @@ void GetCmd::execute(std::vector<std::string> args, RTLIL::Design* design) {
 		    log_cmd_error("Incorrect filter expression: %s\n",
 		                  args[argidx].c_str());
 		}
-		filters.emplace_back(filter.substr(0, separator),
+		parsed_args.filters.emplace_back(filter.substr(0, separator),
 		                     filter.substr(separator + 2));
 	    }
-	    if (filters.size() > 1) {
+	    if (parsed_args.filters.size() > 1) {
 		log_warning(
 		    "Currently -filter switch supports only a single "
 		    "'equal(==)' condition expression, the rest will be "
@@ -108,17 +116,17 @@ void GetCmd::execute(std::vector<std::string> args, RTLIL::Design* design) {
 
 	break;
     }
+    std::copy(args.begin() + argidx, args.end(), std::back_inserter(parsed_args.selection_objects));
+    parsed_args.current_args_idx = argidx;
+    return parsed_args;
+}
 
-    ExecuteSelection(design, args, argidx, is_quiet);
+void GetCmd::execute(std::vector<std::string> args, RTLIL::Design* design) {
+    if (design->top_module() == nullptr) {
+	log_cmd_error("No top module detected\n");
+    }
 
-    // Pack the selected nets into Tcl List
-    Tcl_Interp* interp = yosys_get_tcl_interp();
-    Tcl_Obj* tcl_list = Tcl_NewListObj(0, NULL);
-    for (auto module : design->selected_modules()) {
-	ExtractSelection(tcl_list, module, filters, is_quiet);
-    }
-    if (!is_quiet) {
-	log("\n");
-    }
-    Tcl_SetObjResult(interp, tcl_list);
+    CommandArgs parsed_args(ParseCommand(args));
+    ExecuteSelection(design, args, parsed_args);
+    PackSelectionToTcl(design, parsed_args);
 }

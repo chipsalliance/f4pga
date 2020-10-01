@@ -7,20 +7,20 @@ std::string GetPorts::TypeName() { return "port"; }
 std::string GetPorts::SelectionType() { return "x"; }
 
 void GetPorts::ExtractSelection(Tcl_Obj* tcl_list, RTLIL::Module* module,
-                                GetCmd::Filters& filters, bool is_quiet) {
+                                const CommandArgs& args) {
     for (auto wire : module->selected_wires()) {
 	if (!wire->port_input and !wire->port_output) {
 	    continue;
 	}
-	if (filters.size() > 0) {
-	    Filter filter = filters.at(0);
+	if (args.filters.size() > 0) {
+	    Filter filter = args.filters.at(0);
 	    std::string attr_value = wire->get_string_attribute(
 	        RTLIL::IdString(RTLIL::escape_id(filter.first)));
 	    if (attr_value.compare(filter.second)) {
 		continue;
 	    }
 	}
-	if (!is_quiet) {
+	if (!args.is_quiet) {
 	    log("%s ", id2cstr(wire->name));
 	}
 	Tcl_Obj* value_obj = Tcl_NewStringObj(id2cstr(wire->name), -1);

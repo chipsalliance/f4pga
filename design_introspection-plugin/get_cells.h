@@ -11,7 +11,7 @@ struct GetCells : public GetCmd {
     std::string TypeName() override;
     std::string SelectionType() override;
     void ExtractSelection(Tcl_Obj* tcl_list, RTLIL::Module* module,
-                          Filters& filters, bool is_quiet) override;
+                          const CommandArgs& args) override;
 };
 
 #endif  // GET_CELLS_H_

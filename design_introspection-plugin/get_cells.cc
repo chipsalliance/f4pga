@@ -7,17 +7,17 @@ std::string GetCells::TypeName() { return "cell"; }
 std::string GetCells::SelectionType() { return "c"; }
 
 void GetCells::ExtractSelection(Tcl_Obj* tcl_list, RTLIL::Module* module,
-                               Filters& filters, bool is_quiet) {
+                                const CommandArgs& args) {
     for (auto cell : module->selected_cells()) {
-	if (filters.size() > 0) {
-	    Filter filter = filters.at(0);
+	if (args.filters.size() > 0) {
+	    Filter filter = args.filters.at(0);
 	    std::string attr_value = cell->get_string_attribute(
 	        RTLIL::IdString(RTLIL::escape_id(filter.first)));
 	    if (attr_value.compare(filter.second)) {
 		continue;
 	    }
 	}
-	if (!is_quiet) {
+	if (!args.is_quiet) {
 	    log("%s ", id2cstr(cell->name));
 	}
 	Tcl_Obj* value_obj = Tcl_NewStringObj(id2cstr(cell->name), -1);
