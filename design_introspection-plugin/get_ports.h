@@ -8,9 +8,12 @@ USING_YOSYS_NAMESPACE
 struct GetPorts : public GetCmd {
     GetPorts() : GetCmd("get_ports", "Print matching ports") {}
 
+   private:
     std::string TypeName() override;
     std::string SelectionType() override;
     void execute(std::vector<std::string> args, RTLIL::Design* design) override;
+    SelectionObjects ExtractSelection(RTLIL::Design* design,
+                                      const CommandArgs& args) override;
 };
 
 #endif  // GET_PORTS_H_

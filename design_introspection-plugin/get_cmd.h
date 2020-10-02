@@ -22,13 +22,15 @@ struct GetCmd : public Pass {
     void execute(std::vector<std::string> args, RTLIL::Design* design) override;
 
    protected:
+    CommandArgs ParseCommand(const std::vector<std::string>& args);
+    void PackToTcl(const SelectionObjects& objects);
+
+   private:
     virtual std::string TypeName() = 0;
     virtual std::string SelectionType() = 0;
-    CommandArgs ParseCommand(const std::vector<std::string>& args);
-    virtual void ExtractSelection(Tcl_Obj*, RTLIL::Module*, const CommandArgs& args) {}
+    virtual SelectionObjects ExtractSelection(RTLIL::Design* design, const CommandArgs& args) = 0;
     virtual void ExecuteSelection(RTLIL::Design* design,
                                   const CommandArgs& args);
-    virtual void PackSelectionToTcl(RTLIL::Design* design, const CommandArgs& args);
 };
 
 #endif  // GET_CMD_H_

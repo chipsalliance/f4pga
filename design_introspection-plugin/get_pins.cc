@@ -28,6 +28,10 @@ void GetPins::execute(std::vector<std::string> args, RTLIL::Design* design) {
     Tcl_SetObjResult(yosys_get_tcl_interp(), tcl_list);
 }
 
+GetPins::SelectionObjects GetPins::ExtractSelection(RTLIL::Design* design, const CommandArgs& args) {
+    return SelectionObjects();
+}
+
 void GetPins::ExtractSingleSelection(Tcl_Obj* tcl_list, RTLIL::Design* design,
                                      const std::string& port_name,
                                      const CommandArgs& args) {

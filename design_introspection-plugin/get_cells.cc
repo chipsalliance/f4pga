@@ -6,21 +6,24 @@ std::string GetCells::TypeName() { return "cell"; }
 
 std::string GetCells::SelectionType() { return "c"; }
 
-void GetCells::ExtractSelection(Tcl_Obj* tcl_list, RTLIL::Module* module,
-                                const CommandArgs& args) {
-    for (auto cell : module->selected_cells()) {
-	if (args.filters.size() > 0) {
-	    Filter filter = args.filters.at(0);
-	    std::string attr_value = cell->get_string_attribute(
-	        RTLIL::IdString(RTLIL::escape_id(filter.first)));
-	    if (attr_value.compare(filter.second)) {
-		continue;
+GetCells::SelectionObjects GetCells::ExtractSelection(RTLIL::Design* design, const CommandArgs& args) {
+    SelectionObjects selected_objects;
+    for (auto module : design->selected_modules()) {
+	for (auto cell : module->selected_cells()) {
+	    if (args.filters.size() > 0) {
+		Filter filter = args.filters.at(0);
+		std::string attr_value = cell->get_string_attribute(
+		    RTLIL::IdString(RTLIL::escape_id(filter.first)));
+		if (attr_value.compare(filter.second)) {
+		    continue;
+		}
 	    }
+	    std::string object_name(RTLIL::unescape_id(cell->name));
+	    if (!args.is_quiet) {
+		log("%s ", object_name.c_str());
+	    }
+	    selected_objects.push_back(object_name);
 	}
-	if (!args.is_quiet) {
-	    log("%s ", id2cstr(cell->name));
-	}
-	Tcl_Obj* value_obj = Tcl_NewStringObj(id2cstr(cell->name), -1);
-	Tcl_ListObjAppendElement(yosys_get_tcl_interp(), tcl_list, value_obj);
     }
+    return selected_objects;
 }

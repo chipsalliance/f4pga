@@ -6,6 +6,10 @@ std::string GetPorts::TypeName() { return "port"; }
 
 std::string GetPorts::SelectionType() { return "x"; }
 
+GetPorts::SelectionObjects GetPorts::ExtractSelection(RTLIL::Design* design, const CommandArgs& args) {
+    return SelectionObjects();
+}
+
 void GetPorts::execute(std::vector<std::string> args, RTLIL::Design* design) {
     if (args.size() < 2) {
 	log_cmd_error("No port specified.\n");

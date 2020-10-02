@@ -8,11 +8,12 @@ USING_YOSYS_NAMESPACE
 struct GetPins : public GetCmd {
     GetPins() : GetCmd("get_pins", "Print matching pins") {}
 
+   private:
     std::string TypeName() override;
     std::string SelectionType() override;
     void execute(std::vector<std::string> args, RTLIL::Design* design) override;
-
-   private:
+    SelectionObjects ExtractSelection(RTLIL::Design* design,
+                                      const CommandArgs& args) override;
     void ExtractSingleSelection(Tcl_Obj* tcl_list, RTLIL::Design* design,
                                 const std::string& port_name,
                                 const CommandArgs& args);

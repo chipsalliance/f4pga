@@ -34,28 +34,33 @@ void GetCmd::ExecuteSelection(RTLIL::Design* design, const CommandArgs& args) {
     std::vector<std::string> selection_args;
     // Add name of top module to selection string
     std::transform(args.selection_objects.begin(), args.selection_objects.end(),
-                   std::back_inserter(selection_args), [&](const std::string& obj) {
-	               return RTLIL::unescape_id(design->top_module()->name) + "/" +
-	                      SelectionType() + ":" + obj;
+                   std::back_inserter(selection_args),
+                   [&](const std::string& obj) {
+	               return RTLIL::unescape_id(design->top_module()->name) +
+	                      "/" + SelectionType() + ":" + obj;
                    });
     extra_args(selection_args, 0, design);
     if (design->selected_modules().empty()) {
 	if (!args.is_quiet) {
-	    log_warning("Specified %s not found in design\n", TypeName().c_str());
+	    log_warning("Specified %s not found in design\n",
+	                TypeName().c_str());
 	}
     }
 }
 
-void GetCmd::PackSelectionToTcl(RTLIL::Design* design, const CommandArgs& args) {
-    // Pack the selected nets into Tcl List
-    Tcl_Obj* tcl_list = Tcl_NewListObj(0, NULL);
-    for (auto module : design->selected_modules()) {
-	ExtractSelection(tcl_list, module, args);
+void GetCmd::PackToTcl(const SelectionObjects& objects) {
+    Tcl_Obj* tcl_result;
+    if (objects.size() == 1) {
+	tcl_result = Tcl_NewStringObj(objects.at(0).c_str(), -1);
+    } else {
+	tcl_result = Tcl_NewListObj(0, NULL);
+	for (const auto& object : objects) {
+	    Tcl_Obj* value_obj = Tcl_NewStringObj(object.c_str(), -1);
+	    Tcl_ListObjAppendElement(yosys_get_tcl_interp(), tcl_result,
+	                             value_obj);
+	}
     }
-    if (!args.is_quiet) {
-	log("\n");
-    }
-    Tcl_SetObjResult(yosys_get_tcl_interp(), tcl_list);
+    Tcl_SetObjResult(yosys_get_tcl_interp(), tcl_result);
 }
 
 GetCmd::CommandArgs GetCmd::ParseCommand(const std::vector<std::string>& args) {
@@ -98,7 +103,7 @@ GetCmd::CommandArgs GetCmd::ParseCommand(const std::vector<std::string>& args) {
 		                  args[argidx].c_str());
 		}
 		parsed_args.filters.emplace_back(filter.substr(0, separator),
-		                     filter.substr(separator + 2));
+		                                 filter.substr(separator + 2));
 	    }
 	    if (parsed_args.filters.size() > 1) {
 		log_warning(
@@ -115,7 +120,8 @@ GetCmd::CommandArgs GetCmd::ParseCommand(const std::vector<std::string>& args) {
 
 	break;
     }
-    std::copy(args.begin() + argidx, args.end(), std::back_inserter(parsed_args.selection_objects));
+    std::copy(args.begin() + argidx, args.end(),
+              std::back_inserter(parsed_args.selection_objects));
     return parsed_args;
 }
 
@@ -126,5 +132,5 @@ void GetCmd::execute(std::vector<std::string> args, RTLIL::Design* design) {
 
     CommandArgs parsed_args(ParseCommand(args));
     ExecuteSelection(design, parsed_args);
-    PackSelectionToTcl(design, parsed_args);
+    PackToTcl(ExtractSelection(design, parsed_args));
 }
