@@ -5,7 +5,7 @@ LDLIBS = $(shell yosys-config --ldlibs)
 PLUGINS_DIR = $(shell yosys-config --datdir)/plugins
 
 NAME = design_introspection
-OBJS = $(NAME).o get_cmd.o get_nets.o get_ports.o get_cells.o
+OBJS = $(NAME).o get_cmd.o get_nets.o get_ports.o get_cells.o get_pins.o
 
 $(NAME).so: $(OBJS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared -o $@ $^ $(LDLIBS)
