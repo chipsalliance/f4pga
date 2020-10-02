@@ -11,9 +11,11 @@ struct GetPorts : public GetCmd {
    private:
     std::string TypeName() override;
     std::string SelectionType() override;
-    void execute(std::vector<std::string> args, RTLIL::Design* design) override;
+    /* void execute(std::vector<std::string> args, RTLIL::Design* design) override; */
     SelectionObjects ExtractSelection(RTLIL::Design* design,
                                       const CommandArgs& args) override;
+    void ExecuteSelection(RTLIL::Design* design,
+                          const CommandArgs& args) override;
 };
 
 #endif  // GET_PORTS_H_

@@ -11,10 +11,12 @@ struct GetPins : public GetCmd {
    private:
     std::string TypeName() override;
     std::string SelectionType() override;
-    void execute(std::vector<std::string> args, RTLIL::Design* design) override;
     SelectionObjects ExtractSelection(RTLIL::Design* design,
                                       const CommandArgs& args) override;
-    void ExtractSingleSelection(Tcl_Obj* tcl_list, RTLIL::Design* design,
+    void ExecuteSelection(RTLIL::Design* design,
+                          const CommandArgs& args) override;
+    void ExtractSingleSelection(SelectionObjects& objects,
+                                RTLIL::Design* design,
                                 const std::string& port_name,
                                 const CommandArgs& args);
 };

@@ -6,33 +6,28 @@ std::string GetPins::TypeName() { return "pin"; }
 
 std::string GetPins::SelectionType() { return "c"; }
 
-void GetPins::execute(std::vector<std::string> args, RTLIL::Design* design) {
-    if (design->top_module() == nullptr) {
-	log_cmd_error("No top module detected\n");
-    }
+void GetPins::ExecuteSelection([[gnu::unused]] RTLIL::Design* design,
+                               [[gnu::unused]] const CommandArgs& args) {
+}
 
-    CommandArgs parsed_args(ParseCommand(args));
-    Tcl_Obj* tcl_list = Tcl_NewListObj(0, NULL);
-    for (auto obj : parsed_args.selection_objects) {
+GetPins::SelectionObjects GetPins::ExtractSelection(RTLIL::Design* design, const CommandArgs& args) {
+    SelectionObjects selection_objects;
+    for (auto obj : args.selection_objects) {
 	size_t port_separator = obj.find_last_of("/");
 	std::string cell = obj.substr(0, port_separator);
 	std::string port = obj.substr(port_separator + 1);
 	SelectionObjects selection{RTLIL::unescape_id(design->top_module()->name) + "/" +
 	       SelectionType() + ":" + cell};
 	extra_args(selection, 0, design);
-	ExtractSingleSelection(tcl_list, design, port, parsed_args);
+	ExtractSingleSelection(selection_objects, design, port, args);
     }
-    if (!parsed_args.is_quiet) {
+    if (!args.is_quiet) {
 	log("\n");
     }
-    Tcl_SetObjResult(yosys_get_tcl_interp(), tcl_list);
+    return selection_objects;
 }
 
-GetPins::SelectionObjects GetPins::ExtractSelection(RTLIL::Design* design, const CommandArgs& args) {
-    return SelectionObjects();
-}
-
-void GetPins::ExtractSingleSelection(Tcl_Obj* tcl_list, RTLIL::Design* design,
+void GetPins::ExtractSingleSelection(SelectionObjects& objects, RTLIL::Design* design,
                                      const std::string& port_name,
                                      const CommandArgs& args) {
     if (design->selected_modules().empty()) {
@@ -58,9 +53,7 @@ void GetPins::ExtractSingleSelection(Tcl_Obj* tcl_list, RTLIL::Design* design,
 	    if (!args.is_quiet) {
 		log("%s ", pin_name.c_str());
 	    }
-	    Tcl_Obj* value_obj = Tcl_NewStringObj(pin_name.c_str(), -1);
-	    Tcl_ListObjAppendElement(yosys_get_tcl_interp(), tcl_list,
-	                             value_obj);
+	    objects.push_back(pin_name);
 	}
     }
 }
