@@ -10,7 +10,6 @@ struct GetCmd : public Pass {
     using Filters = std::vector<Filter>;
     using SelectionObjects = std::vector<std::string>;
     struct CommandArgs {
-	size_t current_args_idx;
 	Filters filters;
 	bool is_quiet;
 	SelectionObjects selection_objects;
@@ -28,7 +27,7 @@ struct GetCmd : public Pass {
     CommandArgs ParseCommand(const std::vector<std::string>& args);
     virtual void ExtractSelection(Tcl_Obj*, RTLIL::Module*, const CommandArgs& args) {}
     virtual void ExecuteSelection(RTLIL::Design* design,
-                                  std::vector<std::string>& raw_args, const CommandArgs& args);
+                                  const CommandArgs& args);
     virtual void PackSelectionToTcl(RTLIL::Design* design, const CommandArgs& args);
 };
 

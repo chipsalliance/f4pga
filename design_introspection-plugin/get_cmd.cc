@@ -30,11 +30,11 @@ void GetCmd::help() {
     log("\n");
 }
 
-void GetCmd::ExecuteSelection(RTLIL::Design* design, std::vector<std::string>& raw_args, const CommandArgs& args) {
+void GetCmd::ExecuteSelection(RTLIL::Design* design, const CommandArgs& args) {
     std::vector<std::string> selection_args;
     // Add name of top module to selection string
-    std::transform(raw_args.begin() + args.current_args_idx, raw_args.end(),
-                   std::back_inserter(selection_args), [&](std::string& obj) {
+    std::transform(args.selection_objects.begin(), args.selection_objects.end(),
+                   std::back_inserter(selection_args), [&](const std::string& obj) {
 	               return RTLIL::unescape_id(design->top_module()->name) + "/" +
 	                      SelectionType() + ":" + obj;
                    });
@@ -59,11 +59,10 @@ void GetCmd::PackSelectionToTcl(RTLIL::Design* design, const CommandArgs& args) 
 }
 
 GetCmd::CommandArgs GetCmd::ParseCommand(const std::vector<std::string>& args) {
-    CommandArgs parsed_args{.current_args_idx = 0,
-                            .filters = Filters(),
+    CommandArgs parsed_args{.filters = Filters(),
                             .is_quiet = false,
                             .selection_objects = SelectionObjects()};
-    size_t argidx;
+    size_t argidx(0);
     for (argidx = 1; argidx < args.size(); argidx++) {
 	std::string arg = args[argidx];
 	if (arg == "-quiet") {
@@ -117,7 +116,6 @@ GetCmd::CommandArgs GetCmd::ParseCommand(const std::vector<std::string>& args) {
 	break;
     }
     std::copy(args.begin() + argidx, args.end(), std::back_inserter(parsed_args.selection_objects));
-    parsed_args.current_args_idx = argidx;
     return parsed_args;
 }
 
@@ -127,6 +125,6 @@ void GetCmd::execute(std::vector<std::string> args, RTLIL::Design* design) {
     }
 
     CommandArgs parsed_args(ParseCommand(args));
-    ExecuteSelection(design, args, parsed_args);
+    ExecuteSelection(design, parsed_args);
     PackSelectionToTcl(design, parsed_args);
 }
