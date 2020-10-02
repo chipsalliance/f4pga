@@ -10,8 +10,6 @@ struct GetPorts : public GetCmd {
 
     std::string TypeName() override;
     std::string SelectionType() override;
-    void ExtractSelection(Tcl_Obj* tcl_list, RTLIL::Module* module,
-                          const CommandArgs& args) override;
     void execute(std::vector<std::string> args, RTLIL::Design* design) override;
 };
 
