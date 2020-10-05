@@ -19,6 +19,12 @@
 
 USING_YOSYS_NAMESPACE
 
+const std::map<ClockGroups::ClockGroupRelation, std::string> ClockGroups::relation_name_map = {
+    {NONE, ""},
+    {ASYNCHRONOUS, "asynchronous"},
+    {PHYSICALLY_EXCLUSIVE, "physically_exclusive"},
+    {LOGICALLY_EXCLUSIVE, "logically_exclusive"}};
+
 void SdcWriter::AddFalsePath(FalsePath false_path) {
     false_paths_.push_back(false_path);
 }
@@ -27,10 +33,15 @@ void SdcWriter::SetMaxDelay(TimingPath timing_path) {
     timing_paths_.push_back(timing_path);
 }
 
+void SdcWriter::AddClockGroup(ClockGroups::ClockGroup clock_group, ClockGroups::ClockGroupRelation relation) {
+    clock_groups_.Add(clock_group, relation);
+}
+
 void SdcWriter::WriteSdc(Clocks& clocks, std::ostream& file) {
     WriteClocks(clocks, file);
     WriteFalsePaths(file);
     WriteMaxDelay(file);
+    WriteClockGroups(file);
 }
 
 void SdcWriter::WriteClocks(Clocks& clocks, std::ostream& file) {
@@ -75,6 +86,26 @@ void SdcWriter::WriteMaxDelay(std::ostream& file) {
 	}
 	if (!path.to_pin.empty()) {
 	    file << " -to " << path.to_pin;
+	}
+	file << std::endl;
+    }
+}
+
+void SdcWriter::WriteClockGroups(std::ostream& file) {
+    for (size_t relation = 0; relation <= ClockGroups::CLOCK_GROUP_RELATION_SIZE; relation++) {
+	auto clock_groups = clock_groups_.GetGroups(static_cast<ClockGroups::ClockGroupRelation>(relation));
+	if (clock_groups.size() == 0) {
+	    continue;
+	}
+	file << "create_clock_groups ";
+	for (auto group : clock_groups) {
+	    file << "-group ";
+	    for (auto signal : group) {
+		file << signal << " ";
+	    }
+	}
+	if (relation != ClockGroups::ClockGroupRelation::NONE) {
+	    file << "-" + ClockGroups::relation_name_map.at(static_cast<ClockGroups::ClockGroupRelation>(relation));
 	}
 	file << std::endl;
     }
