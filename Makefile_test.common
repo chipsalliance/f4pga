@@ -1,0 +1,45 @@
+# Each plugin shall have a directory named 'test' that contains test cases
+# directories and a Makefile which includes this Makefile template.
+# The test Makefile specifies which tests to execute and how to verify them.
+# The test to execute should be explicitly specified in the TESTS variable.
+# Each test needs a verification step define in the name_of_test_verify variable.
+# A simple diff verification template have been defined in the template Makefile
+# diff_test performs a simple diff and takes name of file and its extension
+# Example of a test Makefile is given below:
+#
+# include $(shell pwd)/../../Makefile_test.common
+# TESTS = test1 test2
+# test1_verify = $(call diff_test,test1,ext) && test $$(grep "PASS" test1/test1.txt | wc -l) -eq 2
+# test2_verify = $(call diff_test,test2,ext)
+#
+define test_tpl =
+$(1): $(1)/ok
+	@$$($(1)_verify); \
+	RETVAL=$$$$? ; \
+	if [ $$$$RETVAL -eq 0 ]; then \
+		echo "Test $(1) PASSED"; \
+		touch $$<; \
+		true; \
+	else \
+		echo "Test $(1) FAILED"; \
+		false; \
+	fi
+
+$(1)/ok: $(1)/$(1).v
+	@echo "Running test $(1)"
+	@cd $(1); \
+	DESIGN_TOP=$(1) \
+	yosys -c $(1).tcl -q -l $(1).log
+
+endef
+
+diff_test = diff $(1)/$(1).golden.$(2) $(1)/$(1).$(2)
+
+all: $(TESTS)
+.PHONY: all clean $(TESTS)
+
+$(foreach test,$(TESTS),$(eval $(call test_tpl,$(test))))
+
+clean:
+	@rm -rf $(foreach test,$(TESTS),$(test)/$(test).sdc $(test)/$(test).txt $(test)/$(test).eblif $(test)/$(test).json)
+	@find . -name "ok" -or -name "*.log" | xargs rm -rf
