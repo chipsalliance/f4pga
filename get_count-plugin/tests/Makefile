@@ -1,15 +1,5 @@
-TESTS = $(subst /, ,$(wildcard */))
+TESTS = simple
 
-all: clean $(addsuffix /ok,$(TESTS))
+include $(shell pwd)/../../Makefile_test.common
 
-clean:
-	@find . -name "ok" | xargs rm -rf
-
-define maketest =
-$1/ok:
-	cd $1 && $(MAKE) test
-endef
-
-$(foreach _,${TESTS},$(eval $(call maketest,$_)))
-
-.PHONY: all clean
+simple_verify = true

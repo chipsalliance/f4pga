@@ -1,6 +1,1 @@
-TESTS = dummy
-
-all: $(TESTS)
-
-dummy:
-	@echo $@ PASS
+include $(shell pwd)/../../Makefile_test.common
