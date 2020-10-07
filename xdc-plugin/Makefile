@@ -1,3 +1,5 @@
+NAME = xdc
+SOURCES = xdc.cc
 include ../Makefile_plugin.common
 VERILOG_MODULES = BANK.v
 

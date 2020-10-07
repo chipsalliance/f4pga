@@ -4,9 +4,7 @@ LDFLAGS = $(shell yosys-config --ldflags)
 LDLIBS = $(shell yosys-config --ldlibs)
 PLUGINS_DIR = $(shell yosys-config --datdir)/plugins
 
-SOURCES := $(shell find -name '*.cc')
 OBJS := $(SOURCES:cc=o)
-NAME := $(patsubst %-plugin,%,$(notdir $(shell pwd)))
 
 $(NAME).so: $(OBJS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared -o $@ $^ $(LDLIBS)
