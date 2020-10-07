@@ -1,3 +1,41 @@
+# This Makefile template is supposed to be included in each plugin's Makefile.
+# Plugin Makefiles need to specify the plugin's name and source files.
+# The plugin name is how the final shared object will be named.
+# This shared object can be imported to Yosys with `plugin -i` command.
+#
+# Below is an example of a plugin Makefile that uses this template:
+# NAME = plugin_name
+# SOURCES = source1.cc source2.cc
+# include ../Makefile_plugin.common
+#
+# For the above example the final plugin shared object will be named plugin_name.so.
+# In order to test the plugin it has to be copied to Yosys's shared folder.
+# The install target in this Makefile copies the plugins into the shared folder
+# of the Yosys installation that is found in the PATH.
+# This is needed because the shared folder is where Yosys will look for the
+# plugin object when `plugin -i` is called in Yosys's synthesis script.
+#
+# To add tests for the plugin the Makefile_test.common Makefile should be used.
+# Refer to Makefile_test.common to learn more details.
+#
+# Below is a directory structure which shows how the plugin sources and tests
+# should be laid out
+#
+# |-- Makefile_plugin.common
+# |-- Makefile_test.common
+# |-- example-plugin
+# |   |-- Makefile
+# |   |-- source1.cc
+# |   |-- source2.cc
+# |   |-- tests
+# |       |-- Makefile
+# |       |-- test_case_1
+# |       |   |-- test_case_1.tcl
+# |       |   |-- test_case_1.v
+# |       |   |-- test_case_1.golden.ext
+# |       |   |-- ...
+# |-- example2-plugin
+# |-- ...
 CXX = $(shell yosys-config --cxx)
 CXXFLAGS = $(shell yosys-config --cxxflags)
 LDFLAGS = $(shell yosys-config --ldflags)
