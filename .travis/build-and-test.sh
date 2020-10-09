@@ -28,7 +28,7 @@ echo
 echo 'Building plugins..' && echo -en 'travis_fold:start:script.build\\r'
 echo
 
-make plugins
+make plugins -j`nproc`
 
 echo
 echo -en 'travis_fold:end:script.build\\r'
@@ -40,7 +40,7 @@ echo
 echo 'Installing plugins...' && echo -en 'travis_fold:start:script.build\\r'
 echo
 
-make install
+make install -j`nproc`
 
 echo
 echo -en 'travis_fold:end:script.build\\r'
@@ -52,7 +52,7 @@ echo
 echo 'Testing...' && echo -en 'travis_fold:start:script.test\\r'
 echo
 
-make test
+make test -j`nproc`
 
 echo
 echo -en 'travis_fold:end:script.test\\r'
