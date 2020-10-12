@@ -26,6 +26,7 @@ class Propagation {
    public:
     Propagation(RTLIL::Design* design, Pass* pass)
         : design_(design), pass_(pass) {}
+    virtual ~Propagation(){}
 
     virtual void Run(Clocks& clocks) = 0;
     std::vector<RTLIL::Wire*> FindSinkWiresForCellType(
