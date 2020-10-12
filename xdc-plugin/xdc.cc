@@ -61,7 +61,8 @@ const std::unordered_map<std::string, std::vector<std::string>> supported_primit
 	{"OBUFDS", {"IO_LOC_PAIRS", "IOSTANDARD", "SLEW", "IN_TERM"}},
 	{"OBUFTDS", {"IO_LOC_PAIRS", "IOSTANDARD", "SLEW", "IN_TERM"}},
 	{"IBUF", {"IO_LOC_PAIRS", "IOSTANDARD"}},
-	{"IOBUF", {"IO_LOC_PAIRS", "IOSTANDARD", "DRIVE", "SLEW", "IN_TERM"}}
+	{"IOBUF", {"IO_LOC_PAIRS", "IOSTANDARD", "DRIVE", "SLEW", "IN_TERM"}},
+	{"IOBUFDS", {"IO_LOC_PAIRS", "IOSTANDARD", "SLEW", "IN_TERM"}}
 };
 
 void register_in_tcl_interpreter(const std::string& command) {
