@@ -84,6 +84,8 @@ GetCmd::CommandArgs GetCmd::ParseCommand(const std::vector<std::string>& args) {
 	        filter_arg.end());
 
 	    // Parse filters
+	    // TODO Add support for multiple condition expression
+	    // Currently only a single == is supported
 	    std::regex filter_attr_regex("(\\w+\\s?==\\s?\\w+)([(||)(&&)]*)");
 	    std::regex_token_iterator<std::string::iterator> regex_end;
 	    std::regex_token_iterator<std::string::iterator> matches(

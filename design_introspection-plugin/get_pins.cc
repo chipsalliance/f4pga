@@ -6,18 +6,21 @@ std::string GetPins::TypeName() { return "pin"; }
 
 std::string GetPins::SelectionType() { return "c"; }
 
-void GetPins::ExecuteSelection([[gnu::unused]] RTLIL::Design* design,
-                               [[gnu::unused]] const CommandArgs& args) {
+void GetPins::ExecuteSelection(RTLIL::Design* design, const CommandArgs& args) {
+    (void)design;
+    (void)args;
 }
 
-GetPins::SelectionObjects GetPins::ExtractSelection(RTLIL::Design* design, const CommandArgs& args) {
+GetPins::SelectionObjects GetPins::ExtractSelection(RTLIL::Design* design,
+                                                    const CommandArgs& args) {
     SelectionObjects selected_objects;
     for (auto obj : args.selection_objects) {
 	size_t port_separator = obj.find_last_of("/");
 	std::string cell = obj.substr(0, port_separator);
 	std::string port = obj.substr(port_separator + 1);
-	SelectionObjects selection{RTLIL::unescape_id(design->top_module()->name) + "/" +
-	       SelectionType() + ":" + cell};
+	SelectionObjects selection{
+	    RTLIL::unescape_id(design->top_module()->name) + "/" +
+	    SelectionType() + ":" + cell};
 	extra_args(selection, 0, design);
 	ExtractSingleSelection(selected_objects, design, port, args);
     }
@@ -27,7 +30,8 @@ GetPins::SelectionObjects GetPins::ExtractSelection(RTLIL::Design* design, const
     return selected_objects;
 }
 
-void GetPins::ExtractSingleSelection(SelectionObjects& objects, RTLIL::Design* design,
+void GetPins::ExtractSingleSelection(SelectionObjects& objects,
+                                     RTLIL::Design* design,
                                      const std::string& port_name,
                                      const CommandArgs& args) {
     if (design->selected_modules().empty()) {
@@ -49,7 +53,8 @@ void GetPins::ExtractSingleSelection(SelectionObjects& objects, RTLIL::Design* d
 		    continue;
 		}
 	    }
-	    std::string pin_name(RTLIL::unescape_id(cell->name) + "/" + port_name);
+	    std::string pin_name(RTLIL::unescape_id(cell->name) + "/" +
+	                         port_name);
 	    objects.push_back(pin_name);
 	}
     }
