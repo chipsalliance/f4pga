@@ -1,26 +1,9 @@
-CXX = $(shell yosys-config --cxx)
-CXXFLAGS = $(shell yosys-config --cxxflags)
-LDFLAGS = $(shell yosys-config --ldflags)
-LDLIBS = $(shell yosys-config --ldlibs)
-PLUGINS_DIR = $(shell yosys-config --datdir)/plugins
-
 NAME = design_introspection
-OBJS = $(NAME).o get_cmd.o get_nets.o get_ports.o get_cells.o get_pins.o
+SOURCES = design_introspection.cc \
+	  get_cmd.cc \
+	  get_nets.cc \
+	  get_ports.cc \
+	  get_cells.cc \
+	  get_pins.cc
 
-$(NAME).so: $(OBJS)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared -o $@ $^ $(LDLIBS)
-
-install_plugin: $(NAME).so
-	mkdir -p $(PLUGINS_DIR)
-	cp $< $(PLUGINS_DIR)/$<
-
-test:
-	$(MAKE) -C tests all
-
-.PHONY: install
-install: install_plugin
-
-clean:
-	rm -f *.d *.o *.so
-	$(MAKE) -C tests clean
-
+include ../Makefile_plugin.common
