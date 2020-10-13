@@ -1,0 +1,12 @@
+
+*inter* pins quiet
+OBUF_6/I
+
+*inter* pins
+OBUF_6/I
+
+*inter* pins with invalid filter expression
+bottom_intermediate_inst.OBUF_8/I
+
+Filtered pins
+OBUF_7/I OBUF_OUT/I
