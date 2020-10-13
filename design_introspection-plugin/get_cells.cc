@@ -19,11 +19,11 @@ GetCells::SelectionObjects GetCells::ExtractSelection(RTLIL::Design* design, con
 		}
 	    }
 	    std::string object_name(RTLIL::unescape_id(cell->name));
-	    if (!args.is_quiet) {
-		log("%s ", object_name.c_str());
-	    }
 	    selected_objects.push_back(object_name);
 	}
+    }
+    if (selected_objects.size() == 0 and !args.is_quiet) {
+	log_warning("Couldn't find matching cell.\n");
     }
     return selected_objects;
 }

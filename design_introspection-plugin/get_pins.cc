@@ -11,7 +11,7 @@ void GetPins::ExecuteSelection([[gnu::unused]] RTLIL::Design* design,
 }
 
 GetPins::SelectionObjects GetPins::ExtractSelection(RTLIL::Design* design, const CommandArgs& args) {
-    SelectionObjects selection_objects;
+    SelectionObjects selected_objects;
     for (auto obj : args.selection_objects) {
 	size_t port_separator = obj.find_last_of("/");
 	std::string cell = obj.substr(0, port_separator);
@@ -19,12 +19,12 @@ GetPins::SelectionObjects GetPins::ExtractSelection(RTLIL::Design* design, const
 	SelectionObjects selection{RTLIL::unescape_id(design->top_module()->name) + "/" +
 	       SelectionType() + ":" + cell};
 	extra_args(selection, 0, design);
-	ExtractSingleSelection(selection_objects, design, port, args);
+	ExtractSingleSelection(selected_objects, design, port, args);
     }
-    if (!args.is_quiet) {
-	log("\n");
+    if (selected_objects.size() == 0 and !args.is_quiet) {
+	log_warning("Couldn't find matching pin.\n");
     }
-    return selection_objects;
+    return selected_objects;
 }
 
 void GetPins::ExtractSingleSelection(SelectionObjects& objects, RTLIL::Design* design,
@@ -50,9 +50,6 @@ void GetPins::ExtractSingleSelection(SelectionObjects& objects, RTLIL::Design* d
 		}
 	    }
 	    std::string pin_name(RTLIL::unescape_id(cell->name) + "/" + port_name);
-	    if (!args.is_quiet) {
-		log("%s ", pin_name.c_str());
-	    }
 	    objects.push_back(pin_name);
 	}
     }

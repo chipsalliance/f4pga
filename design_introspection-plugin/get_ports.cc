@@ -27,14 +27,11 @@ GetPorts::SelectionObjects GetPorts::ExtractSelection(RTLIL::Design* design,
 	    if (bit >= wire->start_offset &&
 	        bit < wire->start_offset + wire->width) {
 		objects.push_back(port_name);
-		if (!args.is_quiet) {
-		    log("%s ", port_name.c_str());
-		}
 	    }
 	}
     }
     if (objects.size() == 0 and !args.is_quiet) {
-	log_error("Couldn't find port %s\n", port_name.c_str());
+	log_warning("Couldn't find port matching %s\n", port_name.c_str());
     }
     return objects;
 }

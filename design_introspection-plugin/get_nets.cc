@@ -20,11 +20,11 @@ GetNets::SelectionObjects GetNets::ExtractSelection(RTLIL::Design* design,
 		}
 	    }
 	    std::string object_name(RTLIL::unescape_id(wire->name));
-	    if (!args.is_quiet) {
-		log("%s ", object_name.c_str());
-	    }
 	    selected_objects.push_back(object_name);
 	}
+    }
+    if (selected_objects.size() == 0 and !args.is_quiet) {
+	log_warning("Couldn't find matching net.\n");
     }
     return selected_objects;
 }
