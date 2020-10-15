@@ -35,7 +35,7 @@ Pll::Pll(RTLIL::Cell* cell, float input_clock_period, float input_clock_rising_e
 
 void Pll::CheckInputClockPeriod(RTLIL::Cell* cell, float input_clock_period) {
     float abs_diff = fabs(ClkinPeriod() - input_clock_period);
-    bool approx_equal = abs_diff < max(ClkinPeriod(), input_clock_period) * 10 * std::numeric_limits<float>::epsilon();
+    bool approx_equal = abs_diff < std::max(ClkinPeriod(), input_clock_period) * 10 * std::numeric_limits<float>::epsilon();
     if (!approx_equal) {
 	log_cmd_error(
 	    "CLKIN[1/2]_PERIOD doesn't match the virtual clock constraint "

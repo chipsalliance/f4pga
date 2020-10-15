@@ -23,6 +23,7 @@
 #include "propagation.h"
 #include "set_false_path.h"
 #include "set_max_delay.h"
+#include "set_clock_groups.h"
 #include "sdc_writer.h"
 
 USING_YOSYS_NAMESPACE
@@ -255,7 +256,8 @@ class SdcPlugin {
           get_clocks_cmd_(clocks_),
           propagate_clocks_cmd_(clocks_),
           set_false_path_cmd_(sdc_writer_),
-          set_max_delay_cmd_(sdc_writer_) {
+          set_max_delay_cmd_(sdc_writer_),
+          set_clock_groups_cmd_(sdc_writer_) {
 	log("Loaded SDC plugin\n");
     }
 
@@ -266,6 +268,7 @@ class SdcPlugin {
     PropagateClocksCmd propagate_clocks_cmd_;
     SetFalsePath set_false_path_cmd_;
     SetMaxDelay set_max_delay_cmd_;
+    SetClockGroups set_clock_groups_cmd_;
 
    private:
     Clocks clocks_;

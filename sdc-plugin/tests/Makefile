@@ -1,6 +1,8 @@
 # counter, counter2, pll - test buffer and clock divider propagation
 # set_false_path - test the set_false_path command
 # set_max_delay - test the set_max_delay command
+# set_clock_groups - test the set_clock_groups command
+
 TESTS = counter \
 	counter2 \
 	pll \
@@ -8,7 +10,9 @@ TESTS = counter \
 	pll_fbout_phase \
 	pll_approx_equal \
 	set_false_path \
-	set_max_delay
+	set_max_delay \
+	set_clock_groups
+
 include $(shell pwd)/../../Makefile_test.common
 
 counter_verify = $(call diff_test,counter,sdc) && $(call diff_test,counter,txt)
@@ -19,3 +23,4 @@ pll_fbout_phase_verify = $(call diff_test,pll_fbout_phase,sdc)
 pll_approx_equal_verify = $(call diff_test,pll_approx_equal,sdc)
 set_false_path_verify = $(call diff_test,set_false_path,sdc)
 set_max_delay_verify = $(call diff_test,set_max_delay,sdc)
+set_clock_groups_verify = $(call diff_test,set_clock_groups,sdc)

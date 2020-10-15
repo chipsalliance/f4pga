@@ -18,6 +18,7 @@
 #include "clocks.h"
 #include <cassert>
 #include <cmath>
+#include <regex>
 #include "kernel/log.h"
 #include "kernel/register.h"
 #include "propagation.h"

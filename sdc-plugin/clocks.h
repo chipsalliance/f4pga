@@ -18,7 +18,6 @@
 #ifndef _CLOCKS_H_
 #define _CLOCKS_H_
 
-#include <unordered_map>
 #include <vector>
 #include "buffers.h"
 #include "kernel/rtlil.h"
