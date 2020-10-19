@@ -71,6 +71,9 @@ void SdcWriter::WriteFalsePaths(std::ostream& file) {
 	if (!path.from_pin.empty()) {
 	    file << " -from " << path.from_pin;
 	}
+	if (!path.through_pin.empty()) {
+	    file << " -through " << path.through_pin;
+	}
 	if (!path.to_pin.empty()) {
 	    file << " -to " << path.to_pin;
 	}

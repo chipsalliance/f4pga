@@ -41,6 +41,9 @@ void SetFalsePath::help() {
     log("    -to\n");
     log("        List of end points or clocks.\n");
     log("\n");
+    log("    -through\n");
+    log("        List of through points or clocks.\n");
+    log("\n");
 }
 
 void SetFalsePath::execute(std::vector<std::string> args,
@@ -54,6 +57,7 @@ void SetFalsePath::execute(std::vector<std::string> args,
     bool is_quiet = false;
     std::string from_pin;
     std::string to_pin;
+    std::string through_pin;
 
     // Parse command arguments
     for (argidx = 1; argidx < args.size(); argidx++) {
@@ -65,13 +69,16 @@ void SetFalsePath::execute(std::vector<std::string> args,
 
 	if (arg == "-from" and argidx + 1 < args.size()) {
 	    from_pin = args[++argidx];
-	    log("From: %s\n", from_pin.c_str());
 	    continue;
 	}
 
 	if (arg == "-to" and argidx + 1 < args.size()) {
 	    to_pin = args[++argidx];
-	    log("To: %s\n", to_pin.c_str());
+	    continue;
+	}
+
+	if (arg == "-through" and argidx + 1 < args.size()) {
+	    through_pin = args[++argidx];
 	    continue;
 	}
 
@@ -83,8 +90,10 @@ void SetFalsePath::execute(std::vector<std::string> args,
     }
     if (!is_quiet) {
 	std::string msg = (from_pin.empty()) ? "" : "-from " + from_pin;
+	msg += (through_pin.empty()) ? "" : " -through " + through_pin;
 	msg += (to_pin.empty()) ? "" : " -to " + to_pin;
 	log("Adding false path %s\n", msg.c_str());
     }
-    sdc_writer_.AddFalsePath(FalsePath{.from_pin = from_pin, .to_pin = to_pin});
+    sdc_writer_.AddFalsePath(FalsePath{
+        .from_pin = from_pin, .to_pin = to_pin, .through_pin = through_pin});
 }
