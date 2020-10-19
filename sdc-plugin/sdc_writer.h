@@ -25,6 +25,7 @@ USING_YOSYS_NAMESPACE
 struct FalsePath {
     std::string from_pin;
     std::string to_pin;
+    std::string through_pin;
 };
 
 struct TimingPath {
