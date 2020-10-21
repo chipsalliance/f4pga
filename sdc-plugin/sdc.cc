@@ -73,13 +73,13 @@ struct WriteSdcCmd : public Backend {
     }
 
     void execute(std::ostream*& f, std::string filename,
-                 std::vector<std::string> args, RTLIL::Design*) override {
+                 std::vector<std::string> args, RTLIL::Design* design) override {
 	if (args.size() < 2) {
 	    log_cmd_error("Missing output file.\n");
 	}
 	log("\nWriting out clock constraints file(SDC)\n");
 	extra_args(f, filename, args, 1);
-	sdc_writer_.WriteSdc(clocks_, *f);
+	sdc_writer_.WriteSdc(design, *f);
     }
 
     Clocks& clocks_;

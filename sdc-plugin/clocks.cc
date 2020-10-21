@@ -32,24 +32,27 @@ void Clocks::AddClock(const std::string& name, std::vector<RTLIL::Wire*> wires,
 
 void Clocks::AddClock(const std::string& name, RTLIL::Wire* wire, float period,
                       float rising_edge, float falling_edge) {
-    auto clock =
-        std::find_if(clocks_.begin(), clocks_.end(),
-                     [&](Clock& clock) { return clock.Name() == name; });
-    if (clock != clocks_.end()) {
-	log("Clock %s already exists and will be overwritten\n", name.c_str());
-	clock->UpdateClock(wire, period, rising_edge, falling_edge);
-    } else {
-	rising_edge = fmod(rising_edge, period);
-	falling_edge = fmod(falling_edge, period);
-	clocks_.emplace_back(name, wire, period, rising_edge, falling_edge);
-	log("Added clock %s with period %f, rising_edge:%f, falling_edge:%f\n", name.c_str(),
-	    period, rising_edge, falling_edge);
-    }
+    wire->set_string_attribute(RTLIL::escape_id("CLOCK_SIGNAL"), "yes");
+    wire->set_string_attribute(RTLIL::escape_id("PERIOD"), std::to_string(period));
 }
 
 void Clocks::AddClock(Clock& clock) {
     AddClock(clock.Name(), clock.GetClockWires(), clock.Period(),
              clock.RisingEdge(), clock.FallingEdge());
+}
+
+const std::vector<RTLIL::Wire*> Clocks::GetClocks(RTLIL::Design* design) {
+    std::vector<RTLIL::Wire*> clock_wires;
+    RTLIL::Module* top_module = design->top_module();
+    for (auto& wire_obj : top_module->wires_) {
+	auto& wire = wire_obj.second;
+	if (wire->has_attribute(RTLIL::escape_id("CLOCK_SIGNAL"))) {
+		if (wire->get_string_attribute(RTLIL::escape_id("CLOCK_SIGNAL")) == "yes") {
+			clock_wires.push_back(wire);
+		}
+	}
+    }
+    return clock_wires;
 }
 
 std::vector<std::string> Clocks::GetClockNames() {
@@ -69,61 +72,62 @@ std::vector<std::string> Clocks::GetClockNames() {
     return res;
 }
 
-void Clocks::Propagate(NaturalPropagation* pass) {
+void Clocks::Propagate(RTLIL::Design* design, NaturalPropagation* pass) {
 #ifdef SDC_DEBUG
     log("Start natural clock propagation\n");
 #endif
-    for (auto clock : clocks_) {
+    for (auto& clock_wire : Clocks::GetClocks(design)) {
 #ifdef SDC_DEBUG
-	log("Processing clock %s\n", clock.Name().c_str());
+	log("Processing clock %s\n", RTLIL::id2cstr(clock_wire->name));
 #endif
-	auto clock_wires = clock.GetClockWires();
-	for (auto clock_wire : clock_wires) {
-	    auto aliases = pass->FindAliasWires(clock_wire);
-	    AddClock(clock.Name(), aliases, clock.Period(),
-	                  clock.RisingEdge(), clock.FallingEdge());
-	}
+	auto aliases = pass->FindAliasWires(clock_wire);
+	/* AddClock(clock.Name(), aliases, clock.Period(), */
+	/* 	clock.RisingEdge(), clock.FallingEdge()); */
     }
 #ifdef SDC_DEBUG
     log("Finish natural clock propagation\n\n");
 #endif
 }
 
-void Clocks::Propagate(BufferPropagation* pass) {
+void Clocks::Propagate(RTLIL::Design* design, BufferPropagation* pass) {
 #ifdef SDC_DEBUG
     log("Start buffer clock propagation\n");
     log("IBUF pass\n");
 #endif
-    std::vector<Clock> clocks(clocks_);
-    for (auto clock : clocks) {
+    for (auto& clock_wire : Clocks::GetClocks(design)) {
 #ifdef SDC_DEBUG
-	log("Processing clock %s\n", clock.Name().c_str());
+	log("Processing clock %s\n", RTLIL::id2cstr(clock_wire->name));
 #endif
-	PropagateThroughBuffer(pass, clock, IBuf());
+	auto period = std::stof(clock_wire->get_string_attribute(RTLIL::escape_id("PERIOD")));
+	auto clock = Clock(clock_wire, period, 0, period/2);
+	PropagateThroughBuffer(pass, design, clock, IBuf());
     }
 #ifdef SDC_DEBUG
     log("BUFG pass\n");
 #endif
-    clocks = clocks_;
-    for (auto clock : clocks) {
+    for (auto& clock_wire : Clocks::GetClocks(design)) {
 #ifdef SDC_DEBUG
-	log("Processing clock %s\n", clock.Name().c_str());
+	log("Processing clock %s\n", RTLIL::id2cstr(clock_wire->name));
 #endif
-	PropagateThroughBuffer(pass, clock, Bufg());
+	auto period = std::stof(clock_wire->get_string_attribute(RTLIL::escape_id("PERIOD")));
+	auto clock = Clock(clock_wire, period, 0, period/2);
+	PropagateThroughBuffer(pass, design, clock, Bufg());
     }
 #ifdef SDC_DEBUG
     log("Finish buffer clock propagation\n\n");
 #endif
 }
 
-void Clocks::Propagate(ClockDividerPropagation* pass) {
+void Clocks::Propagate(RTLIL::Design* design, ClockDividerPropagation* pass) {
 #ifdef SDC_DEBUG
     log("Start clock divider clock propagation\n");
 #endif
-    for (auto clock : clocks_) {
+    for (auto& clock_wire : Clocks::GetClocks(design)) {
 #ifdef SDC_DEBUG
-	log("Processing clock %s\n", clock.Name().c_str());
+	log("Processing clock %s\n", RTLIL::id2cstr(clock_wire->name));
 #endif
+	auto period = std::stof(clock_wire->get_string_attribute(RTLIL::escape_id("PERIOD")));
+	auto clock = Clock(clock_wire, period, 0, period/2);
 	auto pll_clocks =
 	    pass->FindSinkClocksForCellType(clock, "PLLE2_ADV");
 	for (auto pll_clock : pll_clocks) {
@@ -131,7 +135,7 @@ void Clocks::Propagate(ClockDividerPropagation* pass) {
 	    log("PLL clock: %s\n", pll_clock.Name().c_str());
 #endif
 	    AddClock(pll_clock);
-	    PropagateThroughBuffer(pass, pll_clock, Bufg());
+	    PropagateThroughBuffer(pass, design, pll_clock, Bufg());
 	}
     }
 #ifdef SDC_DEBUG
@@ -139,12 +143,11 @@ void Clocks::Propagate(ClockDividerPropagation* pass) {
 #endif
 }
 
-void Clocks::PropagateThroughBuffer(Propagation* pass, Clock& clock,
+void Clocks::PropagateThroughBuffer(Propagation* pass, RTLIL::Design* design, Clock& clock,
                                     Buffer buffer) {
-    auto clock_wires = clock.GetClockWires();
-    for (auto clock_wire : clock_wires) {
+    for (auto& clock_wire : Clocks::GetClocks(design)) {
 #ifdef SDC_DEBUG
-	log("Clock wire %s\n", RTLIL::unescape_id(clock_wire->name).c_str());
+	log("Clock wire %s\n", RTLIL::id2cstr(clock_wire->name));
 #endif
 	auto buf_wires = pass->FindSinkWiresForCellType(clock_wire, buffer.name,
 	                                                buffer.output);
@@ -152,34 +155,13 @@ void Clocks::PropagateThroughBuffer(Propagation* pass, Clock& clock,
 	for (auto wire : buf_wires) {
 #ifdef SDC_DEBUG
 	    log("%s wire: %s\n", buffer.name.c_str(),
-	        RTLIL::unescape_id(wire->name).c_str());
+	        RTLIL::id2cstr(wire->name));
 #endif
 	    path_delay += buffer.delay;
 	    AddClock(RTLIL::unescape_id(wire->name), wire, clock.Period(),
 	             clock.RisingEdge() + path_delay,
 	             clock.FallingEdge() + path_delay);
 	}
-    }
-}
-
-void Clocks::WriteSdc(std::ostream& file) {
-    for (auto& clock : clocks_) {
-	auto clock_wires = clock.GetClockWires();
-	// FIXME: Input port nets are not found in VPR
-	if (std::all_of(clock_wires.begin(), clock_wires.end(),
-	                [&](RTLIL::Wire* wire) { return wire->port_input; })) {
-	    continue;
-	}
-	file << "create_clock -period " << clock.Period();
-	file << " -waveform {" << clock.RisingEdge() << " "
-	     << clock.FallingEdge() << "}";
-	for (auto clock_wire : clock_wires) {
-	    if (clock_wire->port_input) {
-		continue;
-	    }
-	    file << " " << Clock::ClockWireName(clock_wire);
-	}
-	file << std::endl;
     }
 }
 

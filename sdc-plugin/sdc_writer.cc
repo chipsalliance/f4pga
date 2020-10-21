@@ -37,11 +37,25 @@ void SdcWriter::AddClockGroup(ClockGroups::ClockGroup clock_group, ClockGroups::
     clock_groups_.Add(clock_group, relation);
 }
 
-void SdcWriter::WriteSdc(Clocks& clocks, std::ostream& file) {
-    WriteClocks(clocks, file);
+void SdcWriter::WriteSdc(RTLIL::Design* design, std::ostream& file) {
+    WriteClocks(design, file);
     WriteFalsePaths(file);
     WriteMaxDelay(file);
     WriteClockGroups(file);
+}
+
+void SdcWriter::WriteClocks(RTLIL::Design* design, std::ostream& file) {
+    for (auto& clock_wire : Clocks::GetClocks(design)) {
+	// FIXME: Input port nets are not found in VPR
+	if (clock_wire->port_input) {
+	    continue;
+	}
+	file << "create_clock -period " << clock_wire->get_string_attribute(RTLIL::escape_id("PERIOD"));
+	/* file << " -waveform {" << clock.RisingEdge() << " " */
+	/*      << clock.FallingEdge() << "}"; */
+	file << " " << RTLIL::unescape_id(clock_wire->name);
+	file << std::endl;
+    }
 }
 
 void SdcWriter::WriteClocks(Clocks& clocks, std::ostream& file) {

@@ -48,7 +48,7 @@ class NaturalPropagation : public Propagation {
     NaturalPropagation(RTLIL::Design* design, Pass* pass)
         : Propagation(design, pass) {}
 
-    void Run(Clocks& clocks) override { clocks.Propagate(this); }
+    void Run(Clocks& clocks) override { clocks.Propagate(design_, this); }
     std::vector<RTLIL::Wire*> FindAliasWires(RTLIL::Wire* wire);
 };
 
@@ -57,7 +57,7 @@ class BufferPropagation : public Propagation {
     BufferPropagation(RTLIL::Design* design, Pass* pass)
         : Propagation(design, pass) {}
 
-    void Run(Clocks& clocks) override { clocks.Propagate(this); }
+    void Run(Clocks& clocks) override { clocks.Propagate(design_, this); }
 };
 
 class ClockDividerPropagation : public Propagation {
@@ -65,7 +65,7 @@ class ClockDividerPropagation : public Propagation {
     ClockDividerPropagation(RTLIL::Design* design, Pass* pass)
         : Propagation(design, pass) {}
 
-    void Run(Clocks& clocks) override { clocks.Propagate(this); }
+    void Run(Clocks& clocks) override { clocks.Propagate(design_, this); }
     std::vector<Clock> FindSinkClocksForCellType(Clock driver_wire,
                                                  const std::string& cell_type);
 };

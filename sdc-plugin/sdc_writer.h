@@ -61,10 +61,11 @@ class SdcWriter {
     void AddFalsePath(FalsePath false_path);
     void SetMaxDelay(TimingPath timing_path);
     void AddClockGroup(ClockGroups::ClockGroup clock_group, ClockGroups::ClockGroupRelation relation);
-    void WriteSdc(Clocks& clocks, std::ostream& file);
+    void WriteSdc(RTLIL::Design* design, std::ostream& file);
 
    private:
     void WriteClocks(Clocks& clocks, std::ostream& file);
+    void WriteClocks(RTLIL::Design* design, std::ostream& file);
     void WriteFalsePaths(std::ostream& file);
     void WriteMaxDelay(std::ostream& file);
     void WriteClockGroups(std::ostream& file);
