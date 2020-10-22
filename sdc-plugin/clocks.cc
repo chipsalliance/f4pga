@@ -55,23 +55,6 @@ const std::vector<RTLIL::Wire*> Clocks::GetClocks(RTLIL::Design* design) {
     return clock_wires;
 }
 
-std::vector<std::string> Clocks::GetClockNames() {
-    std::vector<std::string> res;
-    for (auto clock : clocks_) {
-	res.push_back(clock.Name());
-#ifdef SDC_DEBUG
-	std::stringstream ss;
-	for (auto clock_wire : clock.GetClockWires()) {
-	    ss << RTLIL::unescape_id(clock_wire->name) << " ";
-	}
-	log("create_clock -period %f -name %s -waveform {%f %f} %s\n",
-	    clock.Period(), clock.Name().c_str(), clock.RisingEdge(),
-	    clock.FallingEdge(), ss.str().c_str());
-#endif
-    }
-    return res;
-}
-
 void Clocks::Propagate(RTLIL::Design* design, NaturalPropagation* pass) {
 #ifdef SDC_DEBUG
     log("Start natural clock propagation\n");

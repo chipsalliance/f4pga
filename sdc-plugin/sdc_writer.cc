@@ -58,27 +58,6 @@ void SdcWriter::WriteClocks(RTLIL::Design* design, std::ostream& file) {
     }
 }
 
-void SdcWriter::WriteClocks(Clocks& clocks, std::ostream& file) {
-    for (auto clock : clocks.GetClocks()) {
-	auto clock_wires = clock.GetClockWires();
-	// FIXME: Input port nets are not found in VPR
-	if (std::all_of(clock_wires.begin(), clock_wires.end(),
-	                [&](RTLIL::Wire* wire) { return wire->port_input; })) {
-	    continue;
-	}
-	file << "create_clock -period " << clock.Period();
-	file << " -waveform {" << clock.RisingEdge() << " "
-	     << clock.FallingEdge() << "}";
-	for (auto clock_wire : clock_wires) {
-	    if (clock_wire->port_input) {
-		continue;
-	    }
-	    file << " " << Clock::ClockWireName(clock_wire);
-	}
-	file << std::endl;
-    }
-}
-
 void SdcWriter::WriteFalsePaths(std::ostream& file) {
     for (auto path : false_paths_) {
 	file << "set_false_path";

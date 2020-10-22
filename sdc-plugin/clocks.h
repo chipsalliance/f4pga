@@ -67,17 +67,12 @@ class Clocks {
     void AddClock(const std::string& name, RTLIL::Wire* wire, float period,
                   float rising_edge, float falling_edge);
     void AddClock(Clock& clock);
-    std::vector<std::string> GetClockNames();
     void Propagate(RTLIL::Design* design, NaturalPropagation* pass);
     void Propagate(RTLIL::Design* design, BufferPropagation* pass);
     void Propagate(RTLIL::Design* design, ClockDividerPropagation* pass);
-    const std::vector<Clock> GetClocks() {
-	return std::vector<Clock>();
-    }
     static const std::vector<RTLIL::Wire*> GetClocks(RTLIL::Design* design);
 
    private:
-    std::vector<Clock> clocks_;
     void PropagateThroughBuffer(Propagation* pass, RTLIL::Design* design, Clock& clock,
                                 Buffer buffer);
 };

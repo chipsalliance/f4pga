@@ -64,7 +64,6 @@ class SdcWriter {
     void WriteSdc(RTLIL::Design* design, std::ostream& file);
 
    private:
-    void WriteClocks(Clocks& clocks, std::ostream& file);
     void WriteClocks(RTLIL::Design* design, std::ostream& file);
     void WriteFalsePaths(std::ostream& file);
     void WriteMaxDelay(std::ostream& file);
