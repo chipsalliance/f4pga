@@ -40,8 +40,11 @@ class Clock {
     std::vector<RTLIL::Wire*> GetClockWires() { return clock_wires_; }
     const std::string& Name() const { return name_; }
     float Period() { return period_; }
+    static float Period(RTLIL::Wire* clock_wire);
     float RisingEdge() { return rising_edge_; }
+    static float RisingEdge(RTLIL::Wire* clock_wire);
     float FallingEdge() { return falling_edge_; }
+    static float FallingEdge(RTLIL::Wire* clock_wire);
     RTLIL::Wire* ClockWire() { return clock_wire_; }
     void UpdateClock(RTLIL::Wire* wire, float period, float rising_edge,
                      float falling_edge);
@@ -55,6 +58,7 @@ class Clock {
     float rising_edge_;
     float falling_edge_;
 
+    static std::pair<float, float> Waveform(RTLIL::Wire* clock_wire);
     void UpdateWires(RTLIL::Wire* wire);
     void UpdatePeriod(float period);
     void UpdateWaveform(float rising_edge, float falling_edge);

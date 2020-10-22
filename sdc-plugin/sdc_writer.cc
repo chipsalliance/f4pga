@@ -50,10 +50,10 @@ void SdcWriter::WriteClocks(RTLIL::Design* design, std::ostream& file) {
 	if (clock_wire->port_input) {
 	    continue;
 	}
-	file << "create_clock -period " << clock_wire->get_string_attribute(RTLIL::escape_id("PERIOD"));
-	/* file << " -waveform {" << clock.RisingEdge() << " " */
-	/*      << clock.FallingEdge() << "}"; */
-	file << " " << RTLIL::unescape_id(clock_wire->name);
+	file << "create_clock -period " << Clock::Period(clock_wire);
+	file << " -waveform {" << Clock::RisingEdge(clock_wire) << " "
+	     << Clock::FallingEdge(clock_wire) << "}";
+	file << " " << Clock::ClockWireName(clock_wire);
 	file << std::endl;
     }
 }

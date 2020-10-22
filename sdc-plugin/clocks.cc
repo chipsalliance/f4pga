@@ -33,7 +33,12 @@ void Clocks::AddClock(const std::string& name, std::vector<RTLIL::Wire*> wires,
 void Clocks::AddClock(const std::string& name, RTLIL::Wire* wire, float period,
                       float rising_edge, float falling_edge) {
     wire->set_string_attribute(RTLIL::escape_id("CLOCK_SIGNAL"), "yes");
+    wire->set_string_attribute(RTLIL::escape_id("CLASS"), "clock");
+    wire->set_string_attribute(RTLIL::escape_id("NAME"), name);
+    wire->set_string_attribute(RTLIL::escape_id("SOURCE_PINS"), Clock::ClockWireName(wire));
     wire->set_string_attribute(RTLIL::escape_id("PERIOD"), std::to_string(period));
+    std::string waveform(std::to_string(rising_edge) + " " + std::to_string(falling_edge));
+    wire->set_string_attribute(RTLIL::escape_id("WAVEFORM"), waveform);
 }
 
 void Clocks::AddClock(Clock& clock) {
@@ -169,7 +174,41 @@ Clock::Clock(const std::string& name, std::vector<RTLIL::Wire*> wires,
 
 Clock::Clock(RTLIL::Wire* wire, float period,
              float rising_edge, float falling_edge)
-    : Clock(RTLIL::id2cstr(wire->name), wire, period, rising_edge, falling_edge) {}
+    : Clock(RTLIL::unescape_id(wire->name), wire, period, rising_edge, falling_edge) {}
+
+float Clock::Period(RTLIL::Wire* clock_wire) {
+    if (!clock_wire->has_attribute(RTLIL::escape_id("PERIOD"))) {
+	log_warning("Period has not been specified\n Default value 0 will be used\n");
+	return 0;
+    }
+    return std::stof(clock_wire->get_string_attribute(RTLIL::escape_id("PERIOD")));
+}
+
+std::pair<float, float> Clock::Waveform(RTLIL::Wire* clock_wire) {
+    if (!clock_wire->has_attribute(RTLIL::escape_id("WAVEFORM"))) {
+	float period(Period(clock_wire));
+	if (!period) {
+	    log_cmd_error("Neither PERIOD nor WAVEFORM has been specified for wire %s\n", ClockWireName(clock_wire).c_str());
+	    return std::make_pair(0,0);
+	}
+	float falling_edge = period / 2;
+	log_warning("Waveform has not been specified\n Default value {0 %f} will be used\n", falling_edge);
+	return std::make_pair(0, falling_edge);
+    }
+    float rising_edge(0);
+    float falling_edge(0);
+    std::string waveform(clock_wire->get_string_attribute(RTLIL::escape_id("WAVEFORM")));
+    std::sscanf(waveform.c_str(), "%f %f", &rising_edge, &falling_edge);
+    return std::make_pair(rising_edge, falling_edge);
+}
+
+float Clock::RisingEdge(RTLIL::Wire* clock_wire) {
+    return Waveform(clock_wire).first;
+}
+
+float Clock::FallingEdge(RTLIL::Wire* clock_wire) {
+    return Waveform(clock_wire).second;
+}
 
 void Clock::UpdateClock(RTLIL::Wire* wire, float period, float rising_edge,
                         float falling_edge) {
