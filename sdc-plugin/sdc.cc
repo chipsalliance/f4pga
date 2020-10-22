@@ -235,9 +235,9 @@ struct PropagateClocksCmd : public Pass {
 	}
 
 	std::array<std::unique_ptr<Propagation>, 2> passes{
-	    std::unique_ptr<BufferPropagation>(
+	    std::unique_ptr<Propagation>(
 	        new BufferPropagation(design, this)),
-	    std::unique_ptr<ClockDividerPropagation>(
+	    std::unique_ptr<Propagation>(
 	        new ClockDividerPropagation(design, this))};
 
 	log("Perform clock propagation\n");
