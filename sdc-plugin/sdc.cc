@@ -184,8 +184,8 @@ struct CreateClockCmd : public Pass {
 };
 
 struct GetClocksCmd : public Pass {
-    GetClocksCmd(Clocks& clocks)
-        : Pass("get_clocks", "Create clock object"), clocks_(clocks) {}
+    GetClocksCmd()
+        : Pass("get_clocks", "Create clock object") {}
 
     void help() override {
 	log("\n");
@@ -195,22 +195,24 @@ struct GetClocksCmd : public Pass {
 	log("\n");
     }
 
-    void execute(__attribute__((unused)) std::vector<std::string> args,
-                 __attribute__((unused)) RTLIL::Design* design) override {
-	std::vector<std::string> clock_names(clocks_.GetClockNames());
-	if (clock_names.size() == 0) {
+    void execute(std::vector<std::string> args,
+                 RTLIL::Design* design) override {
+	if (args.size() > 1) {
+	    log_warning("Command doesn't support arguments, so they will be ignored.\n");
+	}
+	std::vector<RTLIL::Wire*> clock_wires(Clocks::GetClocks(design));
+	if (clock_wires.size() == 0) {
 	    log_warning("No clocks found in design\n");
 	}
 	Tcl_Interp* interp = yosys_get_tcl_interp();
 	Tcl_Obj* tcl_list = Tcl_NewListObj(0, NULL);
-	for (auto name : clock_names) {
-	    Tcl_Obj* name_obj = Tcl_NewStringObj(name.c_str(), name.size());
+	for (auto wire : clock_wires) {
+	    const char* name = RTLIL::id2cstr(wire->name);
+	    Tcl_Obj* name_obj = Tcl_NewStringObj(name, -1);
 	    Tcl_ListObjAppendElement(interp, tcl_list, name_obj);
 	}
 	Tcl_SetObjResult(interp, tcl_list);
     }
-
-    Clocks& clocks_;
 };
 
 struct PropagateClocksCmd : public Pass {
@@ -253,7 +255,6 @@ class SdcPlugin {
     SdcPlugin()
         : write_sdc_cmd_(clocks_, sdc_writer_),
           create_clock_cmd_(clocks_),
-          get_clocks_cmd_(clocks_),
           propagate_clocks_cmd_(clocks_),
           set_false_path_cmd_(sdc_writer_),
           set_max_delay_cmd_(sdc_writer_),
