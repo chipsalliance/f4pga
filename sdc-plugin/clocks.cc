@@ -23,6 +23,48 @@
 #include "kernel/register.h"
 #include "propagation.h"
 
+float Clock::Period(RTLIL::Wire* clock_wire) {
+    if (!clock_wire->has_attribute(RTLIL::escape_id("PERIOD"))) {
+	log_warning("Period has not been specified\n Default value 0 will be used\n");
+	return 0;
+    }
+    return std::stof(clock_wire->get_string_attribute(RTLIL::escape_id("PERIOD")));
+}
+
+std::pair<float, float> Clock::Waveform(RTLIL::Wire* clock_wire) {
+    if (!clock_wire->has_attribute(RTLIL::escape_id("WAVEFORM"))) {
+	float period(Period(clock_wire));
+	if (!period) {
+	    log_cmd_error("Neither PERIOD nor WAVEFORM has been specified for wire %s\n", ClockWireName(clock_wire).c_str());
+	    return std::make_pair(0,0);
+	}
+	float falling_edge = period / 2;
+	log_warning("Waveform has not been specified\n Default value {0 %f} will be used\n", falling_edge);
+	return std::make_pair(0, falling_edge);
+    }
+    float rising_edge(0);
+    float falling_edge(0);
+    std::string waveform(clock_wire->get_string_attribute(RTLIL::escape_id("WAVEFORM")));
+    std::sscanf(waveform.c_str(), "%f %f", &rising_edge, &falling_edge);
+    return std::make_pair(rising_edge, falling_edge);
+}
+
+float Clock::RisingEdge(RTLIL::Wire* clock_wire) {
+    return Waveform(clock_wire).first;
+}
+
+float Clock::FallingEdge(RTLIL::Wire* clock_wire) {
+    return Waveform(clock_wire).second;
+}
+
+std::string Clock::ClockWireName(RTLIL::Wire* wire) {
+    if (!wire) {
+	return std::string();
+    }
+    std::string wire_name(RTLIL::unescape_id(wire->name));
+    return std::regex_replace(wire_name, std::regex{"\\$"}, "\\$");
+}
+
 void Clocks::AddClock(const std::string& name, std::vector<RTLIL::Wire*> wires,
                       float period, float rising_edge, float falling_edge) {
     std::for_each(wires.begin(), wires.end(), [&](RTLIL::Wire* wire) {
@@ -97,13 +139,8 @@ void Clocks::Propagate(RTLIL::Design* design, ClockDividerPropagation* pass) {
 #ifdef SDC_DEBUG
     log("Start clock divider clock propagation\n");
 #endif
-    for (auto& clock_wire : Clocks::GetClocks(design)) {
-#ifdef SDC_DEBUG
-	log("Processing clock %s\n", RTLIL::id2cstr(clock_wire->name));
-#endif
-	pass->PropagateClocksForCellType(clock_wire, "PLLE2_ADV");
-	PropagateThroughBuffers(pass, design, Bufg());
-    }
+    PropagateThroughClockDividers(pass, design, Pll());
+    PropagateThroughBuffers(pass, design, Bufg());
 #ifdef SDC_DEBUG
     log("Finish clock divider clock propagation\n\n");
 #endif
@@ -115,12 +152,12 @@ void Clocks::PropagateThroughBuffers(Propagation* pass, RTLIL::Design* design,
 #ifdef SDC_DEBUG
 	log("Clock wire %s\n", Clock::ClockWireName(clock_wire).c_str());
 #endif
-	auto buf_wires = pass->FindSinkWiresForCellType(clock_wire, buffer.name,
+	auto buf_wires = pass->FindSinkWiresForCellType(clock_wire, buffer.type,
 	                                                buffer.output);
 	int path_delay(0);
 	for (auto wire : buf_wires) {
 #ifdef SDC_DEBUG
-	    log("%s wire: %s\n", buffer.name.c_str(),
+	    log("%s wire: %s\n", buffer.type.c_str(),
 	        RTLIL::id2cstr(wire->name));
 #endif
 	    path_delay += buffer.delay;
@@ -131,90 +168,12 @@ void Clocks::PropagateThroughBuffers(Propagation* pass, RTLIL::Design* design,
     }
 }
 
-Clock::Clock(const std::string& name, RTLIL::Wire* wire, float period,
-             float rising_edge, float falling_edge)
-    : name_(name),
-      period_(period),
-      rising_edge_(rising_edge),
-      falling_edge_(falling_edge) {
-    UpdateWires(wire);
-}
-
-Clock::Clock(const std::string& name, std::vector<RTLIL::Wire*> wires,
-             float period, float rising_edge, float falling_edge)
-    : name_(name),
-      period_(period),
-      rising_edge_(rising_edge),
-      falling_edge_(falling_edge) {
-    std::for_each(wires.begin(), wires.end(),
-                  [&, this](RTLIL::Wire* wire) { UpdateWires(wire); });
-}
-
-Clock::Clock(RTLIL::Wire* wire, float period,
-             float rising_edge, float falling_edge)
-    : Clock(RTLIL::unescape_id(wire->name), wire, period, rising_edge, falling_edge) {}
-
-float Clock::Period(RTLIL::Wire* clock_wire) {
-    if (!clock_wire->has_attribute(RTLIL::escape_id("PERIOD"))) {
-	log_warning("Period has not been specified\n Default value 0 will be used\n");
-	return 0;
+void Clocks::PropagateThroughClockDividers(ClockDividerPropagation* pass, RTLIL::Design* design,
+                                    ClockDivider divider) {
+    for (auto& clock_wire : Clocks::GetClocks(design)) {
+#ifdef SDC_DEBUG
+	log("Processing clock %s\n", Clock::ClockWireName(clock_wire).c_str());
+#endif
+	pass->PropagateClocksForCellType(clock_wire, divider.type);
     }
-    return std::stof(clock_wire->get_string_attribute(RTLIL::escape_id("PERIOD")));
-}
-
-std::pair<float, float> Clock::Waveform(RTLIL::Wire* clock_wire) {
-    if (!clock_wire->has_attribute(RTLIL::escape_id("WAVEFORM"))) {
-	float period(Period(clock_wire));
-	if (!period) {
-	    log_cmd_error("Neither PERIOD nor WAVEFORM has been specified for wire %s\n", ClockWireName(clock_wire).c_str());
-	    return std::make_pair(0,0);
-	}
-	float falling_edge = period / 2;
-	log_warning("Waveform has not been specified\n Default value {0 %f} will be used\n", falling_edge);
-	return std::make_pair(0, falling_edge);
-    }
-    float rising_edge(0);
-    float falling_edge(0);
-    std::string waveform(clock_wire->get_string_attribute(RTLIL::escape_id("WAVEFORM")));
-    std::sscanf(waveform.c_str(), "%f %f", &rising_edge, &falling_edge);
-    return std::make_pair(rising_edge, falling_edge);
-}
-
-float Clock::RisingEdge(RTLIL::Wire* clock_wire) {
-    return Waveform(clock_wire).first;
-}
-
-float Clock::FallingEdge(RTLIL::Wire* clock_wire) {
-    return Waveform(clock_wire).second;
-}
-
-void Clock::UpdateClock(RTLIL::Wire* wire, float period, float rising_edge,
-                        float falling_edge) {
-    UpdateWires(wire);
-    UpdatePeriod(period);
-    UpdateWaveform(rising_edge, falling_edge);
-}
-
-void Clock::UpdateWires(RTLIL::Wire* wire) {
-    if (std::find(clock_wires_.begin(), clock_wires_.end(), wire) ==
-        clock_wires_.end()) {
-	clock_wires_.push_back(wire);
-    }
-}
-
-void Clock::UpdatePeriod(float period) {
-    period_ = period;
-}
-
-void Clock::UpdateWaveform(float rising_edge, float falling_edge) {
-    rising_edge_ = fmod(rising_edge, period_);
-    falling_edge_ = fmod(falling_edge, period_);
-}
-
-std::string Clock::ClockWireName(RTLIL::Wire* wire) {
-    if (!wire) {
-	return std::string();
-    }
-    std::string wire_name(RTLIL::unescape_id(wire->name));
-    return std::regex_replace(wire_name, std::regex{"\\$"}, "\\$");
 }

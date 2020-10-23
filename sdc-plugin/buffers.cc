@@ -25,7 +25,9 @@ const std::vector<std::string> Pll::outputs = {"CLKOUT0", "CLKOUT1", "CLKOUT2",
 const float Pll::delay = 0;
 const std::string Pll::name = "PLLE2_ADV";
 
-Pll::Pll(RTLIL::Cell* cell, float input_clock_period, float input_clock_rising_edge) {
+Pll::Pll(RTLIL::Cell* cell, float input_clock_period, float input_clock_rising_edge)
+ : ClockDivider({"PLLE2_ADV"})
+{
     assert(RTLIL::unescape_id(cell->type) == "PLLE2_ADV");
     FetchParams(cell);
     CheckInputClockPeriod(cell, input_clock_period);
