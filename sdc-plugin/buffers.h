@@ -45,9 +45,10 @@ struct ClockDivider {
     std::string type;
 };
 
-struct Pll: public ClockDivider {
-    Pll():ClockDivider({"PLLE2_ADV"}){}
-    Pll(RTLIL::Cell* cell, float input_clock_period, float input_clock_rising_edge);
+struct Pll : public ClockDivider {
+    Pll() : ClockDivider({"PLLE2_ADV"}) {}
+    Pll(RTLIL::Cell* cell, float input_clock_period,
+        float input_clock_rising_edge);
 
     // Helper function to fetch a cell parameter or return a default value
     static float FetchParam(RTLIL::Cell* cell, std::string&& param_name,

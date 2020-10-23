@@ -24,3 +24,4 @@ close $fh
 
 # Write out the SDC file after the clock propagation step
 write_sdc $::env(DESIGN_TOP).sdc
+write_json $::env(DESIGN_TOP).json

@@ -31,6 +31,12 @@ class Propagation;
 
 class Clock {
    public:
+    static void Add(const std::string& name, RTLIL::Wire* wire, float period,
+                  float rising_edge, float falling_edge);
+    static void Add(const std::string& name, std::vector<RTLIL::Wire*> wires,
+                  float period, float rising_edge, float falling_edge);
+    static void Add(RTLIL::Wire* wire, float period,
+                  float rising_edge, float falling_edge);
     static float Period(RTLIL::Wire* clock_wire);
     static float RisingEdge(RTLIL::Wire* clock_wire);
     static float FallingEdge(RTLIL::Wire* clock_wire);
@@ -42,22 +48,7 @@ class Clock {
 
 class Clocks {
    public:
-    static void AddClock(const std::string& name, std::vector<RTLIL::Wire*> wires,
-                  float period, float rising_edge, float falling_edge);
-    static void AddClock(const std::string& name, RTLIL::Wire* wire, float period,
-                  float rising_edge, float falling_edge);
-    static void AddClock(RTLIL::Wire* wire, float period,
-                  float rising_edge, float falling_edge);
     static const std::vector<RTLIL::Wire*> GetClocks(RTLIL::Design* design);
-    void Propagate(RTLIL::Design* design, NaturalPropagation* pass);
-    void Propagate(RTLIL::Design* design, BufferPropagation* pass);
-    void Propagate(RTLIL::Design* design, ClockDividerPropagation* pass);
-
-   private:
-    void PropagateThroughBuffers(Propagation* pass, RTLIL::Design* design,
-                                Buffer buffer);
-    void PropagateThroughClockDividers(ClockDividerPropagation* pass, RTLIL::Design* design,
-                                ClockDivider divider);
 };
 
 #endif  // _CLOCKS_H_

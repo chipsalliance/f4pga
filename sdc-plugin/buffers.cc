@@ -15,9 +15,9 @@
  *  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  *  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
+#include "buffers.h"
 #include <cassert>
 #include <cmath>
-#include "buffers.h"
 
 const std::vector<std::string> Pll::inputs = {"CLKIN1", "CLKIN2"};
 const std::vector<std::string> Pll::outputs = {"CLKOUT0", "CLKOUT1", "CLKOUT2",
@@ -25,9 +25,9 @@ const std::vector<std::string> Pll::outputs = {"CLKOUT0", "CLKOUT1", "CLKOUT2",
 const float Pll::delay = 0;
 const std::string Pll::name = "PLLE2_ADV";
 
-Pll::Pll(RTLIL::Cell* cell, float input_clock_period, float input_clock_rising_edge)
- : ClockDivider({"PLLE2_ADV"})
-{
+Pll::Pll(RTLIL::Cell* cell, float input_clock_period,
+         float input_clock_rising_edge)
+    : ClockDivider({"PLLE2_ADV"}) {
     assert(RTLIL::unescape_id(cell->type) == "PLLE2_ADV");
     FetchParams(cell);
     CheckInputClockPeriod(cell, input_clock_period);
@@ -37,7 +37,9 @@ Pll::Pll(RTLIL::Cell* cell, float input_clock_period, float input_clock_rising_e
 
 void Pll::CheckInputClockPeriod(RTLIL::Cell* cell, float input_clock_period) {
     float abs_diff = fabs(ClkinPeriod() - input_clock_period);
-    bool approx_equal = abs_diff < std::max(ClkinPeriod(), input_clock_period) * 10 * std::numeric_limits<float>::epsilon();
+    bool approx_equal = abs_diff < std::max(ClkinPeriod(), input_clock_period) *
+                                       10 *
+                                       std::numeric_limits<float>::epsilon();
     if (!approx_equal) {
 	log_cmd_error(
 	    "CLKIN[1/2]_PERIOD doesn't match the virtual clock constraint "
@@ -55,7 +57,8 @@ void Pll::FetchParams(RTLIL::Cell* cell) {
     divclk_divisor = FetchParam(cell, "DIVCLK_DIVIDE", 1.0);
     for (auto output : outputs) {
 	// CLKOUT[0-5]_DUTY_CYCLE
-	clkout_duty_cycle[output] = FetchParam(cell, output + "_DUTY_CYCLE", 0.5);
+	clkout_duty_cycle[output] =
+	    FetchParam(cell, output + "_DUTY_CYCLE", 0.5);
 	// CLKOUT[0-5]_DIVIDE
 	clkout_divisor[output] = FetchParam(cell, output + "_DIVIDE", 1.0);
 	// CLKOUT[0-5]_PHASE
@@ -65,22 +68,30 @@ void Pll::FetchParams(RTLIL::Cell* cell) {
 
 void Pll::CalculateOutputClockPeriods() {
     for (auto output : outputs) {
-	// CLKOUT[0-5]_PERIOD = CLKIN1_PERIOD * CLKOUT[0-5]_DIVIDE * DIVCLK_DIVIDE /
-	// CLKFBOUT_MULT
-	clkout_period[output] = ClkinPeriod() * clkout_divisor.at(output) / clk_mult *
-	    divclk_divisor;
+	// CLKOUT[0-5]_PERIOD = CLKIN1_PERIOD * CLKOUT[0-5]_DIVIDE *
+	// DIVCLK_DIVIDE / CLKFBOUT_MULT
+	clkout_period[output] = ClkinPeriod() * clkout_divisor.at(output) /
+	                        clk_mult * divclk_divisor;
     }
 }
 
 void Pll::CalculateOutputClockWaveforms(float input_clock_rising_edge) {
     for (auto output : outputs) {
 	float output_clock_period = clkout_period.at(output);
-	clkout_rising_edge[output] = fmod(input_clock_rising_edge - (clk_fbout_phase / 360.0) * ClkinPeriod() + output_clock_period * (clkout_phase[output] / 360.0), output_clock_period);
-	clkout_falling_edge[output] = fmod(clkout_rising_edge[output] + clkout_duty_cycle[output] * output_clock_period, output_clock_period);
+	clkout_rising_edge[output] =
+	    fmod(input_clock_rising_edge -
+	             (clk_fbout_phase / 360.0) * ClkinPeriod() +
+	             output_clock_period * (clkout_phase[output] / 360.0),
+	         output_clock_period);
+	clkout_falling_edge[output] =
+	    fmod(clkout_rising_edge[output] +
+	             clkout_duty_cycle[output] * output_clock_period,
+	         output_clock_period);
     }
 }
 
-float Pll::FetchParam(RTLIL::Cell* cell, std::string&& param_name, float default_value) {
+float Pll::FetchParam(RTLIL::Cell* cell, std::string&& param_name,
+                      float default_value) {
     RTLIL::IdString param(RTLIL::escape_id(param_name));
     if (cell->hasParam(param)) {
 	auto param_obj = cell->parameters.at(param);

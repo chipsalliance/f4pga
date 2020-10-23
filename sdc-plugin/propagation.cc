@@ -20,47 +20,44 @@
 
 USING_YOSYS_NAMESPACE
 
-std::vector<RTLIL::Wire*> NaturalPropagation::FindAliasWires(
-    RTLIL::Wire* wire) {
-    RTLIL::Module* top_module = design_->top_module();
-    assert(top_module);
-    std::vector<RTLIL::Wire*> alias_wires;
-    pass_->extra_args(
-        std::vector<std::string>{
-            top_module->name.str() + "/w:" + wire->name.str(), "%a"},
-        0, design_);
-    for (auto module : design_->selected_modules()) {
-	for (auto wire : module->selected_wires()) {
-	    alias_wires.push_back(wire);
+void Propagation::PropagateThroughBuffers(Buffer buffer) {
+    for (auto& clock_wire : Clocks::GetClocks(design_)) {
+#ifdef SDC_DEBUG
+	log("Clock wire %s\n", Clock::ClockWireName(clock_wire).c_str());
+#endif
+	auto buf_wires =
+	    FindSinkWiresForCellType(clock_wire, buffer.type, buffer.output);
+	int path_delay(0);
+	for (auto wire : buf_wires) {
+#ifdef SDC_DEBUG
+	    log("%s wire: %s\n", buffer.type.c_str(),
+	        RTLIL::id2cstr(wire->name));
+#endif
+	    path_delay += buffer.delay;
+	    Clock::Add(wire, Clock::Period(clock_wire),
+	               Clock::RisingEdge(clock_wire) + path_delay,
+	               Clock::FallingEdge(clock_wire) + path_delay);
 	}
     }
-    return alias_wires;
 }
 
-void ClockDividerPropagation::PropagateClocksForCellType(
-    RTLIL::Wire* driver_wire, const std::string& cell_type) {
-    if (cell_type == "PLLE2_ADV") {
-	RTLIL::Cell* cell = NULL;
-	for (auto input : Pll::inputs) {
-	    cell = FindSinkCellOnPort(driver_wire, input);
-	    if (cell and RTLIL::unescape_id(cell->type) == cell_type) {
-		break;
-	    }
-	}
-	if (!cell) {
-	    return;
-	}
-	Pll pll(cell, Clock::Period(driver_wire), Clock::RisingEdge(driver_wire));
-	for (auto output : Pll::outputs) {
-	    RTLIL::Wire* wire = FindSinkWireOnPort(cell, output);
-	    if (wire) {
-		float clkout_period(pll.clkout_period.at(output));
-		float clkout_rising_edge(pll.clkout_rising_edge.at(output));
-		float clkout_falling_edge(pll.clkout_falling_edge.at(output));
-		Clocks::AddClock(wire, clkout_period, clkout_rising_edge, clkout_falling_edge);
-	    }
-	}
+std::vector<RTLIL::Wire*> Propagation::FindSinkWiresForCellType(
+    RTLIL::Wire* driver_wire, const std::string& cell_type,
+    const std::string& cell_port) {
+    std::vector<RTLIL::Wire*> wires;
+    if (!driver_wire) {
+	return wires;
     }
+    auto cell = FindSinkCellOfType(driver_wire, cell_type);
+    RTLIL::Wire* wire = FindSinkWireOnPort(cell, cell_port);
+    if (wire) {
+	wires.push_back(wire);
+	auto further_wires =
+	    FindSinkWiresForCellType(wire, cell_type, cell_port);
+	std::copy(further_wires.begin(), further_wires.end(),
+	          std::back_inserter(wires));
+    }
+    return wires;
 }
 
 RTLIL::Cell* Propagation::FindSinkCellOfType(RTLIL::Wire* wire,
@@ -87,25 +84,6 @@ RTLIL::Cell* Propagation::FindSinkCellOfType(RTLIL::Wire* wire,
 #endif
     }
     return sink_cell;
-}
-
-std::vector<RTLIL::Wire*> Propagation::FindSinkWiresForCellType(
-    RTLIL::Wire* driver_wire, const std::string& cell_type,
-    const std::string& cell_port) {
-    std::vector<RTLIL::Wire*> wires;
-    if (!driver_wire) {
-	return wires;
-    }
-    auto cell = FindSinkCellOfType(driver_wire, cell_type);
-    RTLIL::Wire* wire = FindSinkWireOnPort(cell, cell_port);
-    if (wire) {
-	wires.push_back(wire);
-	auto further_wires =
-	    FindSinkWiresForCellType(wire, cell_type, cell_port);
-	std::copy(further_wires.begin(), further_wires.end(),
-	          std::back_inserter(wires));
-    }
-    return wires;
 }
 
 RTLIL::Cell* Propagation::FindSinkCellOnPort(RTLIL::Wire* wire,
@@ -161,3 +139,102 @@ RTLIL::Wire* Propagation::FindSinkWireOnPort(RTLIL::Cell* cell,
     }
     return sink_wire;
 }
+void NaturalPropagation::Run() {
+#ifdef SDC_DEBUG
+    log("Start natural clock propagation\n");
+#endif
+    for (auto& clock_wire : Clocks::GetClocks(design_)) {
+#ifdef SDC_DEBUG
+	log("Processing clock %s\n", RTLIL::id2cstr(clock_wire->name));
+#endif
+	auto aliases = FindAliasWires(clock_wire);
+	Clock::Add(Clock::ClockWireName(clock_wire), aliases,
+	           Clock::Period(clock_wire), Clock::RisingEdge(clock_wire),
+	           Clock::FallingEdge(clock_wire));
+    }
+#ifdef SDC_DEBUG
+    log("Finish natural clock propagation\n\n");
+#endif
+}
+
+std::vector<RTLIL::Wire*> NaturalPropagation::FindAliasWires(
+    RTLIL::Wire* wire) {
+    RTLIL::Module* top_module = design_->top_module();
+    assert(top_module);
+    std::vector<RTLIL::Wire*> alias_wires;
+    pass_->extra_args(
+        std::vector<std::string>{
+            top_module->name.str() + "/w:" + wire->name.str(), "%a"},
+        0, design_);
+    for (auto module : design_->selected_modules()) {
+	for (auto wire : module->selected_wires()) {
+	    alias_wires.push_back(wire);
+	}
+    }
+    return alias_wires;
+}
+
+void BufferPropagation::Run() {
+#ifdef SDC_DEBUG
+    log("Start buffer clock propagation\n");
+    log("IBUF pass\n");
+#endif
+    PropagateThroughBuffers(IBuf());
+#ifdef SDC_DEBUG
+    log("BUFG pass\n");
+#endif
+    PropagateThroughBuffers(Bufg());
+#ifdef SDC_DEBUG
+    log("Finish buffer clock propagation\n\n");
+#endif
+}
+
+void ClockDividerPropagation::Run() {
+#ifdef SDC_DEBUG
+    log("Start clock divider clock propagation\n");
+#endif
+    PropagateThroughClockDividers(Pll());
+    PropagateThroughBuffers(Bufg());
+#ifdef SDC_DEBUG
+    log("Finish clock divider clock propagation\n\n");
+#endif
+}
+
+void ClockDividerPropagation::PropagateThroughClockDividers(
+    ClockDivider divider) {
+    for (auto& clock_wire : Clocks::GetClocks(design_)) {
+#ifdef SDC_DEBUG
+	log("Processing clock %s\n", Clock::ClockWireName(clock_wire).c_str());
+#endif
+	PropagateClocksForCellType(clock_wire, divider.type);
+    }
+}
+
+void ClockDividerPropagation::PropagateClocksForCellType(
+    RTLIL::Wire* driver_wire, const std::string& cell_type) {
+    if (cell_type == "PLLE2_ADV") {
+	RTLIL::Cell* cell = NULL;
+	for (auto input : Pll::inputs) {
+	    cell = FindSinkCellOnPort(driver_wire, input);
+	    if (cell and RTLIL::unescape_id(cell->type) == cell_type) {
+		break;
+	    }
+	}
+	if (!cell) {
+	    return;
+	}
+	Pll pll(cell, Clock::Period(driver_wire),
+	        Clock::RisingEdge(driver_wire));
+	for (auto output : Pll::outputs) {
+	    RTLIL::Wire* wire = FindSinkWireOnPort(cell, output);
+	    if (wire) {
+		float clkout_period(pll.clkout_period.at(output));
+		float clkout_rising_edge(pll.clkout_rising_edge.at(output));
+		float clkout_falling_edge(pll.clkout_falling_edge.at(output));
+		Clock::Add(wire, clkout_period, clkout_rising_edge,
+		           clkout_falling_edge);
+	    }
+	}
+    }
+}
+
