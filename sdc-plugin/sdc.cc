@@ -21,10 +21,10 @@
 #include "kernel/register.h"
 #include "kernel/rtlil.h"
 #include "propagation.h"
+#include "sdc_writer.h"
+#include "set_clock_groups.h"
 #include "set_false_path.h"
 #include "set_max_delay.h"
-#include "set_clock_groups.h"
-#include "sdc_writer.h"
 
 USING_YOSYS_NAMESPACE
 
@@ -73,7 +73,8 @@ struct WriteSdcCmd : public Backend {
     }
 
     void execute(std::ostream*& f, std::string filename,
-                 std::vector<std::string> args, RTLIL::Design* design) override {
+                 std::vector<std::string> args,
+                 RTLIL::Design* design) override {
 	if (args.size() < 2) {
 	    log_cmd_error("Missing output file.\n");
 	}
@@ -86,8 +87,7 @@ struct WriteSdcCmd : public Backend {
 };
 
 struct CreateClockCmd : public Pass {
-    CreateClockCmd()
-        : Pass("create_clock", "Create clock object") {}
+    CreateClockCmd() : Pass("create_clock", "Create clock object") {}
 
     void help() override {
 	log("\n");
@@ -169,8 +169,7 @@ struct CreateClockCmd : public Pass {
 	    rising_edge = 0;
 	    falling_edge = period / 2;
 	}
-	Clock::Add(name, selected_wires, period, rising_edge,
-	                 falling_edge);
+	Clock::Add(name, selected_wires, period, rising_edge, falling_edge);
     }
 
     void AddWirePrefix(std::vector<std::string>& args, size_t argidx) {
@@ -181,29 +180,92 @@ struct CreateClockCmd : public Pass {
 };
 
 struct GetClocksCmd : public Pass {
-    GetClocksCmd()
-        : Pass("get_clocks", "Create clock object") {}
+    GetClocksCmd() : Pass("get_clocks", "Create clock object") {}
 
     void help() override {
 	log("\n");
-	log("    get_clocks\n");
+	log("    get_clocks [-include_generated_clocks] [-of <nets>] "
+	    "[<patterns>]\n");
 	log("\n");
 	log("Returns all clocks in the design.\n");
 	log("\n");
+	log("    -include_generated_clocks\n");
+	log("        Include auto-generated clocks.\n");
+	log("\n");
+	log("    -of\n");
+	log("        Get clocks of these nets.\n");
+	log("\n");
+	log("    <pattern>\n");
+	log("        Pattern of clock names. Default are all clocks in the "
+	    "design.\n");
+	log("\n");
+    }
+
+    std::vector<std::string> extract_list(const std::string& args) {
+	std::vector<std::string> port_list;
+	std::stringstream ss(args);
+	std::istream_iterator<std::string> begin(ss);
+	std::istream_iterator<std::string> end;
+	std::copy(begin, end, std::back_inserter(port_list));
+	return port_list;
+    }
+
+    // TODO Check for GENERATED_CLOCK clock wire attribute
+    // For now don't treat any of the added clocks as auto-generated
+    bool IsGeneratedClock(RTLIL::Wire* clock_wire) {
+	(void)clock_wire;
+	return false;
     }
 
     void execute(std::vector<std::string> args,
                  RTLIL::Design* design) override {
-	if (args.size() > 1) {
-	    log_warning("Command doesn't support arguments, so they will be ignored.\n");
+	bool generated_clocks(false);
+	std::vector<std::string> clocks_nets;
+	size_t argidx(0);
+	for (argidx = 1; argidx < args.size(); argidx++) {
+	    std::string arg = args[argidx];
+	    if (arg == "-include_generated_clocks") {
+		generated_clocks = true;
+		continue;
+	    }
+	    if (arg == "-of" and argidx + 1 < args.size()) {
+		clocks_nets = extract_list(args[++argidx]);
+		continue;
+	    }
+	    if (arg.size() > 0 and arg[0] == '-') {
+		log_cmd_error("Unknown option %s.\n", arg.c_str());
+	    }
+
+	    break;
 	}
+	std::vector<std::string> clocks_list(args.begin() + argidx, args.end());
 	std::map<std::string, RTLIL::Wire*> clocks(Clocks::GetClocks(design));
 	if (clocks.size() == 0) {
 	    log_warning("No clocks found in design\n");
 	}
+#ifdef SDC_DEBUG
+	for (auto clock_net : clocks_nets) {
+	    log("Clock filter %s\n", clock_net.c_str());
+	}
+#endif
 	Tcl_Interp* interp = yosys_get_tcl_interp();
 	Tcl_Obj* tcl_list = Tcl_NewListObj(0, NULL);
 	for (auto& clock : clocks) {
+	    if (IsGeneratedClock(clock.second) and !generated_clocks) {
+		continue;
+	    }
+	    // Check if clock name is in the list of design clocks
+	    if (clocks_list.size() > 0 and
+	        std::find(clocks_list.begin(), clocks_list.end(),
+	                  clock.first) == clocks_list.end()) {
+		continue;
+	    }
+	    // Check if clock wire is in the -of list
+	    if (clocks_nets.size() > 0 and
+	        std::find(clocks_nets.begin(), clocks_nets.end(),
+	                  Clock::WireName(clock.second)) == clocks_nets.end()) {
+		continue;
+	    }
 	    auto& wire = clock.second;
 	    const char* name = RTLIL::id2cstr(wire->name);
 	    Tcl_Obj* name_obj = Tcl_NewStringObj(name, -1);
@@ -228,15 +290,15 @@ struct PropagateClocksCmd : public Pass {
     void execute(std::vector<std::string> args,
                  RTLIL::Design* design) override {
 	if (args.size() > 1) {
-	    log_warning("Command accepts no arguments.\nAll will be ignored.\n");
+	    log_warning(
+	        "Command accepts no arguments.\nAll will be ignored.\n");
 	}
 	if (!design->top_module()) {
 	    log_cmd_error("No top module selected\n");
 	}
 
 	std::array<std::unique_ptr<Propagation>, 2> passes{
-	    std::unique_ptr<Propagation>(
-	        new BufferPropagation(design, this)),
+	    std::unique_ptr<Propagation>(new BufferPropagation(design, this)),
 	    std::unique_ptr<Propagation>(
 	        new ClockDividerPropagation(design, this))};
 
