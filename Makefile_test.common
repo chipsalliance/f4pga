@@ -33,7 +33,7 @@ $(1)/ok: $(1)/$(1).v
 
 endef
 
-diff_test = bash -c "diff <(sort $(1)/$(1).golden.$(2)) <(sort $(1)/$(1).$(2))"
+diff_test = diff $(1)/$(1).golden.$(2) $(1)/$(1).$(2)
 
 all: $(TESTS)
 .PHONY: all clean $(TESTS)
