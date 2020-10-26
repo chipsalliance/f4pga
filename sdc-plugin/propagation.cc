@@ -21,9 +21,10 @@
 USING_YOSYS_NAMESPACE
 
 void Propagation::PropagateThroughBuffers(Buffer buffer) {
-    for (auto& clock_wire : Clocks::GetClocks(design_)) {
+    for (auto& clock : Clocks::GetClocks(design_)) {
+	auto& clock_wire = clock.second;
 #ifdef SDC_DEBUG
-	log("Clock wire %s\n", Clock::ClockWireName(clock_wire).c_str());
+	log("Clock wire %s\n", Clock::WireName(clock_wire).c_str());
 #endif
 	auto buf_wires =
 	    FindSinkWiresForCellType(clock_wire, buffer.type, buffer.output);
@@ -143,12 +144,13 @@ void NaturalPropagation::Run() {
 #ifdef SDC_DEBUG
     log("Start natural clock propagation\n");
 #endif
-    for (auto& clock_wire : Clocks::GetClocks(design_)) {
+    for (auto& clock : Clocks::GetClocks(design_)) {
+	auto& clock_wire = clock.second;
 #ifdef SDC_DEBUG
 	log("Processing clock %s\n", RTLIL::id2cstr(clock_wire->name));
 #endif
 	auto aliases = FindAliasWires(clock_wire);
-	Clock::Add(Clock::ClockWireName(clock_wire), aliases,
+	Clock::Add(Clock::WireName(clock_wire), aliases,
 	           Clock::Period(clock_wire), Clock::RisingEdge(clock_wire),
 	           Clock::FallingEdge(clock_wire));
     }
@@ -202,9 +204,10 @@ void ClockDividerPropagation::Run() {
 
 void ClockDividerPropagation::PropagateThroughClockDividers(
     ClockDivider divider) {
-    for (auto& clock_wire : Clocks::GetClocks(design_)) {
+    for (auto& clock : Clocks::GetClocks(design_)) {
+	auto& clock_wire = clock.second;
 #ifdef SDC_DEBUG
-	log("Processing clock %s\n", Clock::ClockWireName(clock_wire).c_str());
+	log("Processing clock %s\n", Clock::WireName(clock_wire).c_str());
 #endif
 	PropagateClocksForCellType(clock_wire, divider.type);
     }

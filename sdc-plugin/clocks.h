@@ -18,6 +18,7 @@
 #ifndef _CLOCKS_H_
 #define _CLOCKS_H_
 
+#include <map>
 #include <vector>
 #include "buffers.h"
 #include "kernel/rtlil.h"
@@ -32,15 +33,16 @@ class Propagation;
 class Clock {
    public:
     static void Add(const std::string& name, RTLIL::Wire* wire, float period,
-                  float rising_edge, float falling_edge);
+                    float rising_edge, float falling_edge);
     static void Add(const std::string& name, std::vector<RTLIL::Wire*> wires,
-                  float period, float rising_edge, float falling_edge);
-    static void Add(RTLIL::Wire* wire, float period,
-                  float rising_edge, float falling_edge);
+                    float period, float rising_edge, float falling_edge);
+    static void Add(RTLIL::Wire* wire, float period, float rising_edge,
+                    float falling_edge);
     static float Period(RTLIL::Wire* clock_wire);
     static float RisingEdge(RTLIL::Wire* clock_wire);
     static float FallingEdge(RTLIL::Wire* clock_wire);
-    static std::string ClockWireName(RTLIL::Wire* wire);
+    static std::string Name(RTLIL::Wire* clock_wire);
+    static std::string WireName(RTLIL::Wire* wire);
 
    private:
     static std::pair<float, float> Waveform(RTLIL::Wire* clock_wire);
@@ -48,7 +50,7 @@ class Clock {
 
 class Clocks {
    public:
-    static const std::vector<RTLIL::Wire*> GetClocks(RTLIL::Design* design);
+    static const std::map<std::string, RTLIL::Wire*> GetClocks(RTLIL::Design* design);
 };
 
 #endif  // _CLOCKS_H_

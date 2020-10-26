@@ -197,13 +197,14 @@ struct GetClocksCmd : public Pass {
 	if (args.size() > 1) {
 	    log_warning("Command doesn't support arguments, so they will be ignored.\n");
 	}
-	std::vector<RTLIL::Wire*> clock_wires(Clocks::GetClocks(design));
-	if (clock_wires.size() == 0) {
+	std::map<std::string, RTLIL::Wire*> clocks(Clocks::GetClocks(design));
+	if (clocks.size() == 0) {
 	    log_warning("No clocks found in design\n");
 	}
 	Tcl_Interp* interp = yosys_get_tcl_interp();
 	Tcl_Obj* tcl_list = Tcl_NewListObj(0, NULL);
-	for (auto wire : clock_wires) {
+	for (auto& clock : clocks) {
+	    auto& wire = clock.second;
 	    const char* name = RTLIL::id2cstr(wire->name);
 	    Tcl_Obj* name_obj = Tcl_NewStringObj(name, -1);
 	    Tcl_ListObjAppendElement(interp, tcl_list, name_obj);

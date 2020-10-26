@@ -28,7 +28,7 @@ void Clock::Add(const std::string& name, RTLIL::Wire* wire, float period,
     wire->set_string_attribute(RTLIL::escape_id("CLASS"), "clock");
     wire->set_string_attribute(RTLIL::escape_id("NAME"), name);
     wire->set_string_attribute(RTLIL::escape_id("SOURCE_PINS"),
-                               Clock::ClockWireName(wire));
+                               Clock::WireName(wire));
     wire->set_string_attribute(RTLIL::escape_id("PERIOD"),
                                std::to_string(period));
     std::string waveform(std::to_string(rising_edge) + " " +
@@ -45,7 +45,7 @@ void Clock::Add(const std::string& name, std::vector<RTLIL::Wire*> wires,
 
 void Clock::Add(RTLIL::Wire* wire, float period, float rising_edge,
                 float falling_edge) {
-    Add(Clock::ClockWireName(wire), wire, period, rising_edge, falling_edge);
+    Add(Clock::WireName(wire), wire, period, rising_edge, falling_edge);
 }
 
 float Clock::Period(RTLIL::Wire* clock_wire) {
@@ -64,7 +64,7 @@ std::pair<float, float> Clock::Waveform(RTLIL::Wire* clock_wire) {
 	if (!period) {
 	    log_cmd_error(
 	        "Neither PERIOD nor WAVEFORM has been specified for wire %s\n",
-	        ClockWireName(clock_wire).c_str());
+	        WireName(clock_wire).c_str());
 	    return std::make_pair(0, 0);
 	}
 	float falling_edge = period / 2;
@@ -90,7 +90,14 @@ float Clock::FallingEdge(RTLIL::Wire* clock_wire) {
     return Waveform(clock_wire).second;
 }
 
-std::string Clock::ClockWireName(RTLIL::Wire* wire) {
+std::string Clock::Name(RTLIL::Wire* clock_wire) {
+    if (clock_wire->has_attribute(RTLIL::escape_id("NAME"))) {
+	return clock_wire->get_string_attribute(RTLIL::escape_id("NAME"));
+    }
+    return WireName(clock_wire);
+}
+
+std::string Clock::WireName(RTLIL::Wire* wire) {
     if (!wire) {
 	return std::string();
     }
@@ -98,15 +105,15 @@ std::string Clock::ClockWireName(RTLIL::Wire* wire) {
     return std::regex_replace(wire_name, std::regex{"\\$"}, "\\$");
 }
 
-const std::vector<RTLIL::Wire*> Clocks::GetClocks(RTLIL::Design* design) {
-    std::vector<RTLIL::Wire*> clock_wires;
+const std::map<std::string, RTLIL::Wire*> Clocks::GetClocks(RTLIL::Design* design) {
+    std::map<std::string, RTLIL::Wire*> clock_wires;
     RTLIL::Module* top_module = design->top_module();
     for (auto& wire_obj : top_module->wires_) {
 	auto& wire = wire_obj.second;
 	if (wire->has_attribute(RTLIL::escape_id("CLOCK_SIGNAL"))) {
 	    if (wire->get_string_attribute(RTLIL::escape_id("CLOCK_SIGNAL")) ==
 	        "yes") {
-		clock_wires.push_back(wire);
+		clock_wires.insert(std::make_pair(Clock::WireName(wire), wire));
 	    }
 	}
     }

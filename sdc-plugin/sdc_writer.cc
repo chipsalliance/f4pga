@@ -45,15 +45,16 @@ void SdcWriter::WriteSdc(RTLIL::Design* design, std::ostream& file) {
 }
 
 void SdcWriter::WriteClocks(RTLIL::Design* design, std::ostream& file) {
-    for (auto& clock_wire : Clocks::GetClocks(design)) {
+    for (auto& clock : Clocks::GetClocks(design)) {
 	// FIXME: Input port nets are not found in VPR
+	auto& clock_wire = clock.second;
 	if (clock_wire->port_input) {
 	    continue;
 	}
 	file << "create_clock -period " << Clock::Period(clock_wire);
 	file << " -waveform {" << Clock::RisingEdge(clock_wire) << " "
 	     << Clock::FallingEdge(clock_wire) << "}";
-	file << " " << Clock::ClockWireName(clock_wire);
+	file << " " << Clock::WireName(clock_wire);
 	file << std::endl;
     }
 }
