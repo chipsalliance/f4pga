@@ -11,7 +11,8 @@ TESTS = counter \
 	pll_approx_equal \
 	set_false_path \
 	set_max_delay \
-	set_clock_groups
+	set_clock_groups \
+	restore_from_json
 
 include $(shell pwd)/../../Makefile_test.common
 
@@ -24,3 +25,4 @@ pll_approx_equal_verify = $(call diff_test,pll_approx_equal,sdc)
 set_false_path_verify = $(call diff_test,set_false_path,sdc)
 set_max_delay_verify = $(call diff_test,set_max_delay,sdc)
 set_clock_groups_verify = $(call diff_test,set_clock_groups,sdc)
+restore_from_json_verify = diff restore_from_json/restore_from_json_1.sdc restore_from_json/restore_from_json_2.sdc
