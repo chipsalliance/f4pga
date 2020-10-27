@@ -54,8 +54,13 @@ float Clock::Period(RTLIL::Wire* clock_wire) {
 	    "Period has not been specified\n Default value 0 will be used\n");
 	return 0;
     }
-    return std::stof(
-        clock_wire->get_string_attribute(RTLIL::escape_id("PERIOD")));
+    float period(0);
+    try {
+	period = std::stof(clock_wire->get_string_attribute(RTLIL::escape_id("PERIOD")));
+    } catch (const std::invalid_argument& e) {
+	log_cmd_error("Incorrect PERIOD format\n");
+    }
+    return period;
 }
 
 std::pair<float, float> Clock::Waveform(RTLIL::Wire* clock_wire) {
@@ -78,7 +83,9 @@ std::pair<float, float> Clock::Waveform(RTLIL::Wire* clock_wire) {
     float falling_edge(0);
     std::string waveform(
         clock_wire->get_string_attribute(RTLIL::escape_id("WAVEFORM")));
-    std::sscanf(waveform.c_str(), "%f %f", &rising_edge, &falling_edge);
+    if (std::sscanf(waveform.c_str(), "%f %f", &rising_edge, &falling_edge) != 2) {
+	log_cmd_error("Incorrect WAVEFORM format\n");
+    }
     return std::make_pair(rising_edge, falling_edge);
 }
 
