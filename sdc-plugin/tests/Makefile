@@ -12,7 +12,9 @@ TESTS = counter \
 	set_false_path \
 	set_max_delay \
 	set_clock_groups \
-	restore_from_json
+	restore_from_json \
+	period_check \
+	waveform_check
 
 include $(shell pwd)/../../Makefile_test.common
 
@@ -26,3 +28,7 @@ set_false_path_verify = $(call diff_test,set_false_path,sdc)
 set_max_delay_verify = $(call diff_test,set_max_delay,sdc)
 set_clock_groups_verify = $(call diff_test,set_clock_groups,sdc)
 restore_from_json_verify = diff restore_from_json/restore_from_json_1.sdc restore_from_json/restore_from_json_2.sdc
+period_check_verify = true
+period_check_negative = 1
+waveform_check_verify = true
+waveform_check_negative = 1
