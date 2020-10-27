@@ -14,9 +14,10 @@
 #
 define test_tpl =
 $(1): $(1)/ok
-	@$$($(1)_verify); \
-	RETVAL=$$$$? ; \
-	if [ $$$$RETVAL -eq 0 ]; then \
+	@echo "Verifying result of test $(1)"
+	@set +e; \
+	$$($(1)_verify); \
+	if [ $$$$? -eq 0 ]; then \
 		echo "Test $(1) PASSED"; \
 		touch $$<; \
 		true; \
@@ -27,9 +28,25 @@ $(1): $(1)/ok
 
 $(1)/ok: $(1)/$(1).v
 	@echo "Running test $(1)"
-	@cd $(1); \
+	@set +e; \
+	cd $(1); \
 	DESIGN_TOP=$(1) \
-	yosys -c $(1).tcl -q -l $(1).log
+	yosys -c $(1).tcl -q -l $(1).log; \
+	RETVAL=$$$$?; \
+	if [ ! -z "$$($(1)_negative)" ] && [ $$($(1)_negative) -eq 1 ]; then \
+		if [ $$$$RETVAL -ne 0 ]; then \
+			echo "Negative test $(1) PASSED"; \
+			true; \
+		else \
+			echo "Negative test $(1) FAILED"; \
+			false; \
+		fi \
+	else \
+		if [ $$$$RETVAL -ne 0 ]; then \
+			echo "Unexpected runtime error"; \
+			false; \
+		fi \
+	fi
 
 endef
 
