@@ -119,8 +119,7 @@ std::string Clock::WireName(RTLIL::Wire* wire) {
     if (!wire) {
 	return std::string();
     }
-    std::string wire_name(RTLIL::unescape_id(wire->name));
-    return std::regex_replace(wire_name, std::regex{"\\$"}, "\\$");
+    return AddEscaping(RTLIL::unescape_id(wire->name));
 }
 
 const std::map<std::string, RTLIL::Wire*> Clocks::GetClocks(RTLIL::Design* design) {

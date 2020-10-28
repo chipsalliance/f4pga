@@ -43,6 +43,9 @@ class Clock {
     static float FallingEdge(RTLIL::Wire* clock_wire);
     static std::string Name(RTLIL::Wire* clock_wire);
     static std::string WireName(RTLIL::Wire* wire);
+    static std::string AddEscaping(const std::string& name) {
+	return std::regex_replace(name, std::regex{"\\$"}, "\\$");
+    }
 
    private:
     static std::pair<float, float> Waveform(RTLIL::Wire* clock_wire);
