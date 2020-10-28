@@ -55,10 +55,16 @@ float Clock::Period(RTLIL::Wire* clock_wire) {
 	return 0;
     }
     float period(0);
+    std::string period_str;
     try {
-	period = std::stof(clock_wire->get_string_attribute(RTLIL::escape_id("PERIOD")));
+	period_str =
+	    clock_wire->get_string_attribute(RTLIL::escape_id("PERIOD"));
+	period = std::stof(period_str);
     } catch (const std::invalid_argument& e) {
-	log_cmd_error("Incorrect PERIOD format\n");
+	log_cmd_error(
+	    "Incorrect value '%s' specifed on PERIOD attribute for wire "
+	    "'%s'.\nPERIOD needs to be a float value.\n",
+	    period_str.c_str(), WireName(clock_wire).c_str());
     }
     return period;
 }
@@ -83,8 +89,13 @@ std::pair<float, float> Clock::Waveform(RTLIL::Wire* clock_wire) {
     float falling_edge(0);
     std::string waveform(
         clock_wire->get_string_attribute(RTLIL::escape_id("WAVEFORM")));
-    if (std::sscanf(waveform.c_str(), "%f %f", &rising_edge, &falling_edge) != 2) {
-	log_cmd_error("Incorrect WAVEFORM format\n");
+    if (std::sscanf(waveform.c_str(), "%f %f", &rising_edge, &falling_edge) !=
+        2) {
+	log_cmd_error(
+	    "Incorrect value '%s' specifed on WAVEFORM attribute for wire "
+	    "'%s'.\nWAVEFORM needs to be specified in form of '<rising_edge> "
+	    "<falling_edge>' where the edge values are floats.\n",
+	    waveform.c_str(), WireName(clock_wire).c_str());
     }
     return std::make_pair(rising_edge, falling_edge);
 }
