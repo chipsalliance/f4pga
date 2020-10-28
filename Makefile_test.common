@@ -12,6 +12,12 @@
 # test1_verify = $(call diff_test,test1,ext) && test $$(grep "PASS" test1/test1.txt | wc -l) -eq 2
 # test2_verify = $(call diff_test,test2,ext)
 #
+GTEST_DIR = ../../third_party/googletest/googletest
+CXX = $(shell yosys-config --cxx)
+CXXFLAGS = $(shell yosys-config --cxxflags) -I.. -I$(GTEST_DIR)/include
+LDLIBS = $(shell yosys-config --ldlibs) -L$(GTEST_DIR)/build/lib -lgtest -lgtest_main -lpthread
+LDFLAGS = $(shell yosys-config --ldflags)
+
 define test_tpl =
 $(1): $(1)/ok
 	@echo "Verifying result of test $(1)"
@@ -50,13 +56,34 @@ $(1)/ok: $(1)/$(1).v
 
 endef
 
+define unit_test_tpl =
+$(1): $(1)/$(1).test
+	@$$<
+
+$(1)/$(1).test: $(1)/$(1).test.o $$(GTEST_DIR)/build/lib/libgtest.a
+	@$(CXX) $(LDFLAGS) -o $$@ $$< $(LDLIBS)
+
+$(1)/$(1).test.o: $(1)/$(1).test.cc
+	@$(CXX) $(CXXFLAGS) $(LDFLAGS) -c $$< -o $$@
+
+endef
+
 diff_test = diff $(1)/$(1).golden.$(2) $(1)/$(1).$(2)
 
-all: $(TESTS)
-.PHONY: all clean $(TESTS)
+all: $(TESTS) $(UNIT_TESTS)
+
+$(GTEST_DIR)/build/lib/libgtest.a $(GTEST_DIR)/build/lib/libgtest_main.a:
+	@mkdir -p $(GTEST_DIR)/build
+	@cd $(GTEST_DIR)/build; \
+	cmake ..; \
+	make
+
+.PHONY: all clean $(TESTS) $(UNIT_TESTS)
 
 $(foreach test,$(TESTS),$(eval $(call test_tpl,$(test))))
+$(foreach test,$(UNIT_TESTS),$(eval $(call unit_test_tpl,$(test))))
 
 clean:
 	@rm -rf $(foreach test,$(TESTS),$(test)/$(test).sdc $(test)/$(test).txt $(test)/$(test).eblif $(test)/$(test).json)
+	@rm -rf $(foreach test,$(UNIT_TESTS),$(test)/$(test).test.o $(test)/$(test).test.d $(test)/$(test).test)
 	@find . -name "ok" -or -name "*.log" | xargs rm -rf
