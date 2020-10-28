@@ -16,6 +16,8 @@ TESTS = counter \
 	period_check \
 	waveform_check
 
+UNIT_TESTS = escaping
+
 include $(shell pwd)/../../Makefile_test.common
 
 counter_verify = $(call diff_test,counter,sdc) && $(call diff_test,counter,txt)
