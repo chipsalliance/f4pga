@@ -2,6 +2,10 @@
 # set_false_path - test the set_false_path command
 # set_max_delay - test the set_max_delay command
 # set_clock_groups - test the set_clock_groups command
+# restore_from_json - test clock propagation when design restored from json instead verilog
+# period_check - test if the clock propagation fails if a clock wire is missing the PERIOD attribute
+# waveform_check - test if the WAVEFORM attribute value is correct on wire
+# period_format_check - test if PERIOD attribute value is correct on wire
 
 TESTS = counter \
 	counter2 \
@@ -14,7 +18,8 @@ TESTS = counter \
 	set_clock_groups \
 	restore_from_json \
 	period_check \
-	waveform_check
+	waveform_check \
+	period_format_check
 
 UNIT_TESTS = escaping
 
@@ -34,3 +39,5 @@ period_check_verify = true
 period_check_negative = 1
 waveform_check_verify = true
 waveform_check_negative = 1
+period_format_check_verify = true
+period_format_check_negative = 1
