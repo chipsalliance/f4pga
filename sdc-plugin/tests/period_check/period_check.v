@@ -1,4 +1,4 @@
-module top((* CLOCK_SIGNAL = "yes", PERIOD = "bad_value", WAVEFORM = "0 5" *) input clk,
+module top((* CLOCK_SIGNAL = "yes", WAVEFORM = "0 5" *) input clk,
         input clk2,
 	input [1:0] in,
 	output [5:0] out );

@@ -50,11 +50,8 @@ void Clock::Add(RTLIL::Wire* wire, float period, float rising_edge,
 
 float Clock::Period(RTLIL::Wire* clock_wire) {
     if (!clock_wire->has_attribute(RTLIL::escape_id("PERIOD"))) {
-	log_warning(
-	    "PERIOD has not been specified on wire '%s'.\nDefault value 0 will "
-	    "be used\n",
-	    WireName(clock_wire).c_str());
-	return 0;
+	log_cmd_error("PERIOD has not been specified on wire '%s'.\n",
+	              WireName(clock_wire).c_str());
     }
     float period(0);
     std::string period_str;
