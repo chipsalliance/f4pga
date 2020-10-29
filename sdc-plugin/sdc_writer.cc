@@ -37,30 +37,24 @@ void SdcWriter::AddClockGroup(ClockGroups::ClockGroup clock_group, ClockGroups::
     clock_groups_.Add(clock_group, relation);
 }
 
-void SdcWriter::WriteSdc(Clocks& clocks, std::ostream& file) {
-    WriteClocks(clocks, file);
+void SdcWriter::WriteSdc(RTLIL::Design* design, std::ostream& file) {
+    WriteClocks(design, file);
     WriteFalsePaths(file);
     WriteMaxDelay(file);
     WriteClockGroups(file);
 }
 
-void SdcWriter::WriteClocks(Clocks& clocks, std::ostream& file) {
-    for (auto clock : clocks.GetClocks()) {
-	auto clock_wires = clock.GetClockWires();
+void SdcWriter::WriteClocks(RTLIL::Design* design, std::ostream& file) {
+    for (auto& clock : Clocks::GetClocks(design)) {
 	// FIXME: Input port nets are not found in VPR
-	if (std::all_of(clock_wires.begin(), clock_wires.end(),
-	                [&](RTLIL::Wire* wire) { return wire->port_input; })) {
+	auto& clock_wire = clock.second;
+	if (clock_wire->port_input) {
 	    continue;
 	}
-	file << "create_clock -period " << clock.Period();
-	file << " -waveform {" << clock.RisingEdge() << " "
-	     << clock.FallingEdge() << "}";
-	for (auto clock_wire : clock_wires) {
-	    if (clock_wire->port_input) {
-		continue;
-	    }
-	    file << " " << Clock::ClockWireName(clock_wire);
-	}
+	file << "create_clock -period " << Clock::Period(clock_wire);
+	file << " -waveform {" << Clock::RisingEdge(clock_wire) << " "
+	     << Clock::FallingEdge(clock_wire) << "}";
+	file << " " << Clock::WireName(clock_wire);
 	file << std::endl;
     }
 }

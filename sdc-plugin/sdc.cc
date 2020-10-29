@@ -61,8 +61,8 @@ struct ReadSdcCmd : public Frontend {
 };
 
 struct WriteSdcCmd : public Backend {
-    WriteSdcCmd(Clocks& clocks, SdcWriter& sdc_writer)
-        : Backend("sdc", "Write SDC file"), clocks_(clocks), sdc_writer_(sdc_writer) {}
+    WriteSdcCmd(SdcWriter& sdc_writer)
+        : Backend("sdc", "Write SDC file"), sdc_writer_(sdc_writer) {}
 
     void help() override {
 	log("\n");
@@ -73,22 +73,21 @@ struct WriteSdcCmd : public Backend {
     }
 
     void execute(std::ostream*& f, std::string filename,
-                 std::vector<std::string> args, RTLIL::Design*) override {
+                 std::vector<std::string> args, RTLIL::Design* design) override {
 	if (args.size() < 2) {
 	    log_cmd_error("Missing output file.\n");
 	}
 	log("\nWriting out clock constraints file(SDC)\n");
 	extra_args(f, filename, args, 1);
-	sdc_writer_.WriteSdc(clocks_, *f);
+	sdc_writer_.WriteSdc(design, *f);
     }
 
-    Clocks& clocks_;
     SdcWriter& sdc_writer_;
 };
 
 struct CreateClockCmd : public Pass {
-    CreateClockCmd(Clocks& clocks)
-        : Pass("create_clock", "Create clock object"), clocks_(clocks) {}
+    CreateClockCmd()
+        : Pass("create_clock", "Create clock object") {}
 
     void help() override {
 	log("\n");
@@ -170,7 +169,7 @@ struct CreateClockCmd : public Pass {
 	    rising_edge = 0;
 	    falling_edge = period / 2;
 	}
-	clocks_.AddClock(name, selected_wires, period, rising_edge,
+	Clock::Add(name, selected_wires, period, rising_edge,
 	                 falling_edge);
     }
 
@@ -179,13 +178,11 @@ struct CreateClockCmd : public Pass {
 	std::transform(selection_begin, args.end(), selection_begin,
 	               [](std::string& w) { return "w:" + w; });
     }
-
-    Clocks& clocks_;
 };
 
 struct GetClocksCmd : public Pass {
-    GetClocksCmd(Clocks& clocks)
-        : Pass("get_clocks", "Create clock object"), clocks_(clocks) {}
+    GetClocksCmd()
+        : Pass("get_clocks", "Create clock object") {}
 
     void help() override {
 	log("\n");
@@ -195,28 +192,30 @@ struct GetClocksCmd : public Pass {
 	log("\n");
     }
 
-    void execute(__attribute__((unused)) std::vector<std::string> args,
-                 __attribute__((unused)) RTLIL::Design* design) override {
-	std::vector<std::string> clock_names(clocks_.GetClockNames());
-	if (clock_names.size() == 0) {
+    void execute(std::vector<std::string> args,
+                 RTLIL::Design* design) override {
+	if (args.size() > 1) {
+	    log_warning("Command doesn't support arguments, so they will be ignored.\n");
+	}
+	std::map<std::string, RTLIL::Wire*> clocks(Clocks::GetClocks(design));
+	if (clocks.size() == 0) {
 	    log_warning("No clocks found in design\n");
 	}
 	Tcl_Interp* interp = yosys_get_tcl_interp();
 	Tcl_Obj* tcl_list = Tcl_NewListObj(0, NULL);
-	for (auto name : clock_names) {
-	    Tcl_Obj* name_obj = Tcl_NewStringObj(name.c_str(), name.size());
+	for (auto& clock : clocks) {
+	    auto& wire = clock.second;
+	    const char* name = RTLIL::id2cstr(wire->name);
+	    Tcl_Obj* name_obj = Tcl_NewStringObj(name, -1);
 	    Tcl_ListObjAppendElement(interp, tcl_list, name_obj);
 	}
 	Tcl_SetObjResult(interp, tcl_list);
     }
-
-    Clocks& clocks_;
 };
 
 struct PropagateClocksCmd : public Pass {
-    PropagateClocksCmd(Clocks& clocks)
-        : Pass("propagate_clocks", "Propagate clock information"),
-          clocks_(clocks) {}
+    PropagateClocksCmd()
+        : Pass("propagate_clocks", "Propagate clock information") {}
 
     void help() override {
 	log("\n");
@@ -226,35 +225,33 @@ struct PropagateClocksCmd : public Pass {
 	log("\n");
     }
 
-    void execute(__attribute__((unused)) std::vector<std::string> args,
+    void execute(std::vector<std::string> args,
                  RTLIL::Design* design) override {
+	if (args.size() > 1) {
+	    log_warning("Command accepts no arguments.\nAll will be ignored.\n");
+	}
 	if (!design->top_module()) {
 	    log_cmd_error("No top module selected\n");
 	}
 
 	std::array<std::unique_ptr<Propagation>, 2> passes{
-	    std::unique_ptr<BufferPropagation>(
+	    std::unique_ptr<Propagation>(
 	        new BufferPropagation(design, this)),
-	    std::unique_ptr<ClockDividerPropagation>(
+	    std::unique_ptr<Propagation>(
 	        new ClockDividerPropagation(design, this))};
 
 	log("Perform clock propagation\n");
 
 	for (auto& pass : passes) {
-	    pass->Run(clocks_);
+	    pass->Run();
 	}
     }
-
-    Clocks& clocks_;
 };
 
 class SdcPlugin {
    public:
     SdcPlugin()
-        : write_sdc_cmd_(clocks_, sdc_writer_),
-          create_clock_cmd_(clocks_),
-          get_clocks_cmd_(clocks_),
-          propagate_clocks_cmd_(clocks_),
+        : write_sdc_cmd_(sdc_writer_),
           set_false_path_cmd_(sdc_writer_),
           set_max_delay_cmd_(sdc_writer_),
           set_clock_groups_cmd_(sdc_writer_) {
@@ -271,7 +268,6 @@ class SdcPlugin {
     SetClockGroups set_clock_groups_cmd_;
 
    private:
-    Clocks clocks_;
     SdcWriter sdc_writer_;
 } SdcPlugin;
 

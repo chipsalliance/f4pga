@@ -18,6 +18,7 @@
 #ifndef _CLOCKS_H_
 #define _CLOCKS_H_
 
+#include <map>
 #include <vector>
 #include "buffers.h"
 #include "kernel/rtlil.h"
@@ -31,53 +32,28 @@ class Propagation;
 
 class Clock {
    public:
-    Clock(const std::string& name, RTLIL::Wire* wire, float period,
-          float rising_edge, float falling_edge);
-    Clock(const std::string& name, std::vector<RTLIL::Wire*> wires,
-          float period, float rising_edge, float falling_edge);
-    Clock(RTLIL::Wire* wire, float period,
-	    float rising_edge, float falling_edge);
-    std::vector<RTLIL::Wire*> GetClockWires() { return clock_wires_; }
-    const std::string& Name() const { return name_; }
-    float Period() { return period_; }
-    float RisingEdge() { return rising_edge_; }
-    float FallingEdge() { return falling_edge_; }
-    void UpdateClock(RTLIL::Wire* wire, float period, float rising_edge,
-                     float falling_edge);
-    static std::string ClockWireName(RTLIL::Wire* wire);
+    static void Add(const std::string& name, RTLIL::Wire* wire, float period,
+                    float rising_edge, float falling_edge);
+    static void Add(const std::string& name, std::vector<RTLIL::Wire*> wires,
+                    float period, float rising_edge, float falling_edge);
+    static void Add(RTLIL::Wire* wire, float period, float rising_edge,
+                    float falling_edge);
+    static float Period(RTLIL::Wire* clock_wire);
+    static float RisingEdge(RTLIL::Wire* clock_wire);
+    static float FallingEdge(RTLIL::Wire* clock_wire);
+    static std::string Name(RTLIL::Wire* clock_wire);
+    static std::string WireName(RTLIL::Wire* wire);
+    static std::string AddEscaping(const std::string& name) {
+	return std::regex_replace(name, std::regex{"\\$"}, "\\$");
+    }
 
    private:
-    std::string name_;
-    std::vector<RTLIL::Wire*> clock_wires_;
-    float period_;
-    float rising_edge_;
-    float falling_edge_;
-
-    void UpdateWires(RTLIL::Wire* wire);
-    void UpdatePeriod(float period);
-    void UpdateWaveform(float rising_edge, float falling_edge);
+    static std::pair<float, float> Waveform(RTLIL::Wire* clock_wire);
 };
 
 class Clocks {
    public:
-    void AddClock(const std::string& name, std::vector<RTLIL::Wire*> wires,
-                  float period, float rising_edge, float falling_edge);
-    void AddClock(const std::string& name, RTLIL::Wire* wire, float period,
-                  float rising_edge, float falling_edge);
-    void AddClock(Clock& clock);
-    std::vector<std::string> GetClockNames();
-    void Propagate(NaturalPropagation* pass);
-    void Propagate(BufferPropagation* pass);
-    void Propagate(ClockDividerPropagation* pass);
-    void WriteSdc(std::ostream& file);
-    const std::vector<Clock> GetClocks() {
-	return clocks_;
-    }
-
-   private:
-    std::vector<Clock> clocks_;
-    void PropagateThroughBuffer(Propagation* pass, Clock& clock,
-                                Buffer buffer);
+    static const std::map<std::string, RTLIL::Wire*> GetClocks(RTLIL::Design* design);
 };
 
 #endif  // _CLOCKS_H_

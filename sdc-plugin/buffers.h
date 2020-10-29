@@ -26,10 +26,10 @@
 USING_YOSYS_NAMESPACE
 
 struct Buffer {
-    Buffer(float delay, const std::string& name, const std::string& output)
-        : delay(delay), name(name), output(output) {}
+    Buffer(float delay, const std::string& type, const std::string& output)
+        : delay(delay), type(type), output(output) {}
     float delay;
-    std::string name;
+    std::string type;
     std::string output;
 };
 
@@ -41,8 +41,14 @@ struct Bufg : Buffer {
     Bufg() : Buffer(0, "BUFG", "O"){};
 };
 
-struct Pll {
-    Pll(RTLIL::Cell* cell, float input_clock_period, float input_clock_rising_edge);
+struct ClockDivider {
+    std::string type;
+};
+
+struct Pll : public ClockDivider {
+    Pll() : ClockDivider({"PLLE2_ADV"}) {}
+    Pll(RTLIL::Cell* cell, float input_clock_period,
+        float input_clock_rising_edge);
 
     // Helper function to fetch a cell parameter or return a default value
     static float FetchParam(RTLIL::Cell* cell, std::string&& param_name,
