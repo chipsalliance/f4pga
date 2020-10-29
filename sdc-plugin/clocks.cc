@@ -51,7 +51,9 @@ void Clock::Add(RTLIL::Wire* wire, float period, float rising_edge,
 float Clock::Period(RTLIL::Wire* clock_wire) {
     if (!clock_wire->has_attribute(RTLIL::escape_id("PERIOD"))) {
 	log_warning(
-	    "Period has not been specified\n Default value 0 will be used\n");
+	    "PERIOD has not been specified on wire '%s'.\nDefault value 0 will "
+	    "be used\n",
+	    WireName(clock_wire).c_str());
 	return 0;
     }
     float period(0);
@@ -80,9 +82,9 @@ std::pair<float, float> Clock::Waveform(RTLIL::Wire* clock_wire) {
 	}
 	float falling_edge = period / 2;
 	log_warning(
-	    "Waveform has not been specified\n Default value {0 %f} will be "
-	    "used\n",
-	    falling_edge);
+	    "Waveform has not been specified on wire '%s'.\nDefault value {0 %f} "
+	    "will be used\n",
+	    WireName(clock_wire).c_str(), falling_edge);
 	return std::make_pair(0, falling_edge);
     }
     float rising_edge(0);
@@ -122,7 +124,8 @@ std::string Clock::WireName(RTLIL::Wire* wire) {
     return AddEscaping(RTLIL::unescape_id(wire->name));
 }
 
-const std::map<std::string, RTLIL::Wire*> Clocks::GetClocks(RTLIL::Design* design) {
+const std::map<std::string, RTLIL::Wire*> Clocks::GetClocks(
+    RTLIL::Design* design) {
     std::map<std::string, RTLIL::Wire*> clock_wires;
     RTLIL::Module* top_module = design->top_module();
     for (auto& wire_obj : top_module->wires_) {
