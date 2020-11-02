@@ -19,7 +19,8 @@ TESTS = counter \
 	restore_from_json \
 	period_check \
 	waveform_check \
-	period_format_check
+	period_format_check \
+	get_clocks
 
 UNIT_TESTS = escaping
 
@@ -41,3 +42,4 @@ waveform_check_verify = true
 waveform_check_negative = 1
 period_format_check_verify = true
 period_format_check_negative = 1
+get_clocks_verify = $(call diff_test,get_clocks,txt)
