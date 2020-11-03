@@ -211,6 +211,7 @@ struct GetClocksCmd : public Pass {
     }
 
     // TODO Check for GENERATED_CLOCK clock wire attribute
+    // Issue https://github.com/SymbiFlow/yosys-symbiflow-plugins/issues/53
     // For now don't treat any of the added clocks as auto-generated
     bool IsGeneratedClock(RTLIL::Wire* clock_wire) {
 	(void)clock_wire;
@@ -219,9 +220,13 @@ struct GetClocksCmd : public Pass {
 
     void execute(std::vector<std::string> args,
                  RTLIL::Design* design) override {
+
+	// Parse command arguments
 	bool generated_clocks(false);
 	std::vector<std::string> clocks_nets;
 	size_t argidx(0);
+
+	// Parse command switches
 	for (argidx = 1; argidx < args.size(); argidx++) {
 	    std::string arg = args[argidx];
 	    if (arg == "-include_generated_clocks") {
@@ -230,6 +235,11 @@ struct GetClocksCmd : public Pass {
 	    }
 	    if (arg == "-of" and argidx + 1 < args.size()) {
 		clocks_nets = extract_list(args[++argidx]);
+#ifdef SDC_DEBUG
+		for (auto clock_net : clocks_nets) {
+		    log("Clock filter %s\n", clock_net.c_str());
+		}
+#endif
 		continue;
 	    }
 	    if (arg.size() > 0 and arg[0] == '-') {
@@ -238,19 +248,21 @@ struct GetClocksCmd : public Pass {
 
 	    break;
 	}
+
+	// Parse object patterns
 	std::vector<std::string> clocks_list(args.begin() + argidx, args.end());
+
+	// Fetch clocks in the design
 	std::map<std::string, RTLIL::Wire*> clocks(Clocks::GetClocks(design));
 	if (clocks.size() == 0) {
 	    log_warning("No clocks found in design\n");
 	}
-#ifdef SDC_DEBUG
-	for (auto clock_net : clocks_nets) {
-	    log("Clock filter %s\n", clock_net.c_str());
-	}
-#endif
+
+	// Extract clocks into tcl list
 	Tcl_Interp* interp = yosys_get_tcl_interp();
 	Tcl_Obj* tcl_list = Tcl_NewListObj(0, NULL);
 	for (auto& clock : clocks) {
+	    // Skip generated clocks if -include_generated_clocks is not specified
 	    if (IsGeneratedClock(clock.second) and !generated_clocks) {
 		continue;
 	    }
