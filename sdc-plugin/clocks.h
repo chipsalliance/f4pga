@@ -46,6 +46,7 @@ class Clock {
     static std::string AddEscaping(const std::string& name) {
 	return std::regex_replace(name, std::regex{"\\$"}, "\\$");
     }
+    static std::string SourcePinName(RTLIL::Wire* clock_wire);
 
    private:
     static std::pair<float, float> Waveform(RTLIL::Wire* clock_wire);

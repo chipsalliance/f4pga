@@ -54,7 +54,7 @@ void SdcWriter::WriteClocks(RTLIL::Design* design, std::ostream& file) {
 	file << "create_clock -period " << Clock::Period(clock_wire);
 	file << " -waveform {" << Clock::RisingEdge(clock_wire) << " "
 	     << Clock::FallingEdge(clock_wire) << "}";
-	file << " " << Clock::WireName(clock_wire);
+	file << " " << Clock::SourcePinName(clock_wire);
 	file << std::endl;
     }
 }

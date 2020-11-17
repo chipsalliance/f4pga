@@ -114,11 +114,18 @@ std::string Clock::Name(RTLIL::Wire* clock_wire) {
     return WireName(clock_wire);
 }
 
-std::string Clock::WireName(RTLIL::Wire* wire) {
-    if (!wire) {
+std::string Clock::WireName(RTLIL::Wire* clock_wire) {
+    if (!clock_wire) {
 	return std::string();
     }
-    return AddEscaping(RTLIL::unescape_id(wire->name));
+    return AddEscaping(RTLIL::unescape_id(clock_wire->name));
+}
+
+std::string Clock::SourcePinName(RTLIL::Wire* clock_wire) {
+    if (clock_wire->has_attribute(RTLIL::escape_id("SOURCE_PINS"))) {
+	return clock_wire->get_string_attribute(RTLIL::escape_id("SOURCE_PINS"));
+    }
+    return Name(clock_wire);
 }
 
 const std::map<std::string, RTLIL::Wire*> Clocks::GetClocks(
