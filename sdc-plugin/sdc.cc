@@ -210,19 +210,11 @@ struct GetClocksCmd : public Pass {
 	return port_list;
     }
 
-    // TODO Check for GENERATED_CLOCK clock wire attribute
-    // Issue https://github.com/SymbiFlow/yosys-symbiflow-plugins/issues/53
-    // For now don't treat any of the added clocks as auto-generated
-    bool IsGeneratedClock(RTLIL::Wire* clock_wire) {
-	(void)clock_wire;
-	return false;
-    }
-
     void execute(std::vector<std::string> args,
                  RTLIL::Design* design) override {
 
 	// Parse command arguments
-	bool generated_clocks(false);
+	bool include_generated_clocks(false);
 	std::vector<std::string> clocks_nets;
 	size_t argidx(0);
 
@@ -230,7 +222,7 @@ struct GetClocksCmd : public Pass {
 	for (argidx = 1; argidx < args.size(); argidx++) {
 	    std::string arg = args[argidx];
 	    if (arg == "-include_generated_clocks") {
-		generated_clocks = true;
+		include_generated_clocks = true;
 		continue;
 	    }
 	    if (arg == "-of" and argidx + 1 < args.size()) {
@@ -262,8 +254,13 @@ struct GetClocksCmd : public Pass {
 	Tcl_Interp* interp = yosys_get_tcl_interp();
 	Tcl_Obj* tcl_list = Tcl_NewListObj(0, NULL);
 	for (auto& clock : clocks) {
+	    // Skip propagated clocks (i.e. clock wires with the same parameters
+	    // as the master clocks they originate from
+	    if (Clock::IsPropagated(clock.second)) {
+		continue;
+	    }
 	    // Skip generated clocks if -include_generated_clocks is not specified
-	    if (IsGeneratedClock(clock.second) and !generated_clocks) {
+	    if (Clock::IsGenerated(clock.second) and !include_generated_clocks) {
 		continue;
 	    }
 	    // Check if clock name is in the list of design clocks
