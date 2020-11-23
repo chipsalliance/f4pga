@@ -34,6 +34,8 @@ class Propagation {
     RTLIL::Design* design_;
     Pass* pass_;
 
+    // This propagation doesn't change the clock so the sink wire is only marked
+    // as propagated clock signal, but has the properties of the driving clock
     void PropagateThroughBuffers(Buffer buffer);
     std::vector<RTLIL::Wire*> FindSinkWiresForCellType(
         RTLIL::Wire* driver_wire, const std::string& cell_type,

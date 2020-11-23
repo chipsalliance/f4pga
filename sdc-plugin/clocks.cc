@@ -23,8 +23,11 @@
 #include "propagation.h"
 
 void Clock::Add(const std::string& name, RTLIL::Wire* wire, float period,
-                float rising_edge, float falling_edge) {
+                float rising_edge, float falling_edge, ClockType type) {
     wire->set_string_attribute(RTLIL::escape_id("CLOCK_SIGNAL"), "yes");
+    wire->set_bool_attribute(RTLIL::escape_id("IS_GENERATED"), type == GENERATED);
+    wire->set_bool_attribute(RTLIL::escape_id("IS_EXPLICIT"), type == EXPLICIT);
+    wire->set_bool_attribute(RTLIL::escape_id("IS_PROPAGATED"), type == PROPAGATED);
     wire->set_string_attribute(RTLIL::escape_id("CLASS"), "clock");
     wire->set_string_attribute(RTLIL::escape_id("NAME"), name);
     wire->set_string_attribute(RTLIL::escape_id("SOURCE_PINS"),
@@ -37,15 +40,15 @@ void Clock::Add(const std::string& name, RTLIL::Wire* wire, float period,
 }
 
 void Clock::Add(const std::string& name, std::vector<RTLIL::Wire*> wires,
-                float period, float rising_edge, float falling_edge) {
+                float period, float rising_edge, float falling_edge, ClockType type) {
     std::for_each(wires.begin(), wires.end(), [&](RTLIL::Wire* wire) {
-	Add(name, wire, period, rising_edge, falling_edge);
+	Add(name, wire, period, rising_edge, falling_edge, type);
     });
 }
 
 void Clock::Add(RTLIL::Wire* wire, float period, float rising_edge,
-                float falling_edge) {
-    Add(Clock::WireName(wire), wire, period, rising_edge, falling_edge);
+                float falling_edge, ClockType type) {
+    Add(Clock::WireName(wire), wire, period, rising_edge, falling_edge, type);
 }
 
 float Clock::Period(RTLIL::Wire* clock_wire) {
@@ -126,6 +129,13 @@ std::string Clock::SourcePinName(RTLIL::Wire* clock_wire) {
 	return clock_wire->get_string_attribute(RTLIL::escape_id("SOURCE_PINS"));
     }
     return Name(clock_wire);
+}
+
+bool Clock::GetClockWireBoolAttribute(RTLIL::Wire* wire, const std::string& attribute_name) {
+    if (wire->has_attribute(RTLIL::escape_id(attribute_name))) {
+	return wire->get_bool_attribute(RTLIL::escape_id(attribute_name));
+    }
+    return false;
 }
 
 const std::map<std::string, RTLIL::Wire*> Clocks::GetClocks(

@@ -32,12 +32,13 @@ class Propagation;
 
 class Clock {
    public:
+    enum ClockType { EXPLICIT, GENERATED, PROPAGATED };
     static void Add(const std::string& name, RTLIL::Wire* wire, float period,
-                    float rising_edge, float falling_edge);
+                    float rising_edge, float falling_edge, ClockType type);
     static void Add(const std::string& name, std::vector<RTLIL::Wire*> wires,
-                    float period, float rising_edge, float falling_edge);
+                    float period, float rising_edge, float falling_edge, ClockType type);
     static void Add(RTLIL::Wire* wire, float period, float rising_edge,
-                    float falling_edge);
+                    float falling_edge, ClockType type);
     static float Period(RTLIL::Wire* clock_wire);
     static float RisingEdge(RTLIL::Wire* clock_wire);
     static float FallingEdge(RTLIL::Wire* clock_wire);
@@ -47,9 +48,22 @@ class Clock {
 	return std::regex_replace(name, std::regex{"\\$"}, "\\$");
     }
     static std::string SourcePinName(RTLIL::Wire* clock_wire);
+    static bool IsPropagated(RTLIL::Wire* wire) {
+	return GetClockWireBoolAttribute(wire, "IS_PROPAGATED");
+    }
+
+    static bool IsGenerated(RTLIL::Wire* wire) {
+	return GetClockWireBoolAttribute(wire, "IS_GENERATED");
+    }
+
+    static bool IsExplicit(RTLIL::Wire* wire) {
+	return GetClockWireBoolAttribute(wire, "IS_EXPLICIT");
+    }
 
    private:
     static std::pair<float, float> Waveform(RTLIL::Wire* clock_wire);
+
+    static bool GetClockWireBoolAttribute(RTLIL::Wire* wire, const std::string& attribute_name);
 };
 
 class Clocks {

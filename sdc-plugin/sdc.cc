@@ -169,7 +169,7 @@ struct CreateClockCmd : public Pass {
 	    rising_edge = 0;
 	    falling_edge = period / 2;
 	}
-	Clock::Add(name, selected_wires, period, rising_edge, falling_edge);
+	Clock::Add(name, selected_wires, period, rising_edge, falling_edge, Clock::EXPLICIT);
     }
 
     void AddWirePrefix(std::vector<std::string>& args, size_t argidx) {

@@ -46,9 +46,13 @@ void SdcWriter::WriteSdc(RTLIL::Design* design, std::ostream& file) {
 
 void SdcWriter::WriteClocks(RTLIL::Design* design, std::ostream& file) {
     for (auto& clock : Clocks::GetClocks(design)) {
-	// FIXME: Input port nets are not found in VPR
 	auto& clock_wire = clock.second;
+	// FIXME: Input port nets are not found in VPR
 	if (clock_wire->port_input) {
+	    continue;
+	}
+	// Write out only GENERATED and EXPLICIT clocks
+	if (Clock::IsPropagated(clock_wire)) {
 	    continue;
 	}
 	file << "create_clock -period " << Clock::Period(clock_wire);
