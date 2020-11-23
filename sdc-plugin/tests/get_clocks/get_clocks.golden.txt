@@ -1,6 +1,6 @@
-{$auto$clkbufmap.cc:262:execute$1800} {$auto$clkbufmap.cc:262:execute$1802} clk clk2 clk_int_1 middle_inst_1.clk_int middle_inst_4.clk
-{$auto$clkbufmap.cc:262:execute$1800} {$auto$clkbufmap.cc:262:execute$1802} clk clk2 clk_int_1 middle_inst_1.clk_int middle_inst_4.clk
+clk clk2 clk_int_1
+clk clk2 clk_int_1
 clk2
 clk_int_1
-clk clk2 clk_int_1 middle_inst_1.clk_int middle_inst_4.clk
+clk clk2 clk_int_1
 clk clk2 clk_int_1

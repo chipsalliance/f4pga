@@ -18,8 +18,8 @@ propagate_clocks
 
 # Write the clocks to file
 set fh [open $::env(DESIGN_TOP).txt w]
-set clocks [get_clocks]
-puts $fh $clocks
+puts $fh [get_clocks]
+puts $fh [get_clocks -include_generated_clocks]
 close $fh
 
 # Write out the SDC file after the clock propagation step
