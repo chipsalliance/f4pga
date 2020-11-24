@@ -71,9 +71,8 @@ struct IntegrateInv : public Pass {
     log("    integrateinv [selection]");
     log("\n");
     log("This pass integrates inverters into cells that have ports with the\n");
-    log("'invertible_pin' attribute set. The attribute should contain name\n");
-    log("of a parameter controlling the inversion. Whenever an inverter\n");
-    log("of a parameter controlling the inversion. Whenever an inverter\n");
+    log("'invertible_pin' attribute set. The attribute should contain the name\n");
+    log("of a parameter controlling the inversion.\n");
     log("\n");
     log("This pass is essentially the opposite of the 'extractinv' pass.\n");
     log("\n");
