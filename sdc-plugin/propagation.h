@@ -42,6 +42,7 @@ class Propagation {
     RTLIL::Cell* FindSinkCellOnPort(RTLIL::Wire* wire, const std::string& port);
     RTLIL::Wire* FindSinkWireOnPort(RTLIL::Cell* cell,
                                     const std::string& port_name);
+    bool WireHasSinkCell(RTLIL::Wire* wire);
 };
 
 class NaturalPropagation : public Propagation {

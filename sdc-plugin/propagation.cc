@@ -114,6 +114,22 @@ RTLIL::Cell* Propagation::FindSinkCellOnPort(RTLIL::Wire* wire,
     return sink_cell;
 }
 
+bool Propagation::WireHasSinkCell(RTLIL::Wire* wire) {
+    if (!wire) {
+	return false;
+    }
+    RTLIL::Module* top_module = design_->top_module();
+    assert(top_module);
+    std::string base_selection =
+        top_module->name.str() + "/w:" + wire->name.str();
+    pass_->extra_args(
+        std::vector<std::string>{base_selection, "%co:*",
+                                 base_selection, "%d"},
+        0, design_);
+    auto selected_cells = top_module->selected_cells();
+    return selected_cells.size() > 0;
+}
+
 RTLIL::Wire* Propagation::FindSinkWireOnPort(RTLIL::Cell* cell,
                                              const std::string& port_name) {
     RTLIL::Wire* sink_wire = NULL;
@@ -140,6 +156,7 @@ RTLIL::Wire* Propagation::FindSinkWireOnPort(RTLIL::Cell* cell,
     }
     return sink_wire;
 }
+
 void NaturalPropagation::Run() {
 #ifdef SDC_DEBUG
     log("Start natural clock propagation\n");
@@ -230,7 +247,8 @@ void ClockDividerPropagation::PropagateClocksForCellType(
 	        Clock::RisingEdge(driver_wire));
 	for (auto output : Pll::outputs) {
 	    RTLIL::Wire* wire = FindSinkWireOnPort(cell, output);
-	    if (wire) {
+	    // Don't add clocks on dangling wires
+	    if (wire && WireHasSinkCell(wire)) {
 		float clkout_period(pll.clkout_period.at(output));
 		float clkout_rising_edge(pll.clkout_rising_edge.at(output));
 		float clkout_falling_edge(pll.clkout_falling_edge.at(output));
