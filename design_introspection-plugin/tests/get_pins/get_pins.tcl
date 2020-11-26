@@ -5,7 +5,7 @@ yosys -import
 
 read_verilog get_pins.v
 # Some of symbiflow expects eblifs with only one module.
-synth_xilinx -vpr -flatten -abc9 -nosrl -noclkbuf -nodsp
+synth_xilinx -flatten -abc9 -nosrl -noclkbuf -nodsp
 
 
 set fp [open "get_pins.txt" "w"]

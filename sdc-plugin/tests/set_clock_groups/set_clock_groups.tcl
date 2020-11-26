@@ -5,7 +5,7 @@ yosys -import
 
 read_verilog set_clock_groups.v
 # Some of symbiflow expects eblifs with only one module.
-synth_xilinx -vpr -flatten -abc9 -nosrl -noclkbuf -nodsp
+synth_xilinx -flatten -abc9 -nosrl -noclkbuf -nodsp
 
 set_clock_groups -group clk1 clk2
 set_clock_groups -asynchronous -group clk3 clk4
