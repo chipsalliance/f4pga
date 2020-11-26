@@ -20,6 +20,15 @@ end_section
 
 ##########################################################################
 
+# Update submodules
+start_section Submodules
+(
+    git submodule update --init --recursive
+)
+end_section
+
+##########################################################################
+
 #Install yosys
 start_section Install-Yosys
 (
