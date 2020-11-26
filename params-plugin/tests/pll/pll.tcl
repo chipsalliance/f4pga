@@ -38,7 +38,7 @@ if {$phase == $reference_phase} {
 close $fp
 
 # Start flow after library reading
-synth_xilinx -vpr -flatten -abc9 -nosrl -noclkbuf -nodsp -iopad -run prepare:check
+synth_xilinx -flatten -abc9 -nosrl -noclkbuf -nodsp -iopad -run prepare:check
 
 # Map Xilinx tech library to 7-series VPR tech library.
 read_verilog -lib ./techmaps/cells_sim.v

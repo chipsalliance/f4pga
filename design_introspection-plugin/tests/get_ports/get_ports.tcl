@@ -5,7 +5,7 @@ yosys -import
 
 read_verilog get_ports.v
 # Some of symbiflow expects eblifs with only one module.
-synth_xilinx -vpr -flatten -abc9 -nosrl -noclkbuf -nodsp
+synth_xilinx -flatten -abc9 -nosrl -noclkbuf -nodsp
 help get_ports
 
 set fp [open "get_ports.txt" "w"]
