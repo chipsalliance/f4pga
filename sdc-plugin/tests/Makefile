@@ -13,6 +13,7 @@ TESTS = counter \
 	pll_div \
 	pll_fbout_phase \
 	pll_approx_equal \
+	pll_dangling_wires \
 	set_false_path \
 	set_max_delay \
 	set_clock_groups \
@@ -32,6 +33,7 @@ pll_verify = $(call diff_test,pll,sdc)
 pll_div_verify = $(call diff_test,pll_div,sdc)
 pll_fbout_phase_verify = $(call diff_test,pll_fbout_phase,sdc)
 pll_approx_equal_verify = $(call diff_test,pll_approx_equal,sdc)
+pll_dangling_wires_verify = $(call diff_test,pll_dangling_wires,sdc)
 set_false_path_verify = $(call diff_test,set_false_path,sdc)
 set_max_delay_verify = $(call diff_test,set_max_delay,sdc)
 set_clock_groups_verify = $(call diff_test,set_clock_groups,sdc)

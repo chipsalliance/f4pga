@@ -46,8 +46,6 @@ PLLE2_ADV #(
 	.CLKOUT0(main_clkout0),
 	.CLKOUT1(main_clkout1),
 	.CLKOUT2(main_clkout2),
-	.CLKOUT3(main_clkout3),
-	.CLKOUT4(main_clkout4),
 	.LOCKED(main_locked)
 );
 
