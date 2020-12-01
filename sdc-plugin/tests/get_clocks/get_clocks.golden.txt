@@ -1,5 +1,5 @@
 clk clk2 clk_int_1
-clk clk2 clk_int_1
+{$auto$clkbufmap.cc:262:execute$1845} clk clk2 clk_int_1
 clk2
 clk_int_1
 clk clk2 clk_int_1
