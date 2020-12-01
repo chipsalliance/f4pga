@@ -37,7 +37,7 @@ void Propagation::PropagateThroughBuffers(Buffer buffer) {
 	    path_delay += buffer.delay;
 	    Clock::Add(wire, Clock::Period(clock_wire),
 	               Clock::RisingEdge(clock_wire) + path_delay,
-	               Clock::FallingEdge(clock_wire) + path_delay);
+	               Clock::FallingEdge(clock_wire) + path_delay, Clock::PROPAGATED);
 	}
     }
 }
@@ -169,7 +169,7 @@ void NaturalPropagation::Run() {
 	auto aliases = FindAliasWires(clock_wire);
 	Clock::Add(Clock::WireName(clock_wire), aliases,
 	           Clock::Period(clock_wire), Clock::RisingEdge(clock_wire),
-	           Clock::FallingEdge(clock_wire));
+	           Clock::FallingEdge(clock_wire), Clock::PROPAGATED);
     }
 #ifdef SDC_DEBUG
     log("Finish natural clock propagation\n\n");
@@ -253,7 +253,7 @@ void ClockDividerPropagation::PropagateClocksForCellType(
 		float clkout_rising_edge(pll.clkout_rising_edge.at(output));
 		float clkout_falling_edge(pll.clkout_falling_edge.at(output));
 		Clock::Add(wire, clkout_period, clkout_rising_edge,
-		           clkout_falling_edge);
+		           clkout_falling_edge, Clock::GENERATED);
 	    }
 	}
     }

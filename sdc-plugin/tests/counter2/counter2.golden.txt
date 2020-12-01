@@ -1,1 +1,1 @@
-{$auto$clkbufmap.cc:262:execute$1801} {$auto$clkbufmap.cc:262:execute$1803} clk clk2 clk_int_1 ibuf_proxy_out middle_inst_1.clk_int middle_inst_4.clk
+clk clk2 clk_int_1
