@@ -47,7 +47,7 @@ class Clock {
     static std::string AddEscaping(const std::string& name) {
 	return std::regex_replace(name, std::regex{"\\$"}, "\\$");
     }
-    static std::string SourcePinName(RTLIL::Wire* clock_wire);
+    static std::string SourceWireName(RTLIL::Wire* clock_wire);
     static bool IsPropagated(RTLIL::Wire* wire) {
 	return GetClockWireBoolAttribute(wire, "IS_PROPAGATED");
     }

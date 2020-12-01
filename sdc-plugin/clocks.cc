@@ -30,7 +30,7 @@ void Clock::Add(const std::string& name, RTLIL::Wire* wire, float period,
     wire->set_bool_attribute(RTLIL::escape_id("IS_PROPAGATED"), type == PROPAGATED);
     wire->set_string_attribute(RTLIL::escape_id("CLASS"), "clock");
     wire->set_string_attribute(RTLIL::escape_id("NAME"), name);
-    wire->set_string_attribute(RTLIL::escape_id("SOURCE_PINS"),
+    wire->set_string_attribute(RTLIL::escape_id("SOURCE_WIRES"),
                                Clock::WireName(wire));
     wire->set_string_attribute(RTLIL::escape_id("PERIOD"),
                                std::to_string(period));
@@ -124,9 +124,9 @@ std::string Clock::WireName(RTLIL::Wire* clock_wire) {
     return AddEscaping(RTLIL::unescape_id(clock_wire->name));
 }
 
-std::string Clock::SourcePinName(RTLIL::Wire* clock_wire) {
-    if (clock_wire->has_attribute(RTLIL::escape_id("SOURCE_PINS"))) {
-	return clock_wire->get_string_attribute(RTLIL::escape_id("SOURCE_PINS"));
+std::string Clock::SourceWireName(RTLIL::Wire* clock_wire) {
+    if (clock_wire->has_attribute(RTLIL::escape_id("SOURCE_WIRES"))) {
+	return clock_wire->get_string_attribute(RTLIL::escape_id("SOURCE_WIRES"));
     }
     return Name(clock_wire);
 }
