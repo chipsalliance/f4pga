@@ -32,6 +32,10 @@ class Propagation;
 
 class Clock {
    public:
+    // We distinguish the following types of clock:
+    // * EXPLICIT - added with create_clocks command
+    // * GENERATED - propagated from explicit clocks changing the clock's parameters
+    // * PROPAGATED - propagated from explicit clocks but with the same parameters as the driver
     enum ClockType { EXPLICIT, GENERATED, PROPAGATED };
     static void Add(const std::string& name, RTLIL::Wire* wire, float period,
                     float rising_edge, float falling_edge, ClockType type);
