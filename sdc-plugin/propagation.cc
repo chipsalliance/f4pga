@@ -248,6 +248,8 @@ void ClockDividerPropagation::PropagateClocksForCellType(
 	for (auto output : Pll::outputs) {
 	    RTLIL::Wire* wire = FindSinkWireOnPort(cell, output);
 	    // Don't add clocks on dangling wires
+	    // TODO Remove the workaround with the WireHasSinkCell check once the following issue is fixed:
+	    // https://github.com/SymbiFlow/yosys-symbiflow-plugins/issues/59
 	    if (wire && WireHasSinkCell(wire)) {
 		float clkout_period(pll.clkout_period.at(output));
 		float clkout_rising_edge(pll.clkout_rising_edge.at(output));
