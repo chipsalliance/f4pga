@@ -29,27 +29,25 @@ struct GetCmd : public Pass {
     using Filters = std::vector<Filter>;
     using SelectionObjects = std::vector<std::string>;
     struct CommandArgs {
-	Filters filters;
-	bool is_quiet;
-	SelectionObjects selection_objects;
+        Filters filters;
+        bool is_quiet;
+        SelectionObjects selection_objects;
     };
 
-    GetCmd(const std::string& name, const std::string& description)
-        : Pass(name, description) {}
+    GetCmd(const std::string &name, const std::string &description) : Pass(name, description) {}
 
     void help() override;
-    void execute(std::vector<std::string> args, RTLIL::Design* design) override;
+    void execute(std::vector<std::string> args, RTLIL::Design *design) override;
 
-   protected:
-    CommandArgs ParseCommand(const std::vector<std::string>& args);
-    void PackToTcl(const SelectionObjects& objects);
+  protected:
+    CommandArgs ParseCommand(const std::vector<std::string> &args);
+    void PackToTcl(const SelectionObjects &objects);
 
-   private:
+  private:
     virtual std::string TypeName() = 0;
     virtual std::string SelectionType() = 0;
-    virtual SelectionObjects ExtractSelection(RTLIL::Design* design, const CommandArgs& args) = 0;
-    virtual void ExecuteSelection(RTLIL::Design* design,
-                                  const CommandArgs& args);
+    virtual SelectionObjects ExtractSelection(RTLIL::Design *design, const CommandArgs &args) = 0;
+    virtual void ExecuteSelection(RTLIL::Design *design, const CommandArgs &args);
 };
 
-#endif  // GET_CMD_H_
+#endif // GET_CMD_H_

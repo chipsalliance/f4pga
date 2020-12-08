@@ -25,15 +25,13 @@
 USING_YOSYS_NAMESPACE
 
 struct SetFalsePath : public Pass {
-    SetFalsePath(SdcWriter& sdc_writer)
-        : Pass("set_false_path", "Set false path on net"),
-          sdc_writer_(sdc_writer) {}
+    SetFalsePath(SdcWriter &sdc_writer) : Pass("set_false_path", "Set false path on net"), sdc_writer_(sdc_writer) {}
 
     void help() override;
 
-    void execute(std::vector<std::string> args, RTLIL::Design* design) override;
+    void execute(std::vector<std::string> args, RTLIL::Design *design) override;
 
-    SdcWriter& sdc_writer_;
+    SdcWriter &sdc_writer_;
 };
 
-#endif  //_SET_FALSE_PATH_H_
+#endif //_SET_FALSE_PATH_H_

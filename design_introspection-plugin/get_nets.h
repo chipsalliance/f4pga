@@ -29,8 +29,7 @@ struct GetNets : public GetCmd {
 
     std::string TypeName() override;
     std::string SelectionType() override;
-    SelectionObjects ExtractSelection(RTLIL::Design* design,
-                                      const CommandArgs& args) override;
+    SelectionObjects ExtractSelection(RTLIL::Design *design, const CommandArgs &args) override;
 };
 
-#endif  // GET_NETS_H_
+#endif // GET_NETS_H_

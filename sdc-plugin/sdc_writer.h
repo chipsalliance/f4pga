@@ -39,39 +39,37 @@ struct ClockGroups {
     using ClockGroup = std::vector<std::string>;
     static const std::map<ClockGroupRelation, std::string> relation_name_map;
 
-    void Add(ClockGroup& group, ClockGroupRelation relation) {
-	groups_[relation].push_back(group);
+    void Add(ClockGroup &group, ClockGroupRelation relation) { groups_[relation].push_back(group); }
+    std::vector<ClockGroup> GetGroups(ClockGroupRelation relation)
+    {
+        if (groups_.count(relation)) {
+            return groups_.at(relation);
+        }
+        return std::vector<ClockGroup>();
     }
-    std::vector<ClockGroup> GetGroups(ClockGroupRelation relation) {
-	if (groups_.count(relation)) {
-	    return groups_.at(relation);
-	}
-	return std::vector<ClockGroup>();
-    }
-    size_t size() {
-	return groups_.size();
-    }
+    size_t size() { return groups_.size(); }
 
-   private:
-    std::map<ClockGroupRelation,std::vector<ClockGroup>> groups_;
+  private:
+    std::map<ClockGroupRelation, std::vector<ClockGroup>> groups_;
 };
 
-class SdcWriter {
-   public:
+class SdcWriter
+{
+  public:
     void AddFalsePath(FalsePath false_path);
     void SetMaxDelay(TimingPath timing_path);
     void AddClockGroup(ClockGroups::ClockGroup clock_group, ClockGroups::ClockGroupRelation relation);
-    void WriteSdc(RTLIL::Design* design, std::ostream& file);
+    void WriteSdc(RTLIL::Design *design, std::ostream &file);
 
-   private:
-    void WriteClocks(RTLIL::Design* design, std::ostream& file);
-    void WriteFalsePaths(std::ostream& file);
-    void WriteMaxDelay(std::ostream& file);
-    void WriteClockGroups(std::ostream& file);
+  private:
+    void WriteClocks(RTLIL::Design *design, std::ostream &file);
+    void WriteFalsePaths(std::ostream &file);
+    void WriteMaxDelay(std::ostream &file);
+    void WriteClockGroups(std::ostream &file);
 
     std::vector<FalsePath> false_paths_;
     std::vector<TimingPath> timing_paths_;
     ClockGroups clock_groups_;
 };
 
-#endif  // _SDC_WRITER_H_
+#endif // _SDC_WRITER_H_

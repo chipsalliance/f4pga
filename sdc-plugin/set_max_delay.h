@@ -25,15 +25,13 @@
 USING_YOSYS_NAMESPACE
 
 struct SetMaxDelay : public Pass {
-    SetMaxDelay(SdcWriter& sdc_writer)
-        : Pass("set_max_delay", "Specify maximum delay for timing paths"),
-          sdc_writer_(sdc_writer) {}
+    SetMaxDelay(SdcWriter &sdc_writer) : Pass("set_max_delay", "Specify maximum delay for timing paths"), sdc_writer_(sdc_writer) {}
 
     void help() override;
 
-    void execute(std::vector<std::string> args, RTLIL::Design* design) override;
+    void execute(std::vector<std::string> args, RTLIL::Design *design) override;
 
-    SdcWriter& sdc_writer_;
+    SdcWriter &sdc_writer_;
 };
 
-#endif  //_SET_MAX_DELAY_H_
+#endif //_SET_MAX_DELAY_H_

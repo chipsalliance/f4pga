@@ -18,16 +18,15 @@
 #ifndef _BUFFERS_H_
 #define _BUFFERS_H_
 
+#include "kernel/rtlil.h"
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include "kernel/rtlil.h"
 
 USING_YOSYS_NAMESPACE
 
 struct Buffer {
-    Buffer(float delay, const std::string& type, const std::string& output)
-        : delay(delay), type(type), output(output) {}
+    Buffer(float delay, const std::string &type, const std::string &output) : delay(delay), type(type), output(output) {}
     float delay;
     std::string type;
     std::string output;
@@ -47,12 +46,10 @@ struct ClockDivider {
 
 struct Pll : public ClockDivider {
     Pll() : ClockDivider({"PLLE2_ADV"}) {}
-    Pll(RTLIL::Cell* cell, float input_clock_period,
-        float input_clock_rising_edge);
+    Pll(RTLIL::Cell *cell, float input_clock_period, float input_clock_rising_edge);
 
     // Helper function to fetch a cell parameter or return a default value
-    static float FetchParam(RTLIL::Cell* cell, std::string&& param_name,
-                            float default_value);
+    static float FetchParam(RTLIL::Cell *cell, std::string &&param_name, float default_value);
 
     // Get the period of the input clock
     // TODO Add support for CLKINSEL
@@ -65,13 +62,13 @@ struct Pll : public ClockDivider {
     std::unordered_map<std::string, float> clkout_rising_edge;
     std::unordered_map<std::string, float> clkout_falling_edge;
 
-   private:
+  private:
     // Approximate equality check of the input clock period and specified in
     // CLKIN[1/2]_PERIOD parameter
-    void CheckInputClockPeriod(RTLIL::Cell* cell, float input_clock_period);
+    void CheckInputClockPeriod(RTLIL::Cell *cell, float input_clock_period);
 
     // Fetch cell's parameters needed for further calculations
-    void FetchParams(RTLIL::Cell* cell);
+    void FetchParams(RTLIL::Cell *cell);
 
     // Calculate the period on the output clocks
     void CalculateOutputClockPeriods();
@@ -90,4 +87,4 @@ struct Pll : public ClockDivider {
     float clk_fbout_phase;
 };
 
-#endif  // _BUFFERS_H_
+#endif // _BUFFERS_H_

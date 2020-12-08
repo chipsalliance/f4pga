@@ -27,14 +27,12 @@ USING_YOSYS_NAMESPACE
 struct GetPorts : public GetCmd {
     GetPorts() : GetCmd("get_ports", "Print matching ports") {}
 
-   private:
+  private:
     std::string TypeName() override;
     std::string SelectionType() override;
     /* void execute(std::vector<std::string> args, RTLIL::Design* design) override; */
-    SelectionObjects ExtractSelection(RTLIL::Design* design,
-                                      const CommandArgs& args) override;
-    void ExecuteSelection(RTLIL::Design* design,
-                          const CommandArgs& args) override;
+    SelectionObjects ExtractSelection(RTLIL::Design *design, const CommandArgs &args) override;
+    void ExecuteSelection(RTLIL::Design *design, const CommandArgs &args) override;
 };
 
-#endif  // GET_PORTS_H_
+#endif // GET_PORTS_H_
