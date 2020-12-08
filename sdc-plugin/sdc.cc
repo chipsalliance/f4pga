@@ -16,6 +16,8 @@
  *  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 #include <algorithm>
+#include <array>
+
 #include "clocks.h"
 #include "kernel/log.h"
 #include "kernel/register.h"
