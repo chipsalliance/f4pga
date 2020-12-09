@@ -84,6 +84,6 @@ $(foreach test,$(TESTS),$(eval $(call test_tpl,$(test))))
 $(foreach test,$(UNIT_TESTS),$(eval $(call unit_test_tpl,$(test))))
 
 clean:
-	@rm -rf $(foreach test,$(TESTS),$(test)/$(test).sdc $(test)/$(test).txt $(test)/$(test).eblif $(test)/$(test).json)
+	@rm -rf $(foreach test,$(TESTS),$(test)/$(test).sdc $(test)/$(test)_[0-9].sdc $(test)/$(test).txt $(test)/$(test).eblif $(test)/$(test).json)
 	@rm -rf $(foreach test,$(UNIT_TESTS),$(test)/$(test).test.o $(test)/$(test).test.d $(test)/$(test).test)
 	@find . -name "ok" -or -name "*.log" | xargs rm -rf
