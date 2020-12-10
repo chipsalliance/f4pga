@@ -23,7 +23,8 @@
 
 // ============================================================================
 
-bool PcfParser::parse (const std::string& a_FileName) {
+bool PcfParser::parse(const std::string &a_FileName)
+{
 
     // Open the file
     std::ifstream file(a_FileName.c_str());
@@ -32,14 +33,12 @@ bool PcfParser::parse (const std::string& a_FileName) {
     return parse(file);
 }
 
-const std::vector<PcfParser::Constraint> PcfParser::getConstraints () const {
-    return m_Constraints;
-}
-
+const std::vector<PcfParser::Constraint> PcfParser::getConstraints() const { return m_Constraints; }
 
 // ============================================================================
 
-bool PcfParser::parse (std::ifstream& a_Stream) {
+bool PcfParser::parse(std::ifstream &a_Stream)
+{
 
     if (!a_Stream.good()) {
         return false;
@@ -58,13 +57,7 @@ bool PcfParser::parse (std::ifstream& a_Stream) {
         // Match against regex
         std::cmatch cm;
         if (std::regex_match(line.c_str(), cm, re)) {
-            m_Constraints.push_back(
-                Constraint(
-                    cm[1].str(),
-                    cm[2].str(),
-                    cm[3].str()
-                )
-            );
+            m_Constraints.push_back(Constraint(cm[1].str(), cm[2].str(), cm[3].str()));
         }
     }
 

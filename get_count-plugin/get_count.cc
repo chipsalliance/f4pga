@@ -30,18 +30,12 @@ PRIVATE_NAMESPACE_BEGIN
 
 struct GetCount : public Pass {
 
-    enum class ObjectType {
-        NONE,
-        MODULE,
-        CELL,
-        WIRE
-    };
+    enum class ObjectType { NONE, MODULE, CELL, WIRE };
 
-    GetCount () :
-        Pass("get_count", "Returns count of various selected object types to the TCL interpreter") {
-        }    
+    GetCount() : Pass("get_count", "Returns count of various selected object types to the TCL interpreter") {}
 
-    void help() YS_OVERRIDE {
+    void help() YS_OVERRIDE
+    {
         log("\n");
         log("    get_count <options> [selection]");
         log("\n");
@@ -59,8 +53,9 @@ struct GetCount : public Pass {
         log("        Returns the count of wires in selection\n");
         log("\n");
     }
-    
-    void execute(std::vector<std::string> a_Args, RTLIL::Design* a_Design) YS_OVERRIDE {
+
+    void execute(std::vector<std::string> a_Args, RTLIL::Design *a_Design) YS_OVERRIDE
+    {
 
         // Parse args
         ObjectType type = ObjectType::NONE;
@@ -70,29 +65,25 @@ struct GetCount : public Pass {
 
         if (a_Args[1] == "-modules") {
             type = ObjectType::MODULE;
-        }
-        else if (a_Args[1] == "-cells") {
+        } else if (a_Args[1] == "-cells") {
             type = ObjectType::CELL;
-        }
-        else if (a_Args[1] == "-wires") {
+        } else if (a_Args[1] == "-wires") {
             type = ObjectType::WIRE;
-        }
-        else if (a_Args[1][0] == '-') {
+        } else if (a_Args[1][0] == '-') {
             log_error("Invalid argument '%s'!\n", a_Args[1].c_str());
-        }
-        else {
+        } else {
             log_error("Object type not specified!\n");
         }
 
         extra_args(a_Args, 2, a_Design);
 
         // Get the TCL interpreter
-        Tcl_Interp* tclInterp = yosys_get_tcl_interp();
+        Tcl_Interp *tclInterp = yosys_get_tcl_interp();
 
         // Count objects
         size_t moduleCount = 0;
-        size_t cellCount   = 0;
-        size_t wireCount   = 0;
+        size_t cellCount = 0;
+        size_t wireCount = 0;
 
         moduleCount += a_Design->selected_modules().size();
         for (auto module : a_Design->selected_modules()) {
@@ -101,8 +92,7 @@ struct GetCount : public Pass {
         }
 
         size_t count = 0;
-        switch (type)
-        {
+        switch (type) {
         case ObjectType::MODULE:
             count = moduleCount;
             break;
@@ -119,7 +109,7 @@ struct GetCount : public Pass {
         // Return the value as string to the TCL interpreter
         std::string value = std::to_string(count);
 
-        Tcl_Obj* tclStr = Tcl_NewStringObj(value.c_str(), value.size());
+        Tcl_Obj *tclStr = Tcl_NewStringObj(value.c_str(), value.size());
         Tcl_SetObjResult(tclInterp, tclStr);
     }
 

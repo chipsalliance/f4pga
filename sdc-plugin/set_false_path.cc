@@ -16,13 +16,14 @@
  *  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 #include "set_false_path.h"
-#include <regex>
 #include "kernel/log.h"
 #include "sdc_writer.h"
+#include <regex>
 
 USING_YOSYS_NAMESPACE
 
-void SetFalsePath::help() {
+void SetFalsePath::help()
+{
     //   |---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|
     log("\n");
     log("   set_false_path [-quiet] [-from <net_name>] [-to <net_name>] \n");
@@ -46,11 +47,11 @@ void SetFalsePath::help() {
     log("\n");
 }
 
-void SetFalsePath::execute(std::vector<std::string> args,
-                           RTLIL::Design* design) {
-    RTLIL::Module* top_module = design->top_module();
+void SetFalsePath::execute(std::vector<std::string> args, RTLIL::Design *design)
+{
+    RTLIL::Module *top_module = design->top_module();
     if (top_module == nullptr) {
-	log_cmd_error("No top module detected\n");
+        log_cmd_error("No top module detected\n");
     }
 
     size_t argidx;
@@ -61,39 +62,38 @@ void SetFalsePath::execute(std::vector<std::string> args,
 
     // Parse command arguments
     for (argidx = 1; argidx < args.size(); argidx++) {
-	std::string arg = args[argidx];
-	if (arg == "-quiet") {
-	    is_quiet = true;
-	    continue;
-	}
+        std::string arg = args[argidx];
+        if (arg == "-quiet") {
+            is_quiet = true;
+            continue;
+        }
 
-	if (arg == "-from" and argidx + 1 < args.size()) {
-	    from_pin = args[++argidx];
-	    continue;
-	}
+        if (arg == "-from" and argidx + 1 < args.size()) {
+            from_pin = args[++argidx];
+            continue;
+        }
 
-	if (arg == "-to" and argidx + 1 < args.size()) {
-	    to_pin = args[++argidx];
-	    continue;
-	}
+        if (arg == "-to" and argidx + 1 < args.size()) {
+            to_pin = args[++argidx];
+            continue;
+        }
 
-	if (arg == "-through" and argidx + 1 < args.size()) {
-	    through_pin = args[++argidx];
-	    continue;
-	}
+        if (arg == "-through" and argidx + 1 < args.size()) {
+            through_pin = args[++argidx];
+            continue;
+        }
 
-	if (arg.size() > 0 and arg[0] == '-') {
-	    log_cmd_error("Unknown option %s.\n", arg.c_str());
-	}
+        if (arg.size() > 0 and arg[0] == '-') {
+            log_cmd_error("Unknown option %s.\n", arg.c_str());
+        }
 
-	break;
+        break;
     }
     if (!is_quiet) {
-	std::string msg = (from_pin.empty()) ? "" : "-from " + from_pin;
-	msg += (through_pin.empty()) ? "" : " -through " + through_pin;
-	msg += (to_pin.empty()) ? "" : " -to " + to_pin;
-	log("Adding false path %s\n", msg.c_str());
+        std::string msg = (from_pin.empty()) ? "" : "-from " + from_pin;
+        msg += (through_pin.empty()) ? "" : " -through " + through_pin;
+        msg += (to_pin.empty()) ? "" : " -to " + to_pin;
+        log("Adding false path %s\n", msg.c_str());
     }
-    sdc_writer_.AddFalsePath(FalsePath{
-        .from_pin = from_pin, .to_pin = to_pin, .through_pin = through_pin});
+    sdc_writer_.AddFalsePath(FalsePath{.from_pin = from_pin, .to_pin = to_pin, .through_pin = through_pin});
 }

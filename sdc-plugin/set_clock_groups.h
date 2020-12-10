@@ -25,15 +25,13 @@
 USING_YOSYS_NAMESPACE
 
 struct SetClockGroups : public Pass {
-    SetClockGroups(SdcWriter& sdc_writer)
-        : Pass("set_clock_groups", "Set exclusive or asynchronous clock groups"),
-          sdc_writer_(sdc_writer) {}
+    SetClockGroups(SdcWriter &sdc_writer) : Pass("set_clock_groups", "Set exclusive or asynchronous clock groups"), sdc_writer_(sdc_writer) {}
 
     void help() override;
 
-    void execute(std::vector<std::string> args, RTLIL::Design* design) override;
+    void execute(std::vector<std::string> args, RTLIL::Design *design) override;
 
-    SdcWriter& sdc_writer_;
+    SdcWriter &sdc_writer_;
 };
 
-#endif  //_SET_CLOCK_GROUPS_H_
+#endif //_SET_CLOCK_GROUPS_H_

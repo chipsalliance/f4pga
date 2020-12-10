@@ -25,33 +25,29 @@ std::string GetPorts::TypeName() { return "port"; }
 
 std::string GetPorts::SelectionType() { return "x"; }
 
-void GetPorts::ExecuteSelection([[gnu::unused]] RTLIL::Design* design,
-                               [[gnu::unused]] const CommandArgs& args) {
-}
+void GetPorts::ExecuteSelection([[gnu::unused]] RTLIL::Design *design, [[gnu::unused]] const CommandArgs &args) {}
 
-GetPorts::SelectionObjects GetPorts::ExtractSelection(RTLIL::Design* design,
-                                                      const CommandArgs& args) {
+GetPorts::SelectionObjects GetPorts::ExtractSelection(RTLIL::Design *design, const CommandArgs &args)
+{
     std::string port_name = args.selection_objects.at(0);
     std::string port_str(port_name.size(), '\0');
     int bit(0);
     if (!sscanf(port_name.c_str(), "%[^[][%d]", &port_str[0], &bit)) {
-	log_error("Couldn't find port %s\n", port_name.c_str());
+        log_error("Couldn't find port %s\n", port_name.c_str());
     }
 
     port_str.resize(strlen(port_str.c_str()));
     RTLIL::IdString port_id(RTLIL::escape_id(port_str));
     SelectionObjects objects;
     if (auto wire = design->top_module()->wire(port_id)) {
-	if (wire->port_input || wire->port_output) {
-	    if (bit >= wire->start_offset &&
-	        bit < wire->start_offset + wire->width) {
-		objects.push_back(port_name);
-	    }
-	}
+        if (wire->port_input || wire->port_output) {
+            if (bit >= wire->start_offset && bit < wire->start_offset + wire->width) {
+                objects.push_back(port_name);
+            }
+        }
     }
     if (objects.size() == 0 and !args.is_quiet) {
-	log_warning("Couldn't find port matching %s\n", port_name.c_str());
+        log_warning("Couldn't find port matching %s\n", port_name.c_str());
     }
     return objects;
 }
-

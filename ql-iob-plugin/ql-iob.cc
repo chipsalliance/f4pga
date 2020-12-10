@@ -41,18 +41,16 @@ struct QuicklogicIob : public Pass {
         std::string port;                        // Name of the port that goes to a pad
         std::vector<std::string> preferredTypes; // A list of preferred IO cell types
 
-        IoCellType (const std::string& _type, const std::string& _port, const std::vector<std::string> _preferredTypes = std::vector<std::string>()) :
-            type(_type),
-            port(_port),
-            preferredTypes(_preferredTypes)
-        {}
+        IoCellType(const std::string &_type, const std::string &_port, const std::vector<std::string> _preferredTypes = std::vector<std::string>())
+            : type(_type), port(_port), preferredTypes(_preferredTypes)
+        {
+        }
     };
 
-    QuicklogicIob () :
-        Pass("quicklogic_iob", "Map IO buffers to cells that correspond to their assigned locations") {
-        }    
+    QuicklogicIob() : Pass("quicklogic_iob", "Map IO buffers to cells that correspond to their assigned locations") {}
 
-    void help() YS_OVERRIDE {
+    void help() YS_OVERRIDE
+    {
         log("\n");
         log("    quicklogic_iob <PCF file> <pinmap file> [<io cell specs>]");
         log("\n");
@@ -82,15 +80,15 @@ struct QuicklogicIob : public Pass {
         log("        types in order of preference.\n");
         log("\n");
     }
-    
-    void execute(std::vector<std::string> a_Args, RTLIL::Design* a_Design) YS_OVERRIDE {
+
+    void execute(std::vector<std::string> a_Args, RTLIL::Design *a_Design) YS_OVERRIDE
+    {
         if (a_Args.size() < 3) {
             log_cmd_error("    Usage: quicklogic_iob <PCF file> <pinmap file> [<io cell specs>]");
         }
 
         // A map of IO cell types and their port names that should go to a pad
         std::unordered_map<std::string, IoCellType> ioCellTypes;
-
 
         // Parse io cell specification
         if (a_Args.size() > 3) {
@@ -100,7 +98,7 @@ struct QuicklogicIob : public Pass {
             std::regex re1("^([\\w$]+):([\\w$]+)$");
             std::regex re2("^([\\w$]+):([\\w$]+):([\\w,$]+)$");
 
-            for (size_t i=3; i<a_Args.size(); ++i) {
+            for (size_t i = 3; i < a_Args.size(); ++i) {
                 std::cmatch cm;
 
                 // No preffered IO cell types
@@ -119,7 +117,7 @@ struct QuicklogicIob : public Pass {
 
                         preferredTypes.push_back(field);
                     }
-                    
+
                     ioCellTypes.emplace(cm[1].str(), IoCellType(cm[1], cm[2], preferredTypes));
                 }
 
@@ -132,14 +130,14 @@ struct QuicklogicIob : public Pass {
 
         // Use the default IO cells for QuickLogic FPGAs
         else {
-            ioCellTypes.emplace("inpad",  IoCellType("inpad",  "P", {"BIDIR", "SDIOMUX"}));
+            ioCellTypes.emplace("inpad", IoCellType("inpad", "P", {"BIDIR", "SDIOMUX"}));
             ioCellTypes.emplace("outpad", IoCellType("outpad", "P", {"BIDIR", "SDIOMUX"}));
-            ioCellTypes.emplace("bipad",  IoCellType("bipad",  "P", {"BIDIR", "SDIOMUX"}));
-            ioCellTypes.emplace("ckpad",  IoCellType("ckpad",  "P", {"CLOCK", "BIDIR", "SDIOMUX"}));
+            ioCellTypes.emplace("bipad", IoCellType("bipad", "P", {"BIDIR", "SDIOMUX"}));
+            ioCellTypes.emplace("ckpad", IoCellType("ckpad", "P", {"CLOCK", "BIDIR", "SDIOMUX"}));
         }
 
         // Get the top module of the design
-        RTLIL::Module* topModule = a_Design->top_module();
+        RTLIL::Module *topModule = a_Design->top_module();
         if (topModule == nullptr) {
             log_cmd_error("No top module detected!\n");
         }
@@ -153,7 +151,7 @@ struct QuicklogicIob : public Pass {
 
         // Build a map of net names to constraints
         std::unordered_map<std::string, const PcfParser::Constraint> constraintMap;
-        for (auto& constraint : pcfParser.getConstraints()) {
+        for (auto &constraint : pcfParser.getConstraints()) {
             if (constraintMap.count(constraint.netName) != 0) {
                 log_cmd_error("The net '%s' is constrained twice!", constraint.netName.c_str());
             }
@@ -169,9 +167,9 @@ struct QuicklogicIob : public Pass {
 
         // Build a map of pad names to entries
         std::unordered_map<std::string, std::vector<PinmapParser::Entry>> pinmapMap;
-        for (auto& entry : pinmapParser.getEntries()) {
+        for (auto &entry : pinmapParser.getEntries()) {
             if (entry.count("name") != 0) {
-                auto& name = entry.at("name");
+                auto &name = entry.at("name");
 
                 if (pinmapMap.count(name) == 0) {
                     pinmapMap[name] = std::vector<PinmapParser::Entry>();
@@ -187,7 +185,7 @@ struct QuicklogicIob : public Pass {
         log("  type       | net        | pad        | loc      | type     | instance\n");
         log(" ------------+------------+------------+----------+----------+-----------\n");
         for (auto cell : topModule->cells()) {
-            auto ysCellType = RTLIL::unescape_id(cell->type); 
+            auto ysCellType = RTLIL::unescape_id(cell->type);
 
             // Not an IO cell
             if (ioCellTypes.count(ysCellType) == 0) {
@@ -202,7 +200,7 @@ struct QuicklogicIob : public Pass {
             std::string cellType;
 
             // Get connections to the specified port
-            const auto& ioCellType = ioCellTypes.at(ysCellType);
+            const auto &ioCellType = ioCellTypes.at(ysCellType);
             const std::string port = RTLIL::escape_id(ioCellType.port);
             if (cell->connections().count(port)) {
 
@@ -220,15 +218,15 @@ struct QuicklogicIob : public Pass {
                             // Check if the wire is constrained. Get pad name.
                             std::string baseName = RTLIL::unescape_id(wire->name);
                             std::string netNames[] = {
-                                baseName,
-                                stringf("%s[%d]", baseName.c_str(), sigbit.offset),
-                                stringf("%s(%d)", baseName.c_str(), sigbit.offset),
+                              baseName,
+                              stringf("%s[%d]", baseName.c_str(), sigbit.offset),
+                              stringf("%s(%d)", baseName.c_str(), sigbit.offset),
                             };
 
                             padName = "";
                             netName = "";
 
-                            for (auto& name : netNames) {                       
+                            for (auto &name : netNames) {
                                 if (constraintMap.count(name)) {
                                     auto constraint = constraintMap.at(name);
                                     padName = constraint.padName;
@@ -241,17 +239,11 @@ struct QuicklogicIob : public Pass {
                             if (pinmapMap.count(padName)) {
 
                                 // Choose a correct entry for the cell
-                                auto entry = choosePinmapEntry(
-                                    pinmapMap.at(padName),
-                                    ioCellType
-                                );
+                                auto entry = choosePinmapEntry(pinmapMap.at(padName), ioCellType);
 
                                 // Location string
                                 if (entry.count("x") && entry.count("y")) {
-                                    locName = stringf("X%sY%s", 
-                                        entry.at("x").c_str(),
-                                        entry.at("y").c_str()
-                                    );
+                                    locName = stringf("X%sY%s", entry.at("x").c_str(), entry.at("y").c_str());
                                 }
 
                                 // Cell type
@@ -264,24 +256,16 @@ struct QuicklogicIob : public Pass {
                 }
             }
 
-            log("| %-10s | %-10s | %-8s | %-8s | %s\n",
-                netName.c_str(),
-                padName.c_str(),
-                locName.c_str(),
-                cellType.c_str(),
-                cell->name.c_str()
-            );
+            log("| %-10s | %-10s | %-8s | %-8s | %s\n", netName.c_str(), padName.c_str(), locName.c_str(), cellType.c_str(), cell->name.c_str());
 
             // Annotate the cell by setting its parameters
-            cell->setParam(RTLIL::escape_id("IO_PAD"),  padName);
-            cell->setParam(RTLIL::escape_id("IO_LOC"),  locName);
+            cell->setParam(RTLIL::escape_id("IO_PAD"), padName);
+            cell->setParam(RTLIL::escape_id("IO_LOC"), locName);
             cell->setParam(RTLIL::escape_id("IO_TYPE"), cellType);
         }
     }
 
-    PinmapParser::Entry choosePinmapEntry(
-        const std::vector<PinmapParser::Entry>& a_Entries,
-        const IoCellType& a_IoCellType)
+    PinmapParser::Entry choosePinmapEntry(const std::vector<PinmapParser::Entry> &a_Entries, const IoCellType &a_IoCellType)
     {
         // No preferred types, pick the first one
         if (a_IoCellType.preferredTypes.empty()) {
@@ -289,10 +273,10 @@ struct QuicklogicIob : public Pass {
         }
 
         // Loop over preferred types
-        for (auto& type : a_IoCellType.preferredTypes) {
-            
+        for (auto &type : a_IoCellType.preferredTypes) {
+
             // Find an entry for that type. If found then return it.
-            for (auto& entry : a_Entries) {
+            for (auto &entry : a_Entries) {
                 if (type == entry.at("type")) {
                     return entry;
                 }

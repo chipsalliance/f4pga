@@ -23,7 +23,8 @@
 
 // ============================================================================
 
-bool PinmapParser::parse (const std::string& a_FileName) {
+bool PinmapParser::parse(const std::string &a_FileName)
+{
 
     // Open the file
     std::ifstream file(a_FileName.c_str());
@@ -32,13 +33,12 @@ bool PinmapParser::parse (const std::string& a_FileName) {
     return parse(file);
 }
 
-const std::vector<PinmapParser::Entry> PinmapParser::getEntries() const {
-    return m_Entries;
-}
+const std::vector<PinmapParser::Entry> PinmapParser::getEntries() const { return m_Entries; }
 
 // ============================================================================
 
-std::vector<std::string> PinmapParser::getFields (const std::string& a_String) {
+std::vector<std::string> PinmapParser::getFields(const std::string &a_String)
+{
 
     std::vector<std::string> fields;
     std::stringstream ss(a_String);
@@ -53,7 +53,8 @@ std::vector<std::string> PinmapParser::getFields (const std::string& a_String) {
     return fields;
 }
 
-bool PinmapParser::parseHeader (std::ifstream& a_Stream) {
+bool PinmapParser::parseHeader(std::ifstream &a_Stream)
+{
 
     // Get the header line
     std::string header;
@@ -68,7 +69,8 @@ bool PinmapParser::parseHeader (std::ifstream& a_Stream) {
     return true;
 }
 
-bool PinmapParser::parseData (std::ifstream& a_Stream) {
+bool PinmapParser::parseData(std::ifstream &a_Stream)
+{
 
     // Parse lines as they come
     while (a_Stream.good()) {
@@ -84,7 +86,7 @@ bool PinmapParser::parseData (std::ifstream& a_Stream) {
 
         // Assign data fields to columns
         Entry entry;
-        for (size_t i=0; i<data.size(); ++i) {
+        for (size_t i = 0; i < data.size(); ++i) {
 
             if (i >= m_Fields.size()) {
                 return false;
@@ -99,7 +101,8 @@ bool PinmapParser::parseData (std::ifstream& a_Stream) {
     return true;
 }
 
-bool PinmapParser::parse (std::ifstream& a_Stream) {
+bool PinmapParser::parse(std::ifstream &a_Stream)
+{
 
     if (!a_Stream.good()) {
         return false;
