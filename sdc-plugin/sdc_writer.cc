@@ -31,15 +31,15 @@ void SdcWriter::AddClockGroup(ClockGroups::ClockGroup clock_group, ClockGroups::
     clock_groups_.Add(clock_group, relation);
 }
 
-void SdcWriter::WriteSdc(RTLIL::Design *design, std::ostream &file)
+void SdcWriter::WriteSdc(RTLIL::Design *design, std::ostream &file, bool include_propagated)
 {
-    WriteClocks(design, file);
+    WriteClocks(design, file, include_propagated);
     WriteFalsePaths(file);
     WriteMaxDelay(file);
     WriteClockGroups(file);
 }
 
-void SdcWriter::WriteClocks(RTLIL::Design *design, std::ostream &file)
+void SdcWriter::WriteClocks(RTLIL::Design *design, std::ostream &file, bool include_propagated)
 {
     for (auto &clock : Clocks::GetClocks(design)) {
         auto &clock_wire = clock.second;
@@ -48,7 +48,7 @@ void SdcWriter::WriteClocks(RTLIL::Design *design, std::ostream &file)
             continue;
         }
         // Write out only GENERATED and EXPLICIT clocks
-        if (Clock::IsPropagated(clock_wire)) {
+        if (Clock::IsPropagated(clock_wire) and !include_propagated) {
             continue;
         }
         file << "create_clock -period " << Clock::Period(clock_wire);
