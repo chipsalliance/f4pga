@@ -67,20 +67,33 @@ struct WriteSdcCmd : public Backend {
     void help() override
     {
         log("\n");
-        log("    write_sdc <filename>\n");
+        log("    write_sdc [-include_propagated_clocks] <filename>\n");
         log("\n");
         log("Write SDC file.\n");
+        log("\n");
+        log("    -include_propagated_clocks\n");
+        log("       Write out all propagated clocks");
         log("\n");
     }
 
     void execute(std::ostream *&f, std::string filename, std::vector<std::string> args, RTLIL::Design *design) override
     {
+        size_t argidx;
+        bool include_propagated = false;
         if (args.size() < 2) {
             log_cmd_error("Missing output file.\n");
         }
+        for (argidx = 1; argidx < args.size(); argidx++) {
+            std::string arg = args[argidx];
+            if (arg == "-include_propagated_clocks" && argidx + 1 < args.size()) {
+                include_propagated = true;
+                continue;
+            }
+            break;
+        }
         log("\nWriting out clock constraints file(SDC)\n");
-        extra_args(f, filename, args, 1);
-        sdc_writer_.WriteSdc(design, *f);
+        extra_args(f, filename, args, argidx);
+        sdc_writer_.WriteSdc(design, *f, include_propagated);
     }
 
     SdcWriter &sdc_writer_;
