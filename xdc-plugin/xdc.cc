@@ -26,7 +26,7 @@
  *   Tcl interpreter and processed by the new XDC commands imported to the
  *   Tcl interpreter.
  */
-#include "../bank_tiles.h"
+#include "../common/bank_tiles.h"
 #include "kernel/log.h"
 #include "kernel/register.h"
 #include "kernel/rtlil.h"
