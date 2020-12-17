@@ -3,6 +3,8 @@ TESTS = get_nets \
 	get_cells \
 	get_pins
 
+UNIT_TESTS = trim_name
+
 include $(shell pwd)/../../Makefile_test.common
 
 get_nets_verify = $(call diff_test,get_nets,txt)

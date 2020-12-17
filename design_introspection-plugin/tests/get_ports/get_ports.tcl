@@ -10,17 +10,23 @@ help get_ports
 
 set fp [open "get_ports.txt" "w"]
 
-puts "\nsignal_p port"
+puts "\n signal_p port"
 puts $fp "signal_p port"
 puts $fp [get_ports signal_p]
 
-puts "\nclk port"
+puts "\n clk port"
 puts $fp "clk port"
 puts $fp [get_ports clk]
 
-puts {\nled[0] port}
+puts "\n"
+puts { led[0] port}
 puts $fp {led[0] port}
 puts $fp [get_ports {led[0]}]
+
+puts "\n"
+puts { led[1] port}
+puts $fp {led[1] port}
+puts $fp [get_ports { led[1] }]
 
 #puts "\nsignal_* ports quiet"
 #puts $fp "signal_* ports quiet"

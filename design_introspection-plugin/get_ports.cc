@@ -18,6 +18,7 @@
  *
  */
 #include "get_ports.h"
+#include "../common/utils.h"
 
 USING_YOSYS_NAMESPACE
 
@@ -30,6 +31,7 @@ void GetPorts::ExecuteSelection([[gnu::unused]] RTLIL::Design *design, [[gnu::un
 GetPorts::SelectionObjects GetPorts::ExtractSelection(RTLIL::Design *design, const CommandArgs &args)
 {
     std::string port_name = args.selection_objects.at(0);
+    trim(port_name);
     std::string port_str(port_name.size(), '\0');
     int bit(0);
     if (!sscanf(port_name.c_str(), "%[^[][%d]", &port_str[0], &bit)) {
