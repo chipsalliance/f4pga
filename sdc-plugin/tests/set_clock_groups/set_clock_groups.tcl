@@ -3,7 +3,7 @@ plugin -i sdc
 #Import the commands from the plugins to the tcl interpreter
 yosys -import
 
-read_verilog set_clock_groups.v
+read_verilog $::env(DESIGN_TOP).v
 # Some of symbiflow expects eblifs with only one module.
 synth_xilinx -flatten -abc9 -nosrl -noclkbuf -nodsp
 
