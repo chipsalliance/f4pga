@@ -1,8 +1,6 @@
 yosys -import
-plugin -i selection
-
-# Import the commands from the plugins to the tcl interpreter
-yosys -import
+if { [info procs selection_to_tcl_list] == {} } { plugin -i selection }
+yosys -import  ;# ingest plugin commands
 
 proc selection_to_tcl_list_through_file { selection } {
     set file_name "[pid].txt"

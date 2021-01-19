@@ -1,8 +1,6 @@
 yosys -import
-plugin -i xdc
-plugin -i params
-# Import the commands from the plugins to the tcl interpreter
-yosys -import
+if { [info procs getparam] == {} } { plugin -i params }
+yosys -import  ;# ingest plugin commands
 
 read_verilog $::env(DESIGN_TOP).v
 read_verilog -specify -lib -D_EXPLICIT_CARRY +/xilinx/cells_sim.v

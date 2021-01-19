@@ -1,8 +1,6 @@
 yosys -import
-
-plugin -i sdc
-
-yosys -import
+if { [info procs read_sdc] == {} } { plugin -i sdc }
+yosys -import  ;# ingest plugin commands
 
 read_verilog $::env(DESIGN_TOP).v
 synth_xilinx

@@ -1,7 +1,6 @@
 yosys -import
-plugin -i design_introspection
-#Import the commands from the plugins to the tcl interpreter
-yosys -import
+if { [info procs get_ports] == {} } { plugin -i design_introspection }
+yosys -import  ;# ingest plugin commands
 
 read_verilog $::env(DESIGN_TOP).v
 # Some of symbiflow expects eblifs with only one module.

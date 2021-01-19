@@ -1,8 +1,7 @@
 yosys -import
-plugin -i sdc
-plugin -i design_introspection
-# Import the commands from the plugins to the tcl interpreter
-yosys -import
+if { [info procs read_sdc] == {} } { plugin -i sdc }
+if { [info procs get_nets] == {} } { plugin -i design_introspection }
+yosys -import  ;# ingest plugin commands
 
 read_verilog $::env(DESIGN_TOP).v
 read_verilog -specify -lib -D_EXPLICIT_CARRY +/xilinx/cells_sim.v
