@@ -1,7 +1,7 @@
 yosys plugin -i get_count
 yosys -import
 
-read_verilog -icells simple.v
+read_verilog -icells $::env(DESIGN_TOP).v
 hierarchy -auto-top
 
 set n [get_count -modules my_gate]

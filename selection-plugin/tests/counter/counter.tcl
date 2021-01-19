@@ -27,7 +27,7 @@ proc test_selection { rfh selection } {
     }
 }
 
-read_verilog counter.v
+read_verilog $::env(DESIGN_TOP).v
 read_verilog -specify -lib -D_EXPLICIT_CARRY +/xilinx/cells_sim.v
 read_verilog -lib +/xilinx/cells_xtra.v
 hierarchy -check -auto-top

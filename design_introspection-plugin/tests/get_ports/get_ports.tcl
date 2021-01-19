@@ -3,7 +3,7 @@ plugin -i design_introspection
 #Import the commands from the plugins to the tcl interpreter
 yosys -import
 
-read_verilog get_ports.v
+read_verilog $::env(DESIGN_TOP).v
 # Some of symbiflow expects eblifs with only one module.
 synth_xilinx -flatten -abc9 -nosrl -noclkbuf -nodsp
 help get_ports
