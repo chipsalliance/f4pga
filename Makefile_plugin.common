@@ -48,8 +48,7 @@ $(NAME).so: $(OBJS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared -o $@ $^ $(LDLIBS)
 
 install_plugin: $(NAME).so
-	mkdir -p $(PLUGINS_DIR)
-	cp $< $(PLUGINS_DIR)/$<
+	install -D $< $(PLUGINS_DIR)/$<
 
 test:
 	$(MAKE) -C tests all
