@@ -1,7 +1,6 @@
 yosys -import
-plugin -i sdc
-#Import the commands from the plugins to the tcl interpreter
-yosys -import
+if { [info procs read_sdc] == {} } { plugin -i sdc }
+yosys -import  ;# ingest plugin commands
 
 read_verilog $::env(DESIGN_TOP).v
 # Some of symbiflow expects eblifs with only one module.

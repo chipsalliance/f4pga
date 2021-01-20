@@ -1,8 +1,7 @@
 yosys -import
-plugin -i design_introspection
-plugin -i xdc
-#Import the commands from the plugins to the tcl interpreter
-yosys -import
+if { [info procs get_ports] == {} } { plugin -i design_introspection }
+if { [info procs read_xdc] == {} } { plugin -i xdc }
+yosys -import  ;# ingest plugin commands
 
 read_verilog $::env(DESIGN_TOP).v
 
