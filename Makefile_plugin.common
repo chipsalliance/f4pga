@@ -48,9 +48,9 @@ ifeq (,$(wildcard $(YOSYS_CONFIG)))
 endif
 
 CXX ?= $(shell $(YOSYS_CONFIG) --cxx)
-CXXFLAGS = $(shell $(YOSYS_CONFIG) --cxxflags) #-DSDC_DEBUG
-LDFLAGS = $(shell $(YOSYS_CONFIG) --ldflags)
-LDLIBS = $(shell $(YOSYS_CONFIG) --ldlibs)
+CXXFLAGS := $(shell $(YOSYS_CONFIG) --cxxflags) $(CXXFLAGS) #-DSDC_DEBUG
+LDFLAGS := $(shell $(YOSYS_CONFIG) --ldflags) $(LDFLAGS)
+LDLIBS := $(shell $(YOSYS_CONFIG) --ldlibs) $(LDLIBS)
 EXTRA_FLAGS ?=
 
 DATA_DIR = $(DESTDIR)$(shell $(YOSYS_CONFIG) --datdir)
