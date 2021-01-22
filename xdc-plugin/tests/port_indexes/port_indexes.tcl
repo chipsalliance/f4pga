@@ -13,7 +13,7 @@ if {[info procs unknown] != ""} {
 	rename unknown ""
 }
 proc unknown args {return "'unknown' proc command handler"}
-set fp [open "port_indexes.txt" "w"]
+set fp [open [test_output_path "port_indexes.txt"] "w"]
 if {[catch {invalid command} result]} {
 	close $fp
 	error "Command should be handled by the 'unknown' proc"
@@ -21,7 +21,7 @@ if {[catch {invalid command} result]} {
 	puts $fp $result
 }
 #Read the design constraints
-read_xdc -part_json ../xc7a35tcsg324-1.json $::env(DESIGN_TOP).xdc
+read_xdc -part_json [file dirname [info script]]/../xc7a35tcsg324-1.json $::env(DESIGN_TOP).xdc
 
 if {[catch {invalid command} result]} {
 	close $fp
@@ -32,4 +32,4 @@ if {[catch {invalid command} result]} {
 close $fp
 
 # Write the design in JSON format.
-write_json $::env(DESIGN_TOP).json
+write_json [test_output_path "port_indexes.json"]

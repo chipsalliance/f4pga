@@ -18,7 +18,7 @@ read_sdc $::env(DESIGN_TOP).input.sdc
 propagate_clocks
 
 # Write the clocks to file
-set fh [open $::env(DESIGN_TOP).txt w]
+set fh [open [test_output_path "get_clocks.txt"] w]
 
 puts $fh [get_clocks]
 

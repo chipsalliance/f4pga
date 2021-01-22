@@ -7,7 +7,7 @@ read_verilog $::env(DESIGN_TOP).v
 synth_xilinx -flatten -abc9 -nosrl -noclkbuf -nodsp
 help get_ports
 
-set fp [open "get_ports.txt" "w"]
+set fp [open [test_output_path "get_ports.txt"] "w"]
 
 puts "\n signal_p port"
 puts $fp "signal_p port"

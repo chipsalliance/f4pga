@@ -15,4 +15,4 @@ set_max_delay 2 -quiet -from clk
 # -from clk to bottom_inst/I
 set_max_delay 3 -from clk -to bottom_inst.I
 
-write_sdc $::env(DESIGN_TOP).sdc
+write_sdc [test_output_path "set_max_delay.sdc"]

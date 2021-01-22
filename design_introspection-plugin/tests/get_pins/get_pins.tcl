@@ -7,7 +7,7 @@ read_verilog $::env(DESIGN_TOP).v
 synth_xilinx -flatten -abc9 -nosrl -noclkbuf -nodsp
 
 
-set fp [open "get_pins.txt" "w"]
+set fp [open [test_output_path "get_pins.txt"] "w"]
 
 puts "\n*inter* pins quiet"
 puts $fp "\n*inter* pins quiet"

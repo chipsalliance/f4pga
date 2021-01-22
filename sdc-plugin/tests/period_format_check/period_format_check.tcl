@@ -13,4 +13,4 @@ synth_xilinx -flatten -abc9 -nosrl -nodsp -iopad -run prepare:check
 propagate_clocks
 
 # Write out the SDC file after the clock propagation step
-write_sdc $::env(DESIGN_TOP).sdc
+write_sdc [test_output_path "period_format_check.sdc"]

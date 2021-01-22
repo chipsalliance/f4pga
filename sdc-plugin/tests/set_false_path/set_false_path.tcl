@@ -18,4 +18,4 @@ set_false_path -from clk -to bottom_inst.I
 # -through bottom_inst/I
 set_false_path -through bottom_inst.I
 
-write_sdc $::env(DESIGN_TOP).sdc
+write_sdc [test_output_path "set_false_path.sdc"]

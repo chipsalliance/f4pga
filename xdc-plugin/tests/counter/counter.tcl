@@ -10,7 +10,7 @@ read_verilog $::env(DESIGN_TOP).v
 synth_xilinx -flatten -abc9 -nosrl -noclkbuf -nodsp
 
 #Read the design constraints
-read_xdc -part_json ../xc7a35tcsg324-1.json $::env(DESIGN_TOP).xdc
+read_xdc -part_json [file dirname $::env(DESIGN_TOP)]/../xc7a35tcsg324-1.json $::env(DESIGN_TOP).xdc
 
 # Write the design in JSON format.
-write_json $::env(DESIGN_TOP).json
+write_json [test_output_path "counter.json"]
