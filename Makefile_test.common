@@ -37,7 +37,8 @@ $(1)/ok: $(1)/$(1).v
 	@echo "Running test $(1)"
 	@set +e; \
 	cd $(1); \
-	echo -e "source $(TEST_UTILS)\nsource $(1).tcl" > run-$(1).tcl ;\
+	echo "source $(TEST_UTILS)" > run-$(1).tcl ;\
+	echo "source $(1).tcl" >> run-$(1).tcl ;\
 	DESIGN_TOP=$(1) TEST_OUTPUT_PREFIX=./ \
 	yosys -c "run-$(1).tcl" -q -l $(1).log; \
 	RETVAL=$$$$?; \
