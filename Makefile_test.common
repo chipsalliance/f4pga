@@ -17,6 +17,7 @@ CXX = $(shell yosys-config --cxx)
 CXXFLAGS = $(shell yosys-config --cxxflags) -I.. -I$(GTEST_DIR)/include
 LDLIBS = $(shell yosys-config --ldlibs) -L$(GTEST_DIR)/build/lib -lgtest -lgtest_main -lpthread
 LDFLAGS = $(shell yosys-config --ldflags)
+TEST_UTILS=../../../test-utils/test-utils.tcl
 
 define test_tpl =
 $(1): $(1)/ok
@@ -37,7 +38,8 @@ $(1)/ok: $(1)/$(1).v
 	@set +e; \
 	cd $(1); \
 	DESIGN_TOP=$(1) \
-	yosys -c $(1).tcl -q -l $(1).log; \
+	TEST_OUTPUT_PREFIX=./ \
+	yosys -c <(echo -e "source $(TEST_UTILS)\nsource $(1).tcl") -q -l $(1).log; \
 	RETVAL=$$$$?; \
 	if [ ! -z "$$($(1)_negative)" ] && [ $$($(1)_negative) -eq 1 ]; then \
 		if [ $$$$RETVAL -ne 0 ]; then \

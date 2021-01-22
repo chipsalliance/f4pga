@@ -10,7 +10,7 @@ read_verilog [file dirname [info script]]/VexRiscv_Lite.v
 synth_xilinx -flatten -abc9 -nosrl -noclkbuf -nodsp
 
 #Read the design constraints
-read_xdc -part_json ../xc7a35tcsg324-1.json $::env(DESIGN_TOP).xdc
+read_xdc -part_json [file dirname [info script]]/../xc7a35tcsg324-1.json $::env(DESIGN_TOP).xdc
 
 # Write the design in JSON format.
-write_json $::env(DESIGN_TOP).json
+write_json [test_output_path "minilitex_ddr_arty.json"]

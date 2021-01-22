@@ -3,7 +3,7 @@ if { [info procs selection_to_tcl_list] == {} } { plugin -i selection }
 yosys -import  ;# ingest plugin commands
 
 proc selection_to_tcl_list_through_file { selection } {
-    set file_name "[pid].txt"
+    set file_name [test_output_path "[pid].txt"]
     select $selection -write $file_name
     set fh [open $file_name r]
     set result [list]
@@ -31,7 +31,7 @@ read_verilog -lib +/xilinx/cells_xtra.v
 hierarchy -check -auto-top
 
 # Test the selection command and write results to file
-set rfh [open counter.txt w]
+set rfh [open [test_output_path "counter.txt"] w]
 
 set selection_tests [list "t:*" "w:*" "*"]
 foreach test $selection_tests {

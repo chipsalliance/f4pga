@@ -16,11 +16,11 @@ read_sdc $::env(DESIGN_TOP).input.sdc
 propagate_clocks
 
 # Write the clocks to file
-set fh [open $::env(DESIGN_TOP).txt w]
+set fh [open [test_output_path "counter.txt"] w]
 puts $fh [get_clocks]
 puts $fh [get_clocks -include_generated_clocks]
 close $fh
 
 # Write out the SDC file after the clock propagation step
-write_sdc $::env(DESIGN_TOP).sdc
-write_json $::env(DESIGN_TOP).json
+write_sdc [test_output_path "counter.sdc"]
+write_json [test_output_path "counter.json"]

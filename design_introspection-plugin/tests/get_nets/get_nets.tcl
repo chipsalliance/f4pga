@@ -7,7 +7,7 @@ read_verilog $::env(DESIGN_TOP).v
 synth_xilinx -flatten -abc9 -nosrl -noclkbuf -nodsp
 
 
-set fp [open "get_nets.txt" "w"]
+set fp [open [test_output_path "get_nets.txt"] "w"]
 
 puts "\n*inter* nets quiet"
 puts $fp "*inter* nets quiet"
