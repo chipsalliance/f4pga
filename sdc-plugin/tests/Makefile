@@ -1,3 +1,4 @@
+# abc9 - test that abc9.D is correctly set after importing a clock.
 # counter, counter2, pll - test buffer and clock divider propagation
 # set_false_path - test the set_false_path command
 # set_max_delay - test the set_max_delay command
@@ -7,7 +8,8 @@
 # waveform_check - test if the WAVEFORM attribute value is correct on wire
 # period_format_check - test if PERIOD attribute value is correct on wire
 
-TESTS = counter \
+TESTS = abc9 \
+	counter \
 	counter2 \
 	pll \
 	pll_div \
@@ -28,6 +30,7 @@ UNIT_TESTS = escaping
 
 include $(shell pwd)/../../Makefile_test.common
 
+abc9_verify = true
 counter_verify = $(call diff_test,counter,sdc) && $(call diff_test,counter,txt)
 counter2_verify = $(call diff_test,counter2,sdc) && $(call diff_test,counter2,txt)
 pll_verify = $(call diff_test,pll,sdc)

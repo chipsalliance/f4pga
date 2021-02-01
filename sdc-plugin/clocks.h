@@ -64,6 +64,7 @@ class Clocks
 {
   public:
     static const std::map<std::string, RTLIL::Wire *> GetClocks(RTLIL::Design *design);
+    static void UpdateAbc9DelayTarget(RTLIL::Design *design);
 };
 
 #endif // _CLOCKS_H_

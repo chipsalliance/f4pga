@@ -323,6 +323,8 @@ struct PropagateClocksCmd : public Pass {
         for (auto &pass : passes) {
             pass->Run();
         }
+
+        Clocks::UpdateAbc9DelayTarget(design);
     }
 };
 

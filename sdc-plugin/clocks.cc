@@ -140,3 +140,23 @@ const std::map<std::string, RTLIL::Wire *> Clocks::GetClocks(RTLIL::Design *desi
     }
     return clock_wires;
 }
+
+void Clocks::UpdateAbc9DelayTarget(RTLIL::Design *design)
+{
+    std::map<std::string, RTLIL::Wire *> clock_wires = Clocks::GetClocks(design);
+
+    for (auto &clock_wire : clock_wires) {
+        auto &wire = clock_wire.second;
+        float period = Clock::Period(wire);
+
+        // Set the ABC9 delay to the shortest clock period in the design.
+        //
+        // By convention, delays in Yosys are in picoseconds, but ABC9 has
+        // no information on interconnect delay, so target half the specified
+        // clock period to give timing slack; otherwise ABC9 may produce a
+        // mapping that cannot meet the specified clock.
+        int abc9_delay = design->scratchpad_get_int("abc9.D", INT32_MAX);
+        int period_ps = period * 1000.0 / 2.0;
+        design->scratchpad_set_int("abc9.D", std::min(abc9_delay, period_ps));
+    }
+}
