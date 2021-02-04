@@ -35,7 +35,7 @@ GetPins::SelectionObjects GetPins::ExtractSelection(RTLIL::Design *design, const
 {
     SelectionObjects selected_objects;
     for (auto obj : args.selection_objects) {
-        size_t port_separator = obj.find_last_of("/");
+        size_t port_separator = obj.find_last_of('/');
         std::string cell = obj.substr(0, port_separator);
         std::string port = obj.substr(port_separator + 1);
         SelectionObjects selection{RTLIL::unescape_id(design->top_module()->name) + "/" + SelectionType() + ":" + cell};
