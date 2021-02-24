@@ -560,36 +560,35 @@ output [15:0] DO
   localparam CLKOUT5_REGS  = pll_clkregs(CLKOUT5_DIVIDE, CLKOUT5_DUTY_CYCLE, CLKOUT5_PHASE);
 
   // Handle inputs that should have certain logic levels when left unconnected
+   localparam INV_CLKINSEL = (_TECHMAP_CONSTMSK_CLKINSEL_ == 1) ? !_TECHMAP_CONSTVAL_CLKINSEL_ :
+			     (_TECHMAP_CONSTVAL_CLKINSEL_ == 0) ? IS_CLKINSEL_INVERTED :
+			     IS_CLKINSEL_INVERTED;
   generate if (_TECHMAP_CONSTMSK_CLKINSEL_ == 1) begin
-    localparam INV_CLKINSEL = !_TECHMAP_CONSTVAL_CLKINSEL_;
     wire clkinsel = 1'b1;
   end else if (_TECHMAP_CONSTVAL_CLKINSEL_ == 0) begin
-    localparam INV_CLKINSEL = IS_CLKINSEL_INVERTED;
     wire clkinsel = 1'b1;
   end else begin
-    localparam INV_CLKINSEL = IS_CLKINSEL_INVERTED;
     wire clkinsel = CLKINSEL;
   end endgenerate
 
+  localparam INV_PWRDWN = (_TECHMAP_CONSTMSK_PWRDWN_ == 1) ? !_TECHMAP_CONSTVAL_PWRDWN_ :
+			  (_TECHMAP_CONSTVAL_PWRDWN_ == 0) ? ~IS_PWRDWN_INVERTED :
+			  IS_PWRDWN_INVERTED;
   generate if (_TECHMAP_CONSTMSK_PWRDWN_ == 1) begin
-    localparam INV_PWRDWN =  !_TECHMAP_CONSTVAL_PWRDWN_;
     wire pwrdwn = 1'b1;
   end else if (_TECHMAP_CONSTVAL_PWRDWN_ == 0) begin
-    localparam INV_PWRDWN = ~IS_PWRDWN_INVERTED;
     wire pwrdwn = 1'b1;
   end else begin
-    localparam INV_PWRDWN =  IS_PWRDWN_INVERTED;
     wire pwrdwn = PWRDWN;
   end endgenerate
 
+  localparam INV_RST = (_TECHMAP_CONSTMSK_RST_ == 1) ? !_TECHMAP_CONSTVAL_PWRDWN_ :
+		       (_TECHMAP_CONSTVAL_RST_ == 0) ? ~IS_RST_INVERTED : IS_RST_INVERTED;
   generate if (_TECHMAP_CONSTMSK_RST_ == 1) begin
-    localparam INV_RST =  !_TECHMAP_CONSTVAL_PWRDWN_;
     wire rst = 1'b1;
   end else if (_TECHMAP_CONSTVAL_RST_ == 0) begin
-    localparam INV_RST = ~IS_RST_INVERTED;
     wire rst = 1'b1;
   end else begin
-    localparam INV_RST =  IS_RST_INVERTED;
     wire rst = RST;
   end endgenerate
 
@@ -600,7 +599,7 @@ output [15:0] DO
   else
     wire dclk = DCLK;
   endgenerate
-  
+
   generate if (_TECHMAP_CONSTMSK_DEN_ == 1)
     wire den = _TECHMAP_CONSTVAL_DEN_;
   else if (_TECHMAP_CONSTVAL_DEN_ == 0)
