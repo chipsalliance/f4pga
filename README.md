@@ -11,14 +11,14 @@ This repository contains plugins for
 4. [Parameters](#parameters-plugin)
 5. [QL IOBs](#quicklogic-iob-plugin)
 6. [SDC](#sdc-plugin)
-7. [Selection](#selection-plugin)
-8. [XDC](#xdc-plugin)
+7. [XDC](#xdc-plugin)
 
 ## Summary
 
 ### Design introspection plugin
 
-Adds several commands that allow for collecting information about cells, nets, pins and ports in the design.
+Adds several commands that allow for collecting information about cells, nets, pins and ports in the design or a selection of objects.
+Additionally provides functions to convert selection on TCL lists.
 
 Following commands are added with the plugin:
 * get_cells
@@ -26,6 +26,7 @@ Following commands are added with the plugin:
 * get_pins
 * get_ports
 * get_count
+* selection_to_tcl_list
 
 ### FASM plugin
 
@@ -68,13 +69,6 @@ The plugin adds the following commands:
 * set_false_path
 * set_max_delay
 * set_clock_groups
-
-### Selection plugin
-
-Extracts the current selection to TCL list
-
-The plugin adds the following command:
-* selection_to_tcl_list
 
 ### XDC plugin
 
