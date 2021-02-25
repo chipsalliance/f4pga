@@ -1,5 +1,5 @@
 yosys -import
-if { [info procs selection_to_tcl_list] == {} } { plugin -i selection }
+if { [info procs selection_to_tcl_list] == {} } { plugin -i design_introspection }
 yosys -import  ;# ingest plugin commands
 
 proc selection_to_tcl_list_through_file { selection } {
@@ -31,7 +31,7 @@ read_verilog -lib +/xilinx/cells_xtra.v
 hierarchy -check -auto-top
 
 # Test the selection command and write results to file
-set rfh [open [test_output_path "counter.txt"] w]
+set rfh [open [test_output_path "selection_to_tcl_list.txt"] w]
 
 set selection_tests [list "t:*" "w:*" "*"]
 foreach test $selection_tests {

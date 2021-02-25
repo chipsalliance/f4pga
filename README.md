@@ -7,25 +7,26 @@ This repository contains plugins for
 ## List of plugins
 1. [Design introspection](#design-introspection-plugin)
 2. [FASM](#fasm-plugin)
-3. [Get count](#get-count-plugin)
-4. [Integrate inverters](#integrate-inverters-plugin)
-5. [Parameters](#parameters-plugin) 
-6. [QL IOBs](#quicklogic-iob-plugin)
-7. [SDC](#sdc-plugin)
-8. [Selection](#selection-plugin)
-9. [XDC](#xdc-plugin)
+3. [Integrate inverters](#integrate-inverters-plugin)
+4. [Parameters](#parameters-plugin)
+5. [QL IOBs](#quicklogic-iob-plugin)
+6. [SDC](#sdc-plugin)
+7. [XDC](#xdc-plugin)
 
 ## Summary
 
 ### Design introspection plugin
 
-Adds several commands that allow for collecting information about cells, nets, pins and ports in the design.
+Adds several commands that allow for collecting information about cells, nets, pins and ports in the design or a selection of objects.
+Additionally provides functions to convert selection on TCL lists.
 
 Following commands are added with the plugin:
 * get_cells
 * get_nets
 * get_pins
 * get_ports
+* get_count
+* selection_to_tcl_list
 
 ### FASM plugin
 
@@ -33,14 +34,6 @@ Writes out the design's [fasm features](https://symbiflow.readthedocs.io/en/late
 
 The plugin adds the following command:
 * write_fasm
-
-### Get count plugin
-
-Returns the count of selected objects to the TCL interpreter.
-The objects can be of various types, such as modules, cells or wires.
-
-The plugin adds the following command:
-* get_count
 
 ### Integrate inverters plugin
 
@@ -76,13 +69,6 @@ The plugin adds the following commands:
 * set_false_path
 * set_max_delay
 * set_clock_groups
-
-### Selection plugin
-
-Extracts the current selection to TCL list
-
-The plugin adds the following command:
-* selection_to_tcl_list
 
 ### XDC plugin
 

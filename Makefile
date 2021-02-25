@@ -1,4 +1,4 @@
-PLUGIN_LIST := fasm xdc params selection sdc get_count ql-iob design_introspection integrateinv
+PLUGIN_LIST := fasm xdc params sdc ql-iob design_introspection integrateinv
 PLUGINS := $(foreach plugin,$(PLUGIN_LIST),$(plugin).so)
 PLUGINS_INSTALL := $(foreach plugin,$(PLUGIN_LIST),install_$(plugin))
 PLUGINS_CLEAN := $(foreach plugin,$(PLUGIN_LIST),clean_$(plugin))

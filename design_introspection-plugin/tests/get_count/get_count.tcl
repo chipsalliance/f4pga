@@ -1,5 +1,5 @@
 yosys -import
-if { [info procs get_count] == {} } { plugin -i get_count }
+if { [info procs get_count] == {} } { plugin -i design_introspection }
 yosys -import # ingest new plugin commands
 
 read_verilog -icells $::env(DESIGN_TOP).v
