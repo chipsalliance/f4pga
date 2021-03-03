@@ -51,9 +51,13 @@ const std::unordered_map<std::string, SetPropertyOptions> set_property_options_m
                                                                                       {"PACKAGE_PIN", SetPropertyOptions::IO_LOC_PAIRS}};
 
 const std::unordered_map<std::string, std::vector<std::string>> supported_primitive_parameters = {
-  {"OBUF", {"IO_LOC_PAIRS", "IOSTANDARD", "DRIVE", "SLEW", "IN_TERM"}},  {"OBUFDS", {"IO_LOC_PAIRS", "IOSTANDARD", "SLEW", "IN_TERM"}},
-  {"OBUFTDS", {"IO_LOC_PAIRS", "IOSTANDARD", "SLEW", "IN_TERM"}},        {"IBUF", {"IO_LOC_PAIRS", "IOSTANDARD"}},
-  {"IOBUF", {"IO_LOC_PAIRS", "IOSTANDARD", "DRIVE", "SLEW", "IN_TERM"}}, {"IOBUFDS", {"IO_LOC_PAIRS", "IOSTANDARD", "SLEW", "IN_TERM"}}};
+  {"OBUF", {"IO_LOC_PAIRS", "IOSTANDARD", "DRIVE", "SLEW", "IN_TERM"}},
+  {"OBUFDS", {"IO_LOC_PAIRS", "IOSTANDARD", "SLEW", "IN_TERM"}},
+  {"OBUFTDS", {"IO_LOC_PAIRS", "IOSTANDARD", "SLEW", "IN_TERM"}},
+  {"IBUF", {"IO_LOC_PAIRS", "IOSTANDARD"}},
+  {"IOBUF", {"IO_LOC_PAIRS", "IOSTANDARD", "DRIVE", "SLEW", "IN_TERM"}},
+  {"IOBUFDS", {"IO_LOC_PAIRS", "IOSTANDARD", "SLEW", "IN_TERM"}},
+  {"IBUFDS_GTE2", {"IO_LOC_PAIRS"}}};
 
 void register_in_tcl_interpreter(const std::string &command)
 {
