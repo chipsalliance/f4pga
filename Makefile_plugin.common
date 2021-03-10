@@ -41,6 +41,7 @@ CXXFLAGS = $(shell yosys-config --cxxflags) #-DSDC_DEBUG
 LDFLAGS = $(shell yosys-config --ldflags)
 LDLIBS = $(shell yosys-config --ldlibs)
 PLUGINS_DIR = $(shell yosys-config --datdir)/plugins
+DATA_DIR = $(shell yosys-config --datdir)
 
 OBJS := $(SOURCES:cc=o)
 
