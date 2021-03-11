@@ -1,6 +1,7 @@
+# The latch test is disabled as latches are not supported in the qlf_k4n8.
+
 TESTS = dffs \
 	iob_no_flatten \
-	latches \
 	soft_adder \
 	logic
 
