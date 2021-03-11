@@ -203,6 +203,7 @@ struct SynthQuickLogicPass : public ScriptPass {
             run("opt_merge");
             run("opt_clean");
             run("opt");
+            run("dfflegalize -cell $_DFF_P_ 0");
         }
 
         if (check_label("map_luts")) {
