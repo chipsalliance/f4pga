@@ -7,4 +7,4 @@ read_verilog iob_no_flatten.v
 synth_quicklogic -top my_top
 yosys stat
 yosys cd my_top
-select -assert-count 2 t:\$_DFF_P_
+select -assert-count 2 t:dff
