@@ -31,7 +31,6 @@ test: $(PLUGINS_TEST)
 clean: $(PLUGINS_CLEAN)
 
 CLANG_FORMAT ?= clang-format-5.0
-
 format:
 	find . \( -name "*.h" -o -name "*.cc" \) -and -not -path './third_party/*' -print0 | xargs -0 -P $$(nproc) ${CLANG_FORMAT} -style=file -i
 
