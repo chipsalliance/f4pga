@@ -30,10 +30,10 @@ test: $(PLUGINS_TEST)
 
 clean: $(PLUGINS_CLEAN)
 
-CLANG_FORMAT ?= clang-format-5.0
+CLANG_FORMAT ?= clang-format
 format:
 	find . \( -name "*.h" -o -name "*.cc" \) -and -not -path './third_party/*' -print0 | xargs -0 -P $$(nproc) ${CLANG_FORMAT} -style=file -i
 
-VERIBLE_FORMAT ?=verible-verilog-format
+VERIBLE_FORMAT ?= verible-verilog-format
 format-verilog:
 	find */tests \( -name "*.v" -o -name "*.sv" \) -and -not -path './third_party/*' -print0 | xargs -0 $(VERIBLE_FORMAT) --inplace

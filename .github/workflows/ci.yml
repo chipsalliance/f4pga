@@ -18,7 +18,7 @@ jobs:
         sudo apt-get install git g++-9 build-essential bison flex \
           libreadline-dev gawk tcl-dev libffi-dev git graphviz xdot \
           pkg-config libboost-system-dev libboost-python-dev \
-          libboost-filesystem-dev zlib1g-dev clang-format-5.0
+          libboost-filesystem-dev zlib1g-dev clang-format
 
     - name: Install Yosys
       run: source .github/workflows/setup.sh
