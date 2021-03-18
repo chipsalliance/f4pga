@@ -10,7 +10,7 @@ import sys
 import json
 import argparse
 
-parameters = ["IOSTANDARD", "DRIVE", "SLEW", "IN_TERM"]
+parameters = ["IOSTANDARD", "DRIVE", "SLEW", "IN_TERM", "IO_LOC_PAIRS"]
 
 def read_cells(json_file):
     with open(json_file) as f:

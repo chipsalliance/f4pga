@@ -50,6 +50,10 @@ const std::unordered_map<std::string, SetPropertyOptions> set_property_options_m
                                                                                       {"LOC", SetPropertyOptions::IO_LOC_PAIRS},
                                                                                       {"PACKAGE_PIN", SetPropertyOptions::IO_LOC_PAIRS}};
 
+// Apart from the common I/OBUFs there is also the GTPE2_CHANNEL primitive which has a total
+// of four IOPADs (2 IPADs and 2 OPADs) which are directly connected to the GTP[RT]X[PN] ports
+// of the BEL. The GTPE2_CHANNEL holds all the placement constraints information of the
+// corresponding PADs
 const std::unordered_map<std::string, std::vector<std::string>> supported_primitive_parameters = {
   {"OBUF", {"IO_LOC_PAIRS", "IOSTANDARD", "DRIVE", "SLEW", "IN_TERM"}},
   {"OBUFDS", {"IO_LOC_PAIRS", "IOSTANDARD", "SLEW", "IN_TERM"}},
@@ -57,7 +61,8 @@ const std::unordered_map<std::string, std::vector<std::string>> supported_primit
   {"IBUF", {"IO_LOC_PAIRS", "IOSTANDARD"}},
   {"IOBUF", {"IO_LOC_PAIRS", "IOSTANDARD", "DRIVE", "SLEW", "IN_TERM"}},
   {"IOBUFDS", {"IO_LOC_PAIRS", "IOSTANDARD", "SLEW", "IN_TERM"}},
-  {"IBUFDS_GTE2", {"IO_LOC_PAIRS"}}};
+  {"IBUFDS_GTE2", {"IO_LOC_PAIRS"}},
+  {"GTPE2_CHANNEL", {"IO_LOC_PAIRS"}}};
 
 void register_in_tcl_interpreter(const std::string &command)
 {

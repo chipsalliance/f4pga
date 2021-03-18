@@ -4,7 +4,13 @@ module top (
     inout out_a,
     output [1:0] out_b,
     output signal_p,
-    output signal_n
+    output signal_n,
+    input rx_n,
+    input rx_p,
+    output tx_n,
+    output tx_p,
+    input ibufds_gte2_i,
+    input ibufds_gte2_ib
 );
 
   wire LD6, LD7, LD8, LD9;
@@ -20,12 +26,14 @@ module top (
   assign led[1] = inter_wire;
   assign inter_wire = inter_wire_2;
   assign {LD9, LD8, LD7, LD6} = counter >> LOG2DELAY;
+
   OBUFTDS OBUFTDS_2 (
       .I (LD6),
       .O (signal_p),
       .OB(signal_n),
       .T (1'b1)
   );
+
   OBUF #(
       .IOSTANDARD("LVCMOS33"),
       .SLEW("SLOW")
@@ -33,6 +41,7 @@ module top (
       .I(LD6),
       .O(led[0])
   );
+
   OBUF #(
       .IOSTANDARD("LVCMOS33"),
       .SLEW("SLOW")
@@ -40,6 +49,7 @@ module top (
       .I(LD7),
       .O(inter_wire_2)
   );
+
   OBUF #(
       .IOSTANDARD("LVCMOS33"),
       .SLEW("SLOW")
@@ -47,14 +57,29 @@ module top (
       .I(LD7),
       .O(out_a)
   );
+
   bottom bottom_inst (
       .I (LD8),
       .O (led[2]),
       .OB(out_b)
   );
+
   bottom_intermediate bottom_intermediate_inst (
       .I(LD9),
       .O(led[3])
+  );
+
+  GTPE2_CHANNEL GTPE2_CHANNEL(
+    .GTPRXP(rx_p),
+    .GTPRXN(rx_n),
+    .GTPTXP(tx_p),
+    .GTPTXN(tx_n)
+  );
+
+  (* keep *)
+  IBUFDS_GTE2 IBUFDS_GTE2(
+    .I(ibufds_gte2_i),
+    .IB(ibufds_gte2_ib)
   );
 endmodule
 
@@ -62,8 +87,10 @@ module bottom_intermediate (
     input  I,
     output O
 );
-  wire bottom_intermediate_wire;
+
+wire bottom_intermediate_wire;
   assign O = bottom_intermediate_wire;
+
   OBUF #(
       .IOSTANDARD("LVCMOS33"),
       .SLEW("SLOW")
@@ -78,6 +105,7 @@ module bottom (
     output [1:0] OB,
     output O
 );
+
   OBUF #(
       .IOSTANDARD("LVCMOS33"),
       .SLEW("SLOW")
@@ -85,6 +113,7 @@ module bottom (
       .I(I),
       .O(O)
   );
+
   OBUF #(
       .IOSTANDARD("LVCMOS33"),
       .SLEW("SLOW")
@@ -92,6 +121,7 @@ module bottom (
       .I(I),
       .O(OB[0])
   );
+
   OBUF #(
       .IOSTANDARD("LVCMOS33"),
       .SLEW("SLOW")
@@ -100,4 +130,3 @@ module bottom (
       .O(OB[1])
   );
 endmodule
-
