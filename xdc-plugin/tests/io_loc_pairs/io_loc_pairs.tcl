@@ -5,12 +5,19 @@ yosys -import  ;# ingest plugin commands
 
 read_verilog $::env(DESIGN_TOP).v
 
+read_verilog -lib -specify +/xilinx/cells_sim.v
+read_verilog -lib +/xilinx/cells_xtra.v
+read_verilog -lib cells_xtra.v
+
+hierarchy -check -top top
+
 # -flatten is used to ensure that the output eblif has only one module.
 # Some of symbiflow expects eblifs with only one module.
-synth_xilinx -flatten -abc9 -nosrl -noclkbuf -nodsp
+synth_xilinx -flatten -abc9 -nosrl -noclkbuf -nodsp -run prepare:check
 
 #Read the design constraints
 read_xdc -part_json [file dirname $::env(DESIGN_TOP)]/../xc7a35tcsg324-1.json $::env(DESIGN_TOP).xdc
 
 # Write the design in JSON format.
 write_json [test_output_path "io_loc_pairs.json"]
+write_blif -param [test_output_path "io_loc_pairs.eblif"]
