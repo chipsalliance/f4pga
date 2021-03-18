@@ -22,34 +22,32 @@ TEST_UTILS=../../../test-utils/test-utils.tcl
 
 define test_tpl =
 $(1): $(1)/ok
-	@echo "Verifying result of test $(1)"
 	@set +e; \
 	$$($(1)_verify); \
 	if [ $$$$? -eq 0 ]; then \
-		echo "Test $(1) PASSED"; \
+		printf "Test %-18s \e[32mPASSED\e[0m @ %s\n" $(1) $(CURDIR); \
 		touch $$<; \
 		true; \
 	else \
-		echo "Test $(1) FAILED"; \
+		printf "Test %-18s \e[30;1mFAILED\e[0m @ %s\n" $(1) $(CURIDR); \
 		false; \
 	fi
 
 $(1)/ok: $(1)/$(1).v
-	@echo "Running test $(1)"
 	@set +e; \
 	cd $(1); \
 	echo "source $(TEST_UTILS)" > run-$(1).tcl ;\
 	echo "source $(1).tcl" >> run-$(1).tcl ;\
 	DESIGN_TOP=$(1) TEST_OUTPUT_PREFIX=./ \
-	yosys -c "run-$(1).tcl" -q -l $(1).log; \
+	yosys -c "run-$(1).tcl" -q -q -l $(1).log; \
 	RETVAL=$$$$?; \
 	rm -f run-$(1).tcl; \
 	if [ ! -z "$$($(1)_negative)" ] && [ $$($(1)_negative) -eq 1 ]; then \
 		if [ $$$$RETVAL -ne 0 ]; then \
-			echo "Negative test $(1) PASSED"; \
+			printf "Negative test %-18s \e[32mPASSED\e[0m @ %s\n" $(1) $(CURDIR); \
 			true; \
 		else \
-			echo "Negative test $(1) FAILED"; \
+			printf "Negative test %-18s \e[30;1mFAILED\e[0m @ %s\n" $(1) $(CURIDR); \
 			false; \
 		fi \
 	else \

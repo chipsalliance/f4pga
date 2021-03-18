@@ -1,3 +1,4 @@
+# -*- Makefile -*-
 # This Makefile template is supposed to be included in each plugin's Makefile.
 # Plugin Makefiles need to specify the plugin's name and source files.
 # The plugin name is how the final shared object will be named.
@@ -52,7 +53,7 @@ install_plugin: $(NAME).so
 	install -D $< $(PLUGINS_DIR)/$<
 
 test:
-	$(MAKE) -C tests all
+	@$(MAKE) -C tests all
 
 .PHONY: install
 install: install_plugin
