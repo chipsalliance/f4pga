@@ -29,7 +29,7 @@ $(1): $(1)/ok
 		touch $$<; \
 		true; \
 	else \
-		printf "Test %-18s \e[30;1mFAILED\e[0m @ %s\n" $(1) $(CURIDR); \
+		printf "Test %-18s \e[31;1mFAILED\e[0m @ %s\n" $(1) $(CURDIR); \
 		false; \
 	fi
 
@@ -47,7 +47,7 @@ $(1)/ok: $(1)/$(1).v
 			printf "Negative test %-18s \e[32mPASSED\e[0m @ %s\n" $(1) $(CURDIR); \
 			true; \
 		else \
-			printf "Negative test %-18s \e[30;1mFAILED\e[0m @ %s\n" $(1) $(CURIDR); \
+			printf "Negative test %-18s \e[31;1mFAILED\e[0m @ %s\n" $(1) $(CURDIR); \
 			false; \
 		fi \
 	else \
