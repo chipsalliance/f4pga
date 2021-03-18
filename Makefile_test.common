@@ -1,3 +1,4 @@
+# -*- Makefile -*-
 # Each plugin shall have a directory named 'test' that contains test cases
 # directories and a Makefile which includes this Makefile template.
 # The test Makefile specifies which tests to execute and how to verify them.

@@ -10,3 +10,7 @@ trim_trailing_whitespace = true
 [*.{h,cc,tcl}]
 indent_style = space
 indent_size = 4
+
+[*.{v,sv}]
+indent_style = space
+indent_size = 2

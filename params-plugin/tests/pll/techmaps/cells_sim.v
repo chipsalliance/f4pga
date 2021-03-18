@@ -3,32 +3,31 @@
 
 // PLLE2_ADV_VPR
 (* blackbox *)
-module PLLE2_ADV_VPR
-(
-input         CLKFBIN,
-input         CLKIN1,
-input         CLKIN2,
-input         CLKINSEL,
+module PLLE2_ADV_VPR (
+    input CLKFBIN,
+    input CLKIN1,
+    input CLKIN2,
+    input CLKINSEL,
 
-output        CLKFBOUT,
-output        CLKOUT0,
-output        CLKOUT1,
-output        CLKOUT2,
-output        CLKOUT3,
-output        CLKOUT4,
-output        CLKOUT5,
+    output CLKFBOUT,
+    output CLKOUT0,
+    output CLKOUT1,
+    output CLKOUT2,
+    output CLKOUT3,
+    output CLKOUT4,
+    output CLKOUT5,
 
-input         PWRDWN,
-input         RST,
-output        LOCKED,
+    input  PWRDWN,
+    input  RST,
+    output LOCKED,
 
-input         DCLK,
-input         DEN,
-input         DWE,
-output        DRDY,
-input  [ 6:0] DADDR,
-input  [15:0] DI,
-output [15:0] DO
+    input         DCLK,
+    input         DEN,
+    input         DWE,
+    output        DRDY,
+    input  [ 6:0] DADDR,
+    input  [15:0] DI,
+    output [15:0] DO
 );
 
   parameter [0:0] INV_CLKINSEL = 1'd0;

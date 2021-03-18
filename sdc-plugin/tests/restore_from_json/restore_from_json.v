@@ -1,11 +1,15 @@
-module top(input clk, input i, output o);
+module top (
+    input  clk,
+    input  i,
+    output o
+);
 
-reg [0:0] outff = 0;
+  reg [0:0] outff = 0;
 
-assign o = outff;
+  assign o = outff;
 
-always @(posedge clk) begin
+  always @(posedge clk) begin
     outff <= i;
-end
+  end
 
 endmodule
