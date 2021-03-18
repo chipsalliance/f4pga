@@ -17,7 +17,7 @@ clean_$(1):
 	$$(MAKE) -C $(1)-plugin clean
 
 test_$(1):
-	$$(MAKE) -C $(1)-plugin test
+	@$$(MAKE) --no-print-directory -C $(1)-plugin test
 endef
 
 $(foreach plugin,$(PLUGIN_LIST),$(eval $(call install_plugin,$(plugin))))
