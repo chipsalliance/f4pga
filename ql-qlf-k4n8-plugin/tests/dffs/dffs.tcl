@@ -1,8 +1,8 @@
 yosys -import
-if { [info procs ql-qlf-k4n8] == {} } { plugin -i ql-qlf-k4n8 }
+if { [info procs synth_quicklogic] == {} } { plugin -i ql-qlf-k4n8 }
 yosys -import  ;# ingest plugin commands
 
-read_verilog dffs.v
+read_verilog $::env(DESIGN_TOP).v
 design -save read
 
 # DFF
