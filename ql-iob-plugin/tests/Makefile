@@ -6,8 +6,8 @@ clean:
 	@find . -name "ok" | xargs rm -rf
 
 sdiomux/ok:
-	cd sdiomux && $(MAKE) test
+	@$(MAKE) -C sdiomux test
 ckpad/ok:
-	cd ckpad && $(MAKE) test
+	@$(MAKE) -C ckpad test
 
 .PHONY: all clean
