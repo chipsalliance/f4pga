@@ -49,15 +49,15 @@ module _80_quicklogic_alu (A, B, CI, BI, X, Y, CO);
             if (_TECHMAP_CONSTMSK_CI_ == 1) begin
 
                 localparam INIT = (_TECHMAP_CONSTVAL_CI_ == 0) ?
-                    16'b0110_0000_0000_0001 :
-                    16'b1001_0000_0000_0111;
+                    16'b0110_0110_0000_1000:
+                    16'b1001_1001_0000_1110;
 
                 // LUT4 configured as 1-bit adder with CI=const
                 adder_lut4 #(
                     .LUT(INIT),
                     .IN2_IS_CIN(1'b0)
                 ) lut_ci_adder (
-                    .in({AA[i], BB[i], 1'b0, 1'b0}), 
+                    .in({AA[i], BB[i], 1'b1, 1'b1}),
                     .cin(), 
                     .lut4_out(Y[i]), 
                     .cout(ci)
@@ -68,10 +68,10 @@ module _80_quicklogic_alu (A, B, CI, BI, X, Y, CO);
 
                 // LUT4 configured as passthrough to drive CI of the next stage
                 adder_lut4 #(
-                    .LUT(16'b1100_0000_0000_0011),
+                    .LUT(16'b0000_0000_0000_1100),
                     .IN2_IS_CIN(1'b0)
                 ) lut_ci (
-                    .in({1'b0,CI,1'b0,1'b0}), 
+                    .in({1'b1, CI, 1'b1, 1'b1}),
                     .cin(), 
                     .lut4_out(), 
                     .cout(ci)
@@ -92,10 +92,10 @@ module _80_quicklogic_alu (A, B, CI, BI, X, Y, CO);
             
             // LUT4 configured as full 1-bit adder
             adder_lut4 #(
-                    .LUT(16'b0110_1001_0110_0001),
+                    .LUT(16'b1001_0110_0110_1000),
                     .IN2_IS_CIN(1'b1)
                 ) lut_adder (
-                    .in({AA[i], BB[i], 1'b0, 1'b0}),
+                    .in({AA[i], BB[i], 1'b1, 1'b1}),
                     .cin(ci), 
                     .lut4_out(Y[i]), 
                     .cout(co)
@@ -116,7 +116,7 @@ module _80_quicklogic_alu (A, B, CI, BI, X, Y, CO);
                     .LUT(16'b0000_1111_0000_1111),
                     .IN2_IS_CIN(1'b1)
                 ) lut_co (
-                    .in({1'b0, co, 1'b0, 1'b0}),
+                    .in({1'b1, co, 1'b1, 1'b1}),
                     .cin(co),
                     .lut4_out(C[i]),
                     .cout()

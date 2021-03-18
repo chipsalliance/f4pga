@@ -44,9 +44,7 @@ module \$__SHREG_DFF_P_ (D, Q, C);
 
     parameter DEPTH = 2;
     reg [DEPTH-2:0] q;
-    //wire [DEPTH-1:0] d;
     genvar i;
-    assign d[0] = D;
     generate for (i = 0; i < DEPTH; i = i + 1) begin: slice
 
 
