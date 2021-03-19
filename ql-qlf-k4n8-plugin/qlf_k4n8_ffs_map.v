@@ -89,7 +89,7 @@ module \$__SHREG_DFF_P_ (D, Q, C);
 
         // First in chain
         generate if (i == 0) begin
-                 sh_dff #() _TECHMAP_REPLACE_ (
+                 sh_dff #() shreg_beg (
                     .Q(q[i]),
                     .D(D),
                     .C(C)
@@ -97,7 +97,7 @@ module \$__SHREG_DFF_P_ (D, Q, C);
         end endgenerate
         // Middle in chain
         generate if (i > 0 && i != DEPTH-1) begin
-                 sh_dff #() _TECHMAP_REPLACE_ (
+                 sh_dff #() shreg_mid (
                     .Q(q[i]),
                     .D(q[i-1]),
                     .C(C)
@@ -105,7 +105,7 @@ module \$__SHREG_DFF_P_ (D, Q, C);
         end endgenerate
         // Last in chain
         generate if (i == DEPTH-1) begin
-                 sh_dff #() _TECHMAP_REPLACE_ (
+                 sh_dff #() shreg_end (
                     .Q(Q),
                     .D(q[i-1]),
                     .C(C)
