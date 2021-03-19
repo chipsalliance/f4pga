@@ -69,17 +69,17 @@ module top (
       .O(led[3])
   );
 
-  GTPE2_CHANNEL GTPE2_CHANNEL(
-    .GTPRXP(rx_p),
-    .GTPRXN(rx_n),
-    .GTPTXP(tx_p),
-    .GTPTXN(tx_n)
+  GTPE2_CHANNEL GTPE2_CHANNEL (
+      .GTPRXP(rx_p),
+      .GTPRXN(rx_n),
+      .GTPTXP(tx_p),
+      .GTPTXN(tx_n)
   );
 
   (* keep *)
-  IBUFDS_GTE2 IBUFDS_GTE2(
-    .I(ibufds_gte2_i),
-    .IB(ibufds_gte2_ib)
+  IBUFDS_GTE2 IBUFDS_GTE2 (
+      .I (ibufds_gte2_i),
+      .IB(ibufds_gte2_ib)
   );
 endmodule
 
@@ -88,7 +88,7 @@ module bottom_intermediate (
     output O
 );
 
-wire bottom_intermediate_wire;
+  wire bottom_intermediate_wire;
   assign O = bottom_intermediate_wire;
 
   OBUF #(
