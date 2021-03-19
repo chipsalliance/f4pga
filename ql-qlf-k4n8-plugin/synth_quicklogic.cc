@@ -63,6 +63,9 @@ struct SynthQuickLogicPass : public ScriptPass {
         log("        By default use adder cells in output netlist.\n");
         log("        Specifying this switch turns it off.\n");
         log("\n");
+        log("    -no_ff_map\n");
+        log("        By default ff techmap is turned on. Specifying this switch turns it off.\n");
+        log("\n");
         log("\n");
         log("The following commands are executed by this synthesis command:\n");
         help_script();
@@ -72,6 +75,7 @@ struct SynthQuickLogicPass : public ScriptPass {
     string top_opt, edif_file, blif_file, family, currmodule, verilog_file;
     bool inferAdder;
     bool abcOpt;
+    bool noffmap;
 
     void clear_flags() override
     {
@@ -83,6 +87,7 @@ struct SynthQuickLogicPass : public ScriptPass {
         family = "qlf_k4n8";
         inferAdder = true;
         abcOpt = true;
+        noffmap = false;
     }
 
     void execute(std::vector<std::string> args, RTLIL::Design *design) override
@@ -119,6 +124,10 @@ struct SynthQuickLogicPass : public ScriptPass {
             }
             if (args[argidx] == "-no_abc_opt") {
                 abcOpt = false;
+                continue;
+            }
+            if (args[argidx] == "-no_ff_map") {
+                noffmap = true;
                 continue;
             }
 
@@ -200,7 +209,9 @@ struct SynthQuickLogicPass : public ScriptPass {
             if (family == "qlf_k4n8") {
                 run("shregmap -minlen 8 -maxlen 8");
             }
-            run("techmap " + techMapArgs);
+            if (!noffmap) {
+                run("techmap " + techMapArgs);
+            }
             run("opt_expr -mux_undef");
             run("simplemap");
             run("opt_expr");
