@@ -7,7 +7,7 @@ read_verilog $::env(DESIGN_TOP).v
 
 read_verilog -lib -specify +/xilinx/cells_sim.v
 read_verilog -lib +/xilinx/cells_xtra.v
-read_verilog -lib cells_xtra.v
+read_verilog -lib [file dirname $::env(DESIGN_TOP)]/cells_xtra.v
 
 hierarchy -check -top top
 
