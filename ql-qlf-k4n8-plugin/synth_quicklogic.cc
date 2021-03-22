@@ -218,7 +218,7 @@ struct SynthQuickLogicPass : public ScriptPass {
             run("opt_merge");
             run("opt_clean");
             run("opt");
-            run("dfflegalize -cell $_DFF_P_ x -cell $_DFF_P??_ x");
+            run("dfflegalize -cell $_DFF_P_ x -cell $_DFF_P??_ x -cell $_DFF_N_ x -cell _DFF_N??_");
         }
 
         if (check_label("map_luts")) {
