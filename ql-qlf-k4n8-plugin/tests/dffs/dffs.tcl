@@ -43,3 +43,40 @@ synth_quicklogic -top my_dffs_n
 yosys cd my_dffs_n
 stat
 select -assert-count 1 t:dffs
+
+# DFFN
+design -load read
+synth_quicklogic -top my_dffn
+yosys cd my_dffn
+stat
+select -assert-count 1 t:dffn
+
+# DFFNR (negedge CLK posedge RST)
+design -load read
+synth_quicklogic -top my_dffnr_p
+yosys cd my_dffnr_p
+stat
+select -assert-count 1 t:dffnr
+select -assert-count 1 t:\$lut
+
+# DFFNR (negedge CLK negedge RST)
+design -load read
+synth_quicklogic -top my_dffnr_n
+yosys cd my_dffnr_n
+stat
+select -assert-count 1 t:dffnr
+
+# DFFNS (negedge CLK posedge SET)
+design -load read
+synth_quicklogic -top my_dffns_p
+yosys cd my_dffns_p
+stat
+select -assert-count 1 t:dffns
+select -assert-count 1 t:\$lut
+
+# DFFS (negedge CLK negedge SET)
+design -load read
+synth_quicklogic -top my_dffns_n
+yosys cd my_dffns_n
+stat
+select -assert-count 1 t:dffns
