@@ -13,12 +13,12 @@
 # test1_verify = $(call diff_test,test1,ext) && test $$(grep "PASS" test1/test1.txt | wc -l) -eq 2
 # test2_verify = $(call diff_test,test2,ext)
 #
-GTEST_DIR = ../../third_party/googletest/googletest
-CXX = $(shell yosys-config --cxx)
-CXXFLAGS = $(shell yosys-config --cxxflags) -I.. -I$(GTEST_DIR)/include
-LDLIBS = $(shell yosys-config --ldlibs) -L$(GTEST_DIR)/build/lib -lgtest -lgtest_main -lpthread
-LDFLAGS = $(shell yosys-config --ldflags)
-TEST_UTILS=../../../test-utils/test-utils.tcl
+GTEST_DIR ?= ../../third_party/googletest/googletest
+CXX ?= $(shell yosys-config --cxx)
+CXXFLAGS ?= $(shell yosys-config --cxxflags) -I.. -I$(GTEST_DIR)/include
+LDLIBS ?= $(shell yosys-config --ldlibs) -L$(GTEST_DIR)/build/lib -lgtest -lgtest_main -lpthread
+LDFLAGS ?= $(shell yosys-config --ldflags)
+TEST_UTILS ?= ../../../test-utils/test-utils.tcl
 
 define test_tpl =
 $(1): $(1)/ok
