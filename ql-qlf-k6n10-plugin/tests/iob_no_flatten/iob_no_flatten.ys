@@ -1,0 +1,6 @@
+read_verilog v/iob_no_flatten.v
+
+synth_quicklogic -top my_top
+stat
+cd my_top
+select -assert-count 2 t:dff
