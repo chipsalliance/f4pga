@@ -3,7 +3,6 @@ module my_dff (
     clk,
     output reg q
 );
-  initial q <= 1'b0;
   always @(posedge clk) q <= d;
 endmodule
 
@@ -13,7 +12,6 @@ module my_dffr_p (
     clr,
     output reg q
 );
-  initial q <= 1'b0;
   always @(posedge clk or posedge clr)
     if (clr) q <= 1'b0;
     else q <= d;
@@ -25,7 +23,6 @@ module my_dffr_n (
     clr,
     output reg q
 );
-  initial q <= 1'b0;
   always @(posedge clk or negedge clr)
     if (!clr) q <= 1'b0;
     else q <= d;
@@ -37,7 +34,6 @@ module my_dffs_p (
     pre,
     output reg q
 );
-  initial q <= 1'b0;
   always @(posedge clk or posedge pre)
     if (pre) q <= 1'b1;
     else q <= d;
@@ -49,7 +45,6 @@ module my_dffs_n (
     pre,
     output reg q
 );
-  initial q <= 1'b0;
   always @(posedge clk or negedge pre)
     if (!pre) q <= 1'b1;
     else q <= d;
