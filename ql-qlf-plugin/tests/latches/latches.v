@@ -30,3 +30,12 @@ module latchsr (
     else if (pre) q <= 1'b1;
     else if (en) q <= d;
 endmodule
+
+module latchp_noinit (
+    input d,
+    clk,
+    en,
+    output reg q
+);
+  always @* if (en) q <= d;
+endmodule
