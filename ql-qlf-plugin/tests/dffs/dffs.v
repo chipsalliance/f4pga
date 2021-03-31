@@ -6,14 +6,6 @@ module my_dff (
   always @(posedge clk) q <= d;
 endmodule
 
-module my_dff_noinit (
-    input d,
-    clk,
-    output reg q
-);
-  always @(posedge clk) q <= d;
-endmodule
-
 module my_dffr_p (
     input d,
     clk,

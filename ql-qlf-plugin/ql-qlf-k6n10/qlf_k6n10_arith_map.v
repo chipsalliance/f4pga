@@ -29,32 +29,32 @@ module _80_quicklogic_alu (A, B, CI, BI, X, Y, CO);
 		end
 	endgenerate
 
-	   wire [Y_WIDTH: 0 ] CARRY;
-	   assign CARRY[0] = CI;
+	wire [Y_WIDTH: 0 ] CARRY;
+	assign CARRY[0] = CI;
 
-	   genvar i;
-	   generate for (i = 0; i < Y_WIDTH - 1; i = i+1) begin:gen3
+	genvar i;
+	generate for (i = 0; i < Y_WIDTH - 1; i = i+1) begin:gen3
 	     adder my_adder (
-	       .cin		(CARRY[i]),
-	       .cout	(CARRY[i+1]),
-	       .a		(AA[i]),
-	       .b		(BB[i]),
-	       .sumout	(Y[i])
+	       .cin     (CARRY[i]  ),
+	       .cout    (CARRY[i+1]),
+	       .a       (AA[i]     ),
+	       .b       (BB[i]     ),
+	       .sumout  (Y[i]      )
 	     );
-	   end endgenerate
+	end endgenerate
 
-	   generate if ((Y_WIDTH -1) % 20 == 0) begin:gen4
+	generate if ((Y_WIDTH -1) % 20 == 0) begin:gen4
 	     assign Y[Y_WIDTH-1] = CARRY[Y_WIDTH-1];
-	   end else begin:gen5
+	end else begin:gen5
 	     adder my_adder (
-	       .cin		(CARRY[Y_WIDTH - 1]),
-	       .cout	(CARRY[Y_WIDTH]),
-	       .a		(1'b0),
-	       .b		(1'b0),
-	       .sumout	(Y[Y_WIDTH -1])
+	       .cin     (CARRY[Y_WIDTH - 1]),
+	       .cout    (CARRY[Y_WIDTH]    ),
+	       .a       (1'b0              ),
+	       .b       (1'b0              ),
+	       .sumout  (Y[Y_WIDTH -1]     )
 	     );
-	   end
-	   endgenerate
+	end
+	endgenerate
 	assign X = AA ^ BB;
 endmodule
 

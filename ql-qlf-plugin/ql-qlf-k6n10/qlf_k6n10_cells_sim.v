@@ -101,16 +101,16 @@ module DP_RAM16K (
         input[31:0] wenb,
         output[31:0] d_out );
 
-                _dual_port_sram memory_0 (
-                        .wclk           (wclk),
-                        .wen            (wen),
-                        .waddr          (waddr),
-                        .data_in        (d_in),
-                        .rclk           (rclk),
-                        .ren            (ren),
-                        .raddr          (raddr),
-                        .wenb		(wenb),
-                        .d_out          (d_out) );
+        _dual_port_sram memory_0 (
+                .wclk           (wclk),
+                .wen            (wen),
+                .waddr          (waddr),
+                .data_in        (d_in),
+                .rclk           (rclk),
+                .ren            (ren),
+                .raddr          (raddr),
+                .wenb		(wenb),
+                .d_out          (d_out) );
 
 endmodule
 

@@ -10,18 +10,18 @@ module \$__QLF_RAM16K (
 );
 
 	generate
-			DP_RAM16K #()
-				 _TECHMAP_REPLACE_ (
-				.d_out(RDATA),
-				.rclk (RCLK ),
-				.wclk (WCLK ),
-				.ren  (RE   ),
-				.raddr(RADDR),
-				.wen  (WE   ),
-				.waddr(WADDR),
-				.wenb (WENB ),
-				.d_in (WDATA)
-				);
+		DP_RAM16K #()
+			_TECHMAP_REPLACE_ (
+			.d_out(RDATA),
+			.rclk (RCLK ),
+			.wclk (WCLK ),
+			.ren  (RE   ),
+			.raddr(RADDR),
+			.wen  (WE   ),
+			.waddr(WADDR),
+			.wenb (WENB ),
+			.d_in (WDATA)
+		);
 	endgenerate
 
 endmodule
@@ -49,13 +49,13 @@ module \$__QLF_RAM16K_M0 (CLK1, A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN);
 		 _TECHMAP_REPLACE_ (
 		.RDATA(A1DATA),
 		.RADDR(A1ADDR),
-		.RCLK(CLK1),
-		.RE(A1EN),
+		.RCLK (CLK1  ),
+		.RE   (A1EN  ),
 		.WDATA(B1DATA),
 		.WADDR(B1ADDR),
-		.WCLK(CLK1),
-		.WE(B1EN),
-		.WENB(WENB)
+		.WCLK (CLK1  ),
+		.WE   (B1EN  ),
+		.WENB (WENB  )
 	);
 endmodule
 
@@ -89,15 +89,15 @@ module \$__QLF_RAM16K_M1 (CLK1, A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN);
 
 	\$__QLF_RAM16K #()
 		 _TECHMAP_REPLACE_ (
-		.RDATA(A1DATA),
-		.RADDR(A1ADDR),
-		.RCLK(CLK1),
-		.RE(A1EN),
-		.WDATA(WDATA),
+		.RDATA(A1DATA     ),
+		.RADDR(A1ADDR     ),
+		.RCLK (CLK1       ),
+		.RE   (A1EN       ),
+		.WDATA(WDATA      ),
 		.WADDR(B1ADDR[9:1]),
-		.WCLK(CLK1),
-		.WENB(WENB),
-		.WE(B1EN)
+		.WCLK (CLK1       ),
+		.WENB (WENB       ),
+		.WE   (B1EN       )
 	);
 
 endmodule
@@ -135,15 +135,15 @@ module \$__QLF_RAM16K_M2 (CLK1, A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN);
 
 	\$__QLF_RAM16K #()
 		 _TECHMAP_REPLACE_ (
-		.RDATA(A1DATA),
-		.RADDR(A1ADDR),
-		.RCLK(CLK1),
-		.RE(A1EN),
-		.WDATA(B1DATA),
+		.RDATA(A1DATA      ),
+		.RADDR(A1ADDR      ),
+		.RCLK (CLK1        ),
+		.RE   (A1EN        ),
+		.WDATA(B1DATA      ),
 		.WADDR(B1ADDR[10:2]),
-		.WCLK(CLK1),
-		.WENB(WENB),
-		.WE(B1EN)
+		.WCLK (CLK1        ),
+		.WENB (WENB        ),
+		.WE   (B1EN        )
 	);
 
 endmodule
@@ -184,15 +184,15 @@ module \$__QLF_RAM16K_M3 (CLK1, A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN);
 
 	\$__QLF_RAM16K #()
 		 _TECHMAP_REPLACE_ (
-		.RDATA(A1DATA),
-		.RADDR(A1ADDR),
-		.RCLK(CLK1),
-		.RE(A1EN),
-		.WDATA(B1DATA),
+		.RDATA(A1DATA      ),
+		.RADDR(A1ADDR      ),
+		.RCLK (CLK1        ),
+		.RE   (A1EN        ),
+		.WDATA(B1DATA      ),
 		.WADDR(B1ADDR[11:3]),
-		.WCLK(CLK1),
-		.WENB(WENB),
-		.WE(B1EN)
+		.WCLK (CLK1        ),
+		.WENB (WENB        ),
+		.WE   (B1EN        )
 	);
 
 endmodule
