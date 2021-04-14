@@ -220,12 +220,8 @@ struct SynthQuickLogicPass : public ScriptPass {
         }
 
         if (check_label("map_ffs")) {
-            std::string techMapArgs = " -map +/quicklogic/" + family + "_ffs_map.v";
             if (family == "qlf_k4n8") {
                 run("shregmap -minlen 8 -maxlen 8");
-            }
-            if (!noffmap) {
-                run("techmap " + techMapArgs);
             }
             run("opt_expr -mux_undef");
             run("simplemap");
@@ -237,6 +233,10 @@ struct SynthQuickLogicPass : public ScriptPass {
                 run("dfflegalize -cell $_DFF_P_ 0");
             } else {
                 run("dfflegalize -cell $_DFF_P_ 0 -cell $_DFF_P??_ 0 -cell $_DFF_N_ 0 -cell $_DFF_N??_ 0");
+            }
+            std::string techMapArgs = " -map +/techmap.v -map +/quicklogic/" + family + "_ffs_map.v";
+            if (!noffmap) {
+                run("techmap " + techMapArgs);
             }
         }
 
