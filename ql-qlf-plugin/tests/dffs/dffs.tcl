@@ -22,6 +22,14 @@ stat
 select -assert-count 1 t:dffr
 select -assert-count 1 t:\$lut
 
+# DFFR (posedge RST)
+design -load read
+synth_quicklogic -family qlf_k4n8 -top my_dffr_p_2
+yosys cd my_dffr_p_2
+stat
+select -assert-count 2 t:dffr
+select -assert-count 1 t:\$lut
+
 # DFFR (negedge RST)
 design -load read
 synth_quicklogic -family qlf_k4n8 -top my_dffr_n
