@@ -27,10 +27,12 @@
  *   Tcl interpreter.
  */
 #include "../common/bank_tiles.h"
+#include "../common/utils.h"
 #include "kernel/log.h"
 #include "kernel/register.h"
 #include "kernel/rtlil.h"
 #include "libs/json11/json11.hpp"
+#include <bits/stdc++.h>
 #include <cassert>
 
 USING_YOSYS_NAMESPACE
@@ -116,6 +118,8 @@ struct SetProperty : public Pass {
         //   |---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|
         log("\n");
         log("    set_property PROPERTY VALUE OBJECT\n");
+        log("or\n");
+        log("    set_property -dict { PROPERTY VALUE PROPERTY2 VALUE2 } OBJECT\n");
         log("\n");
         log("Set the given property to the specified value on an object\n");
         log("\n");
@@ -126,7 +130,31 @@ struct SetProperty : public Pass {
         if (design->top_module() == nullptr) {
             log_cmd_error("No top module detected\n");
         }
+        if (args.at(1) == "-dict") {
+            std::string dict_args = args.at(2);
+            trim(dict_args);
+            std::stringstream args_stream(dict_args);
+            std::vector<std::string> tokens;
+            std::string intermediate;
+            while (getline(args_stream, intermediate, ' ')) {
+                tokens.push_back(intermediate);
+            }
+            if (tokens.size() % 2 != 0) {
+                log_cmd_error("Invalid number of dict parameters: %lu.\n", tokens.size());
+            }
+            for (long unsigned int i = 0; i < tokens.size(); i += 2) {
+                std::vector<std::string> new_args(args);
+                new_args.at(1) = tokens[i];
+                new_args.at(2) = tokens[i + 1];
+                read_property(new_args, design);
+            }
+        } else {
+            read_property(args, design);
+        }
+    }
 
+    void read_property(std::vector<std::string> args, RTLIL::Design *design)
+    {
         std::string option(args[1]);
         if (set_property_options_map.count(option) == 0) {
             log_warning("set_property: %s option is currently not supported\n", option.c_str());
