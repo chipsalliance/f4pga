@@ -1,9 +1,11 @@
 # counter - basic test for IOSTANDARD, SLEW, DRIVE, IN_TERM properties
+# counter-dict - basic test using XDC -dict for IOSTANDARD, SLEW, DRIVE, IN_TERM properties
 # port_indexes - like counter but bus port indices are passes without curly braces
 # io_loc_pairs - test for LOC property being set on IOBUFs as the IO_LOC_PAIRS parameter
 # minilitex_ddr_arty - litex design with more types of IOBUFS including differential
 # package_pins - test for PACKAGE_PIN property being set on IOBUFs as the IO_LOC_PAIRS parameter
 TESTS = counter \
+	counter-dict \
 	port_indexes \
 	io_loc_pairs \
 	minilitex_ddr_arty \
@@ -19,6 +21,7 @@ $(1)_update_json:
 endef
 
 counter_verify = $(call json_test,counter)
+counter-dict_verify = $(call json_test,counter-dict)
 port_indexes_verify = $(call json_test,port_indexes) && test $$(grep "'unknown' proc command handler" port_indexes/port_indexes.txt | wc -l) -eq 2
 io_loc_pairs_verify = $(call json_test,io_loc_pairs)
 minilitex_ddr_arty_verify = $(call json_test,minilitex_ddr_arty)
