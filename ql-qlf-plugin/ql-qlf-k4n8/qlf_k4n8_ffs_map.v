@@ -76,6 +76,78 @@ module \$_DFF_NP1_ (D, Q, C, R);
     dffns _TECHMAP_REPLACE_ (.Q(Q), .D(D), .C(C), .S(!R));
 endmodule
 
+module \$_DFFSR_PPP_ (D, Q, C, R, S);
+    input D;
+    input C;
+    input R;
+    input S;
+    output Q;
+    dffsr _TECHMAP_REPLACE_ (.Q(Q), .D(D), .C(C), .R(!R), .S(!S));
+endmodule
+
+module \$_DFFSR_PNP_ (D, Q, C, R, S);
+    input D;
+    input C;
+    input R;
+    input S;
+    output Q;
+    dffsr _TECHMAP_REPLACE_ (.Q(Q), .D(D), .C(C), .R(!R), .S(S));
+endmodule
+
+module \$_DFFSR_PNN_ (D, Q, C, R, S);
+    input D;
+    input C;
+    input R;
+    input S;
+    output Q;
+    dffsr _TECHMAP_REPLACE_ (.Q(Q), .D(D), .C(C), .R(R), .S(S));
+endmodule
+
+module \$_DFFSR_PPN_ (D, Q, C, R, S);
+    input D;
+    input C;
+    input R;
+    input S;
+    output Q;
+    dffsr _TECHMAP_REPLACE_ (.Q(Q), .D(D), .C(C), .R(R), .S(!S));
+endmodule
+
+module \$_DFFSR_NPP_ (D, Q, C, R, S);
+    input D;
+    input C;
+    input R;
+    input S;
+    output Q;
+    dffnsr _TECHMAP_REPLACE_ (.Q(Q), .D(D), .C(C), .R(!R), .S(!S));
+endmodule
+
+module \$_DFFSR_NNP_ (D, Q, C, R, S);
+    input D;
+    input C;
+    input R;
+    input S;
+    output Q;
+    dffnsr _TECHMAP_REPLACE_ (.Q(Q), .D(D), .C(C), .R(!R), .S(S));
+endmodule
+
+module \$_DFFSR_NNN_ (D, Q, C, R, S);
+    input D;
+    input C;
+    input R;
+    input S;
+    output Q;
+    dffnsr _TECHMAP_REPLACE_ (.Q(Q), .D(D), .C(C), .R(R), .S(S));
+endmodule
+
+module \$_DFFSR_NPN_ (D, Q, C, R, S);
+    input D;
+    input C;
+    input R;
+    input S;
+    output Q;
+    dffnsr _TECHMAP_REPLACE_ (.Q(Q), .D(D), .C(C), .R(R), .S(!S));
+endmodule
+
 module \$__SHREG_DFF_P_ (D, Q, C);
     input D;
     input C;
