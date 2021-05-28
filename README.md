@@ -9,9 +9,10 @@ This repository contains plugins for
 2. [FASM](#fasm-plugin)
 3. [Integrate inverters](#integrate-inverters-plugin)
 4. [Parameters](#parameters-plugin)
-5. [QL IOBs](#quicklogic-iob-plugin)
-6. [SDC](#sdc-plugin)
-7. [XDC](#xdc-plugin)
+5. [QuickLogic IOBs](#quicklogic-iob-plugin)
+6. [QuickLogic QLF FPGAs](#quicklogic-qlf-plugin)
+7. [SDC](#sdc-plugin)
+8. [XDC](#xdc-plugin)
 
 ## Summary
 
@@ -51,10 +52,19 @@ The plugin adds the following command:
 
 ### QuickLogic IOB plugin
 
-[QL IOB plugin](./ql-iob-plugin/) annotates IO buffer cells with information from IO placement constraints.
+[QuickLogic IOB plugin](./ql-iob-plugin/) annotates IO buffer cells with information from IO placement constraints. Used during synthesis for QuickLogic EOS-S3 architecture.
 
 The plugin adds the following command:
 * quicklogic_iob
+
+### QuickLogic QLF FPGAs plugin
+
+[QuickLogic QLF plugin](./ql-qlf-plugin) extends Yosys with synthesis support for `qlf_k4n8` and `qlf_k6n10` architectures.
+
+The plugin adds the following command:
+* synth_quicklogic
+
+Detailed help on the supported command(s) can be obtained by running `help <command_name>` in Yosys.
 
 ### SDC plugin
 
