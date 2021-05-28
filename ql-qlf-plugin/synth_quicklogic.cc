@@ -41,7 +41,8 @@ struct SynthQuickLogicPass : public ScriptPass {
         log("        run synthesis for the specified QuickLogic architecture\n");
         log("        generate the synthesis netlist for the specified family.\n");
         log("        supported values:\n");
-        log("        - qlf_k4n8: qlf_k4n8 \n");
+        log("        - qlf_k4n8 : qlf_k4n8 \n");
+        log("        - qlf_k6n10: qlf_k6n10 \n");
         log("\n");
         log("    -no_abc_opt\n");
         log("        By default most of ABC logic optimization features is\n");
