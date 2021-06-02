@@ -60,6 +60,10 @@ struct SynthQuickLogicPass : public ScriptPass {
         log("        write the design to the specified verilog file. writing of an output file\n");
         log("        is omitted if this parameter is not specified.\n");
         log("\n");
+        log("    -no_dsp\n");
+        log("        By default use DSP blocks in output netlist.\n");
+        log("        do not use DSP blocks to implement multipliers and associated logic\n");
+        log("\n");
         log("    -no_adder\n");
         log("        By default use adder cells in output netlist.\n");
         log("        Specifying this switch turns it off.\n");
@@ -78,6 +82,7 @@ struct SynthQuickLogicPass : public ScriptPass {
     }
 
     string top_opt, edif_file, blif_file, family, currmodule, verilog_file;
+    bool nodsp;
     bool inferAdder;
     bool inferBram;
     bool abcOpt;
@@ -95,6 +100,7 @@ struct SynthQuickLogicPass : public ScriptPass {
         inferBram = true;
         abcOpt = true;
         noffmap = false;
+        nodsp = false;
     }
 
     void execute(std::vector<std::string> args, RTLIL::Design *design) override
@@ -123,6 +129,10 @@ struct SynthQuickLogicPass : public ScriptPass {
             }
             if (args[argidx] == "-verilog" && argidx + 1 < args.size()) {
                 verilog_file = args[++argidx];
+                continue;
+            }
+            if (args[argidx] == "-no_dsp") {
+                nodsp = true;
                 continue;
             }
             if (args[argidx] == "-no_adder") {
@@ -185,7 +195,22 @@ struct SynthQuickLogicPass : public ScriptPass {
             run("peepopt");
             run("pmuxtree");
             run("opt_clean");
-
+            if (help_mode || (-!nodsp && family == "qlf_k6n10")) {
+                run("memory_dff");
+                run("wreduce t:$mul");
+                run("techmap -map +/mul2dsp.v -map +/quicklogic/" + family +
+                      "_dsp_map.v -D DSP_A_MAXWIDTH=16 -D DSP_B_MAXWIDTH=16 "
+                      "-D DSP_A_MINWIDTH=2 -D DSP_B_MINWIDTH=2 -D DSP_Y_MINWIDTH=11 "
+                      "-D DSP_NAME=$__MUL16X16",
+                    "(if -!nodsp)");
+                run("select a:mul2dsp", "              (if -!nodsp)");
+                run("setattr -unset mul2dsp", "        (if -!nodsp)");
+                run("opt_expr -fine", "                (if -!nodsp)");
+                run("wreduce", "                       (if -!nodsp)");
+                run("select -clear", "                 (if -!nodsp)");
+                run("ql_dsp", "                        (if -!nodsp)");
+                run("chtype -set $mul t:$__soft_mul", "(if -!nodsp)");
+            }
             run("alumacc");
             run("opt");
             run("fsm");

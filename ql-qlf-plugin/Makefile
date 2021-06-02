@@ -14,6 +14,7 @@ VERILOG_MODULES = $(COMMON)/cells_sim.v 			\
 		  $(QLF_K6N10_DIR)/qlf_k6n10_brams.txt 		\
 		  $(QLF_K6N10_DIR)/qlf_k6n10_cells_sim.v 	\
 		  $(QLF_K6N10_DIR)/qlf_k6n10_ffs_map.v 		\
+		  $(QLF_K6N10_DIR)/qlf_k6n10_dsp_map.v 		\
 		  $(QLF_K6N10_DIR)/qlf_k6n10_lut_map.v
 
 install_modules: $(VERILOG_MODULES)
