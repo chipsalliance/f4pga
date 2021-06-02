@@ -1,0 +1,27 @@
+# Copyright (C) 2017-2021  The SymbiFlow Authors.
+#
+# Use of this source code is governed by a ISC-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/ISC
+#
+# SPDX-License-Identifier: ISC
+
+name: Licensing
+
+on:
+  push:
+  pull_request:
+
+
+jobs:
+  Checks:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: SymbiFlow/actions/checks@main
+      with:
+        exclude_license: |
+          ./design_introspection-plugin/tests/selection_to_tcl_list/selection_to_tcl_list.v
+        third_party: |
+          ./third_party/googletest/
