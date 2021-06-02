@@ -253,7 +253,7 @@ module dffsre(
 endmodule
 
 (* abc9_flop, lib_whitebox *)
-module latchre (
+module latchsre (
     output reg Q,
     input S,
     input R,

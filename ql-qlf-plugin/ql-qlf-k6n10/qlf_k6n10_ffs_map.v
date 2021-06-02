@@ -74,10 +74,10 @@ module \$_DFFSRE_PPPP_ (D, Q, C, E, R, S);
     dffsre _TECHMAP_REPLACE_ (.Q(Q), .D(D), .C(C), .E(E), .R(R), .S(S));
 endmodule
 
-// Latch with Async reset, enable
-module  \$_DLATCH_PP0_ (input E, R, D, output Q);
+// Latch with async set and reset
+module  \$_DLATCHSR_PPP_ (input E, S, R, D, output Q);
     parameter _TECHMAP_WIREINIT_Q_ = 1'bx;
-    latchre _TECHMAP_REPLACE_ (.D(D), .Q(Q), .E(1'b1), .G(E),  .R(R));
+    latchsre _TECHMAP_REPLACE_ (.D(D), .Q(Q), .E(1'b1), .G(E),  .R(R), .S(S));
 endmodule
 
 // The following techmap operation are not performed right now
