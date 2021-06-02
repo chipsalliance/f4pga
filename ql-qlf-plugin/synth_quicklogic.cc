@@ -243,10 +243,12 @@ struct SynthQuickLogicPass : public ScriptPass {
         }
 
         if (check_label("map_luts")) {
-            if (family == "qlf_k6n10") {
-                run("abc -lut 6 ");
-            } else {
-                run("abc -lut 4 ");
+            if(abcOpt) {
+                if (family == "qlf_k6n10") {
+                    run("abc -lut 6 ");
+                } else {
+                    run("abc -lut 4 ");
+                }
             }
             run("clean");
             run("opt_lut");
