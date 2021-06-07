@@ -17,7 +17,7 @@ module latchn (
   always @* if (!en) q <= d;
 endmodule
 
-module latchsr (
+module my_latchsre (
     input d,
     clk,
     en,

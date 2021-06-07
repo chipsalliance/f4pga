@@ -225,7 +225,11 @@ struct SynthQuickLogicPass : public ScriptPass {
                 run("shregmap -minlen 8 -maxlen 8");
             }
             if (family == "qlf_k6n10") {
-                run("dfflegalize -cell $_DFF_P_ 0");
+                run("dfflegalize -cell $_DFF_P_ 0 -cell $_DFF_PP?_ 0 -cell $_DFFE_PP?P_ 0 -cell $_DFFSR_PPP_ 0 -cell $_DFFSRE_PPPP_ 0 -cell "
+                    "$_DLATCHSR_PPP_ 0");
+                //    In case we add clock inversion in the future.
+                //    run("dfflegalize -cell $_DFF_?_ 0 -cell $_DFF_?P?_ 0 -cell $_DFFE_?P?P_ 0 -cell $_DFFSR_?PP_ 0 -cell $_DFFSRE_?PPP_ 0 -cell
+                //    $_DLATCH_PPP_ 0");
             } else {
                 run("dfflegalize -cell $_DFF_P_ 0 -cell $_DFF_P??_ 0 -cell $_DFF_N_ 0 -cell $_DFF_N??_ 0 -cell $_DFFSR_???_ 0");
             }
