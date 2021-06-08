@@ -195,21 +195,21 @@ struct SynthQuickLogicPass : public ScriptPass {
             run("peepopt");
             run("pmuxtree");
             run("opt_clean");
-            if (help_mode || (-!nodsp && family == "qlf_k6n10")) {
+            if (help_mode || (!nodsp && family == "qlf_k6n10")) {
                 run("memory_dff");
                 run("wreduce t:$mul");
                 run("techmap -map +/mul2dsp.v -map +/quicklogic/" + family +
                       "_dsp_map.v -D DSP_A_MAXWIDTH=16 -D DSP_B_MAXWIDTH=16 "
                       "-D DSP_A_MINWIDTH=2 -D DSP_B_MINWIDTH=2 -D DSP_Y_MINWIDTH=11 "
                       "-D DSP_NAME=$__MUL16X16",
-                    "(if -!nodsp)");
-                run("select a:mul2dsp", "              (if -!nodsp)");
-                run("setattr -unset mul2dsp", "        (if -!nodsp)");
-                run("opt_expr -fine", "                (if -!nodsp)");
-                run("wreduce", "                       (if -!nodsp)");
-                run("select -clear", "                 (if -!nodsp)");
-                run("ql_dsp", "                        (if -!nodsp)");
-                run("chtype -set $mul t:$__soft_mul", "(if -!nodsp)");
+                    "(if -no_dsp)");
+                run("select a:mul2dsp", "              (if -no_dsp)");
+                run("setattr -unset mul2dsp", "        (if -no_dsp)");
+                run("opt_expr -fine", "                (if -no_dsp)");
+                run("wreduce", "                       (if -no_dsp)");
+                run("select -clear", "                 (if -no_dsp)");
+                run("ql_dsp", "                        (if -no_dsp)");
+                run("chtype -set $mul t:$__soft_mul", "(if -no_dsp)");
             }
             run("alumacc");
             run("opt");
