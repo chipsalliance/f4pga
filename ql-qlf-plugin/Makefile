@@ -1,5 +1,6 @@
 NAME = ql-qlf
-SOURCES = synth_quicklogic.cc
+SOURCES = synth_quicklogic.cc \
+	  ql-dsp.cc
 include ../Makefile_plugin.common
 
 COMMON		= common
@@ -17,7 +18,13 @@ VERILOG_MODULES = $(COMMON)/cells_sim.v 			\
 		  $(QLF_K6N10_DIR)/qlf_k6n10_dsp_map.v 		\
 		  $(QLF_K6N10_DIR)/qlf_k6n10_lut_map.v
 
+pre-build:=$(shell python3 pmgen/pmgen.py -o ql-dsp-pm.h -p ql_dsp pmgen/ql_dsp.pmg)
+
 install_modules: $(VERILOG_MODULES)
 	$(foreach f,$^,install -D $(f) $(DATA_DIR)/quicklogic/$(notdir $(f));)
 
 install: install_modules
+
+clean:
+	$(MAKE) -f ../Makefile_plugin.common $@
+	rm -f *pm.h

@@ -1,6 +1,5 @@
 yosys -import
-if { [info procs synth_quicklogic] == {} } { plugin -i ql-qlf }
-plugin -i ql-dsp
+if { [info procs synth_quicklogic] == {} } { plugin -i ql-qlf}
 yosys -import  ;# ingest plugin commands
 
 set TOP "mac_unit"
