@@ -23,7 +23,7 @@
 USING_YOSYS_NAMESPACE
 PRIVATE_NAMESPACE_BEGIN
 
-#include "ql-dsp-pm.h"
+#include "pmgen/ql-dsp-pm.h"
 
 void create_ql_dsp(ql_dsp_pm &pm)
 {
