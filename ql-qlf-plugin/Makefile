@@ -20,7 +20,7 @@ VERILOG_MODULES = $(COMMON)/cells_sim.v 			\
 
 retrieve-pmgen:=$(shell wget -nc -O pmgen/pmgen.py https://raw.githubusercontent.com/SymbiFlow/yosys/master%2Bwip/passes/pmgen/pmgen.py)
 
-pre-build:=$(shell python3 pmgen/pmgen.py -o ql-dsp-pm.h -p ql_dsp pmgen/ql_dsp.pmg)
+pre-build:=$(shell python3 pmgen/pmgen.py -o ql-dsp-pm.h -p ql_dsp pmgen/ql_dsp.pmg && clang-format-8 -style=file -i ql-dsp-pm.h)
 
 install_modules: $(VERILOG_MODULES)
 	$(foreach f,$^,install -D $(f) $(DATA_DIR)/quicklogic/$(notdir $(f));)
