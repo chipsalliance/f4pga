@@ -32,7 +32,7 @@ clean: $(PLUGINS_CLEAN)
 
 CLANG_FORMAT ?= clang-format-8
 format:
-	find . \( -name "*.h" -o -name "*.cc" \) -and -not -path './third_party/*' -and -not -path './ql-qlf-plugin/pmgen/*'. -print0 | xargs -0 -P $$(nproc) ${CLANG_FORMAT} -style=file -i
+	find . \( -name "*.h" -o -name "*.cc" \) -and -not -path './third_party/*' -print0 | xargs -0 -P $$(nproc) ${CLANG_FORMAT} -style=file -i
 
 VERIBLE_FORMAT ?= verible-verilog-format
 format-verilog:
