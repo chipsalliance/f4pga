@@ -3,3 +3,4 @@
 *.so
 *.swp
 *.log
+ql-qlf-plugin/pmgen/*

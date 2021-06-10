@@ -60,6 +60,10 @@ struct SynthQuickLogicPass : public ScriptPass {
         log("        write the design to the specified verilog file. writing of an output file\n");
         log("        is omitted if this parameter is not specified.\n");
         log("\n");
+        log("    -no_dsp\n");
+        log("        By default use DSP blocks in output netlist.\n");
+        log("        do not use DSP blocks to implement multipliers and associated logic\n");
+        log("\n");
         log("    -no_adder\n");
         log("        By default use adder cells in output netlist.\n");
         log("        Specifying this switch turns it off.\n");
@@ -78,6 +82,7 @@ struct SynthQuickLogicPass : public ScriptPass {
     }
 
     string top_opt, edif_file, blif_file, family, currmodule, verilog_file;
+    bool nodsp;
     bool inferAdder;
     bool inferBram;
     bool abcOpt;
@@ -95,6 +100,7 @@ struct SynthQuickLogicPass : public ScriptPass {
         inferBram = true;
         abcOpt = true;
         noffmap = false;
+        nodsp = false;
     }
 
     void execute(std::vector<std::string> args, RTLIL::Design *design) override
@@ -123,6 +129,10 @@ struct SynthQuickLogicPass : public ScriptPass {
             }
             if (args[argidx] == "-verilog" && argidx + 1 < args.size()) {
                 verilog_file = args[++argidx];
+                continue;
+            }
+            if (args[argidx] == "-no_dsp") {
+                nodsp = true;
                 continue;
             }
             if (args[argidx] == "-no_adder") {
@@ -185,7 +195,22 @@ struct SynthQuickLogicPass : public ScriptPass {
             run("peepopt");
             run("pmuxtree");
             run("opt_clean");
-
+            if (help_mode || (!nodsp && family == "qlf_k6n10")) {
+                run("memory_dff");
+                run("wreduce t:$mul");
+                run("techmap -map +/mul2dsp.v -map +/quicklogic/" + family +
+                      "_dsp_map.v -D DSP_A_MAXWIDTH=16 -D DSP_B_MAXWIDTH=16 "
+                      "-D DSP_A_MINWIDTH=2 -D DSP_B_MINWIDTH=2 -D DSP_Y_MINWIDTH=11 "
+                      "-D DSP_NAME=$__MUL16X16",
+                    "(if -no_dsp)");
+                run("select a:mul2dsp", "              (if -no_dsp)");
+                run("setattr -unset mul2dsp", "        (if -no_dsp)");
+                run("opt_expr -fine", "                (if -no_dsp)");
+                run("wreduce", "                       (if -no_dsp)");
+                run("select -clear", "                 (if -no_dsp)");
+                run("ql_dsp", "                        (if -no_dsp)");
+                run("chtype -set $mul t:$__soft_mul", "(if -no_dsp)");
+            }
             run("alumacc");
             run("opt");
             run("fsm");
@@ -229,7 +254,7 @@ struct SynthQuickLogicPass : public ScriptPass {
                     "$_DLATCHSR_PPP_ 0");
                 //    In case we add clock inversion in the future.
                 //    run("dfflegalize -cell $_DFF_?_ 0 -cell $_DFF_?P?_ 0 -cell $_DFFE_?P?P_ 0 -cell $_DFFSR_?PP_ 0 -cell $_DFFSRE_?PPP_ 0 -cell
-                //    $_DLATCH_PPP_ 0");
+                //    $_DLATCH_SRPPP_ 0");
             } else {
                 run("dfflegalize -cell $_DFF_P_ 0 -cell $_DFF_P??_ 0 -cell $_DFF_N_ 0 -cell $_DFF_N??_ 0 -cell $_DFFSR_???_ 0");
             }
