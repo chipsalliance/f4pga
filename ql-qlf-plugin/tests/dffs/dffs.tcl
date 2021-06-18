@@ -402,3 +402,109 @@ yosys cd my_dffsre_nnn
 stat
 select -assert-count 1 t:dffsre
 select -assert-count 3 t:\$lut
+
+design -reset
+
+# DFF on pp3 device
+read_verilog $::env(DESIGN_TOP).v
+design -save read
+
+# DFF
+hierarchy -top my_dff
+yosys proc
+equiv_opt -async2sync -assert -map +/quicklogic/pp3_cells_sim.v synth_quicklogic -family pp3 -top my_dff
+design -load postopt
+yosys cd my_dff
+stat
+select -assert-count 1 t:dffepc
+select -assert-count 1 t:ckpad
+select -assert-count 1 t:inpad
+select -assert-count 1 t:outpad
+select -assert-count 1 t:logic_0
+select -assert-count 1 t:logic_1
+
+# DFFE
+design -load read
+hierarchy -top my_dffe
+yosys proc
+equiv_opt -async2sync -assert -map +/quicklogic/pp3_cells_sim.v synth_quicklogic -family pp3 -top my_dffe
+design -load postopt
+yosys cd my_dffe
+stat
+select -assert-count 1 t:dffepc
+select -assert-count 1 t:ckpad
+select -assert-count 2 t:inpad
+select -assert-count 1 t:outpad
+select -assert-count 1 t:logic_0
+
+# ADFF a.k.a. DFFR_P
+design -load read
+hierarchy -top my_dffr_p
+yosys proc
+equiv_opt -async2sync -assert -map +/quicklogic/pp3_cells_sim.v synth_quicklogic -family pp3 -top my_dffr_p
+design -load postopt
+yosys cd my_dffr_p
+stat
+select -assert-count 1 t:dffepc
+select -assert-count 1 t:logic_0
+select -assert-count 1 t:logic_1
+select -assert-count 1 t:inpad
+select -assert-count 1 t:outpad
+select -assert-count 2 t:ckpad
+
+select -assert-none t:dffepc t:logic_0 t:logic_1 t:inpad t:outpad t:ckpad %% t:* %D
+
+# ADFFN a.k.a. DFFR_N
+design -load read
+hierarchy -top my_dffr_n
+yosys proc
+equiv_opt -async2sync -assert -map +/quicklogic/pp3_cells_sim.v synth_quicklogic -family pp3 -top my_dffr_n
+design -load postopt
+yosys cd my_dffr_n
+stat
+select -assert-count 1 t:LUT1
+select -assert-count 1 t:dffepc
+select -assert-count 1 t:logic_0
+select -assert-count 1 t:logic_1
+select -assert-count 2 t:inpad
+select -assert-count 1 t:outpad
+select -assert-count 1 t:ckpad
+
+select -assert-none t:LUT1 t:dffepc t:logic_0 t:logic_1 t:inpad t:outpad t:ckpad %% t:* %D
+
+# DFFS (posedge, sync set)
+design -load read
+hierarchy -top my_dffs_clk_p
+yosys proc
+equiv_opt -async2sync -assert -map +/quicklogic/pp3_cells_sim.v synth_quicklogic -family pp3 -top my_dffs_clk_p
+design -load postopt
+yosys cd my_dffs_clk_p
+stat
+select -assert-count 1 t:LUT2
+select -assert-count 1 t:dffepc
+select -assert-count 1 t:logic_0
+select -assert-count 1 t:logic_1
+select -assert-count 2 t:inpad
+select -assert-count 1 t:outpad
+select -assert-count 1 t:ckpad
+
+select -assert-none t:LUT2 t:dffepc t:logic_0 t:logic_1 t:inpad t:outpad t:ckpad %% t:* %D
+
+# DFFS (negedge, sync reset)
+design -load read
+hierarchy -top my_dffs_clk_n
+yosys proc
+equiv_opt -async2sync -assert -map +/quicklogic/pp3_cells_sim.v synth_quicklogic -family pp3 -top my_dffs_clk_n
+design -load postopt
+yosys cd my_dffs_clk_n
+stat
+select -assert-count 1 t:LUT1
+select -assert-count 1 t:LUT2
+select -assert-count 1 t:dffepc
+select -assert-count 1 t:logic_0
+select -assert-count 1 t:logic_1
+select -assert-count 3 t:inpad
+select -assert-count 1 t:outpad
+
+select -assert-none t:LUT1 t:LUT2 t:dffepc t:logic_0 t:logic_1 t:inpad t:outpad t:ckpad %% t:* %D
+

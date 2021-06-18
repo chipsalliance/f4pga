@@ -14,6 +14,15 @@ module my_dff (
   always @(posedge clk) q <= d;
 endmodule
 
+module my_dffe( input d, clk, en, output reg q );
+    initial begin
+        q = 0;
+    end
+	  always @( posedge clk )
+        if ( en )
+              q <= d;
+endmodule
+
 module my_dffr_p (
     input d,
     clk,
@@ -413,3 +422,18 @@ module my_dffsre_nnn (
     else if (!clr) q <= 1'b0;
     else if (en) q <= d;
 endmodule
+
+module my_dffs_clk_p( input d, clk, pre, output reg q );
+    initial q <= 0;
+    always @( posedge clk )
+      if ( pre ) q <= 1'b1;
+      else q <= d;
+endmodule
+
+module my_dffs_clk_n( input d, clk, clr, output reg q );
+    initial q <= 0;
+    always @( negedge clk )
+      if ( !clr ) q <= 1'b0;
+      else q <= d;
+endmodule
+
