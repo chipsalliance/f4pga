@@ -100,7 +100,7 @@ struct SynthQuickLogicPass : public ScriptPass {
         inferAdder = true;
         inferBram = true;
         abcOpt = true;
-        abc9 = true;        
+        abc9 = true;
         noffmap = false;
         nodsp = false;
     }
@@ -315,7 +315,15 @@ struct SynthQuickLogicPass : public ScriptPass {
                         run("abc9 -maxlut 4 -dff");
                         run("techmap -map +/quicklogic/" + family + "_abc9_unmap.v");
                     } else {
-                        run("abc -luts 1,2,2,4 -dress");
+                        std::string lutDefs = "+/quicklogic/" + family + "_lutdefs.txt";
+                        rewrite_filename(lutDefs);
+
+                        std::string abcArgs = "+read_lut," + lutDefs + ";"
+                            "strash;ifraig;scorr;dc2;dretime;strash;dch,-f;if;mfs2;" // Common Yosys ABC script
+                            "sweep;eliminate;if;mfs;lutpack;" // Optimization script
+                            "dress"; // "dress" to preserve names
+
+                        run("abc -script " + abcArgs);
                     }
                 }
             }
