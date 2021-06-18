@@ -1,0 +1,12 @@
+Name: LiteX is a Migen/MiSoC based Core/SoC builder that provides the infrastructure to easily create Cores/SoCs (with or without CPU).
+Short Name: litex
+URL: https://github.com/enjoy-digital/litex
+Version: 0
+Revision: 9b11e919
+License: BSD-2-Clause
+
+Description:
+This package is used as stimuli in some test cases that verify that the Yosys plugins produce expected results.
+
+Local Modifications:
+Adjustments for testing purposes to the generated netlist.

@@ -1,3 +1,11 @@
+# Copyright (C) 2020-2021  The SymbiFlow Authors.
+#
+# Use of this source code is governed by a ISC-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/ISC
+#
+# SPDX-License-Identifier:ISC
+
 # abc9 - test that abc9.D is correctly set after importing a clock.
 # counter, counter2, pll - test buffer and clock divider propagation
 # set_false_path - test the set_false_path command
