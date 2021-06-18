@@ -86,6 +86,7 @@ struct SynthQuickLogicPass : public ScriptPass {
     bool inferAdder;
     bool inferBram;
     bool abcOpt;
+    bool abc9;
     bool noffmap;
 
     void clear_flags() override
@@ -99,6 +100,7 @@ struct SynthQuickLogicPass : public ScriptPass {
         inferAdder = true;
         inferBram = true;
         abcOpt = true;
+        abc9 = true;        
         noffmap = false;
         nodsp = false;
     }
@@ -147,6 +149,10 @@ struct SynthQuickLogicPass : public ScriptPass {
                 abcOpt = false;
                 continue;
             }
+            if (args[argidx] == "-no_abc9") {
+                abc9 = false;
+                continue;
+            }
             if (args[argidx] == "-no_ff_map") {
                 noffmap = true;
                 continue;
@@ -158,6 +164,18 @@ struct SynthQuickLogicPass : public ScriptPass {
 
         if (!design->full_selection())
             log_cmd_error("This command only operates on fully selected designs!\n");
+
+		if (family != "pp3" && family != "qlf_k4n8" && family != "qlf_k6n10")
+			log_cmd_error("Invalid family specified: '%s'\n", family.c_str());
+
+        if (family != "pp3") {
+            abc9 = false;
+        }
+
+		if (abc9 && design->scratchpad_get_int("abc9.D", 0) == 0) {
+			log_warning("delay target has not been set via SDC or scratchpad; assuming 12 MHz clock.\n");
+			design->scratchpad_set_int("abc9.D", 41667); // 12MHz = 83.33.. ns; divided by two to allow for interconnect delay.
+		}
 
         log_header(design, "Executing SYNTH_QUICKLOGIC pass.\n");
         log_push();
@@ -180,21 +198,24 @@ struct SynthQuickLogicPass : public ScriptPass {
         if (check_label("prepare")) {
             run("proc");
             run("flatten");
+            if (family == "pp3") {
+                run("tribuf -logic");
+            }
+            run("deminout");
             run("opt_expr");
             run("opt_clean");
-            run("deminout");
-            run("opt");
         }
 
         if (check_label("coarse")) {
-            run("opt_expr");
-            run("opt_clean");
             run("check");
+            run("opt -nodffe -nosdff");
+            run("fsm");
             run("opt");
-            run("wreduce -keepdc");
+            run("wreduce");
             run("peepopt");
-            run("pmuxtree");
             run("opt_clean");
+            run("share");
+
             if (help_mode || (!nodsp && family == "qlf_k6n10")) {
                 run("memory_dff");
                 run("wreduce t:$mul");
@@ -211,10 +232,13 @@ struct SynthQuickLogicPass : public ScriptPass {
                 run("ql_dsp", "                        (if -no_dsp)");
                 run("chtype -set $mul t:$__soft_mul", "(if -no_dsp)");
             }
+
+			run("techmap -map +/cmp2lut.v -D LUT_WIDTH=4");
+			run("opt_expr");
+			run("opt_clean");
             run("alumacc");
+			run("pmuxtree");
             run("opt");
-            run("fsm");
-            run("opt -fast");
             run("memory -nomap");
             run("opt_clean");
         }
@@ -233,12 +257,15 @@ struct SynthQuickLogicPass : public ScriptPass {
         }
 
         if (check_label("map_gates")) {
-            if (inferAdder) {
+            if (inferAdder && (family == "qlf_k4n8" || family == "qlf_k6n10")) {
                 run("techmap -map +/techmap.v -map +/quicklogic/" + family + "_arith_map.v");
             } else {
                 run("techmap");
             }
             run("opt -fast");
+            if (family == "pp3") {
+			    run("muxcover -mux8 -mux4");
+            }
             run("opt_expr");
             run("opt_merge");
             run("opt_clean");
@@ -246,21 +273,28 @@ struct SynthQuickLogicPass : public ScriptPass {
         }
 
         if (check_label("map_ffs")) {
+			run("opt_expr");
             if (family == "qlf_k4n8") {
                 run("shregmap -minlen 8 -maxlen 8");
+                run("dfflegalize -cell $_DFF_P_ 0 -cell $_DFF_P??_ 0 -cell $_DFF_N_ 0 -cell $_DFF_N??_ 0 -cell $_DFFSR_???_ 0");
             }
-            if (family == "qlf_k6n10") {
+            else if (family == "qlf_k6n10") {
                 run("dfflegalize -cell $_DFF_P_ 0 -cell $_DFF_PP?_ 0 -cell $_DFFE_PP?P_ 0 -cell $_DFFSR_PPP_ 0 -cell $_DFFSRE_PPPP_ 0 -cell "
                     "$_DLATCHSR_PPP_ 0");
                 //    In case we add clock inversion in the future.
                 //    run("dfflegalize -cell $_DFF_?_ 0 -cell $_DFF_?P?_ 0 -cell $_DFFE_?P?P_ 0 -cell $_DFFSR_?PP_ 0 -cell $_DFFSRE_?PPP_ 0 -cell
                 //    $_DLATCH_SRPPP_ 0");
-            } else {
-                run("dfflegalize -cell $_DFF_P_ 0 -cell $_DFF_P??_ 0 -cell $_DFF_N_ 0 -cell $_DFF_N??_ 0 -cell $_DFFSR_???_ 0");
+            }
+            else if (family == "pp3") {
+			    run("dfflegalize -cell $_DFFSRE_PPPP_ 0 -cell $_DLATCH_?_ x");
+			    run("techmap -map +/quicklogic/" + family + "_cells_map.v");
             }
             std::string techMapArgs = " -map +/techmap.v -map +/quicklogic/" + family + "_ffs_map.v";
             if (!noffmap) {
                 run("techmap " + techMapArgs);
+            }
+            if (family == "pp3") {
+    			run("opt_expr -mux_undef");
             }
             run("opt_merge");
             run("opt_clean");
@@ -271,15 +305,25 @@ struct SynthQuickLogicPass : public ScriptPass {
             if (abcOpt) {
                 if (family == "qlf_k6n10") {
                     run("abc -lut 6 ");
-                } else {
+                } else if (family == "qlf_k4n8") {
                     run("abc -lut 4 ");
+                } else if (family == "pp3") {
+                    run("techmap -map +/quicklogic/" + family + "_latches_map.v");
+                    if (abc9) {
+                        run("read_verilog -lib -specify -icells +/quicklogic/" + family + "_abc9_model.v");
+                        run("techmap -map +/quicklogic/" + family + "_abc9_map.v");
+                        run("abc9 -maxlut 4 -dff");
+                        run("techmap -map +/quicklogic/" + family + "_abc9_unmap.v");
+                    } else {
+                        run("abc -luts 1,2,2,4 -dress");
+                    }
                 }
             }
             run("clean");
             run("opt_lut");
         }
 
-        if (check_label("map_cells") && family == "qlf_k6n10") {
+        if (check_label("map_cells") && (family == "qlf_k6n10" || family == "pp3")) {
             std::string techMapArgs;
             techMapArgs = "-map +/quicklogic/" + family + "_lut_map.v";
             run("techmap " + techMapArgs);
@@ -293,12 +337,21 @@ struct SynthQuickLogicPass : public ScriptPass {
             run("check -noinit");
         }
 
+		if (check_label("iomap") && family == "pp3") {
+			run("clkbufmap -inpad ckpad Q:P");
+			run("iopadmap -bits -outpad outpad A:P -inpad inpad Q:P -tinoutpad bipad EN:Q:A:P A:top");
+		}
+
         if (check_label("finalize")) {
-            run("check");
-            run("opt_clean -purge");
-            if (check_label("edif") && (!edif_file.empty())) {
-                run("hilomap -hicell logic_1 a -locell logic_0 a -singleton A:top");
+            if (family == "pp3") {
+			    run("setundef -zero -params -undriven");
             }
+            if (family == "pp3" || (check_label("edif") && (!edif_file.empty()))) {
+                run("hilomap -hicell logic_1 A -locell logic_0 A -singleton A:top");
+            }
+            run("opt_clean -purge");
+            run("check");
+			run("blackbox =A:whitebox");
         }
 
         if (check_label("edif") && (!edif_file.empty())) {
