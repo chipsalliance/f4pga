@@ -8,7 +8,8 @@
 
 NAME = ql-qlf
 SOURCES = synth_quicklogic.cc \
-	  ql-dsp.cc
+   	      ql-dsp.cc \
+		  pp3_braminit.cc
 include ../Makefile_plugin.common
 
 COMMON		= common
@@ -33,9 +34,14 @@ VERILOG_MODULES = $(COMMON)/cells_sim.v 			\
 		  $(PP3_DIR)/pp3_cells_sim.v   \
 		  $(PP3_DIR)/pp3_ffs_map.v     \
 		  $(PP3_DIR)/pp3_latches_map.v \
-		  $(PP3_DIR)/pp3_lut_map.v
+		  $(PP3_DIR)/pp3_lut_map.v     \
+		  $(PP3_DIR)/pp3_lutdefs.txt   \
+		  $(PP3_DIR)/pp3_brams_map.v   \
+		  $(PP3_DIR)/pp3_brams.txt     \
+		  $(PP3_DIR)/pp3_bram_init_8_16.vh  \
+		  $(PP3_DIR)/pp3_bram_init_32.vh
 
-retrieve-pmgen:=$(shell mkdir pmgen && wget -nc -O pmgen/pmgen.py https://raw.githubusercontent.com/SymbiFlow/yosys/master%2Bwip/passes/pmgen/pmgen.py)
+retrieve-pmgen:=$(shell mkdir -p pmgen && wget -nc -O pmgen/pmgen.py https://raw.githubusercontent.com/SymbiFlow/yosys/master%2Bwip/passes/pmgen/pmgen.py)
 
 pre-build:=$(shell python3 pmgen/pmgen.py -o pmgen/ql-dsp-pm.h -p ql_dsp ql_dsp.pmg)
 

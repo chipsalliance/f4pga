@@ -243,8 +243,11 @@ struct SynthQuickLogicPass : public ScriptPass {
             run("opt_clean");
         }
 
-        if (check_label("map_bram", "(skip if -no_bram)") && family == "qlf_k6n10" && inferBram) {
+        if (check_label("map_bram", "(skip if -no_bram)") && (family == "qlf_k6n10" || family == "pp3") && inferBram) {
             run("memory_bram -rules +/quicklogic/" + family + "_brams.txt");
+            if (family == "pp3") {
+                run("pp3_braminit");
+            }
             run("techmap -map +/quicklogic/" + family + "_brams_map.v");
         }
 
