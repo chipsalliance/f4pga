@@ -14,6 +14,7 @@ include ../Makefile_plugin.common
 COMMON		= common
 QLF_K4N8_DIR 	= ql-qlf-k4n8
 QLF_K6N10_DIR 	= ql-qlf-k6n10
+PP3_DIR			= pp3
 VERILOG_MODULES = $(COMMON)/cells_sim.v 			\
 		  $(QLF_K4N8_DIR)/qlf_k4n8_arith_map.v 		\
 		  $(QLF_K4N8_DIR)/qlf_k4n8_cells_sim.v 		\
@@ -24,7 +25,15 @@ VERILOG_MODULES = $(COMMON)/cells_sim.v 			\
 		  $(QLF_K6N10_DIR)/qlf_k6n10_cells_sim.v 	\
 		  $(QLF_K6N10_DIR)/qlf_k6n10_ffs_map.v 		\
 		  $(QLF_K6N10_DIR)/qlf_k6n10_dsp_map.v 		\
-		  $(QLF_K6N10_DIR)/qlf_k6n10_lut_map.v
+		  $(QLF_K6N10_DIR)/qlf_k6n10_lut_map.v		\
+		  $(PP3_DIR)/pp3_abc9_map.v    \
+		  $(PP3_DIR)/pp3_abc9_model.v  \
+		  $(PP3_DIR)/pp3_abc9_unmap.v  \
+		  $(PP3_DIR)/pp3_cells_map.v   \
+		  $(PP3_DIR)/pp3_cells_sim.v   \
+		  $(PP3_DIR)/pp3_ffs_map.v     \
+		  $(PP3_DIR)/pp3_latches_map.v \
+		  $(PP3_DIR)/pp3_lut_map.v
 
 retrieve-pmgen:=$(shell mkdir pmgen && wget -nc -O pmgen/pmgen.py https://raw.githubusercontent.com/SymbiFlow/yosys/master%2Bwip/passes/pmgen/pmgen.py)
 
