@@ -120,10 +120,17 @@ static void run_pp3_braminit(Module *module)
 			}
 		}
 
+        // TODO: Support RAM initialization for other widths than 8, 16 and 32
+        if (ramDataWidth != 8 && ramDataWidth != 16 && ramDataWidth != 32) {
+            log("WARNING: The RAM cell '%s' has data width of %d. Initialization of this width from a file is not supported yet!\n",
+                RTLIL::id2cstr(cell->name), ramDataWidth
+            );
+            continue;
+        }
+
 		/* Set attributes */
 		std::string val = "";
 		for (int i=ramDataDepth-1; i>=0; i--) {
-			//std::string val = "";
 			if (ramDataWidth == 8)
 	                     val += std::bitset<8>(mem[i]).to_string();
 			else if (ramDataWidth == 16)
@@ -131,7 +138,7 @@ static void run_pp3_braminit(Module *module)
 			else if (ramDataWidth == 32)
 	                     val += std::bitset<32>(mem[i]).to_string();
 		}
-		cell->setParam("\\INIT", RTLIL::Const::from_string(val));
+		cell->setParam(RTLIL::escape_id("INIT"), RTLIL::Const::from_string(val));
 	}
 }
 

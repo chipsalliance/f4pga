@@ -463,8 +463,8 @@ generate
 endgenerate
 
 	ram8k_2x1_cell_macro # (
-                       `include "pp3_bram_init_8_16.vh"
-                         )
+        .INIT(INIT)
+    )
     	_TECHMAP_REPLACE_ (
                        .A1_0(addr_wr0) , 
                        .A1_1(addr_wr1), 
@@ -666,8 +666,8 @@ generate
 	if (data_width_int <=16)  begin
 
     	    ram8k_2x1_cell_macro # (
-                        `include "pp3_bram_init_32.vh"
-                            )
+                .INIT(INIT)
+            )
 			_TECHMAP_REPLACE_ (
                         .A1_0(addr_wr0) , 
                         .A1_1(addr_wr1), 
@@ -741,9 +741,9 @@ generate
   	end
 	else if (data_width_int > 16)  begin
 
-    	     ram8k_2x1_cell_macro # (
-                        `include "pp3_bram_init_32.vh"
-                           )
+            ram8k_2x1_cell_macro # (
+                .INIT(INIT)
+            )
 			_TECHMAP_REPLACE_ (
                         .A1_0(addr_wr0) , 
                         .A1_1(addr_wr1), 

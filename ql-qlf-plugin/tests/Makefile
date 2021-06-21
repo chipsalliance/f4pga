@@ -19,7 +19,8 @@ TESTS = consts \
 	logic \
 	mux \
 	tribuf \
-	fsm #\
+	fsm \
+	pp3_bram #\
 #	qlf_k6n10_bram \
 
 include $(shell pwd)/../../Makefile_test.common
@@ -36,4 +37,5 @@ logic_verify = true
 mux_verify = true
 tribuf_verify = true
 fsm_verify = true
+pp3_bram_verify = true
 #qlf_k6n10_bram_verify = true
