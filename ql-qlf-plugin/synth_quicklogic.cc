@@ -296,11 +296,13 @@ struct SynthQuickLogicPass : public ScriptPass {
         if (check_label("finalize")) {
             run("check");
             run("opt_clean -purge");
+            if (check_label("edif") && (!edif_file.empty())) {
+                run("hilomap -hicell logic_1 a -locell logic_0 a -singleton A:top");
+            }
         }
 
-        if (check_label("edif")) {
-            if (!edif_file.empty())
-                run(stringf("write_edif -nogndvcc -attrprop -pvector par %s %s", this->currmodule.c_str(), edif_file.c_str()));
+        if (check_label("edif") && (!edif_file.empty())) {
+            run(stringf("write_edif -nogndvcc -attrprop -pvector par %s %s", this->currmodule.c_str(), edif_file.c_str()));
         }
 
         if (check_label("blif")) {
