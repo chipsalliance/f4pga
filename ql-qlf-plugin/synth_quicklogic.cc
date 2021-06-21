@@ -165,17 +165,17 @@ struct SynthQuickLogicPass : public ScriptPass {
         if (!design->full_selection())
             log_cmd_error("This command only operates on fully selected designs!\n");
 
-		if (family != "pp3" && family != "qlf_k4n8" && family != "qlf_k6n10")
-			log_cmd_error("Invalid family specified: '%s'\n", family.c_str());
+        if (family != "pp3" && family != "qlf_k4n8" && family != "qlf_k6n10")
+            log_cmd_error("Invalid family specified: '%s'\n", family.c_str());
 
         if (family != "pp3") {
             abc9 = false;
         }
 
-		if (abc9 && design->scratchpad_get_int("abc9.D", 0) == 0) {
-			log_warning("delay target has not been set via SDC or scratchpad; assuming 12 MHz clock.\n");
-			design->scratchpad_set_int("abc9.D", 41667); // 12MHz = 83.33.. ns; divided by two to allow for interconnect delay.
-		}
+        if (abc9 && design->scratchpad_get_int("abc9.D", 0) == 0) {
+            log_warning("delay target has not been set via SDC or scratchpad; assuming 12 MHz clock.\n");
+            design->scratchpad_set_int("abc9.D", 41667); // 12MHz = 83.33.. ns; divided by two to allow for interconnect delay.
+        }
 
         log_header(design, "Executing SYNTH_QUICKLOGIC pass.\n");
         log_push();
@@ -233,11 +233,11 @@ struct SynthQuickLogicPass : public ScriptPass {
                 run("chtype -set $mul t:$__soft_mul", "(if -no_dsp)");
             }
 
-			run("techmap -map +/cmp2lut.v -D LUT_WIDTH=4");
-			run("opt_expr");
-			run("opt_clean");
+            run("techmap -map +/cmp2lut.v -D LUT_WIDTH=4");
+            run("opt_expr");
+            run("opt_clean");
             run("alumacc");
-			run("pmuxtree");
+            run("pmuxtree");
             run("opt");
             run("memory -nomap");
             run("opt_clean");
@@ -267,7 +267,7 @@ struct SynthQuickLogicPass : public ScriptPass {
             }
             run("opt -fast");
             if (family == "pp3") {
-			    run("muxcover -mux8 -mux4");
+                run("muxcover -mux8 -mux4");
             }
             run("opt_expr");
             run("opt_merge");
@@ -276,28 +276,26 @@ struct SynthQuickLogicPass : public ScriptPass {
         }
 
         if (check_label("map_ffs")) {
-			run("opt_expr");
+            run("opt_expr");
             if (family == "qlf_k4n8") {
                 run("shregmap -minlen 8 -maxlen 8");
                 run("dfflegalize -cell $_DFF_P_ 0 -cell $_DFF_P??_ 0 -cell $_DFF_N_ 0 -cell $_DFF_N??_ 0 -cell $_DFFSR_???_ 0");
-            }
-            else if (family == "qlf_k6n10") {
+            } else if (family == "qlf_k6n10") {
                 run("dfflegalize -cell $_DFF_P_ 0 -cell $_DFF_PP?_ 0 -cell $_DFFE_PP?P_ 0 -cell $_DFFSR_PPP_ 0 -cell $_DFFSRE_PPPP_ 0 -cell "
                     "$_DLATCHSR_PPP_ 0");
                 //    In case we add clock inversion in the future.
                 //    run("dfflegalize -cell $_DFF_?_ 0 -cell $_DFF_?P?_ 0 -cell $_DFFE_?P?P_ 0 -cell $_DFFSR_?PP_ 0 -cell $_DFFSRE_?PPP_ 0 -cell
                 //    $_DLATCH_SRPPP_ 0");
-            }
-            else if (family == "pp3") {
-			    run("dfflegalize -cell $_DFFSRE_PPPP_ 0 -cell $_DLATCH_?_ x");
-			    run("techmap -map +/quicklogic/" + family + "_cells_map.v");
+            } else if (family == "pp3") {
+                run("dfflegalize -cell $_DFFSRE_PPPP_ 0 -cell $_DLATCH_?_ x");
+                run("techmap -map +/quicklogic/" + family + "_cells_map.v");
             }
             std::string techMapArgs = " -map +/techmap.v -map +/quicklogic/" + family + "_ffs_map.v";
             if (!noffmap) {
                 run("techmap " + techMapArgs);
             }
             if (family == "pp3") {
-    			run("opt_expr -mux_undef");
+                run("opt_expr -mux_undef");
             }
             run("opt_merge");
             run("opt_clean");
@@ -321,10 +319,11 @@ struct SynthQuickLogicPass : public ScriptPass {
                         std::string lutDefs = "+/quicklogic/" + family + "_lutdefs.txt";
                         rewrite_filename(lutDefs);
 
-                        std::string abcArgs = "+read_lut," + lutDefs + ";"
-                            "strash;ifraig;scorr;dc2;dretime;strash;dch,-f;if;mfs2;" // Common Yosys ABC script
-                            "sweep;eliminate;if;mfs;lutpack;" // Optimization script
-                            "dress"; // "dress" to preserve names
+                        std::string abcArgs = "+read_lut," + lutDefs +
+                                              ";"
+                                              "strash;ifraig;scorr;dc2;dretime;strash;dch,-f;if;mfs2;" // Common Yosys ABC script
+                                              "sweep;eliminate;if;mfs;lutpack;"                        // Optimization script
+                                              "dress";                                                 // "dress" to preserve names
 
                         run("abc -script " + abcArgs);
                     }
@@ -348,21 +347,21 @@ struct SynthQuickLogicPass : public ScriptPass {
             run("check -noinit");
         }
 
-		if (check_label("iomap") && family == "pp3") {
-			run("clkbufmap -inpad ckpad Q:P");
-			run("iopadmap -bits -outpad outpad A:P -inpad inpad Q:P -tinoutpad bipad EN:Q:A:P A:top");
-		}
+        if (check_label("iomap") && family == "pp3") {
+            run("clkbufmap -inpad ckpad Q:P");
+            run("iopadmap -bits -outpad outpad A:P -inpad inpad Q:P -tinoutpad bipad EN:Q:A:P A:top");
+        }
 
         if (check_label("finalize")) {
             if (family == "pp3") {
-			    run("setundef -zero -params -undriven");
+                run("setundef -zero -params -undriven");
             }
             if (family == "pp3" || (check_label("edif") && (!edif_file.empty()))) {
                 run("hilomap -hicell logic_1 A -locell logic_0 A -singleton A:top");
             }
             run("opt_clean -purge");
             run("check");
-			run("blackbox =A:whitebox");
+            run("blackbox =A:whitebox");
         }
 
         if (check_label("edif") && (!edif_file.empty())) {
