@@ -1,3 +1,11 @@
+// Copyright (C) 2020-2021  The SymbiFlow Authors.
+//
+// Use of this source code is governed by a ISC-style
+// license that can be found in the LICENSE file or at
+// https://opensource.org/licenses/ISC
+//
+// SPDX-License-Identifier:ISC
+
 // This file exists to map purely-synchronous flops to ABC9 flops, while 
 // mapping flops with asynchronous-set/clear as boxes, this is because ABC9 
 // doesn't support asynchronous-set/clear flops in sequential synthesis.

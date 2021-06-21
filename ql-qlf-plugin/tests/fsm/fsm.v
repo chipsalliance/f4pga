@@ -1,4 +1,12 @@
- module fsm ( clock, reset, req_0, req_1, gnt_0, gnt_1 );
+// Copyright (C) 2020-2021  The SymbiFlow Authors.
+//
+// Use of this source code is governed by a ISC-style
+// license that can be found in the LICENSE file or at
+// https://opensource.org/licenses/ISC
+//
+// SPDX-License-Identifier:ISC
+
+module fsm ( clock, reset, req_0, req_1, gnt_0, gnt_1 );
     input   clock,reset,req_0,req_1;
     output  gnt_0,gnt_1;
     wire    clock,reset,req_0,req_1;

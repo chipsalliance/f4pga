@@ -1,3 +1,11 @@
+// Copyright (C) 2020-2021  The SymbiFlow Authors.
+//
+// Use of this source code is governed by a ISC-style
+// license that can be found in the LICENSE file or at
+// https://opensource.org/licenses/ISC
+//
+// SPDX-License-Identifier:ISC
+
 module \$__QUICKLOGIC_RAMB16K (CLK2, CLK3, A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN);
 	parameter CFG_ABITS = 9;
 	parameter CFG_DBITS = 36;
