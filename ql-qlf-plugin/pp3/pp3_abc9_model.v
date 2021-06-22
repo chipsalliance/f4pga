@@ -6,15 +6,14 @@
 //
 // SPDX-License-Identifier:ISC
 
-module mac_unit (
-    a,
-    b,
-    out
+(* abc9_flop, lib_whitebox *)
+module $__PP3_DFFEPC_SYNCONLY (
+  output Q,
+  input D,
+  input CLK,
+  input EN,
 );
-  parameter DATA_WIDTH = 16;
-  input [DATA_WIDTH - 1 : 0] a, b;
-  output [2*DATA_WIDTH - 1 : 0] out;
 
-  assign out = a * b + out;
+  dffepc ff (.Q(Q), .D(D), .CLK(CLK), .EN(EN), .PRE(1'b0), .CLR(1'b0));
+
 endmodule
-

@@ -6,15 +6,15 @@
 //
 // SPDX-License-Identifier:ISC
 
-module mac_unit (
-    a,
-    b,
-    out
+module tristate (
+    en,
+    i,
+    o
 );
-  parameter DATA_WIDTH = 16;
-  input [DATA_WIDTH - 1 : 0] a, b;
-  output [2*DATA_WIDTH - 1 : 0] out;
+  input en;
+  input i;
+  output reg o;
 
-  assign out = a * b + out;
+  always @(en or i) o <= (en) ? i : 1'bZ;
 endmodule
 
