@@ -14,13 +14,16 @@ module my_dff (
   always @(posedge clk) q <= d;
 endmodule
 
-module my_dffe( input d, clk, en, output reg q );
-    initial begin
-        q = 0;
-    end
-	  always @( posedge clk )
-        if ( en )
-              q <= d;
+module my_dffe (
+    input d,
+    clk,
+    en,
+    output reg q
+);
+  initial begin
+    q = 0;
+  end
+  always @(posedge clk) if (en) q <= d;
 endmodule
 
 module my_dffr_p (
@@ -43,12 +46,12 @@ module my_dffr_p_2 (
     output reg q2
 );
   always @(posedge clk or posedge clr)
-    if (clr) begin 
-     q1 <= 1'b0;
-     q2 <= 1'b0;
+    if (clr) begin
+      q1 <= 1'b0;
+      q2 <= 1'b0;
     end else begin
-     q1 <= d1;
-     q2 <= d2;
+      q1 <= d1;
+      q2 <= d2;
     end
 endmodule
 
@@ -118,7 +121,7 @@ module my_dffse_p (
 );
   always @(posedge clk or posedge pre)
     if (pre) q <= 1'b1;
-    else if(en) q <= d;
+    else if (en) q <= d;
 endmodule
 
 module my_dffse_n (
@@ -130,7 +133,7 @@ module my_dffse_n (
 );
   always @(posedge clk or negedge pre)
     if (!pre) q <= 1'b1;
-    else if(en) q <= d;
+    else if (en) q <= d;
 endmodule
 
 module my_dffn (
@@ -423,17 +426,27 @@ module my_dffsre_nnn (
     else if (en) q <= d;
 endmodule
 
-module my_dffs_clk_p( input d, clk, pre, output reg q );
-    initial q <= 0;
-    always @( posedge clk )
-      if ( pre ) q <= 1'b1;
-      else q <= d;
+module my_dffs_clk_p (
+    input d,
+    clk,
+    pre,
+    output reg q
+);
+  initial q <= 0;
+  always @(posedge clk)
+    if (pre) q <= 1'b1;
+    else q <= d;
 endmodule
 
-module my_dffs_clk_n( input d, clk, clr, output reg q );
-    initial q <= 0;
-    always @( negedge clk )
-      if ( !clr ) q <= 1'b0;
-      else q <= d;
+module my_dffs_clk_n (
+    input d,
+    clk,
+    clr,
+    output reg q
+);
+  initial q <= 0;
+  always @(negedge clk)
+    if (!clr) q <= 1'b0;
+    else q <= d;
 endmodule
 

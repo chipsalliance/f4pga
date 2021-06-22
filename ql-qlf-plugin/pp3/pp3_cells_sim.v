@@ -7,34 +7,34 @@
 // SPDX-License-Identifier:ISC
 
 module inv (
-  output Q,
-  input A
+    output Q,
+    input  A
 );
   assign Q = A ? 0 : 1;
 endmodule
 
 module buff (
-  output Q,
-  input A
+    output Q,
+    input  A
 );
   assign Q = A;
 endmodule
 
 module logic_0 (
-  output A
+    output A
 );
   assign A = 0;
 endmodule
 
 module logic_1 (
-  output A
+    output A
 );
   assign A = 1;
 endmodule
 
 module gclkbuff (
-  input A,
-  output Z
+    input  A,
+    output Z
 );
   specify
     (A => Z) = 0;
@@ -44,9 +44,9 @@ module gclkbuff (
 endmodule
 
 module inpad (
-  output Q,
-  (* iopad_external_pin *)
-  input P
+    output Q,
+    (* iopad_external_pin *)
+    input  P
 );
   specify
     (P => Q) = 0;
@@ -55,9 +55,9 @@ module inpad (
 endmodule
 
 module outpad (
-  (* iopad_external_pin *)
-  output P,
-  input A
+    (* iopad_external_pin *)
+    output P,
+    input  A
 );
   specify
     (A => P) = 0;
@@ -66,9 +66,9 @@ module outpad (
 endmodule
 
 module ckpad (
-  output Q,
-  (* iopad_external_pin *)
-  input P
+    output Q,
+    (* iopad_external_pin *)
+    input  P
 );
   specify
     (P => Q) = 0;
@@ -77,21 +77,21 @@ module ckpad (
 endmodule
 
 module bipad (
-  input A,
-  input EN,
-  output Q,
-  (* iopad_external_pin *)
-  inout P
+    input  A,
+    input  EN,
+    output Q,
+    (* iopad_external_pin *)
+    inout  P
 );
   assign Q = P;
   assign P = EN ? A : 1'bz;
 endmodule
 
 module dff (
-  output reg Q,
-  input D,
-  (* clkbuf_sink *)
-  input CLK
+    output reg Q,
+    input D,
+    (* clkbuf_sink *)
+    input CLK
 );
   parameter [0:0] INIT = 1'b0;
   initial Q = INIT;
@@ -99,12 +99,12 @@ module dff (
 endmodule
 
 module dffc (
-  output reg Q,
-  input D,
-  (* clkbuf_sink *)
-  input CLK,
-  (* clkbuf_sink *)
-  input CLR
+    output reg Q,
+    input D,
+    (* clkbuf_sink *)
+    input CLK,
+    (* clkbuf_sink *)
+    input CLR
 );
   parameter [0:0] INIT = 1'b0;
   initial Q = INIT;
@@ -115,12 +115,12 @@ module dffc (
 endmodule
 
 module dffp (
-  output reg Q,
-  input D,
-  (* clkbuf_sink *)
-  input CLK,
-  (* clkbuf_sink *)
-  input PRE
+    output reg Q,
+    input D,
+    (* clkbuf_sink *)
+    input CLK,
+    (* clkbuf_sink *)
+    input PRE
 );
   parameter [0:0] INIT = 1'b0;
   initial Q = INIT;
@@ -131,14 +131,14 @@ module dffp (
 endmodule
 
 module dffpc (
-  output reg Q,
-  input D,
-  (* clkbuf_sink *)
-  input CLK,
-  (* clkbuf_sink *)
-  input CLR,
-  (* clkbuf_sink *)
-  input PRE
+    output reg Q,
+    input D,
+    (* clkbuf_sink *)
+    input CLK,
+    (* clkbuf_sink *)
+    input CLR,
+    (* clkbuf_sink *)
+    input PRE
 );
   parameter [0:0] INIT = 1'b0;
   initial Q = INIT;
@@ -150,11 +150,11 @@ module dffpc (
 endmodule
 
 module dffe (
-  output reg Q,
-  input D,
-  (* clkbuf_sink *)
-  input CLK,
-  input EN
+    output reg Q,
+    input D,
+    (* clkbuf_sink *)
+    input CLK,
+    input EN
 );
   parameter [0:0] INIT = 1'b0;
   initial Q = INIT;
@@ -162,13 +162,13 @@ module dffe (
 endmodule
 
 module dffec (
-  output reg Q,
-  input D,
-  (* clkbuf_sink *)
-  input CLK,
-  input EN,
-  (* clkbuf_sink *)
-  input CLR
+    output reg Q,
+    input D,
+    (* clkbuf_sink *)
+    input CLK,
+    input EN,
+    (* clkbuf_sink *)
+    input CLR
 );
   parameter [0:0] INIT = 1'b0;
   initial Q = INIT;
@@ -180,24 +180,24 @@ endmodule
 
 (* lib_whitebox *)
 module dffepc (
-  output reg Q,
-  input D,
-  (* clkbuf_sink *)
-  input CLK,
-  input EN,
-  (* clkbuf_sink *)
-  input CLR,
-  (* clkbuf_sink *)
-  input PRE
+    output reg Q,
+    input D,
+    (* clkbuf_sink *)
+    input CLK,
+    input EN,
+    (* clkbuf_sink *)
+    input CLR,
+    (* clkbuf_sink *)
+    input PRE
 );
   parameter [0:0] INIT = 1'b0;
 
   specify
-    if (EN) (posedge CLK => (Q : D)) = 1701; // QCK -> QZ
-    if (CLR) (CLR => Q) = 967; // QRT -> QZ
-    if (PRE) (PRE => Q) = 1252; // QST -> QZ
-    $setup(D, posedge CLK, 216); // QCK -> QDS
-    $setup(EN, posedge CLK, 590); // QCK -> QEN
+    if (EN) (posedge CLK => (Q : D)) = 1701;  // QCK -> QZ
+    if (CLR) (CLR => Q) = 967;  // QRT -> QZ
+    if (PRE) (PRE => Q) = 1252;  // QST -> QZ
+    $setup(D, posedge CLK, 216);  // QCK -> QDS
+    $setup(EN, posedge CLK, 590);  // QCK -> QEN
   endspecify
 
   initial Q = INIT;
@@ -210,12 +210,13 @@ endmodule
 //                  FZ       FS F2 (F1 TO 0)
 (* abc9_box, lib_whitebox *)
 module AND2I0 (
-  output Q,
-  input A, B
+    output Q,
+    input  A,
+    B
 );
   specify
-    (A => Q) = 698; // FS -> FZ
-    (B => Q) = 639; // F2 -> FZ
+    (A => Q) = 698;  // FS -> FZ
+    (B => Q) = 639;  // F2 -> FZ
   endspecify
 
   assign Q = A ? B : 0;
@@ -223,13 +224,15 @@ endmodule
 
 (* abc9_box, lib_whitebox *)
 module mux2x0 (
-  output Q,
-  input S, A, B
+    output Q,
+    input  S,
+    A,
+    B
 );
   specify
-    (S => Q) = 698; // FS -> FZ
-    (A => Q) = 639; // F1 -> FZ
-    (B => Q) = 639; // F2 -> FZ
+    (S => Q) = 698;  // FS -> FZ
+    (A => Q) = 639;  // F1 -> FZ
+    (B => Q) = 639;  // F2 -> FZ
   endspecify
 
   assign Q = S ? B : A;
@@ -237,13 +240,15 @@ endmodule
 
 (* abc9_box, lib_whitebox *)
 module mux2x1 (
-  output Q,
-  input S, A, B
+    output Q,
+    input  S,
+    A,
+    B
 );
   specify
-    (S => Q) = 698; // FS -> FZ
-    (A => Q) = 639; // F1 -> FZ
-    (B => Q) = 639; // F2 -> FZ
+    (S => Q) = 698;  // FS -> FZ
+    (A => Q) = 639;  // F1 -> FZ
+    (B => Q) = 639;  // F2 -> FZ
   endspecify
 
   assign Q = S ? B : A;
@@ -251,12 +256,17 @@ endmodule
 
 (* abc9_box, lib_whitebox *)
 module mux4x0 (
-  output Q,
-  input S0, S1, A, B, C, D
+    output Q,
+    input  S0,
+    S1,
+    A,
+    B,
+    C,
+    D
 );
   specify
-    (S0 => Q) = 1251; // TAB -> TZ
-    (S1 => Q) = 1406; // TSL -> TZ
+    (S0 => Q) = 1251;  // TAB -> TZ
+    (S1 => Q) = 1406;  // TSL -> TZ
     (A => Q) = 1699;  // TA1 -> TZ
     (B => Q) = 1687;  // TA2 -> TZ
     (C => Q) = 1669;  // TB1 -> TZ
@@ -280,21 +290,31 @@ endmodule
 // Q CZ
 (* abc9_box, lib_whitebox *)
 module mux8x0 (
-  output Q,
-  input S0, S1, S2, A, B, C, D, E, F, G, H
+    output Q,
+    input  S0,
+    S1,
+    S2,
+    A,
+    B,
+    C,
+    D,
+    E,
+    F,
+    G,
+    H
 );
   specify
-    (S0 => Q) = 1593; // ('TSL', 'BSL') -> CZ
-    (S1 => Q) = 1437; // ('TAB', 'BAB') -> CZ
-    (S2 => Q) = 995; // TBS -> CZ
-    (A => Q) = 1887; // TA1 -> CZ
-    (B => Q) = 1873; // TA2 -> CZ
-    (C => Q) = 1856; // TB1 -> CZ
-    (D => Q) = 1860; // TB2 -> CZ
-    (E => Q) = 1714; // BA1 -> CZ
-    (F => Q) = 1773; // BA2 -> CZ
-    (G => Q) = 1749; // BB1 -> CZ
-    (H => Q) = 1723; // BB2 -> CZ
+    (S0 => Q) = 1593;  // ('TSL', 'BSL') -> CZ
+    (S1 => Q) = 1437;  // ('TAB', 'BAB') -> CZ
+    (S2 => Q) = 995;  // TBS -> CZ
+    (A => Q) = 1887;  // TA1 -> CZ
+    (B => Q) = 1873;  // TA2 -> CZ
+    (C => Q) = 1856;  // TB1 -> CZ
+    (D => Q) = 1860;  // TB2 -> CZ
+    (E => Q) = 1714;  // BA1 -> CZ
+    (F => Q) = 1773;  // BA2 -> CZ
+    (G => Q) = 1749;  // BB1 -> CZ
+    (H => Q) = 1723;  // BB2 -> CZ
   endspecify
 
   assign Q = S2 ? (S1 ? (S0 ? H : G) : (S0 ? F : E)) : (S1 ? (S0 ? D : C) : (S0 ? B : A));
@@ -302,15 +322,15 @@ endmodule
 
 (* abc9_lut=1, lib_whitebox *)
 module LUT1 (
-  output O,
-  input I0
+    output O,
+    input  I0
 );
   parameter [1:0] INIT = 0;
   parameter EQN = "(I0)";
 
   // These timings are for PolarPro 3E; other families will need updating.
   specify
-    (I0 => O) = 698; // FS -> FZ
+    (I0 => O) = 698;  // FS -> FZ
   endspecify
 
   assign O = I0 ? INIT[1] : INIT[0];
@@ -319,16 +339,17 @@ endmodule
 //               TZ        TSL TAB
 (* abc9_lut=2, lib_whitebox *)
 module LUT2 (
-  output O,
-  input I0, I1
+    output O,
+    input  I0,
+    I1
 );
   parameter [3:0] INIT = 4'h0;
   parameter EQN = "(I0)";
 
   // These timings are for PolarPro 3E; other families will need updating.
   specify
-    (I0 => O) = 1251; // TAB -> TZ
-    (I1 => O) = 1406; // TSL -> TZ
+    (I0 => O) = 1251;  // TAB -> TZ
+    (I1 => O) = 1406;  // TSL -> TZ
   endspecify
 
   wire [1:0] s1 = I1 ? INIT[3:2] : INIT[1:0];
@@ -337,17 +358,19 @@ endmodule
 
 (* abc9_lut=2, lib_whitebox *)
 module LUT3 (
-  output O,
-  input I0, I1, I2
+    output O,
+    input  I0,
+    I1,
+    I2
 );
   parameter [7:0] INIT = 8'h0;
   parameter EQN = "(I0)";
 
   // These timings are for PolarPro 3E; other families will need updating.
   specify
-    (I0 => O) = 1251; // TAB -> TZ
-    (I1 => O) = 1406; // TSL -> TZ
-    (I2 => O) = 1699; // ('TA1', 'TA2', 'TB1', 'TB2') -> TZ
+    (I0 => O) = 1251;  // TAB -> TZ
+    (I1 => O) = 1406;  // TSL -> TZ
+    (I2 => O) = 1699;  // ('TA1', 'TA2', 'TB1', 'TB2') -> TZ
   endspecify
 
   wire [3:0] s2 = I2 ? INIT[7:4] : INIT[3:0];
@@ -357,8 +380,11 @@ endmodule
 
 (* abc9_lut=4, lib_whitebox *)
 module LUT4 (
-  output O,
-  input I0, I1, I2, I3
+    output O,
+    input  I0,
+    I1,
+    I2,
+    I3
 );
   parameter [15:0] INIT = 16'h0;
   parameter EQN = "(I0)";
@@ -366,9 +392,9 @@ module LUT4 (
   // These timings are for PolarPro 3E; other families will need updating.
   specify
     (I0 => O) = 995;  // TBS -> CZ
-    (I1 => O) = 1437; // ('TAB', 'BAB') -> CZ
-    (I2 => O) = 1593; // ('TSL', 'BSL') -> CZ
-    (I3 => O) = 1887; // ('TA1', 'TA2', 'TB1', 'TB2', 'BA1', 'BA2', 'BB1', 'BB2') -> CZ
+    (I1 => O) = 1437;  // ('TAB', 'BAB') -> CZ
+    (I2 => O) = 1593;  // ('TSL', 'BSL') -> CZ
+    (I3 => O) = 1887;  // ('TA1', 'TA2', 'TB1', 'TB2', 'BA1', 'BA2', 'BB1', 'BB2') -> CZ
   endspecify
 
   wire [7:0] s3 = I3 ? INIT[15:8] : INIT[7:0];
@@ -377,84 +403,78 @@ module LUT4 (
   assign O = I0 ? s1[1] : s1[0];
 endmodule
 
-module logic_cell_macro(
-    input BA1,
-    input BA2,
-    input BAB,
-    input BAS1,
-    input BAS2,
-    input BB1,
-    input BB2,
-    input BBS1,
-    input BBS2,
-    input BSL,
-    input F1,
-    input F2,
-    input FS,
-    input QCK,
-    input QCKS,
-    input QDI,
-    input QDS,
-    input QEN,
-    input QRT,
-    input QST,
-    input TA1,
-    input TA2,
-    input TAB,
-    input TAS1,
-    input TAS2,
-    input TB1,
-    input TB2,
-    input TBS,
-    input TBS1,
-    input TBS2,
-    input TSL,
+module logic_cell_macro (
+    input  BA1,
+    input  BA2,
+    input  BAB,
+    input  BAS1,
+    input  BAS2,
+    input  BB1,
+    input  BB2,
+    input  BBS1,
+    input  BBS2,
+    input  BSL,
+    input  F1,
+    input  F2,
+    input  FS,
+    input  QCK,
+    input  QCKS,
+    input  QDI,
+    input  QDS,
+    input  QEN,
+    input  QRT,
+    input  QST,
+    input  TA1,
+    input  TA2,
+    input  TAB,
+    input  TAS1,
+    input  TAS2,
+    input  TB1,
+    input  TB2,
+    input  TBS,
+    input  TBS1,
+    input  TBS2,
+    input  TSL,
     output CZ,
     output FZ,
     output QZ,
     output TZ
 );
 
-    wire TAP1,TAP2,TBP1,TBP2,BAP1,BAP2,BBP1,BBP2,QCKP,TAI,TBI,BAI,BBI,TZI,BZI,CZI,QZI;
-    reg QZ_r;
-	
-    initial
-    begin
-        QZ_r=1'b0;
-    end
-    assign QZ = QZ_r;
-    assign TAP1 = TAS1 ? ~TA1 : TA1; 
-    assign TAP2 = TAS2 ? ~TA2 : TA2; 
-    assign TBP1 = TBS1 ? ~TB1 : TB1; 
-    assign TBP2 = TBS2 ? ~TB2 : TB2;
-    assign BAP1 = BAS1 ? ~BA1 : BA1;
-    assign BAP2 = BAS2 ? ~BA2 : BA2;
-    assign BBP1 = BBS1 ? ~BB1 : BB1;
-    assign BBP2 = BBS2 ? ~BB2 : BB2;
+  wire TAP1, TAP2, TBP1, TBP2, BAP1, BAP2, BBP1, BBP2, QCKP, TAI, TBI, BAI, BBI, TZI, BZI, CZI, QZI;
+  reg QZ_r;
 
-    assign TAI = TSL ? TAP2 : TAP1;
-    assign TBI = TSL ? TBP2 : TBP1;
-    assign BAI = BSL ? BAP2 : BAP1;
-    assign BBI = BSL ? BBP2 : BBP1;
-    assign TZI = TAB ? TBI : TAI;
-    assign BZI = BAB ? BBI : BAI;
-    assign CZI = TBS ? BZI : TZI;
-    assign QZI = QDS ? QDI : CZI ;
-    assign FZ = FS ? F2 : F1;
-    assign TZ = TZI;
-    assign CZ = CZI;
-    assign QCKP = QCKS ? QCK : ~QCK;
+  initial begin
+    QZ_r = 1'b0;
+  end
+  assign QZ   = QZ_r;
+  assign TAP1 = TAS1 ? ~TA1 : TA1;
+  assign TAP2 = TAS2 ? ~TA2 : TA2;
+  assign TBP1 = TBS1 ? ~TB1 : TB1;
+  assign TBP2 = TBS2 ? ~TB2 : TB2;
+  assign BAP1 = BAS1 ? ~BA1 : BA1;
+  assign BAP2 = BAS2 ? ~BA2 : BA2;
+  assign BBP1 = BBS1 ? ~BB1 : BB1;
+  assign BBP2 = BBS2 ? ~BB2 : BB2;
+
+  assign TAI  = TSL ? TAP2 : TAP1;
+  assign TBI  = TSL ? TBP2 : TBP1;
+  assign BAI  = BSL ? BAP2 : BAP1;
+  assign BBI  = BSL ? BBP2 : BBP1;
+  assign TZI  = TAB ? TBI : TAI;
+  assign BZI  = BAB ? BBI : BAI;
+  assign CZI  = TBS ? BZI : TZI;
+  assign QZI  = QDS ? QDI : CZI;
+  assign FZ   = FS ? F2 : F1;
+  assign TZ   = TZI;
+  assign CZ   = CZI;
+  assign QCKP = QCKS ? QCK : ~QCK;
 
 
-    always @(posedge QCKP)
-        if(~QRT && ~QST)
-            if(QEN)
-                QZ_r = QZI;
-    always @(QRT or QST)
-        if(QRT)
-            QZ_r = 1'b0;
-        else if (QST)
-            QZ_r = 1'b1;
+  always @(posedge QCKP) if (~QRT && ~QST) if (QEN) QZ_r = QZI;
+  always @(QRT or QST)
+    if (QRT) QZ_r = 1'b0;
+    else if (QST) QZ_r = 1'b1;
 
 endmodule
 
