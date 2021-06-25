@@ -50,12 +50,11 @@ class UhdmAstShared {
 		// UHDM node coverage report
 		UhdmAstReport report;
 
-		// Map from AST type nodes to their names (used mostly for referencing
-		// types contained in packages)
-		std::unordered_map<AST::AstNode*, std::string> type_names;
+		// Vector with name of typedef and name of scope it is declared in
+		std::vector<std::pair<std::string, std::string>> type_names;
 
 		// Map from AST param nodes to their types (used for params with struct types)
-		std::unordered_map<AST::AstNode*, AST::AstNode*> param_types;
+		std::unordered_map<std::string, AST::AstNode*> param_types;
 };
 
 YOSYS_NAMESPACE_END

@@ -73,14 +73,18 @@ class UhdmAst {
 		void process_port();
 		void process_module();
 		void process_struct_typespec();
+		void process_packed_array_typespec();
 		void process_typespec_member();
 		void process_enum_typespec();
 		void process_enum_const();
 		void process_custom_var();
 		void process_int_var();
+		void process_real_var();
 		void process_array_var();
 		void process_param_assign();
 		void process_cont_assign();
+		void process_cont_assign_net();
+		void process_cont_assign_var_init();
 		void process_assignment();
 		void process_net();
 		void process_packed_array_net();
@@ -118,6 +122,9 @@ class UhdmAst {
 		void process_func_call();
 		void process_immediate_assert();
 		void process_hier_path();
+		void process_logic_typespec();
+		void process_int_typespec();
+		void process_bit_typespec();
 
 		UhdmAst(UhdmAst* p, UhdmAstShared& s, const std::string& i) : parent(p), shared(s), indent(i) {}
 
