@@ -365,10 +365,6 @@ struct SynthQuickLogicPass : public ScriptPass {
             run("blackbox =A:whitebox");
         }
 
-        if (check_label("edif") && (!edif_file.empty())) {
-            run(stringf("write_edif -nogndvcc -attrprop -pvector par %s %s", this->currmodule.c_str(), edif_file.c_str()));
-        }
-
         if (check_label("blif")) {
             if (!blif_file.empty()) {
                 if (inferAdder) {
@@ -377,6 +373,13 @@ struct SynthQuickLogicPass : public ScriptPass {
                     run(stringf("write_blif %s", help_mode ? "<file-name>" : blif_file.c_str()));
                 }
             }
+        }
+
+        if (check_label("edif") && (!edif_file.empty())) {
+            run("splitnets -ports -format ()");
+            run("quicklogic_eqn");
+
+            run(stringf("write_edif -nogndvcc -attrprop -pvector par %s %s", this->currmodule.c_str(), edif_file.c_str()));
         }
 
         if (check_label("verilog")) {

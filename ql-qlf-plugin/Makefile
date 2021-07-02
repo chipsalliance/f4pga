@@ -9,7 +9,9 @@
 NAME = ql-qlf
 SOURCES = synth_quicklogic.cc \
           ql-dsp.cc \
-          pp3_braminit.cc
+          pp3_braminit.cc \
+          quicklogic_eqn.cc
+
 include ../Makefile_plugin.common
 
 COMMON          = common

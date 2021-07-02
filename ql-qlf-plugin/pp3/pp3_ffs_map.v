@@ -15,9 +15,7 @@ module \$_DFFSRE_PPPP_ (
     output Q
 );
   wire _TECHMAP_REMOVEINIT_Q_ = 1;
-  dffepc #(
-      .INIT(1'b0)
-  ) _TECHMAP_REPLACE_ (
+  dffepc _TECHMAP_REPLACE_ (
       .CLK(C),
       .PRE(S),
       .CLR(R),
