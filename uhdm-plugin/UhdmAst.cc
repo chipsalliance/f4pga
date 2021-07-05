@@ -1386,6 +1386,7 @@ void UhdmAst::process_operation() {
 				case vpiLogOrOp: current_node->type = AST::AST_LOGIC_OR; break;
 				case vpiEqOp: current_node->type = AST::AST_EQ; break;
 				case vpiNeqOp: current_node->type = AST::AST_NE; break;
+				case vpiCaseEqOp: current_node->type = AST::AST_EQX; break;
 				case vpiGtOp: current_node->type = AST::AST_GT; break;
 				case vpiGeOp: current_node->type = AST::AST_GE; break;
 				case vpiLtOp: current_node->type = AST::AST_LT; break;
