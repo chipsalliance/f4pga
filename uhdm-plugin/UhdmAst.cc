@@ -2029,7 +2029,7 @@ void UhdmAst::process_function() {
 					 [&](AST::AstNode* node) {
 						 if (node) {
 							 current_node->children.push_back(node);
-							 node->str = current_node->str;
+							 node->str = "$result";
 						 }
 					 });
 	visit_one_to_many({vpiIODecl},
