@@ -1575,12 +1575,10 @@ void UhdmAst::process_stream_op()  {
 	loop_node->children.push_back(init_stmt);
 	loop_node->children.push_back(cond_stmt);
 	loop_node->children.push_back(inc_stmt);
-	loop_node->children.push_back(new AST::AstNode(AST::AST_BLOCK, assign_node));
+	loop_node->children.push_back(make_ast_node(AST::AST_BLOCK, {assign_node}));
+	loop_node->children[3]->str = "\\stream_op_block" + std::to_string(loop_id);
 
-	block_node->children.push_back(new AST::AstNode(AST::AST_BLOCK, loop_node));
-	// Yosys requires that AST_BLOCK str was set
-	block_node->children[1]->str = "\\stream_op_block" + std::to_string(loop_id);
-	block_node->children[1]->children[0]->children[3]->str = "\\stream_op_block" + std::to_string(loop_id);
+	block_node->children.push_back(make_ast_node(AST::AST_BLOCK, {loop_node}));
 
 	// Do not create a node
 	shared.report.mark_handled(obj_h);
