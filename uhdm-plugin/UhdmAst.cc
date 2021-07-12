@@ -2027,8 +2027,11 @@ void UhdmAst::process_function() {
 					 obj_h,
 					 [&](AST::AstNode* node) {
 						 if (node) {
+							 auto net_type = vpi_get(vpiNetType, obj_h);
+							 node->is_reg = net_type == vpiReg;
+							 node->str = current_node->str;
 							 current_node->children.push_back(node);
-							 node->str = "$result";
+
 						 }
 					 });
 	visit_one_to_many({vpiIODecl},
