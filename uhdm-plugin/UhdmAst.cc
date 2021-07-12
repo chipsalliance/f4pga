@@ -338,18 +338,39 @@ void UhdmAst::add_typedef(AST::AstNode* current_node, AST::AstNode* type_node) {
 		typedef_node->children.push_back(type_node);
 		current_node->children.push_back(typedef_node);
 	} else if (type_node->type == AST::AST_ENUM) {
-		type_node->str = "$enum" + std::to_string(shared.next_enum_id());
-		for (auto* enum_item : type_node->children) {
-			enum_item->attributes["\\enum_base_type"] = AST::AstNode::mkconst_str(type_node->str);
+		if(type_node->attributes.count("\\enum_base_type")) {
+			auto base_type = type_node->attributes["\\enum_base_type"];
+			auto wire_node = new AST::AstNode(AST::AST_WIRE);
+			for (auto c : base_type->children) {
+				std::string enum_item_str = "\\enum_value_";
+				log_assert(c->children.size() > 0);
+				log_assert(c->children[0]->type == AST::AST_CONSTANT);
+				int width = 1;
+				bool is_signed = c->children[0]->is_signed;
+				if (c->children.size() == 2) {
+					width = c->children[1]->children[0]->integer + 1;
+				}
+				RTLIL::Const val = c->children[0]->bitsAsConst(width, is_signed);
+				enum_item_str.append(val.as_string());
+				wire_node->attributes[enum_item_str.c_str()] = AST::AstNode::mkconst_str(c->str);
+			}
+			typedef_node->children.push_back(wire_node);
+			current_node->children.push_back(typedef_node);
+
+		} else {
+			type_node->str = "$enum" + std::to_string(shared.next_enum_id());
+			for (auto* enum_item : type_node->children) {
+				enum_item->attributes["\\enum_base_type"] = AST::AstNode::mkconst_str(type_node->str);
+			}
+			auto wire_node = new AST::AstNode(AST::AST_WIRE);
+			wire_node->attributes["\\enum_type"] = AST::AstNode::mkconst_str(type_node->str);
+			if (!type_node->children.empty() && type_node->children[0]->children.size() > 1) {
+				wire_node->children.push_back(type_node->children[0]->children[1]->clone());
+			}
+			typedef_node->children.push_back(wire_node);
+			current_node->children.push_back(type_node);
+			current_node->children.push_back(typedef_node);
 		}
-		auto wire_node = new AST::AstNode(AST::AST_WIRE);
-		wire_node->attributes["\\enum_type"] = AST::AstNode::mkconst_str(type_node->str);
-		if (!type_node->children.empty() && type_node->children[0]->children.size() > 1) {
-			wire_node->children.push_back(type_node->children[0]->children[1]->clone());
-		}
-		typedef_node->children.push_back(wire_node);
-		current_node->children.push_back(type_node);
-		current_node->children.push_back(typedef_node);
 	} else {
 		type_node->str.clear();
 		typedef_node->children.push_back(type_node);
@@ -826,6 +847,13 @@ void UhdmAst::process_typespec_member() {
 
 void UhdmAst::process_enum_typespec() {
 	current_node = make_ast_node(AST::AST_ENUM);
+	visit_one_to_one({vpiTypedefAlias},
+							   obj_h,
+							   [&](AST::AstNode* node) {
+								if (node) {
+									current_node->attributes["\\enum_base_type"] = node->clone();
+								}
+							   });
 	visit_one_to_many({vpiEnumConst},
 					  obj_h,
 					  [&](AST::AstNode* node) {
