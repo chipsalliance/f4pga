@@ -203,6 +203,9 @@ AST::AstNode* UhdmAst::make_ast_node(AST::AstNodeType type, std::vector<AST::Ast
 		}
 	}
 	sanitize_symbol_name(node->str);
+	auto it = node_renames.find(node->str);
+	if (it != node_renames.end())
+		node->str = it->second;
 	if (auto filename = vpi_get_str(vpiFile, obj_h)) {
 		node->filename = filename;
 	}
@@ -1894,19 +1897,22 @@ void UhdmAst::process_for() {
 	current_node = make_ast_node(AST::AST_FOR);
 	auto loop_id = shared.next_loop_id();
 	current_node->str = "$loop" + std::to_string(loop_id);
-	auto loop_parent_node = make_ast_node(AST::AST_BLOCK);
-	loop_parent_node->str = current_node->str;
+	auto parent_node = find_ancestor({AST::AST_FUNCTION, AST::AST_GENBLOCK, AST::AST_MODULE});
 	visit_one_to_many({vpiForInitStmt},
 					  obj_h,
 					  [&](AST::AstNode* node) {
 						  if (node->type == AST::AST_ASSIGN_LE) node->type = AST::AST_ASSIGN_EQ;
-						  if (node->children[0]->type == AST::AST_WIRE) {
-						  	auto *wire = node->children[0]->clone();
-							wire->is_reg = true;
-							loop_parent_node->children.push_back(wire);
-							node->children[0]->type = AST::AST_IDENTIFIER;
-							node->children[0]->is_signed = false;
-							node->children[0]->children.clear();
+						  auto lhs = node->children[0];
+						  if (lhs->type == AST::AST_WIRE) {
+							  auto old_str = lhs->str;
+							  lhs->str = '\\' + current_node->str.substr(1) + "::" + lhs->str.substr(1);
+							  node_renames.insert(std::make_pair(old_str, lhs->str));
+							  auto *wire = lhs->clone();
+							  wire->is_reg = true;
+							  parent_node->children.push_back(wire);
+							  lhs->type = AST::AST_IDENTIFIER;
+							  lhs->is_signed = false;
+							  lhs->children.clear();
 						  }
 						  current_node->children.push_back(node);
 					  });
@@ -1925,14 +1931,10 @@ void UhdmAst::process_for() {
 					 obj_h,
 					 [&](AST::AstNode* node) {
 						 auto *statements = make_ast_node(AST::AST_BLOCK);
+						 statements->str = current_node->str; // Needed in simplify step
 						 statements->children.push_back(node);
 						 current_node->children.push_back(statements);
 					 });
-	//auto for_block = make_ast_node(AST::AST_BLOCK);
-	//for_block->str = "";
-	//for_block->children.push_back(current_node);
-	loop_parent_node->children.push_back(current_node);
-	current_node = loop_parent_node;
 }
 
 void UhdmAst::process_gen_scope_array() {

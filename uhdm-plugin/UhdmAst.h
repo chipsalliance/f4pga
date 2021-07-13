@@ -67,6 +67,9 @@ class UhdmAst {
 		// Indentation used for debug printing
 		std::string indent;
 
+		// Mapping of names that should be replaced to new names
+		std::unordered_map<std::string, std::string> node_renames;
+
 		// Functions that process specific types of nodes
 		void process_design();
 		void process_parameter();
@@ -126,7 +129,9 @@ class UhdmAst {
 		void process_int_typespec();
 		void process_bit_typespec();
 
-		UhdmAst(UhdmAst* p, UhdmAstShared& s, const std::string& i) : parent(p), shared(s), indent(i) {}
+		UhdmAst(UhdmAst* p, UhdmAstShared& s, const std::string& i) : parent(p), shared(s), indent(i) {
+			if (parent) node_renames = parent->node_renames;
+		}
 
 	public:
 		UhdmAst(UhdmAstShared& s, const std::string& i = "") : UhdmAst(nullptr, s, i) {}
