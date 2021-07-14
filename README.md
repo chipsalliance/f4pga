@@ -63,6 +63,7 @@ The plugin adds the following command:
 
 The plugin adds the following command:
 * synth_quicklogic
+* ql_dsp
 
 Detailed help on the supported command(s) can be obtained by running `help <command_name>` in Yosys.
 
