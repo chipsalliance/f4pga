@@ -63,7 +63,7 @@ endcode
 code argQ ffA sigA clock clock_pol
 	if (mul->type != \QL_DSP || !param(mul, \A_REG).as_bool()) {
 		argQ = sigA;
-		subpattern(in_dffe);
+		//subpattern(in_dffe);
 		if (dff) {
 			ffA = dff;
 			clock = dffclock;
@@ -76,7 +76,7 @@ endcode
 code argQ ffB sigB clock clock_pol
 	if (mul->type != \QL_DSP || !param(mul, \B_REG).as_bool()) {
 		argQ = sigB;
-		subpattern(in_dffe);
+		//subpattern(in_dffe);
 		if (dff) {
 			ffB = dff;
 			clock = dffclock;
@@ -91,7 +91,7 @@ code argD argSdff ffFJKG sigH clock clock_pol
 			(mul->type != \QL_DSP)) {
 		argD = sigH;
 		argSdff = false;
-		subpattern(out_dffe);
+		//subpattern(out_dffe);
 		if (dff) {
 			// F/J/K/G do not have a CE-like (hold) input
 			if (dff->hasPort(\EN))
@@ -135,7 +135,7 @@ code argD argSdff ffH sigH sigO clock clock_pol
 			(mul->type != \QL_DSP)) {
 		argD = sigH;
 		argSdff = false;
-		subpattern(out_dffe);
+		//subpattern(out_dffe);
 		if (dff) {
 			// H does not have a CE-like (hold) input
 			if (dff->hasPort(\EN))
@@ -222,7 +222,7 @@ code argD argSdff ffO sigO sigCD clock clock_pol cd_signed o_lo
 		if (nusers(sigO) == 2) {
 			argD = sigO;
 			argSdff = !mux;
-			subpattern(out_dffe);
+			//subpattern(out_dffe);
 		}
 
 		// Otherwise try just its least significant 16 bits
@@ -230,7 +230,7 @@ code argD argSdff ffO sigO sigCD clock clock_pol cd_signed o_lo
 			argD = sigO.extract(0, 16);
 			if (nusers(argD) == 2) {
 				argSdff = !mux;
-				subpattern(out_dffe);
+				//subpattern(out_dffe);
 				o_lo = dff;
 			}
 		}
@@ -265,7 +265,7 @@ code argQ ffCD sigCD clock clock_pol
 	if (!sigCD.empty() && sigCD != sigO &&
 			(mul->type != \QL_DSP || (!param(mul, \C_REG).as_bool() && !param(mul, \D_REG).as_bool()))) {
 		argQ = sigCD;
-		subpattern(in_dffe);
+		//subpattern(in_dffe);
 		if (dff) {
 			// Reset signal of C (IRSTTOP) and D (IRSTBOT)
 			//   shared with A and B
@@ -309,6 +309,10 @@ code
 endcode
 
 // #######################
+// Currently, QL_DSP performs only combinatorial operations
+// but we aim to convert it into a mac unit in the futur
+// so we're leaving the subpattern in the code, it is 
+// however not being used for now.
 
 subpattern in_dffe
 arg argD argQ clock clock_pol
@@ -362,6 +366,10 @@ code argQ argD
 endcode
 
 // #######################
+// Currently, QL_DSP performs only combinatorial operations
+// but we aim to convert it into a mac unit in the futur
+// so we're leaving the subpattern in the code, it is 
+// however not being used for now.
 
 subpattern out_dffe
 arg argD argSdff argQ clock clock_pol
