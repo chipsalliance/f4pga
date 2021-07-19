@@ -733,6 +733,11 @@ void UhdmAst::process_module() {
 									} else {
 										add_or_replace_child(module_node, node);
 									}
+								} else if ((module_node->attributes.count(ID::partial) && module_node->attributes[ID::partial]->integer == 2)) {
+									// When module definition is not parsed by Surelog, left setting parameters to yosys
+									auto clone = node->clone();
+									clone->type = AST::AST_PARASET;
+									current_node->children.push_back(clone);
 								}
 							  }
 						  });
