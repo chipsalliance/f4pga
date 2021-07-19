@@ -38,10 +38,30 @@ module _80_quicklogic_alu (A, B, CI, BI, X, Y, CO);
 	endgenerate
 
 	wire [Y_WIDTH: 0 ] CARRY;
-	assign CARRY[0] = CI;
+
+	// Due to VPR limitations regarding IO connexion to carry chain,
+	// we generate the carry chain input signal using an intermediate adder
+	// since we can connect a & b from io pads, but not cin & cout
+	generate
+	     adder intermediate_adder (
+	       .cin     ( ),
+	       .cout    (CARRY[0]),
+	       .a       (CI     ),
+	       .b       (CI     ),
+	       .sumout  (      )
+	     );
+
+	     adder first_adder (
+	       .cin     (CARRY[0]),
+	       .cout    (CARRY[1]),
+	       .a       (AA[0]  ),
+	       .b       (BB[0]  ),
+	       .sumout  (Y[0]   )
+	     );
+	endgenerate
 
 	genvar i;
-	generate for (i = 0; i < Y_WIDTH - 1; i = i+1) begin:gen3
+	generate for (i = 1; i < Y_WIDTH - 1; i = i+1) begin:gen3
 	     adder my_adder (
 	       .cin     (CARRY[i]  ),
 	       .cout    (CARRY[i+1]),
@@ -50,19 +70,6 @@ module _80_quicklogic_alu (A, B, CI, BI, X, Y, CO);
 	       .sumout  (Y[i]      )
 	     );
 	end endgenerate
-
-	generate if ((Y_WIDTH -1) % 20 == 0) begin:gen4
-	     assign Y[Y_WIDTH-1] = CARRY[Y_WIDTH-1];
-	end else begin:gen5
-	     adder my_adder (
-	       .cin     (CARRY[Y_WIDTH - 1]),
-	       .cout    (CARRY[Y_WIDTH]    ),
-	       .a       (1'b0              ),
-	       .b       (1'b0              ),
-	       .sumout  (Y[Y_WIDTH -1]     )
-	     );
-	end
-	endgenerate
 	assign X = AA ^ BB;
 endmodule
 
