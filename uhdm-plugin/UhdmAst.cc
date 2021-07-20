@@ -674,32 +674,42 @@ void UhdmAst::process_module() {
 	} else {
 		// Not a top module, create instance
 		current_node = make_ast_node(AST::AST_CELL);
-		auto module_node = shared.top_nodes[type];
+
+		std::string module_parameters;
+		visit_one_to_many({vpiParamAssign},
+						  obj_h,
+						  [&](AST::AstNode* node) {
+							  if (node) {
+								  if (!(cell_instance || (node->children.size() > 0 && node->children[0]->type != AST::AST_CONSTANT))) {
+									  if (node->children[0]->str != "")
+										  module_parameters += node->str + "=" + node->children[0]->str;
+									  else
+										  module_parameters += node->str + "=" + std::to_string(node->children[0]->integer);
+								  }
+							  }
+						  });
+		//rename module in same way yosys do
+		std::string module_name;
+		if (module_parameters.size() > 60)
+			module_name = "$paramod$" + sha1(module_parameters) + type;
+		else if(module_parameters != "")
+			module_name = "$paramod" + type + module_parameters;
+		else module_name = type;
+		auto module_node = shared.top_nodes[module_name];
 		if (!module_node) {
-			module_node = shared.top_node_templates[type];
+			module_node = shared.top_nodes[type];
 			if (!module_node) {
 				module_node = new AST::AstNode(AST::AST_MODULE);
 				module_node->str = type;
 				module_node->attributes[ID::partial] = AST::AstNode::mkconst_int(2, false, 1);
+				shared.top_nodes[module_node->str] = module_node;
 			}
-			shared.top_nodes[module_node->str] = module_node;
+			if (!module_parameters.empty()) {
+				module_node = module_node->clone();
+			}
 		}
-		module_node = module_node->clone();
-		auto cell_instance = vpi_get(vpiCellInstance, obj_h);
-		if (cell_instance) {
-			module_node->attributes[ID::whitebox] = AST::AstNode::mkconst_int(1, false, 1);
-		}
-		//TODO: setting keep attribute probably shouldn't be needed,
-		// but without this, modules that are generated in genscope are removed
-		// for now lets just add this attribute
-		module_node->attributes[ID::keep] = AST::AstNode::mkconst_int(1, false, 1);
-		if (module_node->attributes.count(ID::partial)) {
-			AST::AstNode *attr = module_node->attributes.at(ID::partial);
-			if (attr->type == AST::AST_CONSTANT)
-				if (attr->integer == 1)
-					module_node->attributes.erase(ID::partial);
-		}
-		std::string module_parameters;
+		module_node->str = module_name;
+		shared.top_nodes[module_node->str] = module_node;
 		visit_one_to_many({vpiParamAssign},
 						  obj_h,
 						  [&](AST::AstNode* node) {
@@ -726,11 +736,6 @@ void UhdmAst::process_module() {
 												current_node->children.push_back(clone);
 											}
 										} else {
-											if (node->children[0]->str != "")
-												module_parameters += node->str + "=" + node->children[0]->str;
-											else
-												module_parameters += node->str + "=" + std::to_string(node->children[0]->integer);
-											//replace
 											add_or_replace_child(module_node, node);
 										}
 									} else {
@@ -744,16 +749,23 @@ void UhdmAst::process_module() {
 								}
 							  }
 						  });
-		//rename module in same way yosys do
-		if (module_parameters.size() > 60)
-			module_node->str = "$paramod$" + sha1(module_parameters) + type;
-		else if(module_parameters != "")
-			module_node->str = "$paramod" + type + module_parameters;
+		auto cell_instance = vpi_get(vpiCellInstance, obj_h);
+		if (cell_instance) {
+			module_node->attributes[ID::whitebox] = AST::AstNode::mkconst_int(1, false, 1);
+		}
+		//TODO: setting keep attribute probably shouldn't be needed,
+		// but without this, modules that are generated in genscope are removed
+		// for now lets just add this attribute
+		module_node->attributes[ID::keep] = AST::AstNode::mkconst_int(1, false, 1);
+		if (module_node->attributes.count(ID::partial)) {
+			AST::AstNode *attr = module_node->attributes.at(ID::partial);
+			if (attr->type == AST::AST_CONSTANT)
+				if (attr->integer == 1)
+					module_node->attributes.erase(ID::partial);
+		}
 		auto typeNode = new AST::AstNode(AST::AST_CELLTYPE);
 		typeNode->str = module_node->str;
 		current_node->children.insert(current_node->children.begin(), typeNode);
-		shared.top_node_templates[module_node->str] = module_node;
-		shared.top_nodes[module_node->str] = module_node;
 		visit_one_to_many({vpiVariables,
 						   vpiNet,
 						   vpiArrayNet},
