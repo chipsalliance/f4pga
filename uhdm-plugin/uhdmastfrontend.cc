@@ -107,7 +107,6 @@ struct UhdmAstFrontend : public Frontend {
 		if (report_directory != "") {
 			shared.report.write(report_directory);
 		}
-		cleanup(current_ast, shared);
 		bool dump_ast1 = shared.debug_flag;
 		bool dump_ast2 = shared.debug_flag;
 		bool dont_redefine = false;
@@ -118,41 +117,6 @@ struct UhdmAstFrontend : public Frontend {
 		);
 		delete current_ast;
 	}
-
-	void cleanup(AST::AstNode* ast, UhdmAstShared& shared) {
-		std::unordered_set<AST::AstNode*> nodes_to_delete, visited;
-		for (auto node : shared.visited) {
-			nodes_to_delete.insert(node.second); // Put all visited nodes in a set
-		}
-		ast->visitEachDescendant([&nodes_to_delete, &visited](AST::AstNode* node) {
-			nodes_to_delete.erase(node); // Prevent a node actually used in the AST from being deleted
-			visited.insert(node); // Store it as visited
-		});
-		nodes_to_delete.erase(ast); // Prevent the root node from being deleted
-		for (auto node : std::unordered_set<AST::AstNode*>(nodes_to_delete)) {
-			node->visitEachDescendant([&nodes_to_delete](AST::AstNode* node) {
-				nodes_to_delete.erase(node);
-			});
-			erase_repeating(node, visited); // Prevent deleting some nodes multiple times
-		}
-		for (auto node : nodes_to_delete) {
-			delete node;
-		}
-		shared.visited.clear();
-	}
-
-	// Erases nodes that are in the 'visited' set from the AST
-	void erase_repeating(AST::AstNode* node, std::unordered_set<AST::AstNode*>& visited) {
-		visited.insert(node);
-		node->children.erase(std::remove_if(node->children.begin(), node->children.end(),
-											[&](AST::AstNode* x) {
-												return visited.find(x) != visited.end();
-											}), node->children.end());
-		for (auto child : node->children) {
-			erase_repeating(child, visited);
-		}
-	}
-
 } UhdmAstFrontend;
 
 YOSYS_NAMESPACE_END

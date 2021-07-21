@@ -40,13 +40,6 @@ class UhdmAstShared {
 		// Top nodes of the design (modules, interfaces)
 		std::unordered_map<std::string, AST::AstNode*> top_nodes;
 
-		// Templates for top nodes of the design (in case there are multiple
-		// versions, e.g. for different parameters)
-		std::unordered_map<std::string, AST::AstNode*> top_node_templates;
-
-		// Map from already visited UHDM nodes to AST nodes
-		std::unordered_map<const UHDM::BaseClass*, AST::AstNode*> visited;
-
 		// UHDM node coverage report
 		UhdmAstReport report;
 

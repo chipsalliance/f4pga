@@ -21,6 +21,22 @@ static void sanitize_symbol_name(std::string &name) {
 	}
 }
 
+static std::string get_name(vpiHandle obj_h) {
+	std::string name;
+	if (auto s = vpi_get_str(vpiName, obj_h)) {
+		name = s;
+	} else if (auto s = vpi_get_str(vpiDefName, obj_h)) {
+		name = s;
+	} else if (auto s = vpi_get_str(vpiFullName, obj_h)) {
+		name = s;
+		if (name.rfind(".") != std::string::npos) {
+			name = name.substr(name.rfind(".") + 1);
+		}
+	}
+	sanitize_symbol_name(name);
+	return name;
+}
+
 static std::string strip_package_name(std::string name) {
 	auto sep_index = name.find("::");
 	if (sep_index != string::npos) {
@@ -190,19 +206,7 @@ AST::AstNode* UhdmAst::process_value(vpiHandle obj_h) {
 
 AST::AstNode* UhdmAst::make_ast_node(AST::AstNodeType type, std::vector<AST::AstNode*> children) {
 	auto node = new AST::AstNode(type);
-	if (auto name = vpi_get_str(vpiName, obj_h)) {
-		node->str = name;
-	} else if (auto name = vpi_get_str(vpiDefName, obj_h)) {
-		node->str = name;
-	} else if (auto name = vpi_get_str(vpiFullName, obj_h)) {
-		std::string s = std::string(name);
-		if (s.rfind(".") != std::string::npos) {
-			node->str = s.substr(s.rfind(".") + 1);
-		} else {
-			node->str = s;
-		}
-	}
-	sanitize_symbol_name(node->str);
+	node->str = get_name(obj_h);
 	auto it = node_renames.find(node->str);
 	if (it != node_renames.end())
 		node->str = it->second;
@@ -212,9 +216,6 @@ AST::AstNode* UhdmAst::make_ast_node(AST::AstNodeType type, std::vector<AST::Ast
 	if (unsigned int line = vpi_get(vpiLineNo, obj_h)) {
 		node->location.first_line = node->location.last_line = line;
 	}
-	const uhdm_handle* const handle = (const uhdm_handle*) obj_h;
-	const UHDM::BaseClass* const object = (const UHDM::BaseClass*) handle->object;
-	shared.visited[object] = node;
 	node->children = children;
 	return node;
 }
@@ -249,11 +250,12 @@ static void add_or_replace_child(AST::AstNode* parent, AST::AstNode* child) {
 				auto multirange_node = new AST::AstNode(AST::AST_MULTIRANGE);
 				multirange_node->is_packed = true;
 				for (auto *c : child->children) {
-					multirange_node->children.push_back(c->clone());
+					multirange_node->children.push_back(c);
 				}
 				child->children.clear();
 				child->children.push_back(multirange_node);
 			}
+			delete *it;
 			*it = child;
 			return;
 		}
@@ -417,6 +419,7 @@ void UhdmAst::process_design() {
 				current_node->children.push_back(pair.second);
 		} else {
 			log_warning("Removing module: %s from the design.\n", pair.second->str.c_str());
+			delete pair.second;
 		}
 	}
 }
@@ -686,6 +689,7 @@ void UhdmAst::process_module() {
 									  else
 										  module_parameters += node->str + "=" + std::to_string(node->children[0]->integer);
 								  }
+								  delete node;
 							  }
 						  });
 		//rename module in same way yosys do
@@ -930,6 +934,7 @@ void UhdmAst::process_custom_var() {
 							 // anonymous typespec, move the children to variable
 							 current_node->type = node->type;
 							 current_node->children = std::move(node->children);
+							 delete node;
 						 } else {
 						 	 // custom var in gen scope have definition with declaration
 							 auto *parent = find_ancestor({AST::AST_GENBLOCK, AST::AST_BLOCK});
@@ -1533,7 +1538,7 @@ void UhdmAst::process_stream_op()  {
 	if (lhs_node->type == AST::AST_WIRE) {
 		module_node->children.insert(module_node->children.begin(), lhs_node->clone());
 		temp_var = lhs_node->clone(); //if we already have wire as lhs, we want to create the same wire for temp_var 
-		lhs_node->children.clear();
+		lhs_node->delete_children();
 		lhs_node->type = AST::AST_IDENTIFIER;
 		bits_call = make_ast_node(AST::AST_FCALL, {lhs_node->clone()});
 		bits_call->str = "\\$bits";
@@ -1731,6 +1736,7 @@ void UhdmAst::process_assignment_pattern_op() {
 	std::reverse(current_node->children.begin(), current_node->children.end());
 	if (!assignments.empty()) {
 		if (current_node->children.empty()) {
+			delete assign_node->children[0];
 			assign_node->children[0] = assignments[0]->children[0];
 			current_node = assignments[0]->children[1];
 			assignments[0]->children.clear();
@@ -1791,11 +1797,9 @@ void UhdmAst::process_bit_select() {
 
 void UhdmAst::process_part_select() {
 	current_node = make_ast_node(AST::AST_IDENTIFIER);
-	visit_one_to_one({vpiParent},
-					 obj_h,
-					 [&](AST::AstNode* node) {
-						 current_node->str = node->str;
-					 });
+	vpiHandle parent_h = vpi_handle(vpiParent, obj_h);
+	current_node->str = get_name(parent_h);
+	vpi_free_object(parent_h);
 	auto range_node = new AST::AstNode(AST::AST_RANGE);
 	range_node->filename = current_node->filename;
 	range_node->location = current_node->location;
@@ -1810,11 +1814,9 @@ void UhdmAst::process_part_select() {
 
 void UhdmAst::process_indexed_part_select() {
 	current_node = make_ast_node(AST::AST_IDENTIFIER);
-	visit_one_to_one({vpiParent},
-					 obj_h,
-					 [&](AST::AstNode* node) {
-						 current_node->str = node->str;
-					 });
+	vpiHandle parent_h = vpi_handle(vpiParent, obj_h);
+	current_node->str = get_name(parent_h);
+	vpi_free_object(parent_h);
 	//TODO: check if there are other types, for now only handle 1 and 2 (+: and -:)
 	auto indexed_part_select_type = vpi_get(vpiIndexedPartSelectType, obj_h) == 1 ? AST::AST_ADD : AST::AST_SUB;
 	auto range_node = new AST::AstNode(AST::AST_RANGE);
@@ -1924,7 +1926,7 @@ void UhdmAst::process_for() {
 							  parent_node->children.push_back(wire);
 							  lhs->type = AST::AST_IDENTIFIER;
 							  lhs->is_signed = false;
-							  lhs->children.clear();
+							  lhs->delete_children();
 						  }
 						  current_node->children.push_back(node);
 					  });
@@ -2245,9 +2247,6 @@ AST::AstNode* UhdmAst::process_object(vpiHandle obj_handle) {
 		std::cout << indent << "Object '" << object->VpiName() << "' of type '" << UHDM::VpiTypeName(obj_h) << '\'' << std::endl;
 	}
 
-	if (shared.visited.find(object) != shared.visited.end()) {
-		return shared.visited[object]->clone();
-	}
 	switch(object_type) {
 		case vpiDesign: process_design(); break;
 		case vpiParameter: process_parameter(); break;
@@ -2327,7 +2326,6 @@ AST::AstNode* UhdmAst::process_object(vpiHandle obj_handle) {
 			shared.report.mark_handled(object);
 			return current_node;
 		}
-		shared.visited.erase(object);
 	}
 	return nullptr;
 }
