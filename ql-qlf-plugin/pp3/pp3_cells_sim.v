@@ -21,15 +21,15 @@ module buff (
 endmodule
 
 module logic_0 (
-    output A
+    output a
 );
-  assign A = 0;
+  assign a = 0;
 endmodule
 
 module logic_1 (
-    output A
+    output a
 );
-  assign A = 1;
+  assign a = 1;
 endmodule
 
 module gclkbuff (
