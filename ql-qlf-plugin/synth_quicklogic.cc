@@ -358,7 +358,7 @@ struct SynthQuickLogicPass : public ScriptPass {
                 run("setundef -zero -params -undriven");
             }
             if (family == "pp3" || (check_label("edif") && (!edif_file.empty()))) {
-                run("hilomap -hicell logic_1 A -locell logic_0 A -singleton A:top");
+                run("hilomap -hicell logic_1 a -locell logic_0 a -singleton A:top");
             }
             run("opt_clean -purge");
             run("check");
