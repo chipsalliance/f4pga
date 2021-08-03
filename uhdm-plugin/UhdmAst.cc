@@ -337,7 +337,6 @@ void UhdmAst::add_typedef(AST::AstNode* current_node, AST::AstNode* type_node) {
 	typedef_node->str = strip_package_name(type_node->str);
 	if (std::find(shared.type_names.begin(), shared.type_names.end(), std::make_pair(type_node->str, current_node->str)) != shared.type_names.end()) return;
 	shared.type_names.push_back(std::make_pair(type_node->str, current_node->str));
-	type_node = type_node->clone();
 	if (type_node->type == AST::AST_STRUCT) {
 		type_node->str.clear();
 		typedef_node->children.push_back(type_node);
@@ -735,9 +734,8 @@ void UhdmAst::process_module() {
 											// parameters, but this module would be already parametrized
 											if ((node->children[0]->integer != (*parent_node)->children[0]->integer ||
                                                                                              node->children[0]->str != (*parent_node)->children[0]->str)) {
-												auto clone = node->clone();
-												clone->type = AST::AST_PARASET;
-												current_node->children.push_back(clone);
+												node->type = AST::AST_PARASET;
+												current_node->children.push_back(node);
 											}
 										} else {
 											add_or_replace_child(module_node, node);
@@ -843,8 +841,11 @@ void UhdmAst::process_typespec_member() {
 									 auto str = current_node->str;
 									 node->cloneInto(current_node);
 									 current_node->str = str;
+									 delete node;
 								 } else if (typespec_type == vpiEnumTypespec) {
 									 current_node->children.push_back(node);
+								 } else {
+									 delete node;
 								 }
 							 });
 			break;
@@ -896,6 +897,7 @@ void UhdmAst::process_enum_typespec() {
 								for (auto child : current_node->children) {
 									child->children.push_back(node->clone());
 								}
+								delete node;
 							});
 				if (!has_range) // range is needed for simplify
 					for (auto child : current_node->children)
@@ -943,12 +945,14 @@ void UhdmAst::process_custom_var() {
 						 } else {
 						 	 // custom var in gen scope have definition with declaration
 							 auto *parent = find_ancestor({AST::AST_GENBLOCK, AST::AST_BLOCK});
-						 	 if (parent && std::find(shared.type_names.begin(), shared.type_names.end(), std::make_pair(node->str, parent->str)) == shared.type_names.end() && node->children.size() > 0) {
-							     add_typedef(parent, node);
-							 }
 							 auto wiretype_node = new AST::AstNode(AST::AST_WIRETYPE);
 							 wiretype_node->str = node->str;
 							 current_node->children.push_back(wiretype_node);
+						 	 if (parent && std::find(shared.type_names.begin(), shared.type_names.end(), std::make_pair(node->str, parent->str)) == shared.type_names.end() && node->children.size() > 0) {
+							     add_typedef(parent, node);
+							 } else {
+								 delete node;
+							 }
 						 }
 					 });
 	auto type = vpi_get(vpiType, obj_h);
@@ -1023,6 +1027,7 @@ void UhdmAst::process_param_assign() {
 								}
 							 }
 							 shared.param_types[current_node->str] = shared.param_types[node->str];
+							 delete node;
 						 }
 					 });
 	visit_one_to_one({vpiRhs},
@@ -1285,17 +1290,20 @@ void UhdmAst::process_io_decl() {
 	visit_one_to_one({vpiTypedef},
 					 obj_h,
 					 [&](AST::AstNode* node) {
-					 	 if (node && node->str != "") {
-							 auto wiretype_node = new AST::AstNode(AST::AST_WIRETYPE);
-							 wiretype_node->str = node->str;
-							 // wiretype needs to be 1st node (if port have also another range nodes)
-							 current_node->children.insert(current_node->children.begin(), wiretype_node);
-							 current_node->is_custom_type=true;
-						 } else {
-						 	// anonymous typedef, just move childrens
-							for (auto child : node->children) {
-								current_node->children.push_back(child->clone());
-							}
+						 if (node) {
+							 if (node->str != "") {
+								 auto wiretype_node = new AST::AstNode(AST::AST_WIRETYPE);
+							 	 wiretype_node->str = node->str;
+								 // wiretype needs to be 1st node (if port have also another range nodes)
+								 current_node->children.insert(current_node->children.begin(), wiretype_node);
+								 current_node->is_custom_type=true;
+							 } else {
+								 // anonymous typedef, just move children
+								 for (auto child : node->children) {
+									current_node->children.push_back(child->clone());
+								 }
+							 }
+							 delete node;
 						 }
 					 });
 	if (const int n = vpi_get(vpiDirection, obj_h)) {
@@ -1664,6 +1672,7 @@ void UhdmAst::process_cast_op() {
 					  obj_h,
 					  [&](AST::AstNode* node) {
 						  node->cloneInto(current_node);
+						  delete node;
 					  });
 	vpiHandle typespec_h = vpi_handle(vpiTypespec, obj_h);
 	shared.report.mark_handled(typespec_h);
@@ -2189,15 +2198,17 @@ void UhdmAst::process_hier_path() {
 						  	current_node->type = AST::AST_PREFIX;
 							current_node->str = node->str;
 							current_node->children.push_back(node->children[0]->children[0]->clone());
+							delete node;
 						  } else {
 						  	if (current_node->type == AST::AST_IDENTIFIER) {
 								if (current_node->str != "\\") {
 								      current_node->str += ".";
 								}
 								current_node->str += node->str.substr(1);
-								current_node->children = node->children;
+								current_node->children = std::move(node->children);
+								delete node;
 							} else {
-								current_node->children.push_back(node->clone());
+								current_node->children.push_back(node);
 							}
 						  }
 					  });
@@ -2213,7 +2224,7 @@ void UhdmAst::process_logic_typespec() {
 					}
 				});
 	if (current_node->str != "") {
-		add_typedef(find_ancestor({AST::AST_MODULE, AST::AST_PACKAGE}), current_node);
+		add_typedef(find_ancestor({AST::AST_MODULE, AST::AST_PACKAGE}), current_node->clone());
 	}
 }
 
