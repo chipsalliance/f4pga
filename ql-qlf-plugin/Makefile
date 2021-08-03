@@ -44,7 +44,8 @@ VERILOG_MODULES = $(COMMON)/cells_sim.v                  \
                   $(PP3_DIR)/pp3_bram_init_8_16.vh \
                   $(PP3_DIR)/pp3_bram_init_32.vh   \
                   $(PP3_DIR)/pp3_qlal4s3b_sim.v    \
-                  $(PP3_DIR)/pp3_mult_sim.v
+                  $(PP3_DIR)/pp3_mult_sim.v        \
+                  $(PP3_DIR)/pp3_qlal3_sim.v       \
 
 retrieve-pmgen:=$(shell mkdir -p pmgen && wget -nc -O pmgen/pmgen.py https://raw.githubusercontent.com/SymbiFlow/yosys/master%2Bwip/passes/pmgen/pmgen.py)
 

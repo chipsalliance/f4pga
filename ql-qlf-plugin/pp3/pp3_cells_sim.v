@@ -480,7 +480,10 @@ endmodule
 
 // Include simulation models of QLAL4S3B eFPGA interface
 `include "pp3_qlal4s3b_sim.v"
+// Include simulation models for QLAL3 hard blocks
+`include "pp3_qlal3_sim.v"
 // Include BRAM and FIFO simulation models
 `include "pp3_brams_sim.v"
 // Include MULT simulation models
 `include "pp3_mult_sim.v"
+
