@@ -192,7 +192,10 @@ struct SynthQuickLogicPass : public ScriptPass {
             std::string readVelArgs;
             readVelArgs = " +/quicklogic/" + family + "/cells_sim.v";
 
-            run("read_verilog -lib -specify +/quicklogic/common/cells_sim.v" + readVelArgs);
+            // Use -nomem2reg here to prevent Yosys from complaining about
+            // some block ram cell models. After all the only part of the cells
+            // library required here is cell port definitions plus specify blocks.
+            run("read_verilog -lib -specify -nomem2reg +/quicklogic/common/cells_sim.v" + readVelArgs);
             run(stringf("hierarchy -check %s", help_mode ? "-top <top>" : top_opt.c_str()));
         }
 
