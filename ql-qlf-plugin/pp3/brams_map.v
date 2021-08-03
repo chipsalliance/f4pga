@@ -35,8 +35,8 @@ module \$__QUICKLOGIC_RAMB16K (
   input [CFG_DBITS-1:0] B1DATA;
   input [CFG_ENABLE_B-1:0] B1EN;
 
-  assign VCC = 1'b1;
-  assign GND = 1'b0;
+  wire VCC = 1'b1;
+  wire GND = 1'b0;
 
   wire [3:0] DIP, DOP;
   wire [31:0] DI, DO;
@@ -259,8 +259,8 @@ module \$__QUICKLOGIC_RAMB8K (
   assign wen_reg[2:CFG_ENABLE_B] = 0;
   assign wen_reg[CFG_ENABLE_B-1:0] = B1EN;
 
-  assign GND = 1'b0;
-  assign VCC = 1'b1;
+  wire GND = 1'b0;
+  wire VCC = 1'b1;
 
   assign A1DATA = DO;
   assign DI = B1DATA;
@@ -547,7 +547,9 @@ module RAM_8K_BLK (
       .RMEB(GND)
   );
 
-  assign RD[data_width_int-1 : 0] = out_reg0[data_width_int-1 : 0];
+  // FIXME: The output RD is 18-bit while RAM data is 16-bit. Why the two
+  // extra bits?
+  assign RD[data_width_int-1 : 0] = {2'b00, out_reg0};
 
 endmodule
 
@@ -825,7 +827,9 @@ module RAM_16K_BLK (
 
   endgenerate
 
-  assign RD[data_width_int-1 : 0] = out_reg0[data_width_int-1 : 0];
+  // FIXME: The output RD is 36-bit while RAM data is 32-bit. Why the four
+  // extra bits?
+  assign RD[data_width_int-1 : 0] = {4'd0, out_reg0};
 
 endmodule
 
@@ -849,7 +853,7 @@ module FIFO_8K_BLK (
     DOUT
 );
 
-  parameter data_depth_int = 512, data_width_int = 36, reg_rd_int = 0, sync_fifo_int = 0;
+  parameter data_depth_int = 512, data_width_int = 18, reg_rd_int = 0, sync_fifo_int = 0;
 
   input Fifo_Push_Flush, Fifo_Pop_Flush;
   input Push_Clk, Pop_Clk;
@@ -1002,7 +1006,9 @@ module FIFO_8K_BLK (
       .RMEB(GND)
   );
 
-  assign DOUT[data_width_int-1 : 0] = out_reg0[data_width_int-1 : 0];
+  // FIXME: The output RD is 18-bit while RAM data is 16-bit. Why the two
+  // extra bits?
+  assign DOUT[data_width_int-1 : 0] = {2'b00, out_reg0};
 
 endmodule
 
@@ -1255,6 +1261,8 @@ module FIFO_16K_BLK (
 
   endgenerate
 
-  assign DOUT[data_width_int-1 : 0] = out_reg0[data_width_int-1 : 0];
+  // FIXME: The output RD is 36-bit while RAM data is 32-bit. Why the four
+  // extra bits?
+  assign DOUT[data_width_int-1 : 0] = {4'd0, out_reg0};
 
 endmodule
