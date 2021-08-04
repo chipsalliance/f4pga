@@ -330,7 +330,7 @@ void UhdmAst::make_cell(vpiHandle obj_h, AST::AstNode* cell_node, AST::AstNode* 
 	vpi_free_object(port_itr);
 }
 
-void UhdmAst::add_typedef(AST::AstNode* current_node, AST::AstNode* type_node) {
+void UhdmAst::move_type_to_new_typedef(AST::AstNode* current_node, AST::AstNode* type_node) {
 	auto typedef_node = new AST::AstNode(AST::AST_TYPEDEF);
 	typedef_node->location = type_node->location;
 	typedef_node->filename = type_node->filename;
@@ -360,7 +360,7 @@ void UhdmAst::add_typedef(AST::AstNode* current_node, AST::AstNode* type_node) {
 			}
 			typedef_node->children.push_back(wire_node);
 			current_node->children.push_back(typedef_node);
-
+			delete type_node;
 		} else {
 			type_node->str = "$enum" + std::to_string(shared.next_enum_id());
 			for (auto* enum_item : type_node->children) {
@@ -651,7 +651,7 @@ void UhdmAst::process_module() {
 							  obj_h,
 							  [&](AST::AstNode* node) {
 								  if (node) {
-									  add_typedef(current_node, node);
+									  move_type_to_new_typedef(current_node, node);
 								  }
 							  });
 			visit_one_to_many({vpiModule,
@@ -949,7 +949,7 @@ void UhdmAst::process_custom_var() {
 							 wiretype_node->str = node->str;
 							 current_node->children.push_back(wiretype_node);
 						 	 if (parent && std::find(shared.type_names.begin(), shared.type_names.end(), std::make_pair(node->str, parent->str)) == shared.type_names.end() && node->children.size() > 0) {
-							     add_typedef(parent, node);
+							     move_type_to_new_typedef(parent, node);
 							 } else {
 								 delete node;
 							 }
@@ -1209,7 +1209,7 @@ void UhdmAst::process_package() {
 					  obj_h,
 					  [&](AST::AstNode* node) {
 						  if (node) {
-							  add_typedef(current_node, node);
+							  move_type_to_new_typedef(current_node, node);
 						  }
 					  });
 	visit_one_to_many({vpiTaskFunc},
@@ -2224,7 +2224,7 @@ void UhdmAst::process_logic_typespec() {
 					}
 				});
 	if (current_node->str != "") {
-		add_typedef(find_ancestor({AST::AST_MODULE, AST::AST_PACKAGE}), current_node->clone());
+		move_type_to_new_typedef(find_ancestor({AST::AST_MODULE, AST::AST_PACKAGE}), current_node->clone());
 	}
 }
 
@@ -2236,7 +2236,7 @@ void UhdmAst::process_int_typespec() {
 	current_node->children.push_back(range);
 	current_node->is_signed = true;
 	if (current_node->str != "") {
-		add_typedef(find_ancestor({AST::AST_MODULE, AST::AST_PACKAGE}), current_node);
+		move_type_to_new_typedef(find_ancestor({AST::AST_MODULE, AST::AST_PACKAGE}), current_node);
 	}
 }
 
@@ -2249,7 +2249,7 @@ void UhdmAst::process_bit_typespec() {
 					}
 				});
 	if (current_node->str != "") {
-		add_typedef(find_ancestor({AST::AST_MODULE, AST::AST_PACKAGE}), current_node);
+		move_type_to_new_typedef(find_ancestor({AST::AST_MODULE, AST::AST_PACKAGE}), current_node);
 	}
 }
 

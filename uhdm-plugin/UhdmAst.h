@@ -40,8 +40,8 @@ class UhdmAst {
 		// Makes the passed node a cell node of the specified type
 		void make_cell(vpiHandle obj_h, AST::AstNode* node, AST::AstNode* type);
 
-		// Adds a typedef node to the current node
-		void add_typedef(AST::AstNode* current_node, AST::AstNode* type_node);
+		// Moves a type node to the specified node
+		void move_type_to_new_typedef(AST::AstNode* current_node, AST::AstNode* type_node);
 
 		// Go up the UhdmAst to find a parent node of the specified type
 		AST::AstNode* find_ancestor(const std::unordered_set<AST::AstNodeType>& types);
