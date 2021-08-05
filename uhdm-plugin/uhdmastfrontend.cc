@@ -107,6 +107,7 @@ struct UhdmAstFrontend : public Frontend {
 		if (report_directory != "") {
 			shared.report.write(report_directory);
 		}
+		for (auto design : restoredDesigns) vpi_release_handle(design);
 		bool dump_ast1 = shared.debug_flag;
 		bool dump_ast2 = shared.debug_flag;
 		bool dont_redefine = false;
