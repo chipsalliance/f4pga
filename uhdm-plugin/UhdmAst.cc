@@ -451,7 +451,9 @@ void UhdmAst::process_parameter() {
 				visit_one_to_one({vpiTypespec},
 								 obj_h,
 								 [&](AST::AstNode* node) {
-									 shared.param_types[current_node->str] = node;
+									 auto it = shared.param_types.find(current_node->str);
+									 if (it == shared.param_types.end())
+										 shared.param_types.insert(std::make_pair(current_node->str, node));
 								 });
 				break;
 			}
@@ -1508,8 +1510,14 @@ void UhdmAst::process_operation() {
 					current_node = concat_node;
 					break;
 				}
-				case vpiNullOp: current_node = nullptr; break; //do nothing
+				case vpiNullOp: {
+					delete current_node;
+					current_node = nullptr;
+					break;
+				}
 				default: {
+					delete current_node;
+					current_node = nullptr;
 					const uhdm_handle* const handle = (const uhdm_handle*) obj_h;
 					const UHDM::BaseClass* const object = (const UHDM::BaseClass*) handle->object;
 					report_error("Encountered unhandled operation type %d at %s:%d\n", operation,
@@ -1874,8 +1882,10 @@ void UhdmAst::process_var_select() {
 					  [&](AST::AstNode* node) {
 						  if (node->str == current_node->str) {
 							  for (auto child : node->children) {
-								  current_node->children.push_back(child->clone());
+								  current_node->children.push_back(child);
 							  }
+							  node->children.clear();
+							  delete node;
 						  } else {
 							  auto range_node = new AST::AstNode(AST::AST_RANGE);
 							  range_node->filename = current_node->filename;
@@ -2001,6 +2011,8 @@ void UhdmAst::process_gen_scope_array() {
 						  current_node->children.insert(current_node->children.end(),
 														genscope_node->children.begin(),
 														genscope_node->children.end());
+						  genscope_node->children.clear();
+						  delete genscope_node;
 					  });
 }
 
@@ -2020,11 +2032,10 @@ void UhdmAst::process_gen_scope() {
 					   [&](AST::AstNode* node) {
 						   if (node) {
 						   	   if ((node->type == AST::AST_PARAMETER || node->type == AST::AST_LOCALPARAM) &&
-									   node->children.size() == 0) {
-
-							   	return; //skip parameters without any children
-							   }
-							   current_node->children.push_back(node);
+									   node->children.size() == 0)
+								   delete node;	//skip parameters without any children
+							   else
+								   current_node->children.push_back(node);
 						   }
 					   });
 }
