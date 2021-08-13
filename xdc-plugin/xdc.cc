@@ -136,7 +136,9 @@ struct SetProperty : public Pass {
             std::vector<std::string> tokens;
             std::string intermediate;
             while (getline(args_stream, intermediate, ' ')) {
-                tokens.push_back(intermediate);
+                if(intermediate != "\0") {
+                    tokens.push_back(intermediate);
+                }
             }
             if (tokens.size() % 2 != 0) {
                 log_cmd_error("Invalid number of dict parameters: %lu.\n", tokens.size());
