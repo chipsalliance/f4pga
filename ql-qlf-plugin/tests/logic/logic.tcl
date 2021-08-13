@@ -6,7 +6,7 @@ yosys -import  ;# ingest plugin commands
 read_verilog $::env(DESIGN_TOP).v
 hierarchy -top top
 yosys proc
-equiv_opt -assert -map +/quicklogic/qlf_k4n8_cells_sim.v synth_quicklogic -family qlf_k4n8
+equiv_opt -assert -map +/quicklogic/qlf_k4n8/cells_sim.v synth_quicklogic -family qlf_k4n8
 design -load postopt
 yosys cd top
 
@@ -19,7 +19,7 @@ design -reset
 read_verilog $::env(DESIGN_TOP).v
 hierarchy -top top
 yosys proc
-equiv_opt -assert -map +/quicklogic/qlf_k6n10_cells_sim.v synth_quicklogic -family qlf_k6n10
+equiv_opt -assert -map +/quicklogic/qlf_k6n10/cells_sim.v synth_quicklogic -family qlf_k6n10
 design -load postopt
 yosys cd top
 
@@ -32,7 +32,7 @@ design -reset
 read_verilog $::env(DESIGN_TOP).v
 hierarchy -top top
 yosys proc
-equiv_opt -assert -map +/quicklogic/pp3_cells_sim.v synth_quicklogic -family pp3
+equiv_opt -assert -map +/quicklogic/pp3/cells_sim.v synth_quicklogic -family pp3
 design -load postopt
 yosys cd top
 

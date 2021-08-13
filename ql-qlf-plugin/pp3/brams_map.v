@@ -71,7 +71,7 @@ module \$__QUICKLOGIC_RAMB16K (
   generate
     if (CFG_DBITS <= 16) begin
       ram8k_2x1_cell_macro #(
-          `include "pp3_bram_init_32.vh"
+          `include "bram_init_32.vh"
       ) _TECHMAP_REPLACE_ (
           .A1_0(B1ADDR),
           .A1_1(GND),
@@ -138,7 +138,7 @@ module \$__QUICKLOGIC_RAMB16K (
       );
     end else if (CFG_DBITS <= 32) begin
       ram8k_2x1_cell_macro #(
-          `include "pp3_bram_init_32.vh"
+          `include "bram_init_32.vh"
       ) _TECHMAP_REPLACE_ (
           .A1_0(B1ADDR),
           .A1_1(GND),
@@ -287,7 +287,7 @@ module \$__QUICKLOGIC_RAMB8K (
   end
 
   ram8k_2x1_cell_macro #(
-      `include "pp3_bram_init_8_16.vh"
+      `include "bram_init_8_16.vh"
   ) _TECHMAP_REPLACE_ (
       .A1_0(B1ADDR_11),
       .A1_1(GND),

@@ -7,7 +7,7 @@ design -save read
 
 hierarchy -top mux2
 yosys proc
-equiv_opt -assert -map +/quicklogic/pp3_cells_sim.v synth_quicklogic -family pp3
+equiv_opt -assert -map +/quicklogic/pp3/cells_sim.v synth_quicklogic -family pp3
 design -load postopt
 yosys cd mux2
 select -assert-count 1 t:LUT3
@@ -19,7 +19,7 @@ select -assert-none t:LUT3 t:inpad t:outpad %% t:* %D
 design -load read
 hierarchy -top mux4
 yosys proc
-equiv_opt -assert -map +/quicklogic/pp3_cells_sim.v synth_quicklogic -family pp3
+equiv_opt -assert -map +/quicklogic/pp3/cells_sim.v synth_quicklogic -family pp3
 design -load postopt
 yosys cd mux4
 select -assert-count 3 t:LUT3
@@ -31,7 +31,7 @@ select -assert-none t:LUT3 t:inpad t:outpad %% t:* %D
 design -load read
 hierarchy -top mux8
 yosys proc
-equiv_opt -assert -map +/quicklogic/pp3_cells_sim.v synth_quicklogic -family pp3
+equiv_opt -assert -map +/quicklogic/pp3/cells_sim.v synth_quicklogic -family pp3
 design -load postopt
 yosys cd mux8
 select -assert-count 1 t:LUT1
@@ -45,7 +45,7 @@ select -assert-none t:LUT1 t:LUT3 t:mux4x0 t:inpad t:outpad %% t:* %D
 design -load read
 hierarchy -top mux16
 yosys proc
-equiv_opt -assert -map +/quicklogic/pp3_cells_sim.v synth_quicklogic -family pp3
+equiv_opt -assert -map +/quicklogic/pp3/cells_sim.v synth_quicklogic -family pp3
 design -load postopt
 yosys cd mux16
 select -assert-count 1 t:LUT3
