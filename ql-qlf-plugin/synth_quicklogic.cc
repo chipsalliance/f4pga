@@ -190,9 +190,9 @@ struct SynthQuickLogicPass : public ScriptPass {
     {
         if (check_label("begin")) {
             std::string readVelArgs;
-            readVelArgs = " +/quicklogic/" + family + "_cells_sim.v";
+            readVelArgs = " +/quicklogic/" + family + "/cells_sim.v";
 
-            run("read_verilog -lib -specify +/quicklogic/cells_sim.v" + readVelArgs);
+            run("read_verilog -lib -specify +/quicklogic/common/cells_sim.v" + readVelArgs);
             run(stringf("hierarchy -check %s", help_mode ? "-top <top>" : top_opt.c_str()));
         }
 
@@ -221,7 +221,7 @@ struct SynthQuickLogicPass : public ScriptPass {
                 run("memory_dff");
                 run("wreduce t:$mul");
                 run("techmap -map +/mul2dsp.v -map +/quicklogic/" + family +
-                      "_dsp_map.v -D DSP_A_MAXWIDTH=16 -D DSP_B_MAXWIDTH=16 "
+                      "/dsp_map.v -D DSP_A_MAXWIDTH=16 -D DSP_B_MAXWIDTH=16 "
                       "-D DSP_A_MINWIDTH=2 -D DSP_B_MINWIDTH=2 -D DSP_Y_MINWIDTH=11 "
                       "-D DSP_NAME=$__MUL16X16",
                     "(if -no_dsp)");
@@ -245,11 +245,11 @@ struct SynthQuickLogicPass : public ScriptPass {
         }
 
         if (check_label("map_bram", "(skip if -no_bram)") && (family == "qlf_k6n10" || family == "pp3") && inferBram) {
-            run("memory_bram -rules +/quicklogic/" + family + "_brams.txt");
+            run("memory_bram -rules +/quicklogic/" + family + "/brams.txt");
             if (family == "pp3") {
                 run("pp3_braminit");
             }
-            run("techmap -map +/quicklogic/" + family + "_brams_map.v");
+            run("techmap -map +/quicklogic/" + family + "/brams_map.v");
         }
 
         if (check_label("map_ffram")) {
@@ -262,7 +262,7 @@ struct SynthQuickLogicPass : public ScriptPass {
 
         if (check_label("map_gates")) {
             if (inferAdder && (family == "qlf_k4n8" || family == "qlf_k6n10")) {
-                run("techmap -map +/techmap.v -map +/quicklogic/" + family + "_arith_map.v");
+                run("techmap -map +/techmap.v -map +/quicklogic/" + family + "/arith_map.v");
             } else {
                 run("techmap");
             }
@@ -289,9 +289,9 @@ struct SynthQuickLogicPass : public ScriptPass {
                 //    $_DLATCH_SRPPP_ 0");
             } else if (family == "pp3") {
                 run("dfflegalize -cell $_DFFSRE_PPPP_ 0 -cell $_DLATCH_?_ x");
-                run("techmap -map +/quicklogic/" + family + "_cells_map.v");
+                run("techmap -map +/quicklogic/" + family + "/cells_map.v");
             }
-            std::string techMapArgs = " -map +/techmap.v -map +/quicklogic/" + family + "_ffs_map.v";
+            std::string techMapArgs = " -map +/techmap.v -map +/quicklogic/" + family + "/ffs_map.v";
             if (!noffmap) {
                 run("techmap " + techMapArgs);
             }
@@ -310,14 +310,14 @@ struct SynthQuickLogicPass : public ScriptPass {
                 } else if (family == "qlf_k4n8") {
                     run("abc -lut 4 ");
                 } else if (family == "pp3") {
-                    run("techmap -map +/quicklogic/" + family + "_latches_map.v");
+                    run("techmap -map +/quicklogic/" + family + "/latches_map.v");
                     if (abc9) {
-                        run("read_verilog -lib -specify -icells +/quicklogic/" + family + "_abc9_model.v");
-                        run("techmap -map +/quicklogic/" + family + "_abc9_map.v");
+                        run("read_verilog -lib -specify -icells +/quicklogic/" + family + "/abc9_model.v");
+                        run("techmap -map +/quicklogic/" + family + "/abc9_map.v");
                         run("abc9 -maxlut 4 -dff");
-                        run("techmap -map +/quicklogic/" + family + "_abc9_unmap.v");
+                        run("techmap -map +/quicklogic/" + family + "/abc9_unmap.v");
                     } else {
-                        std::string lutDefs = "+/quicklogic/" + family + "_lutdefs.txt";
+                        std::string lutDefs = "+/quicklogic/" + family + "/lutdefs.txt";
                         rewrite_filename(lutDefs);
 
                         std::string abcArgs = "+read_lut," + lutDefs +
@@ -336,7 +336,7 @@ struct SynthQuickLogicPass : public ScriptPass {
 
         if (check_label("map_cells") && (family == "qlf_k6n10" || family == "pp3")) {
             std::string techMapArgs;
-            techMapArgs = "-map +/quicklogic/" + family + "_lut_map.v";
+            techMapArgs = "-map +/quicklogic/" + family + "/lut_map.v";
             run("techmap " + techMapArgs);
             run("clean");
         }

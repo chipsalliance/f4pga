@@ -8,7 +8,7 @@ design -save read
 # DFF
 hierarchy -top my_dff
 yosys proc
-equiv_opt -assert -map +/quicklogic/qlf_k4n8_cells_sim.v synth_quicklogic -family qlf_k4n8 -top my_dff
+equiv_opt -assert -map +/quicklogic/qlf_k4n8/cells_sim.v synth_quicklogic -family qlf_k4n8 -top my_dff
 design -load postopt
 yosys cd my_dff
 stat
@@ -163,7 +163,7 @@ design -save read
 # DFF
 hierarchy -top my_dff
 yosys proc
-equiv_opt -assert -map +/quicklogic/qlf_k6n10_cells_sim.v synth_quicklogic -family qlf_k6n10 -top my_dff
+equiv_opt -assert -map +/quicklogic/qlf_k6n10/cells_sim.v synth_quicklogic -family qlf_k6n10 -top my_dff
 design -load postopt
 yosys cd my_dff
 stat
@@ -412,7 +412,7 @@ design -save read
 # DFF
 hierarchy -top my_dff
 yosys proc
-equiv_opt -async2sync -assert -map +/quicklogic/pp3_cells_sim.v synth_quicklogic -family pp3 -top my_dff
+equiv_opt -async2sync -assert -map +/quicklogic/pp3/cells_sim.v synth_quicklogic -family pp3 -top my_dff
 design -load postopt
 yosys cd my_dff
 stat
@@ -427,7 +427,7 @@ select -assert-count 1 t:logic_1
 design -load read
 hierarchy -top my_dffe
 yosys proc
-equiv_opt -async2sync -assert -map +/quicklogic/pp3_cells_sim.v synth_quicklogic -family pp3 -top my_dffe
+equiv_opt -async2sync -assert -map +/quicklogic/pp3/cells_sim.v synth_quicklogic -family pp3 -top my_dffe
 design -load postopt
 yosys cd my_dffe
 stat
@@ -441,7 +441,7 @@ select -assert-count 1 t:logic_0
 design -load read
 hierarchy -top my_dffr_p
 yosys proc
-equiv_opt -async2sync -assert -map +/quicklogic/pp3_cells_sim.v synth_quicklogic -family pp3 -top my_dffr_p
+equiv_opt -async2sync -assert -map +/quicklogic/pp3/cells_sim.v synth_quicklogic -family pp3 -top my_dffr_p
 design -load postopt
 yosys cd my_dffr_p
 stat
@@ -458,7 +458,7 @@ select -assert-none t:dffepc t:logic_0 t:logic_1 t:inpad t:outpad t:ckpad %% t:*
 design -load read
 hierarchy -top my_dffr_n
 yosys proc
-equiv_opt -async2sync -assert -map +/quicklogic/pp3_cells_sim.v synth_quicklogic -family pp3 -top my_dffr_n
+equiv_opt -async2sync -assert -map +/quicklogic/pp3/cells_sim.v synth_quicklogic -family pp3 -top my_dffr_n
 design -load postopt
 yosys cd my_dffr_n
 stat
@@ -476,7 +476,7 @@ select -assert-none t:LUT1 t:dffepc t:logic_0 t:logic_1 t:inpad t:outpad t:ckpad
 design -load read
 hierarchy -top my_dffs_clk_p
 yosys proc
-equiv_opt -async2sync -assert -map +/quicklogic/pp3_cells_sim.v synth_quicklogic -family pp3 -top my_dffs_clk_p
+equiv_opt -async2sync -assert -map +/quicklogic/pp3/cells_sim.v synth_quicklogic -family pp3 -top my_dffs_clk_p
 design -load postopt
 yosys cd my_dffs_clk_p
 stat
@@ -494,7 +494,7 @@ select -assert-none t:LUT2 t:dffepc t:logic_0 t:logic_1 t:inpad t:outpad t:ckpad
 design -load read
 hierarchy -top my_dffs_clk_n
 yosys proc
-equiv_opt -async2sync -assert -map +/quicklogic/pp3_cells_sim.v synth_quicklogic -family pp3 -top my_dffs_clk_n
+equiv_opt -async2sync -assert -map +/quicklogic/pp3/cells_sim.v synth_quicklogic -family pp3 -top my_dffs_clk_n
 design -load postopt
 yosys cd my_dffs_clk_n
 stat

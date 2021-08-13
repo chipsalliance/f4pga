@@ -9,7 +9,7 @@ hierarchy -top fsm
 yosys proc
 flatten
 
-equiv_opt -run :prove -map +/quicklogic/pp3_cells_sim.v synth_quicklogic -family pp3
+equiv_opt -run :prove -map +/quicklogic/pp3/cells_sim.v synth_quicklogic -family pp3
 async2sync
 miter -equiv -make_assert -flatten gold gate miter
 sat -verify -prove-asserts -show-public -set-at 1 in_reset 1 -seq 20 -prove-skip 1 miter

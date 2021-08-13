@@ -9,7 +9,7 @@ yosys proc
 tribuf
 flatten
 synth
-equiv_opt -assert -map +/quicklogic/pp3_cells_sim.v -map +/simcells.v synth_quicklogic -family pp3
+equiv_opt -assert -map +/quicklogic/pp3/cells_sim.v -map +/simcells.v synth_quicklogic -family pp3
 design -load postopt
 yosys cd tristate
 select -assert-count 2 t:inpad

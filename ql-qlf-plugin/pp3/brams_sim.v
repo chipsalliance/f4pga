@@ -2129,7 +2129,7 @@ module RAM_8K_BLK (
   endgenerate
 
   ram8k_2x1_cell_macro #(
-      `include "pp3_bram_init_8_16.vh"
+      `include "bram_init_8_16.vh"
       .INIT_FILE(INIT_FILE),
       .data_width_int(data_width_int),
       .data_depth_int(data_depth_int)
@@ -2332,7 +2332,7 @@ module RAM_16K_BLK (
     if (data_width_int <= 16) begin
 
       ram8k_2x1_cell_macro #(
-          `include "pp3_bram_init_8_16.vh"
+          `include "bram_init_8_16.vh"
           .INIT_FILE(INIT_FILE),
           .data_width_int(data_width_int),
           .data_depth_int(data_depth_int)
@@ -2409,7 +2409,7 @@ module RAM_16K_BLK (
     end else if (data_width_int > 16) begin
 
       ram8k_2x1_cell_macro #(
-          `include "pp3_bram_init_32.vh"
+          `include "bram_init_32.vh"
           .INIT_FILE(INIT_FILE),
           .data_width_int(data_width_int),
           .data_depth_int(data_depth_int)
