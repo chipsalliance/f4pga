@@ -265,7 +265,7 @@ struct QLEdifBackend : public Backend {
                     *f << stringf("          (port %s (direction %s))\n", EDIF_DEF(port_it.first), dir);
                 else {
                     for (int b = start; b < start + width; b++) {
-                        *f << stringf("          (port (rename %s_%d_ \"%s(%d)\")  (direction %s))\n", EDIF_DEF(port_it.first), b,
+                        *f << stringf("          (port (rename %s_%d_ \"%s(%d)\") (direction %s))\n", EDIF_DEF(port_it.first), b,
                                       EDIF_DEF(port_it.first), b, dir);
                     }
                 }
@@ -312,9 +312,35 @@ struct QLEdifBackend : public Backend {
         auto add_prop = [&](IdString name, Const val) {
             if ((val.flags & RTLIL::CONST_FLAG_STRING) != 0)
                 *f << stringf("\n            (property %s (string \"%s\"))", EDIF_DEF(name), val.decode_string().c_str());
-            else if (val.bits.size() <= 32 && RTLIL::SigSpec(val).is_fully_def())
+            else if (val.bits.size() <= 32 && RTLIL::SigSpec(val).is_fully_def()) {
                 *f << stringf("\n            (property %s (integer %u))", EDIF_DEF(name), val.as_int());
-            else {
+            } else {
+                std::string hex_string = "";
+                for (size_t i = 0; i < val.bits.size(); i += 4) {
+                    int digit_value = 0;
+                    if (i + 0 < val.bits.size() && val.bits.at(i + 0) == RTLIL::State::S1)
+                        digit_value |= 1;
+                    if (i + 1 < val.bits.size() && val.bits.at(i + 1) == RTLIL::State::S1)
+                        digit_value |= 2;
+                    if (i + 2 < val.bits.size() && val.bits.at(i + 2) == RTLIL::State::S1)
+                        digit_value |= 4;
+                    if (i + 3 < val.bits.size() && val.bits.at(i + 3) == RTLIL::State::S1)
+                        digit_value |= 8;
+                    char digit_str[2] = {"0123456789abcdef"[digit_value], 0};
+                    hex_string = std::string(digit_str) + hex_string;
+                }
+                *f << stringf("\n            (property %s (string \"%d'h%s\"))", EDIF_DEF(name), GetSize(val.bits), hex_string.c_str());
+            }
+        };
+        auto add_lut_prop = [&](IdString name, Const val) {
+            if ((val.flags & RTLIL::CONST_FLAG_STRING) != 0)
+                *f << stringf("\n            (property %s (string \"%s\"))", EDIF_DEF(name), val.decode_string().c_str());
+            else if (val.bits.size() <= 32 && RTLIL::SigSpec(val).is_fully_def()) {
+                if (strstr(name.c_str(), "INIT"))
+                    *f << stringf("\n            (property %s (string \"%X\"))", EDIF_DEF(name), val.as_int());
+                else
+                    *f << stringf("\n            (property %s (integer %u))", EDIF_DEF(name), val.as_int());
+            } else {
                 std::string hex_string = "";
                 for (size_t i = 0; i < val.bits.size(); i += 4) {
                     int digit_value = 0;
@@ -462,11 +488,19 @@ struct QLEdifBackend : public Backend {
                 *f << stringf("          (instance %s\n", EDIF_DEF(cell->name));
                 *f << stringf("            (viewRef VIEW_NETLIST (cellRef %s%s))", EDIF_REF(cell->type),
                               lib_cell_ports.count(cell->type) > 0 ? " (libraryRef LIB)" : "");
-                for (auto &p : cell->parameters)
-                    add_prop(p.first, p.second);
-                if (attr_properties)
-                    for (auto &p : cell->attributes)
+                if (strstr(cell->type.c_str(), "LUT")) {
+                    for (auto &p : cell->parameters)
+                        add_lut_prop(p.first, p.second);
+                    if (attr_properties)
+                        for (auto &p : cell->attributes)
+                            add_lut_prop(p.first, p.second);
+                } else {
+                    for (auto &p : cell->parameters)
                         add_prop(p.first, p.second);
+                    if (attr_properties)
+                        for (auto &p : cell->attributes)
+                            add_prop(p.first, p.second);
+                }
 
                 *f << stringf(")\n");
                 for (auto &p : cell->connections()) {
@@ -490,9 +524,9 @@ struct QLEdifBackend : public Backend {
                                 net_join_db[sig[i]].insert(make_pair(
                                   stringf("(portRef %s (instanceRef %s))", EDIF_REF(p.first), EDIF_REF(cell->name)), cell->output(p.first)));
                             else {
-                                net_join_db[sig[i]].insert(
-                                  make_pair(stringf("(portRef %s_%d_ (instanceRef %s))", EDIF_REF(p.first), member_idx, EDIF_REF(cell->name)),
-                                            cell->output(p.first)));
+                                net_join_db[sig[i]].insert(make_pair(stringf("(portRef %s_%d_ (instanceRef %s))", EDIF_REF(p.first),
+                                                                             width - member_idx - 1, EDIF_REF(cell->name)), // reverse IDs
+                                                                     cell->output(p.first)));
                             }
                         }
                 }
