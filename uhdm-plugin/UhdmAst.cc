@@ -681,7 +681,7 @@ void UhdmAst::process_module() {
 						  obj_h,
 						  [&](AST::AstNode* node) {
 							  if (node) {
-								  if (!(node->children.size() > 0 && node->children[0]->type != AST::AST_CONSTANT)) {
+								  if (shared.top_nodes.count(type) && !(node->children.size() > 0 && node->children[0]->type != AST::AST_CONSTANT)) {
 									  if (node->children[0]->str != "")
 										  module_parameters += node->str + "=" + node->children[0]->str;
 									  else
