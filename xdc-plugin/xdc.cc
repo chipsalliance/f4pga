@@ -136,7 +136,7 @@ struct SetProperty : public Pass {
             std::vector<std::string> tokens;
             std::string intermediate;
             while (getline(args_stream, intermediate, ' ')) {
-                if(intermediate != "\0") {
+                if (intermediate != "\0") {
                     tokens.push_back(intermediate);
                 }
             }
