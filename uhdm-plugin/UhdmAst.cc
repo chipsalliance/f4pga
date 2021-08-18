@@ -2340,6 +2340,7 @@ AST::AstNode* UhdmAst::process_object(vpiHandle obj_handle) {
 				  break;
 		case vpiHierPath: process_hier_path(); break;
 		case UHDM::uhdmimport: break;
+		case vpiDelayControl: break;
 		case vpiLogicTypespec: process_logic_typespec(); break;
 		case vpiIntTypespec: process_int_typespec(); break;
 		case vpiBitTypespec: process_bit_typespec(); break;
