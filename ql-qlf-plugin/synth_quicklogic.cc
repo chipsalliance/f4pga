@@ -379,7 +379,7 @@ struct SynthQuickLogicPass : public ScriptPass {
             run("splitnets -ports -format ()");
             run("quicklogic_eqn");
 
-            run(stringf("write_edif -nogndvcc -attrprop -pvector par %s %s", this->currmodule.c_str(), edif_file.c_str()));
+            run(stringf("write_ql_edif -nogndvcc -attrprop -pvector par %s %s", this->currmodule.c_str(), edif_file.c_str()));
         }
 
         if (check_label("verilog")) {
