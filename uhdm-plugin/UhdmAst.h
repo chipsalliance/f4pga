@@ -128,6 +128,8 @@ class UhdmAst {
 		void process_logic_typespec();
 		void process_int_typespec();
 		void process_bit_typespec();
+		void process_string_var();
+		void process_string_typespec();
 
 		UhdmAst(UhdmAst* p, UhdmAstShared& s, const std::string& i) : parent(p), shared(s), indent(i) {
 			if (parent) node_renames = parent->node_renames;

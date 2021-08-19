@@ -2252,6 +2252,47 @@ void UhdmAst::process_int_typespec() {
 	}
 }
 
+void UhdmAst::process_string_var() {
+	current_node = make_ast_node(AST::AST_WIRE);
+	current_node->is_string = true;
+	// FIXME:
+	// this is only basic support for strings,
+	// currently yosys doesn't support dynamic resize of wire
+	// based on string size
+	// here we try to get size of string based on provided const string
+	// if it is not available, we are setting size to explicite 64 bits
+	visit_one_to_one({vpiExpr}, obj_h, [&](AST::AstNode *expr_node) {
+		if (expr_node->type == AST::AST_CONSTANT) {
+		    auto left_const = AST::AstNode::mkconst_int(expr_node->range_left, true);
+		    auto right_const = AST::AstNode::mkconst_int(expr_node->range_right, true);
+		    auto range = make_ast_node(AST::AST_RANGE, {left_const, right_const});
+		    current_node->children.push_back(range);
+		}
+
+	});
+	if (current_node->children.size() == 0) {
+	    auto left_const = AST::AstNode::mkconst_int(64, true);
+	    auto right_const = AST::AstNode::mkconst_int(0, true);
+	    auto range = make_ast_node(AST::AST_RANGE, {left_const, right_const});
+	    current_node->children.push_back(range);
+	}
+	visit_default_expr(obj_h);
+}
+
+void UhdmAst::process_string_typespec() {
+	current_node = make_ast_node(AST::AST_WIRE);
+	current_node->is_string = true;
+	// FIXME:
+	// this is only basic support for strings,
+	// currently yosys doesn't support dynamic resize of wire
+	// based on string size
+	// here, we are setting size to explicite 64 bits
+	auto left_const = AST::AstNode::mkconst_int(64, true);
+	auto right_const = AST::AstNode::mkconst_int(0, true);
+	auto range = make_ast_node(AST::AST_RANGE, {left_const, right_const});
+	current_node->children.push_back(range);
+}
+
 void UhdmAst::process_bit_typespec() {
 	current_node = make_ast_node(AST::AST_WIRE);
 	visit_range(obj_h,
@@ -2344,6 +2385,8 @@ AST::AstNode* UhdmAst::process_object(vpiHandle obj_handle) {
 		case vpiLogicTypespec: process_logic_typespec(); break;
 		case vpiIntTypespec: process_int_typespec(); break;
 		case vpiBitTypespec: process_bit_typespec(); break;
+		case vpiStringVar: process_string_var(); break;
+		case vpiStringTypespec: process_string_typespec(); break;
 		case vpiProgram:
 		default: report_error("Encountered unhandled object '%s' of type '%s' at %s:%d\n", object->VpiName().c_str(),
 							  UHDM::VpiTypeName(obj_h).c_str(), object->VpiFile().c_str(), object->VpiLineNo()); break;
