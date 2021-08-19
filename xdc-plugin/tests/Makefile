@@ -8,12 +8,14 @@
 
 # counter - basic test for IOSTANDARD, SLEW, DRIVE, IN_TERM properties
 # counter-dict - basic test using XDC -dict for IOSTANDARD, SLEW, DRIVE, IN_TERM properties
+# package_pins-dict-space - basic test for variable whitespace between PACKAGE_PINs and IOSTANDARD
 # port_indexes - like counter but bus port indices are passes without curly braces
 # io_loc_pairs - test for LOC property being set on IOBUFs as the IO_LOC_PAIRS parameter
 # minilitex_ddr_arty - litex design with more types of IOBUFS including differential
 # package_pins - test for PACKAGE_PIN property being set on IOBUFs as the IO_LOC_PAIRS parameter
 TESTS = counter \
 	counter-dict \
+	package_pins-dict-space \
 	port_indexes \
 	io_loc_pairs \
 	minilitex_ddr_arty \
@@ -34,3 +36,4 @@ port_indexes_verify = $(call json_test,port_indexes) && test $$(grep "'unknown' 
 io_loc_pairs_verify = $(call json_test,io_loc_pairs)
 minilitex_ddr_arty_verify = $(call json_test,minilitex_ddr_arty)
 package_pins_verify = $(call json_test,package_pins)
+package_pins-dict-space_verify = $(call json_test,package_pins-dict-space)
