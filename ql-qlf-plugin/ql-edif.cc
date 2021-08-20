@@ -332,14 +332,16 @@ struct QLEdifBackend : public Backend {
                 *f << stringf("\n            (property %s (string \"%d'h%s\"))", EDIF_DEF(name), GetSize(val.bits), hex_string.c_str());
             }
         };
-        auto add_lut_prop = [&](IdString name, Const val) {
+        auto add_lut_prop = [&](IdString name, Const val, int lut_in) {
             if ((val.flags & RTLIL::CONST_FLAG_STRING) != 0)
                 *f << stringf("\n            (property %s (string \"%s\"))", EDIF_DEF(name), val.decode_string().c_str());
             else if (val.bits.size() <= 32 && RTLIL::SigSpec(val).is_fully_def()) {
-                if (strstr(name.c_str(), "INIT"))
-                    *f << stringf("\n            (property %s (string \"%X\"))", EDIF_DEF(name), val.as_int());
-                else
+                if (strstr(name.c_str(), "INIT")) {
+                    int hex_code_width = ((1 << lut_in) / 4);
+                    *f << stringf("\n            (property %s (string \"%0*X\"))", EDIF_DEF(name), hex_code_width, val.as_int());
+                } else {
                     *f << stringf("\n            (property %s (integer %u))", EDIF_DEF(name), val.as_int());
+                }
             } else {
                 std::string hex_string = "";
                 for (size_t i = 0; i < val.bits.size(); i += 4) {
@@ -488,12 +490,15 @@ struct QLEdifBackend : public Backend {
                 *f << stringf("          (instance %s\n", EDIF_DEF(cell->name));
                 *f << stringf("            (viewRef VIEW_NETLIST (cellRef %s%s))", EDIF_REF(cell->type),
                               lib_cell_ports.count(cell->type) > 0 ? " (libraryRef LIB)" : "");
-                if (strstr(cell->type.c_str(), "LUT")) {
+                const char *lut_pos;
+                lut_pos = strstr(cell->type.c_str(), "LUT");
+                if (lut_pos) {
+                    int lut_in = atoi(lut_pos + 3); // get the number of LUT inputs
                     for (auto &p : cell->parameters)
-                        add_lut_prop(p.first, p.second);
+                        add_lut_prop(p.first, p.second, lut_in);
                     if (attr_properties)
                         for (auto &p : cell->attributes)
-                            add_lut_prop(p.first, p.second);
+                            add_lut_prop(p.first, p.second, lut_in);
                 } else {
                     for (auto &p : cell->parameters)
                         add_prop(p.first, p.second);
