@@ -8,7 +8,11 @@
 
 name: CI tests
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - uhdm-plugin
+  pull_request:
 
 jobs:
 
