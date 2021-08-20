@@ -31,7 +31,6 @@
 #include <unistd.h>
 #endif
 
-#include "API/PythonAPI.h"
 #include "ErrorReporting/Report.h"
 #include "StringUtils.h"
 #include "surelog.h"
@@ -70,19 +69,6 @@ unsigned int executeCompilation(
 	bool parseOnly = clp->parseOnly();
 	errors->printMessages(clp->muteStdout());
 	if (success && (!clp->help())) {
-		// Load Python scripts in the interpreter
-		if (clp->pythonListener() || clp->pythonEvalScriptPerFile() ||
-				clp->pythonEvalScript()) {
-			SURELOG::PythonAPI::loadScripts();
-
-			if (!SURELOG::PythonAPI::isListenerLoaded()) {
-				SURELOG::Location loc(0);
-				SURELOG::Error err(
-						SURELOG::ErrorDefinition::PY_NO_PYTHON_LISTENER_FOUND, loc);
-				errors->addError(err);
-			}
-		}
-
 		SURELOG::scompiler* compiler = SURELOG::start_compiler(clp);
 		if (!compiler) codedReturn |= 1;
 		SURELOG::shutdown_compiler(compiler);
@@ -193,11 +179,9 @@ int run_surelog(int argc, const char** argv) {
 
 	unsigned int codedReturn = 0;
 	COMP_MODE mode = NORMAL;
-	bool python_mode = true;
 	bool nostdout = false;
 	std::string batchFile;
 	std::string diff_unit_opt = "-diffcompunit";
-	std::string nopython_opt = "-nopython";
 	std::string parseonly_opt = "-parseonly";
 	std::string batch_opt = "-batch";
 	std::string nostdout_opt = "-nostdout";
@@ -205,8 +189,6 @@ int run_surelog(int argc, const char** argv) {
 		if (parseonly_opt == argv[i]) {
 		} else if (diff_unit_opt == argv[i]) {
 			mode = DIFF;
-		} else if (nopython_opt == argv[i]) {
-			python_mode = false;
 		} else if (batch_opt == argv[i]) {
 			batchFile = argv[i + 1];
 			i++;
@@ -215,8 +197,6 @@ int run_surelog(int argc, const char** argv) {
 			nostdout = true;
 		}
 	}
-
-	if (python_mode) SURELOG::PythonAPI::init(argc, argv);
 
 	switch (mode) {
 		case DIFF: {
@@ -251,7 +231,6 @@ int run_surelog(int argc, const char** argv) {
 			break;
 	}
 
-	if (python_mode) SURELOG::PythonAPI::shutdown();
 	return codedReturn;
 }
 
