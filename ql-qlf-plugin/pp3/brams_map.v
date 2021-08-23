@@ -547,9 +547,7 @@ module RAM_8K_BLK (
       .RMEB(GND)
   );
 
-  // FIXME: The output RD is 18-bit while RAM data is 16-bit. Why the two
-  // extra bits?
-  assign RD[data_width_int-1 : 0] = {2'b00, out_reg0};
+  assign RD[data_width_int-1 : 0] = {out_par0, out_reg0};
 
 endmodule
 
@@ -827,9 +825,7 @@ module RAM_16K_BLK (
 
   endgenerate
 
-  // FIXME: The output RD is 36-bit while RAM data is 32-bit. Why the four
-  // extra bits?
-  assign RD[data_width_int-1 : 0] = {4'd0, out_reg0};
+  assign RD[data_width_int-1 : 0] = {out_par0, out_reg0};
 
 endmodule
 
@@ -1006,9 +1002,7 @@ module FIFO_8K_BLK (
       .RMEB(GND)
   );
 
-  // FIXME: The output RD is 18-bit while RAM data is 16-bit. Why the two
-  // extra bits?
-  assign DOUT[data_width_int-1 : 0] = {2'b00, out_reg0};
+  assign DOUT[data_width_int-1 : 0] = {out_par0, out_reg0};
 
 endmodule
 
@@ -1261,8 +1255,6 @@ module FIFO_16K_BLK (
 
   endgenerate
 
-  // FIXME: The output RD is 36-bit while RAM data is 32-bit. Why the four
-  // extra bits?
-  assign DOUT[data_width_int-1 : 0] = {4'd0, out_reg0};
+  assign DOUT[data_width_int-1 : 0] = {out_par0, out_reg0};
 
 endmodule
