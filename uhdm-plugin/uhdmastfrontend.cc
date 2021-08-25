@@ -104,7 +104,7 @@ struct UhdmAstFrontend : public Frontend {
 			UHDM::visit_object(design, 1, "", &shared.report.unhandled, shared.debug_flag ? std::cout : strstr);
 		}
 		current_ast = uhdm_ast.visit_designs(restoredDesigns);
-		if (report_directory != "") {
+		if (!report_directory.empty()) {
 			shared.report.write(report_directory);
 		}
 		for (auto design : restoredDesigns) vpi_release_handle(design);
@@ -121,4 +121,3 @@ struct UhdmAstFrontend : public Frontend {
 } UhdmAstFrontend;
 
 YOSYS_NAMESPACE_END
-

@@ -34,7 +34,7 @@ static std::string replace_in_string(std::string str, const std::string& to_find
 void UhdmAstReport::write(const std::string& directory) {
 	std::unordered_map<std::string, std::unordered_set<unsigned>> unhandled_per_file;
 	for (auto object : unhandled) {
-		if (object->VpiFile() != "" && object->VpiFile() != AST::current_filename) {
+		if (!object->VpiFile().empty() && object->VpiFile() != AST::current_filename) {
 			unhandled_per_file.insert(std::make_pair(object->VpiFile(), std::unordered_set<unsigned>()));
 			unhandled_per_file.at(object->VpiFile()).insert(object->VpiLineNo());
 			handled_count_per_file.insert(std::make_pair(object->VpiFile(), 0));
@@ -42,12 +42,12 @@ void UhdmAstReport::write(const std::string& directory) {
 	}
 	unsigned total_handled = 0;
 	for (auto& hc : handled_count_per_file) {
-		if (hc.first != "" && hc.first != AST::current_filename) {
+		if (!hc.first.empty() && hc.first != AST::current_filename) {
 			unhandled_per_file.insert(std::make_pair(hc.first, std::unordered_set<unsigned>()));
 			total_handled += hc.second;
 		}
 	}
-	float coverage = total_handled * 100.f / (total_handled + unhandled.size()); 
+	float coverage = total_handled * 100.f / (total_handled + unhandled.size());
 	mkdir(directory.c_str(), 0777);
 	std::ofstream index_file(directory + "/index.html");
 	index_file << "<!DOCTYPE html>\n<html>\n<head>\n<style>h3{margin:0;padding:10}</style>\n</head><body>" << std::endl;

@@ -14,7 +14,7 @@ YOSYS_NAMESPACE_BEGIN
 
 static void sanitize_symbol_name(std::string &name) {
 	if (!name.empty()) {
-		auto pos = name.find_last_of("@");
+		auto pos = name.find_last_of('@');
 		name = name.substr(pos+1);
 		// symbol names must begin with '\'
 		name.insert(0, "\\");
@@ -29,8 +29,8 @@ static std::string get_name(vpiHandle obj_h) {
 		name = s;
 	} else if (auto s = vpi_get_str(vpiFullName, obj_h)) {
 		name = s;
-		if (name.rfind(".") != std::string::npos) {
-			name = name.substr(name.rfind(".") + 1);
+		if (name.rfind('.') != std::string::npos) {
+			name = name.substr(name.rfind('.') + 1);
 		}
 	}
 	sanitize_symbol_name(name);
@@ -118,7 +118,7 @@ void UhdmAst::visit_default_expr(vpiHandle obj_h) {
             mod->children.insert(insert_it, initial_node);
         }
         // Ensure single AST_BLOCK node in AST_INITIAL
-        if (initial_node->children.size() && initial_node->children[0]) {
+        if (!initial_node->children.empty() && initial_node->children[0]) {
             block_node = initial_node->children[0];
         } else {
             block_node = new AST::AstNode(AST::AST_BLOCK);
@@ -285,8 +285,8 @@ static void add_or_replace_child(AST::AstNode* parent, AST::AstNode* child) {
 }
 
 void UhdmAst::make_cell(vpiHandle obj_h, AST::AstNode* cell_node, AST::AstNode* type_node) {
-	if (cell_node->children.size() == 0 ||
-			(cell_node->children.size() > 1 && cell_node->children[0]->type != AST::AST_CELLTYPE)) {
+	if (cell_node->children.empty() ||
+        (!cell_node->children.empty() && cell_node->children[0]->type != AST::AST_CELLTYPE)) {
 		auto typeNode = new AST::AstNode(AST::AST_CELLTYPE);
 		typeNode->str = type_node->str;
 		cell_node->children.insert(cell_node->children.begin(), typeNode);
@@ -334,7 +334,7 @@ void UhdmAst::move_type_to_new_typedef(AST::AstNode* current_node, AST::AstNode*
 			auto wire_node = new AST::AstNode(AST::AST_WIRE);
 			for (auto c : base_type->children) {
 				std::string enum_item_str = "\\enum_value_";
-				log_assert(c->children.size() > 0);
+				log_assert(!c->children.empty());
 				log_assert(c->children[0]->type == AST::AST_CONSTANT);
 				int width = 1;
 				bool is_signed = c->children[0]->is_signed;
@@ -583,7 +583,7 @@ void UhdmAst::process_port() {
 					 obj_h,
 					 [&](AST::AstNode* node) {
 						 if (node) {
-							 if (node->str != "") {
+							 if (!node->str.empty()) {
 								 auto wiretype_node = new AST::AstNode(AST::AST_WIRETYPE);
 								 wiretype_node->str = node->str;
 								 // wiretype needs to be 1st node (if port have also another range nodes)
@@ -679,8 +679,8 @@ void UhdmAst::process_module() {
 						  obj_h,
 						  [&](AST::AstNode* node) {
 							  if (node) {
-								  if (shared.top_nodes.count(type) && !(node->children.size() > 0 && node->children[0]->type != AST::AST_CONSTANT)) {
-									  if (node->children[0]->str != "")
+								  if (shared.top_nodes.count(type) && !(!node->children.empty() && node->children[0]->type != AST::AST_CONSTANT)) {
+									  if (!node->children[0]->str.empty())
 										  module_parameters += node->str + "=" + node->children[0]->str;
 									  else
 										  module_parameters += node->str + "=" + std::to_string(node->children[0]->integer);
@@ -692,7 +692,7 @@ void UhdmAst::process_module() {
 		std::string module_name;
 		if (module_parameters.size() > 60)
 			module_name = "$paramod$" + sha1(module_parameters) + type;
-		else if(module_parameters != "")
+		else if(!module_parameters.empty())
 			module_name = "$paramod" + type + module_parameters;
 		else module_name = type;
 		auto module_node = shared.top_nodes[module_name];
@@ -725,7 +725,7 @@ void UhdmAst::process_module() {
 								                       							child->type != AST::AST_REALVALUE;});
 								 if (parent_node != module_node->children.end()) {
 									if ((*parent_node)->type == AST::AST_PARAMETER) {
-										if (cell_instance || (node->children.size() > 0 && node->children[0]->type != AST::AST_CONSTANT)) { //if cell is a blackbox or we need to simplify parameter first, left setting parameters to yosys
+										if (cell_instance || (!node->children.empty() && node->children[0]->type != AST::AST_CONSTANT)) { //if cell is a blackbox or we need to simplify parameter first, left setting parameters to yosys
 											// We only want to add AST_PARASET for parameters that is different than already set
 											// to match the name yosys gives to the module.
 											// Note: this should also be applied for other (not only cell_instance) modules
@@ -948,7 +948,7 @@ void UhdmAst::process_custom_var() {
 							 auto wiretype_node = new AST::AstNode(AST::AST_WIRETYPE);
 							 wiretype_node->str = node->str;
 							 current_node->children.push_back(wiretype_node);
-						 	 if (parent && std::find(shared.type_names.begin(), shared.type_names.end(), std::make_pair(node->str, parent->str)) == shared.type_names.end() && node->children.size() > 0) {
+						 	 if (parent && std::find(shared.type_names.begin(), shared.type_names.end(), std::make_pair(node->str, parent->str)) == shared.type_names.end() && !node->children.empty()) {
 							     move_type_to_new_typedef(parent, node);
 							 } else {
 								 delete node;
@@ -1294,7 +1294,7 @@ void UhdmAst::process_io_decl() {
 					 obj_h,
 					 [&](AST::AstNode* node) {
 						 if (node) {
-							 if (node->str != "") {
+							 if (!node->str.empty()) {
 								 auto wiretype_node = new AST::AstNode(AST::AST_WIRETYPE);
 							 	 wiretype_node->str = node->str;
 								 // wiretype needs to be 1st node (if port have also another range nodes)
@@ -1559,7 +1559,7 @@ void UhdmAst::process_stream_op()  {
 	AST::AstNode *bits_call = nullptr;
 	if (lhs_node->type == AST::AST_WIRE) {
 		module_node->children.insert(module_node->children.begin(), lhs_node->clone());
-		temp_var = lhs_node->clone(); //if we already have wire as lhs, we want to create the same wire for temp_var 
+		temp_var = lhs_node->clone(); //if we already have wire as lhs, we want to create the same wire for temp_var
 		lhs_node->delete_children();
 		lhs_node->type = AST::AST_IDENTIFIER;
 		bits_call = make_ast_node(AST::AST_FCALL, {lhs_node->clone()});
@@ -1993,8 +1993,8 @@ void UhdmAst::process_gen_scope_array() {
 										auto *param = new AST::AstNode(AST::AST_IDENTIFIER);
 										param->str = child->str;
 										auto *field = new AST::AstNode(AST::AST_IDENTIFIER);
-										field->str = "\\" + node->str.substr(node->str.rfind("]") + 2);
-										node->str = node->str.substr(0, node->str.find("["));
+										field->str = "\\" + node->str.substr(node->str.rfind(']') + 2);
+										node->str = node->str.substr(0, node->str.find('['));
 										node->children.push_back(param);
 										node->children.push_back(field);
 									  }
@@ -2025,10 +2025,11 @@ void UhdmAst::process_gen_scope() {
 					   [&](AST::AstNode* node) {
 						   if (node) {
 						   	   if ((node->type == AST::AST_PARAMETER || node->type == AST::AST_LOCALPARAM) &&
-									   node->children.size() == 0)
+                                   node->children.empty()) {
 								   delete node;	//skip parameters without any children
-							   else
+							   } else {
 								   current_node->children.push_back(node);
+                               }
 						   }
 					   });
 }
@@ -2206,7 +2207,7 @@ void UhdmAst::process_hier_path() {
 	visit_one_to_many({vpiActual},
 					  obj_h,
 					  [&](AST::AstNode* node) {
-						  if (current_node->str == "\\" && node->children.size() > 0 && node->children[0]->type == AST::AST_RANGE) {
+						  if (current_node->str == "\\" && !node->children.empty() && node->children[0]->type == AST::AST_RANGE) {
 						  	current_node->type = AST::AST_PREFIX;
 							current_node->str = node->str;
 							current_node->children.push_back(node->children[0]->children[0]->clone());
@@ -2235,7 +2236,7 @@ void UhdmAst::process_logic_typespec() {
 						current_node->children.push_back(node);
 					}
 				});
-	if (current_node->str != "") {
+	if (!current_node->str.empty()) {
 		move_type_to_new_typedef(find_ancestor({AST::AST_MODULE, AST::AST_PACKAGE}), current_node->clone());
 	}
 }
@@ -2247,7 +2248,7 @@ void UhdmAst::process_int_typespec() {
 	auto range = new AST::AstNode(AST::AST_RANGE, left_const, right_const);
 	current_node->children.push_back(range);
 	current_node->is_signed = true;
-	if (current_node->str != "") {
+	if (!current_node->str.empty()) {
 		move_type_to_new_typedef(find_ancestor({AST::AST_MODULE, AST::AST_PACKAGE}), current_node);
 	}
 }
@@ -2268,9 +2269,8 @@ void UhdmAst::process_string_var() {
 		    auto range = make_ast_node(AST::AST_RANGE, {left_const, right_const});
 		    current_node->children.push_back(range);
 		}
-
 	});
-	if (current_node->children.size() == 0) {
+	if (current_node->children.empty()) {
 	    auto left_const = AST::AstNode::mkconst_int(64, true);
 	    auto right_const = AST::AstNode::mkconst_int(0, true);
 	    auto range = make_ast_node(AST::AST_RANGE, {left_const, right_const});
@@ -2301,7 +2301,7 @@ void UhdmAst::process_bit_typespec() {
 						current_node->children.push_back(node);
 					}
 				});
-	if (current_node->str != "") {
+	if (!current_node->str.empty()) {
 		move_type_to_new_typedef(find_ancestor({AST::AST_MODULE, AST::AST_PACKAGE}), current_node);
 	}
 }
@@ -2426,4 +2426,3 @@ void UhdmAst::report_error(const char *format, ...) const {
 }
 
 YOSYS_NAMESPACE_END
-
