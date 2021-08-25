@@ -46,7 +46,7 @@ start_section Install-Yosys
         mkdir -p ~/.local-src
         mkdir -p ~/.local-bin
         cd ~/.local-src
-        git clone https://github.com/SymbiFlow/yosys.git -b master+wip
+        git clone https://github.com/YosysHQ/yosys.git
         cd yosys
         make config-gcc # Build Yosys using GCC
         PREFIX=$HOME/.local-bin make -j$(nproc)
