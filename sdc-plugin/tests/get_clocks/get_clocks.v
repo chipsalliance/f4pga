@@ -39,11 +39,14 @@ module top (
       .CLKOUT0(main_clkout0),
   );
 
+  wire main_clkout0_bufg;
+  BUFG bufg (.I(main_clkout0), .O(main_clkout0_bufg));
+
   always @(posedge clk_int_2) begin
     cnt <= cnt + 1;
   end
 
-  always @(posedge main_clkout0) begin
+  always @(posedge main_clkout0_bufg) begin
     cnt2 <= cnt2 + 1;
   end
 

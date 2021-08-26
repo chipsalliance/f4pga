@@ -8,7 +8,7 @@ read_verilog -lib +/xilinx/cells_xtra.v
 hierarchy -check -auto-top
 
 # Start flow after library reading
-synth_xilinx -flatten -abc9 -nosrl -nodsp -iopad -run prepare:check
+synth_xilinx -flatten -abc9 -nosrl -nodsp -iopad -noclkbuf -run prepare:check
 
 # Read the design timing constraints
 read_sdc $::env(DESIGN_TOP).input.sdc
