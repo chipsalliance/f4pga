@@ -1,5 +1,5 @@
 yosys -import
-if { [info procs synth_quicklogic] == {} } { plugin -i ql-qlf}
+if { [info procs quicklogic_eqn] == {} } { plugin -i ql-qlf}
 yosys -import  ;# ingest plugin commands
 
 read_verilog $::env(DESIGN_TOP).v
