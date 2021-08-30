@@ -306,6 +306,9 @@ void UhdmAst::make_cell(vpiHandle obj_h, AST::AstNode* cell_node, AST::AstNode* 
 						 port_h,
 						 [&](AST::AstNode* node) {
 						 	if (node) {
+								if (node->type == AST::AST_PARAMETER || node->type == AST::AST_LOCALPARAM) {
+								    node->type = AST::AST_IDENTIFIER;
+								}
 						 		arg_node->children.push_back(node);
 						 	}
 						 });
@@ -403,7 +406,7 @@ void UhdmAst::process_design() {
 			else
 				current_node->children.push_back(pair.second);
 		} else {
-			log_warning("Removing module: %s from the design.\n", pair.second->str.c_str());
+			log_warning("Removing unused module: %s from the design.\n", pair.second->str.c_str());
 			delete pair.second;
 		}
 	}
@@ -534,8 +537,12 @@ void UhdmAst::process_port() {
 				visit_one_to_many({vpiElement},
 								  actual_h,
 								  [&](AST::AstNode* node) {
-									  if (node && GetSize(node->children) == 1)
+									  if (node && GetSize(node->children) == 1) {
 										  current_node->children.push_back(node->children[0]);
+										  if (node->children[0]->type == AST::AST_WIRETYPE) {
+										      current_node->is_custom_type=true;
+										  }
+									  }
 								  });
 				visit_one_to_many({vpiRange},
 								  actual_h,
@@ -581,15 +588,17 @@ void UhdmAst::process_port() {
 					 obj_h,
 					 [&](AST::AstNode* node) {
 						 if (node) {
-							 if (!node->str.empty()) {
-								 auto wiretype_node = new AST::AstNode(AST::AST_WIRETYPE);
-								 wiretype_node->str = node->str;
-								 // wiretype needs to be 1st node (if port have also another range nodes)
-								 current_node->children.insert(current_node->children.begin(), wiretype_node);
-								 current_node->is_custom_type=true;
-							 } else {
-								 // anonymous typedef, just move children
-								 current_node->children = std::move(node->children);
+							 if (!current_node->children.empty() && current_node->children[0]->type != AST::AST_WIRETYPE) {
+							     if (!node->str.empty()) {
+								     auto wiretype_node = new AST::AstNode(AST::AST_WIRETYPE);
+								     wiretype_node->str = node->str;
+								     // wiretype needs to be 1st node (if port have also another range nodes)
+								     current_node->children.insert(current_node->children.begin(), wiretype_node);
+								     current_node->is_custom_type = true;
+							     } else {
+								     // anonymous typedef, just move children
+								     current_node->children = std::move(node->children);
+							     }
 							 }
 							 delete node;
 						 }
@@ -676,7 +685,7 @@ void UhdmAst::process_module() {
 		visit_one_to_many({vpiParamAssign},
 						  obj_h,
 						  [&](AST::AstNode* node) {
-							  if (node) {
+							  if (node && node->type == AST::AST_PARAMETER) {
 								  if (shared.top_nodes.count(type) && !(!node->children.empty() && node->children[0]->type != AST::AST_CONSTANT)) {
 									  if (!node->children[0]->str.empty())
 										  module_parameters += node->str + "=" + node->children[0]->str;
@@ -1050,7 +1059,7 @@ void UhdmAst::process_cont_assign_var_init() {
 					 obj_h,
 					 [&](AST::AstNode* node) {
 						 if (node) {
-							 if (node->type == AST::AST_WIRE) {
+							 if (node->type == AST::AST_WIRE || node->type == AST::AST_PARAMETER || node->type == AST::AST_LOCALPARAM) {
 								 assign_node->children.push_back(new AST::AstNode(AST::AST_IDENTIFIER));
 								 assign_node->children.back()->str = node->str;
 							 } else {
@@ -1068,7 +1077,7 @@ void UhdmAst::process_cont_assign_net() {
 					 obj_h,
 					 [&](AST::AstNode* node) {
 						 if (node) {
-							 if (node->type == AST::AST_WIRE) {
+							 if (node->type == AST::AST_WIRE || node->type == AST::AST_PARAMETER || node->type == AST::AST_LOCALPARAM) {
 								 current_node->children.push_back(new AST::AstNode(AST::AST_IDENTIFIER));
 								 current_node->children.back()->str = node->str;
 							 } else {
@@ -1105,6 +1114,9 @@ void UhdmAst::process_assignment() {
 					 obj_h,
 					 [&](AST::AstNode* node) {
 						 if (node) {
+							 if(node->type == AST::AST_PARAMETER || node->type == AST::AST_LOCALPARAM) {
+								node->type = AST::AST_IDENTIFIER;
+							 }
 							 current_node->children.push_back(node);
 						 }
 					 });
@@ -1131,7 +1143,7 @@ void UhdmAst::process_net() {
 							 wiretype_node->str = node->str;
 							 // wiretype needs to be 1st node
 							 current_node->children.insert(current_node->children.begin(), wiretype_node);
-							 current_node->is_custom_type=true;
+							 current_node->is_custom_type = true;
 						 }
 					 });
 	visit_range(obj_h,
@@ -2335,6 +2347,7 @@ AST::AstNode* UhdmAst::process_object(vpiHandle obj_handle) {
 		case vpiContAssign: process_cont_assign(); break;
 		case vpiAssignStmt:
 		case vpiAssignment: process_assignment(); break;
+		case vpiRefVar:
 		case vpiRefObj: current_node = make_ast_node(AST::AST_IDENTIFIER); break;
 		case vpiNet: process_net(); break;
 		case vpiArrayNet: process_array_net(); break;
