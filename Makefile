@@ -14,6 +14,14 @@ PLUGINS_TEST := $(foreach plugin,$(PLUGIN_LIST),test_$(plugin))
 
 all: plugins
 
+TOP_DIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
+REQUIREMENTS_FILE ?= requirements.txt
+ENVIRONMENT_FILE ?= environment.yml
+
+include third_party/make-env/conda.mk
+
+env:: | $(CONDA_ENV_PYTHON)
+
 define install_plugin =
 $(1).so:
 	$$(MAKE) -C $(1)-plugin $$@
@@ -36,7 +44,7 @@ install: $(PLUGINS_INSTALL)
 
 test: $(PLUGINS_TEST)
 
-clean: $(PLUGINS_CLEAN)
+clean:: $(PLUGINS_CLEAN)
 
 CLANG_FORMAT ?= clang-format-8
 format:

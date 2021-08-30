@@ -31,5 +31,8 @@ if {[catch {invalid command} result]} {
 }
 close $fp
 
+# Clean processes before writing JSON.
+yosys proc
+
 # Write the design in JSON format.
 write_json [test_output_path "port_indexes.json"]

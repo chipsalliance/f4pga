@@ -11,5 +11,8 @@ synth_xilinx -flatten -abc9 -nosrl -noclkbuf -nodsp
 #Read the design constraints
 read_xdc -part_json [file dirname [info script]]/../xc7a35tcsg324-1.json $::env(DESIGN_TOP).xdc
 
+# Clean processes before writing JSON.
+yosys proc
+
 # Write the design in JSON format.
 write_json [test_output_path "package_pins-dict-space.json"]

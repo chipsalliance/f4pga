@@ -50,6 +50,9 @@ opt_clean
 setundef -zero -params
 stat
 
+# Clean processes before writing JSON.
+yosys proc
+
 # Write the design in JSON format.
 write_json [test_output_path "pll.json"]
 write_blif -attr -param -cname -conn [test_output_path "pll.eblif"]
