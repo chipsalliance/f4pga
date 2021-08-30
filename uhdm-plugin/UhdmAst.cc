@@ -170,8 +170,7 @@ AST::AstNode *UhdmAst::process_value(vpiHandle obj_h) {
 			default: {
 				const uhdm_handle* const handle = (const uhdm_handle*) obj_h;
 				const UHDM::BaseClass* const object = (const UHDM::BaseClass*) handle->object;
-				report_error("Encountered unhandled constant format %d at %s:%d\n", val.format,
-							 object->VpiFile().c_str(), object->VpiLineNo());
+				report_error("%s:%d: Encountered unhandled constant format %d\n", object->VpiFile().c_str(), object->VpiLineNo(), val.format);
 			}
 		}
 		// handle vpiBinStrVal, vpiDecStrVal and vpiHexStrVal
@@ -453,9 +452,8 @@ void UhdmAst::process_parameter() {
 			default: {
 				const uhdm_handle* const handle = (const uhdm_handle*) typespec_h;
 				const UHDM::BaseClass* const object = (const UHDM::BaseClass*) handle->object;
-				report_error("Encountered unhandled typespec in process_parameter: '%s' of type '%s' at %s:%d\n",
-							 object->VpiName().c_str(), UHDM::VpiTypeName(typespec_h).c_str(), object->VpiFile().c_str(),
-							 object->VpiLineNo());
+				report_error("%s:%d: Encountered unhandled typespec in process_parameter: '%s' of type '%s'\n", object->VpiFile().c_str(), object->VpiLineNo(),
+							 object->VpiName().c_str(), UHDM::VpiTypeName(typespec_h).c_str());
 				break;
 			}
 		}
@@ -570,8 +568,8 @@ void UhdmAst::process_port() {
 			default: {
 				const uhdm_handle* const handle = (const uhdm_handle*) actual_h;
 				const UHDM::BaseClass* const object = (const UHDM::BaseClass*) handle->object;
-				report_error("Encountered unhandled type in process_port: %s at %s:%d\n", UHDM::VpiTypeName(actual_h).c_str(),
-							 object->VpiFile().c_str(), object->VpiLineNo());
+				report_error("%s:%d: Encountered unhandled type in process_port: %s\n", object->VpiFile().c_str(), object->VpiLineNo(),
+                             UHDM::VpiTypeName(actual_h).c_str());
 				break;
 			}
 		}
@@ -860,9 +858,9 @@ void UhdmAst::process_typespec_member() {
 		default: {
 			const uhdm_handle* const handle = (const uhdm_handle*) typespec_h;
 			const UHDM::BaseClass* const object = (const UHDM::BaseClass*) handle->object;
-			report_error("Encountered unhandled typespec in process_typespec_member: '%s' of type '%s' at %s:%d\n",
-						 object->VpiName().c_str(), UHDM::VpiTypeName(typespec_h).c_str(), object->VpiFile().c_str(),
-						 object->VpiLineNo());
+			report_error("%s:%d: Encountered unhandled typespec in process_typespec_member: '%s' of type '%s'\n", object->VpiFile().c_str(),
+                         object->VpiLineNo(),
+						 object->VpiName().c_str(), UHDM::VpiTypeName(typespec_h).c_str());
 			break;
 		}
 	}
@@ -912,9 +910,9 @@ void UhdmAst::process_enum_typespec() {
 			default: {
 				const uhdm_handle* const handle = (const uhdm_handle*) typespec_h;
 				const UHDM::BaseClass* const object = (const UHDM::BaseClass*) handle->object;
-				report_error("Encountered unhandled typespec in process_enum_typespec: '%s' of type '%s' at %s:%d\n",
-							 object->VpiName().c_str(), UHDM::VpiTypeName(typespec_h).c_str(), object->VpiFile().c_str(),
-							 object->VpiLineNo());
+				report_error("%s:%d: Encountered unhandled typespec in process_enum_typespec: '%s' of type '%s'\n", object->VpiFile().c_str(),
+							 object->VpiLineNo(),
+							 object->VpiName().c_str(), UHDM::VpiTypeName(typespec_h).c_str());
 				break;
 			}
 		}
@@ -1513,8 +1511,7 @@ void UhdmAst::process_operation() {
 					current_node = nullptr;
 					const uhdm_handle* const handle = (const uhdm_handle*) obj_h;
 					const UHDM::BaseClass* const object = (const UHDM::BaseClass*) handle->object;
-					report_error("Encountered unhandled operation type %d at %s:%d\n", operation,
-								 object->VpiFile().c_str(), object->VpiLineNo());
+					report_error("%s:%d: Encountered unhandled operation type %d\n", object->VpiFile().c_str(), object->VpiLineNo(), operation);
 				}
 			}
 		}
@@ -2388,8 +2385,9 @@ AST::AstNode* UhdmAst::process_object(vpiHandle obj_handle) {
 		case vpiStringVar: process_string_var(); break;
 		case vpiStringTypespec: process_string_typespec(); break;
 		case vpiProgram:
-		default: report_error("Encountered unhandled object '%s' of type '%s' at %s:%d\n", object->VpiName().c_str(),
-							  UHDM::VpiTypeName(obj_h).c_str(), object->VpiFile().c_str(), object->VpiLineNo()); break;
+		default: report_error("%s:%d: Encountered unhandled object '%s' of type '%s'\n", object->VpiFile().c_str(), object->VpiLineNo(), object->VpiName().c_str(),
+                          UHDM::VpiTypeName(obj_h).c_str());
+        break;
 	}
 
 	// Check if we initialized the node in switch-case
