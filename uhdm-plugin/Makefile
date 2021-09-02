@@ -1,6 +1,7 @@
 NAME = uhdm
 SOURCES = UhdmAst.cc \
 	  uhdmastfrontend.cc \
+	  uhdmsurelogastfrontend.cc \
 	  uhdmastreport.cc \
 	  vpivisitor.cc
 
