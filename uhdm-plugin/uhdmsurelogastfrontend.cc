@@ -54,133 +54,33 @@ get_line_num(void)
 	return 1;
 }
 
-unsigned int executeCompilation(
-		int argc, const char** argv, bool diff_comp_mode, bool fileunit,
-		SURELOG::ErrorContainer::Stats* overallStats = NULL) {
+std::vector<vpiHandle> executeCompilation(SURELOG::SymbolTable* symbolTable,
+		SURELOG::ErrorContainer* errors, SURELOG::CommandLineParser* clp,
+		SURELOG::scompiler* compiler) {
 	bool success = true;
 	bool noFatalErrors = true;
 	unsigned int codedReturn = 0;
-	SURELOG::SymbolTable* symbolTable = new SURELOG::SymbolTable();
-	SURELOG::ErrorContainer* errors = new SURELOG::ErrorContainer(symbolTable);
-	SURELOG::CommandLineParser* clp = new SURELOG::CommandLineParser(
-			errors, symbolTable, diff_comp_mode, fileunit);
-	success = clp->parseCommandLine(argc, argv);
-	bool parseOnly = clp->parseOnly();
+	clp->setWriteUhdm(false);
 	errors->printMessages(clp->muteStdout());
+	std::vector<vpiHandle> the_design;
 	if (success && (!clp->help())) {
-		SURELOG::scompiler* compiler = SURELOG::start_compiler(clp);
+		compiler = SURELOG::start_compiler(clp);
 		if (!compiler) codedReturn |= 1;
-		SURELOG::shutdown_compiler(compiler);
+		the_design.push_back(SURELOG::get_uhdm_design(compiler));
 	}
 	SURELOG::ErrorContainer::Stats stats;
 	if (!clp->help()) {
 		stats = errors->getErrorStats();
-		if (overallStats) (*overallStats) += stats;
 		if (stats.nbFatal) codedReturn |= 1;
 		if (stats.nbSyntax) codedReturn |= 2;
-		// Only return non-zero for fatal and syntax errors
-		// if (stats.nbError)
-		//	codedReturn |= 4;
 	}
 	bool noFErrors = true;
 	if (!clp->help()) noFErrors = errors->printStats(stats, clp->muteStdout());
 	if (noFErrors == false) {
 		noFatalErrors = false;
 	}
-
-	std::string ext_command = clp->getExeCommand();
-	if (!ext_command.empty()) {
-		std::string directory = symbolTable->getSymbol(clp->getFullCompileDir());
-		std::string fileList = directory + "/file.lst";
-		std::string command = ext_command + " " + fileList;
-		int result = system(command.c_str());
-		codedReturn |= result;
-		std::cout << "Command result: " << result << std::endl;
-	}
-	clp->logFooter();
-	if (diff_comp_mode && fileunit) {
-		SURELOG::Report* report = new SURELOG::Report();
-		std::pair<bool, bool> results =
-				report->makeDiffCompUnitReport(clp, symbolTable);
-		success = results.first;
-		noFatalErrors = results.second;
-		delete report;
-	}
-	clp->cleanCache();	// only if -nocache
-	delete clp;
-	delete symbolTable;
-	delete errors;
 	if ((!noFatalErrors) || (!success)) codedReturn |= 1;
-	if (parseOnly)
-		return 0;
-	else
-		return codedReturn;
-}
-
-enum COMP_MODE {
-	NORMAL,
-	DIFF,
-	BATCH,
-};
-
-int run_surelog(int argc, const char** argv) {
-	SURELOG::Waiver::initWaivers();
-
-	unsigned int codedReturn = 0;
-	COMP_MODE mode = NORMAL;
-	bool nostdout = false;
-	std::string batchFile;
-	std::string diff_unit_opt = "-diffcompunit";
-	std::string parseonly_opt = "-parseonly";
-	std::string batch_opt = "-batch";
-	std::string nostdout_opt = "-nostdout";
-	for (int i = 1; i < argc; i++) {
-		if (parseonly_opt == argv[i]) {
-		} else if (diff_unit_opt == argv[i]) {
-			mode = DIFF;
-		} else if (batch_opt == argv[i]) {
-			batchFile = argv[i + 1];
-			i++;
-			mode = BATCH;
-		} else if (nostdout_opt == argv[i]) {
-			nostdout = true;
-		}
-	}
-
-	switch (mode) {
-		case DIFF: {
-#if (defined(_MSC_VER) || defined(__MINGW32__) || defined(__CYGWIN__))
-			// REVISIT: Windows doesn't have the concept of forks!
-			// Implement it sequentially for now and optimize it if this
-			// proves to be a bottleneck (preferably, implemented as a
-			// cross platform solution).
-			executeCompilation(argc, argv, true, false);
-			codedReturn = executeCompilation(argc, argv, true, true);
-#else
-			pid_t pid = fork();
-			if (pid == 0) {
-				// child process
-				executeCompilation(argc, argv, true, false);
-			} else if (pid > 0) {
-				// parent process
-				codedReturn = executeCompilation(argc, argv, true, true);
-			} else {
-				// fork failed
-				printf("fork() failed!\n");
-				return 1;
-			}
-#endif
-			break;
-		}
-		case NORMAL:
-			codedReturn = executeCompilation(argc, argv, false, false);
-			break;
-		case BATCH:
-			printf("Currently batch mode is not supported!\n");
-			return 1;
-	}
-
-	return codedReturn;
+	return the_design;
 }
 
 struct UhdmSurelogAstFrontend : public Frontend {
@@ -218,60 +118,56 @@ struct UhdmSurelogAstFrontend : public Frontend {
 		UhdmAstShared shared;
 		UhdmAst uhdm_ast(shared);
 		bool defer = false;
-		bool process = false;
 
 		std::string report_directory;
-		for (size_t i = 1; i < args.size(); i++) {
-			if (args[i] == "-process" || process == true) {
-				process = true;
-				if (args[i] == "-debug") {
-					shared.debug_flag = true;
-				} else if (args[i] == "-report" && ++i < args.size()) {
-					report_directory = args[i];
-					shared.stop_on_error = false;
-				} else if (args[i] == "-noassert") {
-					shared.no_assert = true;
-				} else if (args[i] == "-defer") {
-					defer = true;
-				}
+		auto it = args.begin();
+		while (it != args.end()) {
+			if (*it == "-debug") {
+				shared.debug_flag = true;
+				it = args.erase(it);
+			} else if (*it == "-report" && (it = args.erase(it)) < args.end()) {
+				report_directory = *it;
+				shared.stop_on_error = false;
+				it = args.erase(it);
+			} else if (*it == "-noassert") {
+				shared.no_assert = true;
+				it = args.erase(it);
+			} else if (*it == "-defer") {
+				defer = true;
+				it = args.erase(it);
+			} else {
+				++it;
 			}
 		}
-		if (!process) {
-			std::vector<const char*> cstrings;
-			cstrings.reserve(args.size());
-			for(size_t i = 0; i < args.size(); ++i)
-				cstrings.push_back(const_cast<char*>(args[i].c_str()));
-			run_surelog(cstrings.size(), &cstrings[0]);
-		} else {
-			extra_args(f, filename, args, args.size() - 1);
-			AST::current_filename = filename;
-			AST::set_line_num = &set_line_num;
-			AST::get_line_num = &get_line_num;
-			struct AST::AstNode *current_ast;
+		std::vector<const char*> cstrings;
+		cstrings.reserve(args.size());
+		for(size_t i = 0; i < args.size(); ++i)
+			cstrings.push_back(const_cast<char*>(args[i].c_str()));
 
-			UHDM::Serializer serializer;
-
-			std::vector<vpiHandle> restoredDesigns = serializer.Restore(filename);
-			for (auto design : restoredDesigns) {
-				std::stringstream strstr;
-				UHDM::visit_object(design, 1, "", &shared.report.unhandled, shared.debug_flag ? std::cout : strstr);
-			}
-			current_ast = uhdm_ast.visit_designs(restoredDesigns);
-			if (report_directory != "") {
-				shared.report.write(report_directory);
-			}
-			for (auto design : restoredDesigns) vpi_release_handle(design);
-			bool dump_ast1 = shared.debug_flag;
-			bool dump_ast2 = shared.debug_flag;
-			bool dont_redefine = false;
-			bool default_nettype_wire = true;
-			AST::process(design, current_ast,
-				dump_ast1, dump_ast2, false, false, false, false, false, false, false, false,
-				false, false, false, false, false, false, dont_redefine, false, defer, default_nettype_wire
-			);
-			delete current_ast;
+		SURELOG::SymbolTable* symbolTable = new SURELOG::SymbolTable();
+		SURELOG::ErrorContainer* errors = new SURELOG::ErrorContainer(symbolTable);
+		SURELOG::CommandLineParser* clp = new SURELOG::CommandLineParser(
+				errors, symbolTable, false, false);
+		clp->parseCommandLine(cstrings.size(), &cstrings[0]);
+		SURELOG::scompiler* compiler = nullptr;
+		const std::vector<vpiHandle> uhdm_design = executeCompilation(symbolTable, errors, clp, compiler);
+		struct AST::AstNode *current_ast = uhdm_ast.visit_designs(uhdm_design);
+		if (report_directory != "") {
+			shared.report.write(report_directory);
 		}
-
+		bool dump_ast1 = shared.debug_flag;
+		bool dump_ast2 = shared.debug_flag;
+		bool dont_redefine = false;
+		bool default_nettype_wire = true;
+		AST::process(design, current_ast,
+			dump_ast1, dump_ast2, false, false, false, false, false, false, false, false,
+			false, false, false, false, false, false, dont_redefine, false, defer, default_nettype_wire
+		);
+		delete current_ast;
+		SURELOG::shutdown_compiler(compiler);
+		delete clp;
+		delete symbolTable;
+		delete errors;
 	}
 } UhdmSurelogAstFrontend;
 
