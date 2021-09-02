@@ -32,7 +32,6 @@
 #endif
 
 #include "ErrorReporting/Report.h"
-#include "StringUtils.h"
 #include "surelog.h"
 
 namespace UHDM {
@@ -124,56 +123,6 @@ enum COMP_MODE {
 	BATCH,
 };
 
-int batchCompilation(const char* argv0, std::string batchFile, bool nostdout) {
-	char path[10000];
-	int returnCode = 0;
-	SURELOG::ErrorContainer::Stats overallStats;
-	char* p = getcwd(path, 9999);
-	if (!p) returnCode |= 1;
-	std::ifstream stream;
-	stream.open(batchFile);
-	if (!stream.good()) {
-		returnCode |= 1;
-		return returnCode;
-	}
-	std::string line;
-	int count = 0;
-	while (std::getline(stream, line)) {
-		if (!nostdout)
-			std::cout << "Processing: " << line << std::endl << std::flush;
-		std::vector<std::string> args;
-		SURELOG::StringUtils::tokenize(line, " ", args);
-		int argc = args.size() + 1;
-		char** argv = new char*[argc];
-		argv[0] = new char[strlen(argv0) + 1];
-		strcpy(argv[0], argv0);
-		for (int i = 0; i < argc - 1; i++) {
-			argv[i + 1] = new char[args[i].length() + 1];
-			strcpy(argv[i + 1], args[i].c_str());
-		}
-		returnCode |= executeCompilation(argc, (const char**)argv, false, false, &overallStats);
-		for (int i = 0; i < argc; i++) {
-			delete[] argv[i];
-		}
-		delete[] argv;
-		count++;
-		int ret = chdir(path);
-		if (ret < 0) {
-			std::cout << "FATAL: Could not change directory to " << path << "\n" << std::endl;
-			returnCode |= 1;
-		}
-	}
-	if (!nostdout)
-		std::cout << "Processed " << count << " tests." << std::endl << std::flush;
-	SURELOG::SymbolTable* symbolTable = new SURELOG::SymbolTable();
-	SURELOG::ErrorContainer* errors = new SURELOG::ErrorContainer(symbolTable);
-	if (!nostdout) errors->printStats(overallStats);
-	delete errors;
-	delete symbolTable;
-	stream.close();
-	return returnCode;
-}
-
 int run_surelog(int argc, const char** argv) {
 	SURELOG::Waiver::initWaivers();
 
@@ -227,8 +176,8 @@ int run_surelog(int argc, const char** argv) {
 			codedReturn = executeCompilation(argc, argv, false, false);
 			break;
 		case BATCH:
-			codedReturn = batchCompilation(argv[0], batchFile, nostdout);
-			break;
+			printf("Currently batch mode is not supported!\n");
+			return 1;
 	}
 
 	return codedReturn;
