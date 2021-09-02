@@ -13,4 +13,4 @@ CPPFLAGS += -std=c++17 -I${UHDM_INSTALL_DIR}/include/uhdm \
 
 CXXFLAGS += -Wno-inconsistent-missing-override -Wno-unused-parameter
 LDFLAGS += -L${UHDM_INSTALL_DIR}/lib/uhdm -L${UHDM_INSTALL_DIR}/lib/surelog -L${UHDM_INSTALL_DIR}/lib
-LDLIBS += -luhdm -lcapnp -lkj -ldl -lutil -lm -lrt -lpthread -lsurelog
+LDLIBS += -luhdm -lcapnp -lkj -ldl -lutil -lm -lrt -lpthread -lsurelog -lantlr4-runtime -lflatbuffers
