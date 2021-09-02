@@ -23,14 +23,6 @@
 #include "frontends/ast/ast.h"
 #include "UhdmAst.h"
 
-#if defined(_MSC_VER)
-#include <direct.h>
-#include <process.h>
-#else
-#include <sys/param.h>
-#include <unistd.h>
-#endif
-
 namespace UHDM {
 	extern void visit_object (vpiHandle obj_h, int indent, const char *relation, std::set<const BaseClass*>* visited, std::ostream& out, bool shallowVisit = false);
 }
