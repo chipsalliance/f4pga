@@ -219,7 +219,8 @@ static void add_or_replace_child(AST::AstNode* parent, AST::AstNode* child) {
 				child->is_input = (*it)->is_input;
 				child->is_output = (*it)->is_output;
 				child->port_id = (*it)->port_id;
-				child->type = AST::AST_WIRE;
+				if (child->type == AST::AST_MEMORY)
+				    child->type = AST::AST_WIRE;
 			}
 			if (!(*it)->children.empty() && child->children.empty()) {
 				// This is a bit ugly, but if the child we're replacing has children and
