@@ -51,7 +51,6 @@ jobs:
 
     - name: Build and test plugins
       run: |
-        source env/conda/bin/activate yosys-plugins
         source .github/workflows/build-and-test.sh
       env:
         OS: ${{ runner.os }}
