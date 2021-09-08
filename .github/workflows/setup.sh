@@ -40,13 +40,25 @@ end_section
 start_section Install-Yosys
 (
     echo '=========================='
-    echo 'Making env with yosys'
+    echo 'Making env with yosys and Surelog'
     echo '=========================='
-    make env
-    make enter
+    mkdir -p ~/.local-src
+    mkdir -p ~/.local-bin
+    cd ~/.local-src
+    git clone https://github.com/antmicro/yosys.git -b uhdm-plugin
+    cd yosys
+    PREFIX=$HOME/.local-bin make -j$(nproc)
+    PREFIX=$HOME/.local-bin make install
     echo $(which yosys)
     echo $(which yosys-config)
     echo $(yosys-config --datdir)
+    cd ..
+    git clone --recursive https://github.com/chipsalliance/Surelog.git -b master
+    cd Surelog
+    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$HOME/.local-bin -DCMAKE_POSITION_INDEPENDENT_CODE=ON -S . -B build
+    cmake --build build -j $(nproc)
+    cmake --install build
+    cd ../..
 )
 end_section
 
