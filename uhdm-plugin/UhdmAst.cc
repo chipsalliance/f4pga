@@ -948,11 +948,18 @@ void UhdmAst::process_array_var()
             shared.report.mark_handled(reg_h);
             shared.report.mark_handled(typespec_h);
             vpi_release_handle(typespec_h);
+        } else if (vpi_get(vpiType, reg_h) == vpiLogicVar) {
+            current_node->is_logic = true;
+            visit_one_to_many({vpiRange}, reg_h, [&](AST::AstNode *node) { current_node->children.push_back(node); });
         }
         vpi_release_handle(reg_h);
     }
     vpi_release_handle(itr);
     visit_one_to_many({vpiRange}, obj_h, [&](AST::AstNode *node) { current_node->children.push_back(node); });
+    if (current_node->children.size() == 2 && current_node->children[0]->type == AST::AST_RANGE &&
+        current_node->children[1]->type == AST::AST_RANGE) {
+        current_node->type = AST::AST_MEMORY;
+    }
 }
 
 void UhdmAst::process_param_assign()
@@ -2024,6 +2031,7 @@ void UhdmAst::process_function()
 void UhdmAst::process_logic_var()
 {
     current_node = make_ast_node(AST::AST_WIRE);
+    current_node->is_logic = true;
     // TODO: add const attribute, but it seems it is little more
     // then just setting boolean value
     // current_node->is_const = vpi_get(vpiConstantVariable, obj_h);
