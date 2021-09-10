@@ -25,11 +25,9 @@ end_section
 
 ##########################################################################
 
-#Disable testing, as for now there isn't any uhdm-plugin related tests
-#and some other test is failing
-#start_section Testing
-#make test -j`nproc`
-#end_section
+start_section Testing
+make test -j`nproc`
+end_section
 
 ##########################################################################
 
