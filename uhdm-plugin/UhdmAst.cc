@@ -22,18 +22,20 @@ static void sanitize_symbol_name(std::string &name)
     }
 }
 
-static std::string get_name(vpiHandle obj_h)
+static std::string get_name(vpiHandle obj_h, bool prefer_full_name = false)
 {
+    auto first_check = prefer_full_name ? vpiFullName : vpiName;
+    auto last_check = prefer_full_name ? vpiName : vpiFullName;
     std::string name;
-    if (auto s = vpi_get_str(vpiName, obj_h)) {
+    if (auto s = vpi_get_str(first_check, obj_h)) {
         name = s;
     } else if (auto s = vpi_get_str(vpiDefName, obj_h)) {
         name = s;
-    } else if (auto s = vpi_get_str(vpiFullName, obj_h)) {
+    } else if (auto s = vpi_get_str(last_check, obj_h)) {
         name = s;
-        if (name.rfind('.') != std::string::npos) {
-            name = name.substr(name.rfind('.') + 1);
-        }
+    }
+    if (name.rfind('.') != std::string::npos) {
+        name = name.substr(name.rfind('.') + 1);
     }
     sanitize_symbol_name(name);
     return name;
@@ -193,10 +195,10 @@ AST::AstNode *UhdmAst::process_value(vpiHandle obj_h)
     return nullptr;
 }
 
-AST::AstNode *UhdmAst::make_ast_node(AST::AstNodeType type, std::vector<AST::AstNode *> children)
+AST::AstNode *UhdmAst::make_ast_node(AST::AstNodeType type, std::vector<AST::AstNode *> children, bool prefer_full_name)
 {
     auto node = new AST::AstNode(type);
-    node->str = get_name(obj_h);
+    node->str = get_name(obj_h, prefer_full_name);
     auto it = node_renames.find(node->str);
     if (it != node_renames.end())
         node->str = it->second;
@@ -415,7 +417,7 @@ void UhdmAst::process_design()
 void UhdmAst::process_parameter()
 {
     auto type = vpi_get(vpiLocalParam, obj_h) == 1 ? AST::AST_LOCALPARAM : AST::AST_PARAMETER;
-    current_node = make_ast_node(type);
+    current_node = make_ast_node(type, {}, true);
     // if (vpi_get_str(vpiImported, obj_h) != "") { } //currently unused
     std::vector<AST::AstNode *> range_nodes;
     visit_range(obj_h, [&](AST::AstNode *node) {
@@ -1136,6 +1138,7 @@ void UhdmAst::process_package()
     current_node = make_ast_node(AST::AST_PACKAGE);
     visit_one_to_many({vpiParameter, vpiParamAssign}, obj_h, [&](AST::AstNode *node) {
         if (node) {
+            node->str = strip_package_name(node->str);
             add_or_replace_child(current_node, node);
         }
     });
@@ -2076,6 +2079,7 @@ void UhdmAst::process_func_call()
         if (node) {
             if (node->type == AST::AST_PARAMETER || node->type == AST::AST_LOCALPARAM) {
                 node->type = AST::AST_IDENTIFIER;
+                node->children.clear();
             }
             current_node->children.push_back(node);
         }
