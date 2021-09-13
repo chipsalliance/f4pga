@@ -6,9 +6,11 @@
 #include "UhdmAst.h"
 #include "frontends/ast/ast.h"
 #include "frontends/verilog/verilog_frontend.h"
-#include "headers/uhdm.h"
 #include "libs/sha1/sha1.h"
-#include "vpi_user.h"
+
+// UHDM
+#include <uhdm/uhdm.h>
+#include <uhdm/vpi_user.h>
 
 YOSYS_NAMESPACE_BEGIN
 

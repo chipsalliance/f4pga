@@ -5,8 +5,8 @@
 #include <vector>
 #undef cover
 
-#include "uhdm.h"
 #include "uhdmastshared.h"
+#include <uhdm/uhdm.h>
 
 YOSYS_NAMESPACE_BEGIN
 

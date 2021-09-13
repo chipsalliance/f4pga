@@ -1,8 +1,8 @@
 #include "uhdmastreport.h"
-#include "BaseClass.h"
 #include "frontends/ast/ast.h"
 #include <fstream>
 #include <sys/stat.h>
+#include <uhdm/BaseClass.h>
 #include <unordered_set>
 
 YOSYS_NAMESPACE_BEGIN

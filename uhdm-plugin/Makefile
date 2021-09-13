@@ -14,9 +14,7 @@ SOURCES = UhdmAst.cc \
 
 include ../Makefile_plugin.common
 
-CPPFLAGS += -std=c++17 -I${UHDM_INSTALL_DIR}/include/uhdm \
-			-I${UHDM_INSTALL_DIR}/include/uhdm/include \
-			-I${UHDM_INSTALL_DIR}/include/uhdm/headers \
+CPPFLAGS += -std=c++17 -I${UHDM_INSTALL_DIR}/include \
 			-I${UHDM_INSTALL_DIR}/include/surelog
 
 CXXFLAGS += -Wno-inconsistent-missing-override -Wno-unused-parameter
