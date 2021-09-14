@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <cstring>
 #include <functional>
+#include <string>
 #include <vector>
 
 #include "UhdmAst.h"
@@ -1223,6 +1224,8 @@ void UhdmAst::process_io_decl()
                 for (auto child : node->children) {
                     current_node->children.push_back(child->clone());
                 }
+                current_node->is_logic = node->is_logic;
+                current_node->is_reg = node->is_reg;
             }
             delete node;
         }
@@ -1886,37 +1889,44 @@ void UhdmAst::process_if_else()
 void UhdmAst::process_for()
 {
     current_node = make_ast_node(AST::AST_FOR);
+    auto loop = current_node;
     auto loop_id = shared.next_loop_id();
     current_node->str = "$loop" + std::to_string(loop_id);
-    auto parent_node = find_ancestor({AST::AST_FUNCTION, AST::AST_GENBLOCK, AST::AST_MODULE});
     visit_one_to_many({vpiForInitStmt}, obj_h, [&](AST::AstNode *node) {
         if (node->type == AST::AST_ASSIGN_LE)
             node->type = AST::AST_ASSIGN_EQ;
         auto lhs = node->children[0];
         if (lhs->type == AST::AST_WIRE) {
-            auto old_str = lhs->str;
-            lhs->str = '\\' + current_node->str.substr(1) + "::" + lhs->str.substr(1);
-            node_renames.insert(std::make_pair(old_str, lhs->str));
+            current_node = make_ast_node(AST::AST_BLOCK);
+            current_node->str = "$fordecl_block" + std::to_string(loop_id);
             auto *wire = lhs->clone();
             wire->is_reg = true;
-            parent_node->children.push_back(wire);
+            current_node->children.push_back(wire);
             lhs->type = AST::AST_IDENTIFIER;
             lhs->is_signed = false;
             lhs->delete_children();
+            current_node->children.push_back(loop);
         }
-        current_node->children.push_back(node);
+        loop->children.push_back(node);
     });
-    visit_one_to_one({vpiCondition}, obj_h, [&](AST::AstNode *node) { current_node->children.push_back(node); });
+    visit_one_to_one({vpiCondition}, obj_h, [&](AST::AstNode *node) { loop->children.push_back(node); });
     visit_one_to_many({vpiForIncStmt}, obj_h, [&](AST::AstNode *node) {
         if (node->type == AST::AST_ASSIGN_LE)
             node->type = AST::AST_ASSIGN_EQ;
-        current_node->children.push_back(node);
+        loop->children.push_back(node);
     });
     visit_one_to_one({vpiStmt}, obj_h, [&](AST::AstNode *node) {
-        auto *statements = make_ast_node(AST::AST_BLOCK);
-        statements->str = current_node->str; // Needed in simplify step
-        statements->children.push_back(node);
-        current_node->children.push_back(statements);
+        if (node->type != AST::AST_BLOCK) {
+            auto *statements = make_ast_node(AST::AST_BLOCK);
+            statements->str = current_node->str; // Needed in simplify step
+            statements->children.push_back(node);
+            loop->children.push_back(statements);
+        } else {
+            if (node->str == "") {
+                node->str = loop->str;
+            }
+            loop->children.push_back(node);
+        }
     });
 }
 
@@ -2023,6 +2033,7 @@ void UhdmAst::process_function()
     });
     visit_one_to_many({vpiIODecl}, obj_h, [&](AST::AstNode *node) {
         node->type = AST::AST_WIRE;
+        node->port_id = shared.next_port_id();
         current_node->children.push_back(node);
     });
     visit_one_to_many({vpiVariables}, obj_h, [&](AST::AstNode *node) { current_node->children.push_back(node); });
@@ -2305,8 +2316,12 @@ AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
         process_initial();
         break;
     case vpiNamedBegin:
+        process_begin();
+        break;
     case vpiBegin:
         process_begin();
+        // for unnamed block, reset block name
+        current_node->str = "";
         break;
     case vpiCondition:
     case vpiOperation:
