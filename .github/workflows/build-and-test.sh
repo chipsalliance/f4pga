@@ -32,7 +32,7 @@ end_section
 ##########################################################################
 
 start_section Cleanup
-make clean -j`nproc`
+make plugins_clean -j`nproc`
 end_section
 
 ##########################################################################

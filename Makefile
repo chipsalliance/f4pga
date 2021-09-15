@@ -44,7 +44,9 @@ install: $(PLUGINS_INSTALL)
 
 test: $(PLUGINS_TEST)
 
-clean:: $(PLUGINS_CLEAN)
+plugins_clean: $(PLUGINS_CLEAN)
+
+clean:: plugins_clean
 
 CLANG_FORMAT ?= clang-format-8
 format:
