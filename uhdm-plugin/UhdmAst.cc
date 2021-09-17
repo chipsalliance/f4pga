@@ -338,9 +338,11 @@ void UhdmAst::move_type_to_new_typedef(AST::AstNode *current_node, AST::AstNode 
     typedef_node->location = type_node->location;
     typedef_node->filename = type_node->filename;
     typedef_node->str = strip_package_name(type_node->str);
-    if (std::find(shared.type_names.begin(), shared.type_names.end(), std::make_pair(type_node->str, current_node->str)) != shared.type_names.end())
-        return;
-    shared.type_names.push_back(std::make_pair(type_node->str, current_node->str));
+    for (auto c : current_node->children) {
+        if (c->str == typedef_node->str) {
+            return;
+        }
+    }
     if (type_node->type == AST::AST_STRUCT) {
         type_node->str.clear();
         typedef_node->children.push_back(type_node);
@@ -906,21 +908,12 @@ void UhdmAst::process_custom_var()
             // anonymous typespec, move the children to variable
             current_node->type = node->type;
             current_node->children = std::move(node->children);
-            delete node;
         } else {
-            // custom var in gen scope have definition with declaration
-            auto *parent = find_ancestor({AST::AST_GENBLOCK, AST::AST_BLOCK});
             auto wiretype_node = new AST::AstNode(AST::AST_WIRETYPE);
             wiretype_node->str = node->str;
             current_node->children.push_back(wiretype_node);
-            if (parent &&
-                std::find(shared.type_names.begin(), shared.type_names.end(), std::make_pair(node->str, parent->str)) == shared.type_names.end() &&
-                !node->children.empty()) {
-                move_type_to_new_typedef(parent, node);
-            } else {
-                delete node;
-            }
         }
+        delete node;
     });
     auto type = vpi_get(vpiType, obj_h);
     if (type == vpiEnumVar || type == vpiStructVar) {
@@ -1979,6 +1972,12 @@ void UhdmAst::process_gen_scope_array()
 void UhdmAst::process_gen_scope()
 {
     current_node = make_ast_node(AST::AST_GENBLOCK);
+    visit_one_to_many({vpiTypedef}, obj_h, [&](AST::AstNode *node) {
+        if (node) {
+            move_type_to_new_typedef(current_node, node);
+        }
+    });
+
     visit_one_to_many({vpiParamAssign, vpiParameter, vpiNet, vpiArrayNet, vpiVariables, vpiContAssign, vpiProcess, vpiModule, vpiGenScopeArray},
                       obj_h, [&](AST::AstNode *node) {
                           if (node) {

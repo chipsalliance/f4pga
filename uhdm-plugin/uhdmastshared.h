@@ -44,9 +44,6 @@ class UhdmAstShared
     // UHDM node coverage report
     UhdmAstReport report;
 
-    // Vector with name of typedef and name of scope it is declared in
-    std::vector<std::pair<std::string, std::string>> type_names;
-
     // Map from AST param nodes to their types (used for params with struct types)
     std::unordered_map<std::string, AST::AstNode *> param_types;
 };
