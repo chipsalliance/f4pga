@@ -166,7 +166,14 @@ AST::AstNode *UhdmAst::process_value(vpiHandle obj_h)
         case vpiUIntVal:
         case vpiIntVal: {
             auto size = vpi_get(vpiSize, obj_h);
-            auto c = AST::AstNode::mkconst_int(val.value.integer, true, size ? size : 64);
+            // Surelog by default returns 64 bit numbers and stardard says that they shall be at least 32bits
+            // yosys is assuming that int/uint is 32 bit, so we are setting here correct size
+            // NOTE: it *shouldn't* break on explicite 64 bit const values, as they *should* be handled
+            // above by vpi*StrVal
+            if (size == 64) {
+                size = 32;
+            }
+            auto c = AST::AstNode::mkconst_int(val.value.integer, true, size ? size : 32);
             if (size == 0)
                 c->is_unsized = true;
             return c;
@@ -187,7 +194,7 @@ AST::AstNode *UhdmAst::process_value(vpiHandle obj_h)
         } else {
             auto size = vpi_get(vpiSize, obj_h);
             if (size == 0) {
-                auto c = AST::AstNode::mkconst_int(atoi(val.value.str), true, 64);
+                auto c = AST::AstNode::mkconst_int(atoi(val.value.str), true, 32);
                 c->is_unsized = true;
                 return c;
             } else {
@@ -450,6 +457,16 @@ void UhdmAst::process_parameter()
                 if (it == shared.param_types.end())
                     shared.param_types.insert(std::make_pair(current_node->str, node));
             });
+            break;
+        }
+        case vpiArrayTypespec: {
+            shared.report.mark_handled(typespec_h);
+            visit_one_to_one({vpiElemTypespec}, typespec_h, [&](AST::AstNode *node) {
+                if (node) {
+                    range_nodes.push_back(node->children[0]);
+                }
+            });
+
             break;
         }
         default: {
