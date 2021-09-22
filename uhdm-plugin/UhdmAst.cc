@@ -784,8 +784,19 @@ void UhdmAst::process_packed_array_typespec()
 {
     current_node = make_ast_node(AST::AST_WIRE);
     visit_one_to_one({vpiElemTypespec}, obj_h, [&](AST::AstNode *node) {
-        if (node) {
+        if (node && node->type == AST::AST_STRUCT) {
+            auto str = current_node->str;
+            node->cloneInto(current_node);
+            current_node->str = str;
+            delete node;
+        } else if (node) {
             current_node->str = node->str;
+            delete node;
+        }
+    });
+    visit_range(obj_h, [&](AST::AstNode *node) {
+        if (node) {
+            current_node->children.push_back(node);
         }
     });
 }
@@ -827,8 +838,17 @@ void UhdmAst::process_typespec_member()
     }
     case vpiPackedArrayTypespec:
         visit_one_to_one({vpiTypespec}, obj_h, [&](AST::AstNode *node) {
-            if (node) {
-                current_node->str = node->str;
+            if (node && node->type == AST::AST_STRUCT) {
+                auto str = current_node->str;
+                node->cloneInto(current_node);
+                current_node->str = str;
+                delete node;
+            } else if (node) {
+                auto str = current_node->str;
+                node->cloneInto(current_node);
+                current_node->str = str;
+                current_node->type = AST::AST_STRUCT_ITEM;
+                delete node;
             }
         });
         break;
@@ -1141,7 +1161,8 @@ void UhdmAst::process_array_net()
     }
     vpi_release_handle(itr);
     visit_one_to_many({vpiRange}, obj_h, [&](AST::AstNode *node) { current_node->children.push_back(node); });
-    if (current_node->children.size() == 2) { // If there is 2 ranges, change type to AST_MEMORY
+    if (current_node->children.size() == 2 && current_node->children[0]->type == AST::AST_RANGE &&
+        current_node->children[1]->type == AST::AST_RANGE) {
         current_node->type = AST::AST_MEMORY;
     }
 }
@@ -1775,7 +1796,9 @@ void UhdmAst::process_tagged_pattern()
     if (vpi_get(vpiType, typespec_h) == vpiStringTypespec) {
         std::string field_name = vpi_get_str(vpiName, typespec_h);
         if (field_name != "default") { // TODO: better support of the default keyword
-            current_node->children[0]->str += '.' + field_name;
+            auto field = new AST::AstNode(AST::AST_DOT);
+            field->str = field_name;
+            current_node->children[0]->children.push_back(field);
         }
     } else if (vpi_get(vpiType, typespec_h) == vpiIntegerTypespec) {
         s_vpi_value val;
@@ -1957,11 +1980,14 @@ void UhdmAst::process_gen_scope_array()
                         node->type = AST::AST_PREFIX;
                         auto *param = new AST::AstNode(AST::AST_IDENTIFIER);
                         param->str = child->str;
-                        auto *field = new AST::AstNode(AST::AST_IDENTIFIER);
-                        field->str = "\\" + node->str.substr(node->str.rfind(']') + 2);
-                        node->str = node->str.substr(0, node->str.find('['));
                         node->children.push_back(param);
-                        node->children.push_back(field);
+                        auto bracket = node->str.rfind(']');
+                        if (bracket + 2 <= node->str.size()) {
+                            auto *field = new AST::AstNode(AST::AST_IDENTIFIER);
+                            field->str = "\\" + node->str.substr(bracket + 2);
+                            node->children.push_back(field);
+                        }
+                        node->str = node->str.substr(0, node->str.find('['));
                     }
                 });
             }
@@ -2132,23 +2158,20 @@ void UhdmAst::process_hier_path()
 {
     current_node = make_ast_node(AST::AST_IDENTIFIER);
     current_node->str = "\\";
+    AST::AstNode *top_node = nullptr;
     visit_one_to_many({vpiActual}, obj_h, [&](AST::AstNode *node) {
-        if (current_node->str == "\\" && !node->children.empty() && node->children[0]->type == AST::AST_RANGE) {
-            current_node->type = AST::AST_PREFIX;
-            current_node->str = node->str;
-            current_node->children.push_back(node->children[0]->children[0]->clone());
+        if (node->str.find('[') != std::string::npos)
+            node->str = node->str.substr(0, node->str.find('['));
+        // for first node, just set correct string and move any children
+        if (!top_node) {
+            current_node->str += node->str.substr(1);
+            current_node->children = std::move(node->children);
+            top_node = current_node;
             delete node;
-        } else {
-            if (current_node->type == AST::AST_IDENTIFIER) {
-                if (current_node->str != "\\") {
-                    current_node->str += ".";
-                }
-                current_node->str += node->str.substr(1);
-                current_node->children = std::move(node->children);
-                delete node;
-            } else {
-                current_node->children.push_back(node);
-            }
+        } else { // for other nodes, change type to AST_DOT
+            node->type = AST::AST_DOT;
+            top_node->children.push_back(node);
+            top_node = node;
         }
     });
 }
