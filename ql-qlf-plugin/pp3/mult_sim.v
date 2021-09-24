@@ -20,7 +20,7 @@ endmodule  /* qlal4s3_32x32_mult_cell */
 module qlal4s3_mult_16x16_cell (
     input  [15:0] Amult,
     input  [15:0] Bmult,
-    input  [ 1:0] Valid_mult,
+    input         Valid_mult,
     output [31:0] Cmult
 );
 
