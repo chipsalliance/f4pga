@@ -2153,6 +2153,11 @@ void UhdmAst::process_hier_path()
     });
 }
 
+void UhdmAst::process_nonsynthesizable(const UHDM::BaseClass *object)
+{
+    log_warning("%s:%d: Non-synthesizable object of type '%s'\n", object->VpiFile().c_str(), object->VpiLineNo(), UHDM::VpiTypeName(obj_h).c_str());
+}
+
 void UhdmAst::process_logic_typespec()
 {
     current_node = make_ast_node(AST::AST_WIRE);
@@ -2416,6 +2421,7 @@ AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
     case UHDM::uhdmimport:
         break;
     case vpiDelayControl:
+        process_nonsynthesizable(object);
         break;
     case vpiLogicTypespec:
         process_logic_typespec();
