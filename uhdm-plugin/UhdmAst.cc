@@ -985,6 +985,18 @@ void UhdmAst::process_array_var()
             vpi_release_handle(typespec_h);
         } else if (vpi_get(vpiType, reg_h) == vpiLogicVar) {
             current_node->is_logic = true;
+            vpiHandle typespec_h = vpi_handle(vpiTypespec, reg_h);
+            if (typespec_h) {
+                std::string name = vpi_get_str(vpiName, typespec_h);
+                sanitize_symbol_name(name);
+                auto wiretype_node = new AST::AstNode(AST::AST_WIRETYPE);
+                wiretype_node->str = name;
+                current_node->children.push_back(wiretype_node);
+                current_node->is_custom_type = true;
+                shared.report.mark_handled(reg_h);
+                shared.report.mark_handled(typespec_h);
+                vpi_release_handle(typespec_h);
+            }
             visit_one_to_many({vpiRange}, reg_h, [&](AST::AstNode *node) { current_node->children.push_back(node); });
         }
         vpi_release_handle(reg_h);
