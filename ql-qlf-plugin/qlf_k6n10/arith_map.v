@@ -21,24 +21,25 @@ module _80_quicklogic_alu (A, B, CI, BI, X, Y, CO);
 
 	input [A_WIDTH-1:0] A;
 	input [B_WIDTH-1:0] B;
-	output [Y_WIDTH:0] X, Y;
+	output [Y_WIDTH-1:0] X, Y;
 
 	input CI, BI;
-	output [Y_WIDTH:0] CO;
+	output [Y_WIDTH-1:0] CO;
 
-	wire [Y_WIDTH-1:0] AA, BB;
 	wire [1024:0] _TECHMAP_DO_ = "splitnets CARRY; clean";
 
-	generate
-		if (A_SIGNED && B_SIGNED) begin:BLOCK1
-			assign AA = $signed(A), BB = BI ? ~$signed(B) : $signed(B);
-		end else begin:BLOCK2
-			assign AA = $unsigned(A), BB = BI ? ~$unsigned(B) : $unsigned(B);
-		end
-	endgenerate
+        (* force_downto *)
+        wire [Y_WIDTH-1:0] A_buf, B_buf;
+        \$pos #(.A_SIGNED(A_SIGNED), .A_WIDTH(A_WIDTH), .Y_WIDTH(Y_WIDTH)) A_conv (.A(A), .Y(A_buf));
+        \$pos #(.A_SIGNED(B_SIGNED), .A_WIDTH(B_WIDTH), .Y_WIDTH(Y_WIDTH)) B_conv (.A(B), .Y(B_buf));
 
+        (* force_downto *)
+        wire [Y_WIDTH-1:0] AA = A_buf;
+        (* force_downto *)
+        wire [Y_WIDTH-1:0] BB = BI ? ~B_buf : B_buf;
 	wire [Y_WIDTH: 0 ] CARRY;
 
+	assign CO[Y_WIDTH-1:0] = CARRY[Y_WIDTH:1];
 	// Due to VPR limitations regarding IO connexion to carry chain,
 	// we generate the carry chain input signal using an intermediate adder
 	// since we can connect a & b from io pads, but not cin & cout
@@ -61,7 +62,7 @@ module _80_quicklogic_alu (A, B, CI, BI, X, Y, CO);
 	endgenerate
 
 	genvar i;
-	generate for (i = 1; i < Y_WIDTH - 1; i = i+1) begin:gen3
+	generate for (i = 1; i < Y_WIDTH ; i = i+1) begin:gen3
 	     adder my_adder (
 	       .cin     (CARRY[i]  ),
 	       .cout    (CARRY[i+1]),
