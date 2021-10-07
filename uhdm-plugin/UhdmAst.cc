@@ -974,6 +974,19 @@ void UhdmAst::process_real_var()
 void UhdmAst::process_array_var()
 {
     current_node = make_ast_node(AST::AST_WIRE);
+    visit_one_to_one({vpiTypespec}, obj_h, [&](AST::AstNode *node) {
+        if (node->str.empty()) {
+            // anonymous typespec, move the children to variable
+            current_node->type = node->type;
+            current_node->children = std::move(node->children);
+        } else {
+            auto wiretype_node = new AST::AstNode(AST::AST_WIRETYPE);
+            wiretype_node->str = node->str;
+            current_node->children.push_back(wiretype_node);
+            current_node->is_custom_type = true;
+        }
+        delete node;
+    });
     vpiHandle itr = vpi_iterate(vpi_get(vpiType, obj_h) == vpiArrayVar ? vpiReg : vpiElement, obj_h);
     while (vpiHandle reg_h = vpi_scan(itr)) {
         if (vpi_get(vpiType, reg_h) == vpiStructVar || vpi_get(vpiType, reg_h) == vpiEnumVar) {
