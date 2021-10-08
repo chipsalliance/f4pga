@@ -1203,6 +1203,9 @@ void UhdmAst::process_package()
     visit_one_to_many({vpiParameter, vpiParamAssign}, obj_h, [&](AST::AstNode *node) {
         if (node) {
             node->str = strip_package_name(node->str);
+            for (auto c : node->children) {
+                c->str = strip_package_name(c->str);
+            }
             add_or_replace_child(current_node, node);
         }
     });
