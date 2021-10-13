@@ -15,6 +15,25 @@
 
 YOSYS_NAMESPACE_BEGIN
 
+#ifndef BUILD_ANTMICRO
+namespace RTLIL
+{
+namespace ID
+{
+IdString partial;
+}
+} // namespace RTLIL
+
+static AST::AstNode *mkconst_real(double d)
+{
+    AST::AstNode *node = new AST::AstNode(AST::AST_REALVALUE);
+    node->realvalue = d;
+    return node;
+}
+#else
+#define mkconst_real(x) AST::AstNode::mkconst_real(x)
+#endif
+
 static void sanitize_symbol_name(std::string &name)
 {
     if (!name.empty()) {
@@ -87,7 +106,9 @@ void UhdmAst::visit_range(vpiHandle obj_h, const std::function<void(AST::AstNode
     visit_one_to_many({vpiRange}, obj_h, [&](AST::AstNode *node) { range_nodes.push_back(node); });
     if (range_nodes.size() > 1) {
         auto multirange_node = new AST::AstNode(AST::AST_MULTIRANGE);
+#ifdef BUILD_ANTMICRO
         multirange_node->is_packed = true;
+#endif
         multirange_node->children = range_nodes;
         f(multirange_node);
     } else if (!range_nodes.empty()) {
@@ -179,7 +200,7 @@ AST::AstNode *UhdmAst::process_value(vpiHandle obj_h)
             return c;
         }
         case vpiRealVal:
-            return AST::AstNode::mkconst_real(val.value.real);
+            return mkconst_real(val.value.real);
         case vpiStringVal:
             return AST::AstNode::mkconst_str(val.value.str);
         default: {
@@ -249,7 +270,9 @@ static void add_or_replace_child(AST::AstNode *parent, AST::AstNode *child)
             if (child->children.size() > 1 && child->type == AST::AST_WIRE && child->children[0]->type == AST::AST_RANGE &&
                 child->children[1]->type == AST::AST_RANGE) {
                 auto multirange_node = new AST::AstNode(AST::AST_MULTIRANGE);
+#ifdef BUILD_ANTMICRO
                 multirange_node->is_packed = true;
+#endif
                 for (auto *c : child->children) {
                     multirange_node->children.push_back(c);
                 }
@@ -494,7 +517,9 @@ void UhdmAst::process_parameter()
     }
     if (range_nodes.size() > 1) {
         auto multirange_node = new AST::AstNode(AST::AST_MULTIRANGE);
+#ifdef BUILD_ANTMICRO
         multirange_node->is_packed = true;
+#endif
         multirange_node->children = range_nodes;
         current_node->children.push_back(multirange_node);
     } else if (range_nodes.size() == 1) {
@@ -550,8 +575,10 @@ void UhdmAst::process_port()
             current_node->is_logic = true;
             current_node->is_signed = vpi_get(vpiSigned, actual_h);
             visit_range(actual_h, [&](AST::AstNode *node) {
+#ifdef BUILD_ANTMICRO
                 if (node->type == AST::AST_MULTIRANGE)
                     node->is_packed = true;
+#endif
                 current_node->children.push_back(node);
             });
             shared.report.mark_handled(actual_h);
@@ -1148,9 +1175,11 @@ void UhdmAst::process_net()
     });
     visit_range(obj_h, [&](AST::AstNode *node) {
         current_node->children.push_back(node);
+#ifdef BUILD_ANTMICRO
         if (node->type == AST::AST_MULTIRANGE) {
             node->is_packed = true;
         }
+#endif
     });
 }
 
@@ -1829,9 +1858,13 @@ void UhdmAst::process_tagged_pattern()
     if (vpi_get(vpiType, typespec_h) == vpiStringTypespec) {
         std::string field_name = vpi_get_str(vpiName, typespec_h);
         if (field_name != "default") { // TODO: better support of the default keyword
+#ifdef BUILD_ANTMICRO
             auto field = new AST::AstNode(AST::AST_DOT);
             field->str = field_name;
             current_node->children[0]->children.push_back(field);
+#else
+            current_node->children[0]->str += '.' + field_name;
+#endif
         }
     } else if (vpi_get(vpiType, typespec_h) == vpiIntegerTypespec) {
         s_vpi_value val;
@@ -1917,7 +1950,9 @@ void UhdmAst::process_var_select()
     });
     if (current_node->children.size() > 1) {
         auto multirange_node = new AST::AstNode(AST::AST_MULTIRANGE);
+#ifdef BUILD_ANTMICRO
         multirange_node->is_packed = true;
+#endif
         multirange_node->children = current_node->children;
         current_node->children.clear();
         current_node->children.push_back(multirange_node);
@@ -2007,6 +2042,7 @@ void UhdmAst::process_gen_scope_array()
             if (child->type == AST::AST_PARAMETER || child->type == AST::AST_LOCALPARAM) {
                 auto param_str = child->str.substr(1);
                 auto array_str = "[" + param_str + "]";
+#ifdef BUILD_ANTMICRO
                 genscope_node->visitEachDescendant([&](AST::AstNode *node) {
                     auto pos = node->str.find(array_str);
                     if (pos != std::string::npos) {
@@ -2023,6 +2059,7 @@ void UhdmAst::process_gen_scope_array()
                         node->str = node->str.substr(0, node->str.find('['));
                     }
                 });
+#endif
             }
         }
         current_node->children.insert(current_node->children.end(), genscope_node->children.begin(), genscope_node->children.end());
@@ -2192,6 +2229,7 @@ void UhdmAst::process_hier_path()
     current_node = make_ast_node(AST::AST_IDENTIFIER);
     current_node->str = "\\";
     AST::AstNode *top_node = nullptr;
+#ifdef BUILD_ANTMICRO
     visit_one_to_many({vpiActual}, obj_h, [&](AST::AstNode *node) {
         if (node->str.find('[') != std::string::npos)
             node->str = node->str.substr(0, node->str.find('['));
@@ -2207,6 +2245,27 @@ void UhdmAst::process_hier_path()
             top_node = node;
         }
     });
+#else
+    visit_one_to_many({vpiActual}, obj_h, [&](AST::AstNode *node) {
+        if (current_node->str == "\\" && !node->children.empty() && node->children[0]->type == AST::AST_RANGE) {
+            current_node->type = AST::AST_PREFIX;
+            current_node->str = node->str;
+            current_node->children.push_back(node->children[0]->children[0]->clone());
+            delete node;
+        } else {
+            if (current_node->type == AST::AST_IDENTIFIER) {
+                if (current_node->str != "\\") {
+                    current_node->str += ".";
+                }
+                current_node->str += node->str.substr(1);
+                current_node->children = std::move(node->children);
+                delete node;
+            } else {
+                current_node->children.push_back(node);
+            }
+        }
+    });
+#endif
 }
 
 void UhdmAst::process_nonsynthesizable(const UHDM::BaseClass *object)
