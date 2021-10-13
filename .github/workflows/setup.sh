@@ -42,23 +42,35 @@ start_section Install-Yosys
     echo '=========================='
     echo 'Making env with yosys and Surelog'
     echo '=========================='
-    mkdir -p ~/.local-src
-    mkdir -p ~/.local-bin
-    cd ~/.local-src
-    git clone https://github.com/antmicro/yosys.git -b uhdm-plugin
-    cd yosys
-    PREFIX=$HOME/.local-bin make -j$(nproc)
-    PREFIX=$HOME/.local-bin make install
-    echo $(which yosys)
-    echo $(which yosys-config)
-    echo $(yosys-config --datdir)
-    cd ..
+    if [ "$BUILD_ANTMICRO" = "1" ]
+    then
+	mkdir -p ~/.local-src
+	mkdir -p ~/.local-bin
+	cd ~/.local-src
+	git clone https://github.com/antmicro/yosys.git -b uhdm-plugin
+	cd yosys
+	PREFIX=$HOME/.local-bin make -j$(nproc)
+	PREFIX=$HOME/.local-bin make install
+	cd ..
+	git clone --recursive https://github.com/chipsalliance/Surelog.git -b master
+	cd Surelog
+	cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$HOME/.local-bin -DCMAKE_POSITION_INDEPENDENT_CODE=ON -S . -B build
+	cmake --build build -j $(nproc)
+	cmake --install build
+	cd ../..
+    else
+	make env
+	make enter
+    fi
     git clone --recursive https://github.com/chipsalliance/Surelog.git -b master
     cd Surelog
     cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$HOME/.local-bin -DCMAKE_POSITION_INDEPENDENT_CODE=ON -S . -B build
     cmake --build build -j $(nproc)
     cmake --install build
     cd ../..
+    echo $(which yosys)
+    echo $(which yosys-config)
+    echo $(yosys-config --datdir)
 )
 end_section
 

@@ -18,6 +18,13 @@ jobs:
 
   Run-tests:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {BUILD_ANTMICRO: "0"}
+          - {BUILD_ANTMICRO: "1"}
+
     steps:
 
     - uses: actions/checkout@v2
@@ -48,9 +55,12 @@ jobs:
         source .github/workflows/setup.sh
       env:
         OS: ${{ runner.os }}
+        BUILD_ANTMICRO: ${{ matrix.BUILD_ANTMICRO }}
 
     - name: Build and test plugins
       run: |
+        if [ "$BUILD_ANTMICRO" = "0" ]; then source env/conda/bin/activate yosys-plugins; fi
         source .github/workflows/build-and-test.sh
       env:
         OS: ${{ runner.os }}
+        BUILD_ANTMICRO: ${{ matrix.BUILD_ANTMICRO }}
