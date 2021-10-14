@@ -42,7 +42,7 @@ start_section Install-Yosys
     echo '=========================='
     echo 'Making env with yosys and Surelog'
     echo '=========================='
-    if [ "$BUILD_ANTMICRO" = "1" ]
+    if [ "$BUILD_UPSTREAM" = "0" ]
     then
 	mkdir -p ~/.local-src
 	mkdir -p ~/.local-bin

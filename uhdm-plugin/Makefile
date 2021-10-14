@@ -17,8 +17,8 @@ include ../Makefile_plugin.common
 CPPFLAGS += -std=c++17 -I${UHDM_INSTALL_DIR}/include \
 			-I${UHDM_INSTALL_DIR}/include/surelog
 
-ifeq ($(BUILD_ANTMICRO), 1)
-CXXFLAGS += -DBUILD_ANTMICRO=1
+ifeq ($(BUILD_UPSTREAM), 1)
+CXXFLAGS += -DBUILD_UPSTREAM=1
 endif
 
 CXXFLAGS += -Wno-unused-parameter

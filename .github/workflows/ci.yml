@@ -22,8 +22,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {BUILD_ANTMICRO: "0"}
-          - {BUILD_ANTMICRO: "1"}
+          - {BUILD_UPSTREAM: "0"}
+          - {BUILD_UPSTREAM: "1"}
+
+    name: "BUILD_UPSTREAM=${{matrix.BUILD_UPSTREAM}}"
 
     steps:
 
@@ -55,12 +57,12 @@ jobs:
         source .github/workflows/setup.sh
       env:
         OS: ${{ runner.os }}
-        BUILD_ANTMICRO: ${{ matrix.BUILD_ANTMICRO }}
+        BUILD_UPSTREAM: ${{ matrix.BUILD_UPSTREAM }}
 
     - name: Build and test plugins
       run: |
-        if [ "$BUILD_ANTMICRO" = "0" ]; then source env/conda/bin/activate yosys-plugins; fi
+        if [ "$BUILD_UPSTREAM" = "1" ]; then source env/conda/bin/activate yosys-plugins; fi
         source .github/workflows/build-and-test.sh
       env:
         OS: ${{ runner.os }}
-        BUILD_ANTMICRO: ${{ matrix.BUILD_ANTMICRO }}
+        BUILD_UPSTREAM: ${{ matrix.BUILD_UPSTREAM }}
