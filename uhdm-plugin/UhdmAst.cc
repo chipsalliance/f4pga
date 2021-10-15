@@ -57,6 +57,19 @@ static std::string strip_package_name(std::string name)
     return name;
 }
 
+static std::string get_object_name(vpiHandle obj_h, const std::vector<int> &name_fields = {vpiName})
+{
+    std::string objectName;
+    for (auto name : name_fields) {
+        if (auto s = vpi_get_str(name, obj_h)) {
+            objectName = s;
+            sanitize_symbol_name(objectName);
+            break;
+        }
+    }
+    return objectName;
+}
+
 #ifdef BUILD_UPSTREAM
 #include "UhdmAstUpstream.cc"
 #else
@@ -1814,7 +1827,7 @@ void UhdmAst::process_logic_var()
             auto wiretype_node = new AST::AstNode(AST::AST_WIRETYPE);
             wiretype_node->str = node->str;
             // wiretype needs to be 1st node (if port have also another range nodes)
-            current_node->children.insert(current_node->children.begin(), wiretype_node);
+            current_node->children.push_back(wiretype_node);
             current_node->is_custom_type = true;
         }
     });
@@ -1876,6 +1889,16 @@ void UhdmAst::process_logic_typespec()
 {
     current_node = make_ast_node(AST::AST_WIRE);
     current_node->is_logic = true;
+    if (!current_node->str.empty() && current_node->str.find("::") == std::string::npos) {
+        std::string package_name = "";
+        if (vpiHandle instance_h = vpi_handle(vpiInstance, obj_h)) {
+            if (vpi_get(vpiType, instance_h) == vpiPackage) {
+                package_name = get_object_name(instance_h, {vpiDefName});
+                current_node->str = package_name + "::" + current_node->str.substr(1);
+            }
+            vpi_release_handle(instance_h);
+        }
+    }
     visit_range(obj_h, [&](AST::AstNode *node) {
         if (node) {
             current_node->children.push_back(node);
