@@ -435,13 +435,13 @@ void UhdmAst::process_module()
     if (!is_module_instance) {
         if (shared.top_nodes.find(type) != shared.top_nodes.end()) {
             current_node = shared.top_nodes[type];
-            visit_one_to_many(
-              {vpiModule, vpiInterface, vpiParameter, vpiParamAssign, vpiPort, vpiNet, vpiArrayNet, vpiGenScopeArray, vpiContAssign, vpiVariables},
-              obj_h, [&](AST::AstNode *node) {
-                  if (node) {
-                      add_or_replace_child(current_node, node);
-                  }
-              });
+            visit_one_to_many({vpiModule, vpiInterface, vpiParameter, vpiParamAssign, vpiPort, vpiNet, vpiArrayNet, vpiTaskFunc, vpiGenScopeArray,
+                               vpiContAssign, vpiVariables},
+                              obj_h, [&](AST::AstNode *node) {
+                                  if (node) {
+                                      add_or_replace_child(current_node, node);
+                                  }
+                              });
             auto it = current_node->attributes.find(ID::partial);
             if (it != current_node->attributes.end()) {
                 delete it->second;
