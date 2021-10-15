@@ -73,6 +73,7 @@ class UhdmAst
     void process_module();
     void process_struct_typespec();
     void process_packed_array_typespec();
+    void process_array_typespec();
     void process_typespec_member();
     void process_enum_typespec();
     void process_enum_const();

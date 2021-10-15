@@ -595,7 +595,7 @@ void UhdmAst::process_struct_typespec()
     visit_one_to_many({vpiTypespecMember}, obj_h, [&](AST::AstNode *node) { current_node->children.push_back(node); });
 }
 
-void UhdmAst::process_packed_array_typespec()
+void UhdmAst::process_array_typespec()
 {
     current_node = make_ast_node(AST::AST_WIRE);
     visit_one_to_one({vpiElemTypespec}, obj_h, [&](AST::AstNode *node) {
@@ -2023,6 +2023,9 @@ AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
         break;
     case vpiPackedArrayTypespec:
         process_packed_array_typespec();
+        break;
+    case vpiArrayTypespec:
+        process_array_typespec();
         break;
     case vpiTypespecMember:
         process_typespec_member();
