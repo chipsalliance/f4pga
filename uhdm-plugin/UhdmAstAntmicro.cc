@@ -170,6 +170,7 @@ void UhdmAst::process_port()
         case vpiArrayNet:
         case vpiStructVar:
         case vpiEnumVar:
+        case vpiShortIntVar:
         case vpiIntVar:
             break;
         default: {
