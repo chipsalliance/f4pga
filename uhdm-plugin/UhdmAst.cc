@@ -1954,6 +1954,23 @@ void UhdmAst::process_bit_typespec()
     }
 }
 
+void UhdmAst::process_repeat()
+{
+    current_node = make_ast_node(AST::AST_REPEAT);
+    visit_one_to_one({vpiCondition}, obj_h, [&](AST::AstNode *node) { current_node->children.push_back(node); });
+    visit_one_to_one({vpiStmt}, obj_h, [&](AST::AstNode *node) {
+        if (node) {
+            AST::AstNode *block = nullptr;
+            if (node->type != AST::AST_BLOCK) {
+                block = new AST::AstNode(AST::AST_BLOCK, node);
+            } else {
+                block = node;
+            }
+            current_node->children.push_back(block);
+        }
+    });
+}
+
 AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
 {
     obj_h = obj_handle;
@@ -2151,6 +2168,9 @@ AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
         break;
     case vpiStringTypespec:
         process_string_typespec();
+        break;
+    case vpiRepeat:
+        process_repeat();
         break;
     case vpiProgram:
     default:

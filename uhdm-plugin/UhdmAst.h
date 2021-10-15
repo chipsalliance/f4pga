@@ -126,6 +126,7 @@ class UhdmAst
     void process_bit_typespec();
     void process_string_var();
     void process_string_typespec();
+    void process_repeat();
     void process_nonsynthesizable(const UHDM::BaseClass *object);
 
     UhdmAst(UhdmAst *p, UhdmAstShared &s, const std::string &i) : parent(p), shared(s), indent(i)
