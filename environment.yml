@@ -12,3 +12,4 @@ channels:
   - litex-hub
 dependencies:
   - litex-hub::yosys
+  - litex-hub::surelog

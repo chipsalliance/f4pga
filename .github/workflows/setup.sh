@@ -62,12 +62,6 @@ start_section Install-Yosys
 	make env
 	make enter
     fi
-    git clone --recursive https://github.com/chipsalliance/Surelog.git -b master
-    cd Surelog
-    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$HOME/.local-bin -DCMAKE_POSITION_INDEPENDENT_CODE=ON -S . -B build
-    cmake --build build -j $(nproc)
-    cmake --install build
-    cd ../..
     echo $(which yosys)
     echo $(which yosys-config)
     echo $(yosys-config --datdir)

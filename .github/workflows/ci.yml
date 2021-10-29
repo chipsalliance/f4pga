@@ -8,11 +8,7 @@
 
 name: CI tests
 
-on:
-  push:
-    branches:
-      - uhdm-plugin
-  pull_request:
+on: [push, pull_request]
 
 jobs:
 
@@ -25,7 +21,7 @@ jobs:
           - {BUILD_UPSTREAM: "0"}
           - {BUILD_UPSTREAM: "1"}
 
-    name: "BUILD_UPSTREAM=${{matrix.BUILD_UPSTREAM}}"
+    name: "UHDM_BUILD_UPSTREAM_YOSYS=${{matrix.BUILD_UPSTREAM}}"
 
     steps:
 
