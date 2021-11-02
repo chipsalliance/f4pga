@@ -49,7 +49,7 @@ start_section Install-Yosys
 	cd ~/.local-src
 	git clone https://github.com/antmicro/yosys.git -b uhdm-plugin
 	cd yosys
-	PREFIX=$HOME/.local-bin make ENABLE_NDEBUG=1 -j$(nproc)
+	PREFIX=$HOME/.local-bin make CONFIG=gcc ENABLE_NDEBUG=1 -j$(nproc)
 	PREFIX=$HOME/.local-bin make install
 	cd ..
 	git clone --recursive https://github.com/chipsalliance/Surelog.git -b master
