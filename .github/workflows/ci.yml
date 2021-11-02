@@ -46,6 +46,8 @@ jobs:
 
     - name: ccache
       uses: hendrikmuhs/ccache-action@v1
+      with:
+        key: ${{ matrix.BUILD_UPSTREAM }}
 
     - name: Install Yosys
       run: |
