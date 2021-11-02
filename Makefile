@@ -12,10 +12,6 @@ PLUGINS_INSTALL := $(foreach plugin,$(PLUGIN_LIST),install_$(plugin))
 PLUGINS_CLEAN := $(foreach plugin,$(PLUGIN_LIST),clean_$(plugin))
 PLUGINS_TEST := $(foreach plugin,$(PLUGIN_LIST),test_$(plugin))
 
-#Currently this tests are failing due to override of synth_quicklogic
-#in mainline yosys is from conda, where it is compiled with disabled asserts
-PLUGINS_TEST := $(filter-out test_ql-qlf,$(PLUGINS_TEST))
-
 all: plugins
 
 TOP_DIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
