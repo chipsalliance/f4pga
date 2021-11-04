@@ -361,6 +361,7 @@ void UhdmAst::move_type_to_new_typedef(AST::AstNode *current_node, AST::AstNode 
         if (type_node->attributes.count("\\enum_base_type")) {
             auto base_type = type_node->attributes["\\enum_base_type"];
             auto wire_node = new AST::AstNode(AST::AST_WIRE);
+            wire_node->is_reg = true;
             for (auto c : base_type->children) {
                 std::string enum_item_str = "\\enum_value_";
                 log_assert(!c->children.empty());
@@ -383,6 +384,7 @@ void UhdmAst::move_type_to_new_typedef(AST::AstNode *current_node, AST::AstNode 
                 enum_item->attributes["\\enum_base_type"] = AST::AstNode::mkconst_str(type_node->str);
             }
             auto wire_node = new AST::AstNode(AST::AST_WIRE);
+            wire_node->is_reg = true;
             wire_node->attributes["\\enum_type"] = AST::AstNode::mkconst_str(type_node->str);
             if (!type_node->children.empty() && type_node->children[0]->children.size() > 1) {
                 wire_node->children.push_back(type_node->children[0]->children[1]->clone());
