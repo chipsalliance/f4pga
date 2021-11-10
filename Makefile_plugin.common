@@ -53,8 +53,14 @@ LDFLAGS ?= $(shell $(YOSYS_CONFIG) --ldflags)
 LDLIBS ?= $(shell $(YOSYS_CONFIG) --ldlibs)
 PLUGINS_DIR ?= $(shell $(YOSYS_CONFIG) --datdir)/plugins
 DATA_DIR ?= $(shell $(YOSYS_CONFIG) --datdir)
+EXTRA_FLAGS ?=
 
 OBJS := $(SOURCES:cc=o)
+
+all: $(NAME).so
+
+$(OBJS): %.o: %.cc
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(EXTRA_FLAGS) $(EXTRA_FLAGS) -c -o $@ $^
 
 $(NAME).so: $(OBJS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared -o $@ $^ $(LDLIBS)
