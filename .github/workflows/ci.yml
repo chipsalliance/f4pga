@@ -59,6 +59,7 @@ jobs:
 
     - name: Build and test plugins
       run: |
+        export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
         if [ "$BUILD_UPSTREAM" = "1" ]; then source env/conda/bin/activate yosys-plugins; fi
         source .github/workflows/build-and-test.sh
       env:

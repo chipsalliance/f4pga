@@ -60,7 +60,7 @@ OBJS := $(SOURCES:cc=o)
 all: $(NAME).so
 
 $(OBJS): %.o: %.cc
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(EXTRA_FLAGS) $(EXTRA_FLAGS) -c -o $@ $^
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(EXTRA_FLAGS) -c -o $@ $^
 
 $(NAME).so: $(OBJS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared -o $@ $^ $(LDLIBS)
