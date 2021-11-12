@@ -24,14 +24,21 @@
 USING_YOSYS_NAMESPACE
 PRIVATE_NAMESPACE_BEGIN
 
+#define XSTR(val) #val
+#define STR(val) XSTR(val)
+
+#ifndef PASS_NAME
+#define PASS_NAME synth_quicklogic
+#endif
+
 struct SynthQuickLogicPass : public ScriptPass {
 
-    SynthQuickLogicPass() : ScriptPass("synth_quicklogic", "Synthesis for QuickLogic FPGAs") {}
+    SynthQuickLogicPass() : ScriptPass(STR(PASS_NAME), "Synthesis for QuickLogic FPGAs") {}
 
     void help() override
     {
         log("\n");
-        log("   synth_quicklogic [options]\n");
+        log("   %s [options]\n", STR(PASS_NAME));
         log("This command runs synthesis for QuickLogic FPGAs\n");
         log("\n");
         log("    -top <module>\n");
