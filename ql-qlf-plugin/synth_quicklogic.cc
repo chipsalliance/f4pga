@@ -218,7 +218,6 @@ struct SynthQuickLogicPass : public ScriptPass {
         }
 
         std::string noDFFArgs;
-        //if (family == "qlf_k4n8" || family == "qlf_k6n10") {
         if (family == "qlf_k4n8") {
             noDFFArgs = " -nodffe -nosdff";
         }
