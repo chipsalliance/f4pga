@@ -1031,17 +1031,21 @@ size_t UhdmAst::add_multirange_attribute(AST::AstNode *wire_node, const std::vec
 
 void UhdmAst::visitEachDescendant(AST::AstNode *node, const std::function<void(AST::AstNode *)> &f)
 {
-    shared.multirange_scope.push_back("");
     for (auto child : node->children) {
         if (node->type == AST::AST_MODULE || node->type == AST::AST_PACKAGE) {
             shared.current_top_node = node;
         }
-        if (node->type == AST::AST_FUNCTION) {
-            shared.multirange_scope.push_back(node->str);
+        if (node->type == AST::AST_BLOCK || node->type == AST::AST_GENBLOCK || node->type == AST::AST_FUNCTION) {
+            // TODO: if it is empty, we probably need to generate unique name
+            if (!node->str.empty()) {
+                shared.multirange_scope.push_back(node->str);
+            }
         }
         f(child);
         visitEachDescendant(child, f);
-        shared.multirange_scope.pop_back();
+        if (node->type == AST::AST_FUNCTION || node->type == AST::AST_BLOCK || node->type == AST::AST_GENBLOCK)
+            if (!node->str.empty())
+                shared.multirange_scope.pop_back();
     }
 }
 
@@ -1049,6 +1053,8 @@ void UhdmAst::convert_multiranges(AST::AstNode *module_node)
 {
     std::map<std::string, std::pair<AST::AstNode *, std::vector<AST::AstNode *>>> multirange_wires;
     std::vector<std::string> remove_ids;
+    shared.multirange_scope.clear();
+    shared.multirange_scope.push_back("");
     visitEachDescendant(module_node, [&](AST::AstNode *node) {
         // TODO: this is ugly, probably this could be done better
         // We can't convert AST_MEMORY if it is accessed by readmemh
@@ -1056,7 +1062,11 @@ void UhdmAst::convert_multiranges(AST::AstNode *module_node)
             remove_ids.push_back(node->children[1]->str);
             return;
         }
-        std::string name = shared.multirange_scope.back() + node->str;
+        std::string name = "";
+        for (auto s : shared.multirange_scope) {
+            name += s;
+        }
+        name += node->str;
         if (node->type == AST::AST_WIRE || node->type == AST::AST_PARAMETER || node->type == AST::AST_LOCALPARAM) {
             if (node->attributes.count(ID::packed_ranges) || node->attributes.count(ID::unpacked_ranges)) {
                 if (node->attributes[ID::packed_ranges]->children.empty() && node->attributes[ID::unpacked_ranges]->children.empty()) {
@@ -1074,8 +1084,19 @@ void UhdmAst::convert_multiranges(AST::AstNode *module_node)
             }
         }
         if (node->type == AST::AST_IDENTIFIER && std::find(remove_ids.begin(), remove_ids.end(), node->str) == remove_ids.end()) {
-            if (multirange_wires.count(name)) {
-                multirange_wires[name].second.push_back(node);
+            auto current_scope = shared.multirange_scope;
+            // wire can be declared in previous scope
+            while (!current_scope.empty()) {
+                std::string id_name = "";
+                for (auto s : current_scope) {
+                    id_name += s;
+                }
+                id_name += node->str;
+                if (multirange_wires.count(id_name)) {
+                    multirange_wires[id_name].second.push_back(node);
+                    break;
+                }
+                current_scope.pop_back();
             }
         }
     });
