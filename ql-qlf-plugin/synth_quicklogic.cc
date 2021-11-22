@@ -44,6 +44,7 @@ struct SynthQuickLogicPass : public ScriptPass {
         log("        - pp3      : pp3 \n");
         log("        - qlf_k4n8 : qlf_k4n8 \n");
         log("        - qlf_k6n10: qlf_k6n10 \n");
+        log("        - qlf_k6n10f: qlf_k6n10f \n");
         log("\n");
         log("    -no_abc_opt\n");
         log("        By default most of ABC logic optimization features is\n");
@@ -166,7 +167,7 @@ struct SynthQuickLogicPass : public ScriptPass {
         if (!design->full_selection())
             log_cmd_error("This command only operates on fully selected designs!\n");
 
-        if (family != "pp3" && family != "qlf_k4n8" && family != "qlf_k6n10")
+        if (family != "pp3" && family != "qlf_k4n8" && family != "qlf_k6n10" && family != "qlf_k6n10f")
             log_cmd_error("Invalid family specified: '%s'\n", family.c_str());
 
         if (family != "pp3") {
@@ -247,7 +248,7 @@ struct SynthQuickLogicPass : public ScriptPass {
             run("opt_clean");
         }
 
-        if (check_label("map_bram", "(skip if -no_bram)") && (family == "qlf_k6n10" || family == "pp3") && inferBram) {
+        if (check_label("map_bram", "(skip if -no_bram)") && (family == "qlf_k6n10" || family == "qlf_k6n10f" || family == "pp3") && inferBram) {
             run("memory_bram -rules +/quicklogic/" + family + "/brams.txt");
             if (family == "pp3") {
                 run("pp3_braminit");
@@ -264,7 +265,7 @@ struct SynthQuickLogicPass : public ScriptPass {
         }
 
         if (check_label("map_gates")) {
-            if (inferAdder && (family == "qlf_k4n8" || family == "qlf_k6n10")) {
+            if (inferAdder && (family == "qlf_k4n8" || family == "qlf_k6n10" || family == "qlf_k6n10f")) {
                 run("techmap -map +/techmap.v -map +/quicklogic/" + family + "/arith_map.v");
             } else {
                 run("techmap");
@@ -284,7 +285,7 @@ struct SynthQuickLogicPass : public ScriptPass {
             if (family == "qlf_k4n8") {
                 run("shregmap -minlen 8 -maxlen 8");
                 run("dfflegalize -cell $_DFF_P_ 0 -cell $_DFF_P??_ 0 -cell $_DFF_N_ 0 -cell $_DFF_N??_ 0 -cell $_DFFSR_???_ 0");
-            } else if (family == "qlf_k6n10") {
+            } else if (family == "qlf_k6n10" || family == "qlf_k6n10f") {
                 run("dfflegalize -cell $_DFF_P_ 0 -cell $_DFF_PP?_ 0 -cell $_DFFE_PP?P_ 0 -cell $_DFFSR_PPP_ 0 -cell $_DFFSRE_PPPP_ 0 -cell "
                     "$_DLATCHSR_PPP_ 0");
                 //    In case we add clock inversion in the future.
@@ -308,7 +309,7 @@ struct SynthQuickLogicPass : public ScriptPass {
 
         if (check_label("map_luts")) {
             if (abcOpt) {
-                if (family == "qlf_k6n10") {
+                if (family == "qlf_k6n10" || family == "qlf_k6n10f") {
                     run("abc -lut 6 ");
                 } else if (family == "qlf_k4n8") {
                     run("abc -lut 4 ");
@@ -337,7 +338,7 @@ struct SynthQuickLogicPass : public ScriptPass {
             run("opt_lut");
         }
 
-        if (check_label("map_cells") && (family == "qlf_k6n10" || family == "pp3")) {
+        if (check_label("map_cells") && (family == "qlf_k6n10" || family == "pp3" || family == "qlf_k6n10f")) {
             std::string techMapArgs;
             techMapArgs = "-map +/quicklogic/" + family + "/lut_map.v";
             run("techmap " + techMapArgs);
