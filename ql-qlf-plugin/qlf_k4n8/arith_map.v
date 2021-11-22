@@ -42,7 +42,7 @@ module _80_quicklogic_alu (A, B, CI, BI, X, Y, CO);
     (* force_downto *)
     wire [Y_WIDTH-1:0] C;
 
-    assign CO = C[Y_WIDTH-1];
+    assign CO = C;
 
     genvar i;
     generate for (i = 0; i < Y_WIDTH; i = i + 1) begin: slice
@@ -121,10 +121,10 @@ module _80_quicklogic_alu (A, B, CI, BI, X, Y, CO);
             // LUT4 configured for passing its CI input to output. This should
             // get pruned if the actual CO port is not connected anywhere.
             adder_lut4 #(
-                    .LUT(16'b0000_1111_0000_1111),
+                    .LUT(16'b1111_0000_1111_0000),
                     .IN2_IS_CIN(1'b1)
                 ) lut_co (
-                    .in({1'b1, co, 1'b1, 1'b1}),
+                    .in({1'b1, 1'b1, 1'b1, 1'b1}),
                     .cin(co),
                     .lut4_out(C[i]),
                     .cout()

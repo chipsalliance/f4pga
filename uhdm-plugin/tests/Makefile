@@ -1,4 +1,4 @@
-# Copyright (C) 2021  The SymbiFlow Authors.
+# Copyright (C) 2020-2021  The SymbiFlow Authors.
 #
 # Use of this source code is governed by a ISC-style
 # license that can be found in the LICENSE file or at
@@ -6,10 +6,4 @@
 #
 # SPDX-License-Identifier:ISC
 
-name: yosys-plugins
-channels:
-  - defaults
-  - litex-hub
-dependencies:
-  - litex-hub::yosys
-  - litex-hub::surelog
+include $(shell pwd)/../../Makefile_test.common
