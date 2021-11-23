@@ -37,7 +37,6 @@ VERILOG_MODULES = $(COMMON)/cells_sim.v         \
                   $(QLF_K6N10F_DIR)/cells_sim.v \
                   $(QLF_K6N10F_DIR)/ffs_map.v   \
                   $(QLF_K6N10F_DIR)/dsp_map.v   \
-                  $(QLF_K6N10F_DIR)/lut_map.v   \
                   $(PP3_DIR)/abc9_map.v    \
                   $(PP3_DIR)/abc9_model.v  \
                   $(PP3_DIR)/abc9_unmap.v  \

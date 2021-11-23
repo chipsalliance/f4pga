@@ -20,14 +20,6 @@ module sh_dff(
             Q <= D;
 endmodule
 
-module MUXCY(output O, input CI, DI, S);
-  assign O = S ? CI : DI;
-endmodule
-
-module XORCY(output O, input CI, LI);
-  assign O = CI ^ LI;
-endmodule
-
 (* abc9_box, lib_blackbox *)
 module adder_carry(
     output sumout,
@@ -289,33 +281,6 @@ module dffsr(
         endcase
 endmodule
 
-/*
-module dffsre(
-    output reg Q,
-    input D,
-    (* clkbuf_sink *)
-    (* invertible_pin = "IS_C_INVERTED" *)
-    input C,
-    input E,
-    input R,
-    input S
-);
-    parameter [0:0] INIT = 1'b0;
-    parameter [0:0] IS_C_INVERTED = 1'b0;
-    initial Q = INIT;
-    case(|IS_C_INVERTED)
-          1'b0:
-            always @(posedge C or posedge S or posedge R)
-              if (S)
-                Q <= 1'b1;
-              else if (R)
-                Q <= 1'b0;
-              else if (E)
-                Q <= D;
-        endcase
-endmodule
-*/
-
 module dffsre(
     output reg Q,
     input D,
@@ -359,28 +324,6 @@ module dffnsre(
             Q <= D;
         
 endmodule
-
-/*
-(* abc9_flop, lib_whitebox *)
-module latchsre (
-    output reg Q,
-    input S,
-    input R,
-    input D,
-    input G,
-    input E
-);
-    parameter [0:0] INIT = 1'b0;
-    parameter [0:0] IS_C_INVERTED = 1'b0;
-    initial Q = INIT;
-    always @*
-            begin
-              if (R) Q <= 1'b0;
-              if (S) Q <= 1'b1;
-            else if (E && G) Q <= D;
-    end
-endmodule
-*/
 
 (* abc9_flop, lib_whitebox *)
 module latchsre (
@@ -438,166 +381,6 @@ module scff(
     always @(posedge clk)
             Q <= D;
 endmodule
-
-module DP_RAM16K (
-    input rclk, 
-    input wclk,
-    input wen,
-    input ren,
-    input[8:0] waddr,
-    input[8:0] raddr,
-    input[31:0] d_in,
-    input[31:0] wenb,
-    output[31:0] d_out );
-
-    _dual_port_sram memory_0 (
-                .wclk           (wclk),
-                .wen            (wen),
-                .waddr          (waddr),
-                .data_in        (d_in),
-                .rclk           (rclk),
-                .ren            (ren),
-                .raddr          (raddr),
-                .wenb		(wenb),
-                .d_out          (d_out) );
-
-endmodule
-
-module _dual_port_sram (
-    input wclk,
-    input wen,
-    input[8:0] waddr,
-    input[31:0] data_in,
-    input rclk,
-    input ren,
-    input[8:0] raddr,
-    input[31:0] wenb,
-    output[31:0] d_out );
-
-    // MODE 0:  512 x 32
-    // MODE 1: 1024 x 16
-    // MODE 2: 1024 x 8
-    // MODE 3: 2048 x 4
-        
-    integer i;
-    reg[31:0] ram[512:0];
-    reg[31:0] internal;
-    // The memory is self initialised
-        
-    initial begin
-            for (i=0;i<=512;i=i+1)
-            begin
-                ram[i] = 0;
-            end
-            internal = 31'b0; 
-    end
-    
-    wire [31:0] WMASK;
-
-    assign d_out = internal;
-    assign WMASK = wenb;
-
-    always @(posedge wclk) begin
-            if(!wen) begin
-              if (WMASK[ 0]) ram[waddr][ 0] <= data_in[ 0];
-              if (WMASK[ 1]) ram[waddr][ 1] <= data_in[ 1];
-              if (WMASK[ 2]) ram[waddr][ 2] <= data_in[ 2];
-              if (WMASK[ 3]) ram[waddr][ 3] <= data_in[ 3];
-              if (WMASK[ 4]) ram[waddr][ 4] <= data_in[ 4];
-              if (WMASK[ 5]) ram[waddr][ 5] <= data_in[ 5];
-              if (WMASK[ 6]) ram[waddr][ 6] <= data_in[ 6];
-              if (WMASK[ 7]) ram[waddr][ 7] <= data_in[ 7];
-              if (WMASK[ 8]) ram[waddr][ 8] <= data_in[ 8];
-              if (WMASK[ 9]) ram[waddr][ 9] <= data_in[ 9];
-              if (WMASK[10]) ram[waddr][10] <= data_in[10];
-              if (WMASK[11]) ram[waddr][11] <= data_in[11];
-              if (WMASK[12]) ram[waddr][12] <= data_in[12];
-              if (WMASK[13]) ram[waddr][13] <= data_in[13];
-              if (WMASK[14]) ram[waddr][14] <= data_in[14];
-              if (WMASK[15]) ram[waddr][15] <= data_in[15];
-              if (WMASK[16]) ram[waddr][16] <= data_in[16];
-              if (WMASK[17]) ram[waddr][17] <= data_in[17];
-              if (WMASK[18]) ram[waddr][18] <= data_in[18];
-              if (WMASK[19]) ram[waddr][19] <= data_in[19];
-              if (WMASK[20]) ram[waddr][20] <= data_in[20];
-              if (WMASK[21]) ram[waddr][21] <= data_in[21];
-              if (WMASK[22]) ram[waddr][22] <= data_in[22];
-              if (WMASK[23]) ram[waddr][23] <= data_in[23];
-              if (WMASK[24]) ram[waddr][24] <= data_in[24];
-              if (WMASK[25]) ram[waddr][25] <= data_in[25];
-              if (WMASK[26]) ram[waddr][26] <= data_in[26];
-              if (WMASK[27]) ram[waddr][27] <= data_in[27];
-              if (WMASK[28]) ram[waddr][28] <= data_in[28];
-              if (WMASK[29]) ram[waddr][29] <= data_in[29];
-              if (WMASK[30]) ram[waddr][30] <= data_in[30];
-              if (WMASK[31]) ram[waddr][31] <= data_in[31];
-            end
-    end
-
-    always @(posedge rclk) begin
-            if(!ren) begin
-              internal <= ram[raddr];
-            end
-    end
-endmodule
-
-module QL_DSP (
-    input CLK,
-    input [15:0] A, B, C, D,
-    output [31:0] O,
-    output CO // Currently unused, left in case we want to support signed operations in the future.
-);
-    parameter [0:0] A_REG = 0;
-    parameter [0:0] B_REG = 0;
-    parameter [0:0] C_REG = 0;
-    parameter [0:0] D_REG = 0;
-    parameter [0:0] ENABLE_DSP = 0;
-    parameter [0:0] A_SIGNED = 0;
-    parameter [0:0] B_SIGNED = 0;
-
-    wire [15:0] iA, iB, iC, iD;
-    wire [15:0] iF, iJ, iK, iG;
-
-    // Regs C and A, currently unused
-    reg [15:0] rC, rA;
-
-    assign iC = C_REG ? rC : C;
-    assign iA = A_REG ? rA : A;
-
-    // Regs B and D, currently unused
-    reg [15:0] rB, rD;
-
-    assign iB = B_REG ? rB : B;
-    assign iD = D_REG ? rD : D;
-
-    // Multiplier Stage
-    wire [15:0] p_Ah_Bh, p_Al_Bh, p_Ah_Bl, p_Al_Bl;
-    wire [15:0] Ah, Al, Bh, Bl;
-    assign Ah = {A_SIGNED ? {8{iA[15]}} : 8'b0, iA[15: 8]};
-    assign Al = {8'b0, iA[ 7: 0]};
-    assign Bh = {B_SIGNED ? {8{iB[15]}} : 8'b0, iB[15: 8]};
-    assign Bl = {8'b0, iB[ 7: 0]};
-    assign p_Ah_Bh = Ah * Bh; // F
-    assign p_Al_Bh = {8'b0, Al[7:0]} * Bh; // J
-    assign p_Ah_Bl = Ah * {8'b0, Bl[7:0]}; // K
-    assign p_Al_Bl = Al * Bl; // G
-
-    assign iF = p_Ah_Bh;
-    assign iJ = p_Al_Bh;
-
-    assign iK = p_Ah_Bl;
-    assign iG = p_Al_Bl;
-
-    // Adder Stage
-    wire [23:0] iK_e = {A_SIGNED ? {8{iK[15]}} : 8'b0, iK};
-    wire [23:0] iJ_e = {B_SIGNED ? {8{iJ[15]}} : 8'b0, iJ};
-    assign iL = iG + (iK_e << 8) + (iJ_e << 8) + (iF << 16);
-
-    // Output Stage
-    assign O = iL;
-
-endmodule
-
 
 module TDP_BRAM18 (
     (* clkbuf_sink *)

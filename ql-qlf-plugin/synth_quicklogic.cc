@@ -297,12 +297,16 @@ struct SynthQuickLogicPass : public ScriptPass {
             if (family == "qlf_k4n8") {
                 run("shregmap -minlen 8 -maxlen 8");
                 run("dfflegalize -cell $_DFF_P_ 0 -cell $_DFF_P??_ 0 -cell $_DFF_N_ 0 -cell $_DFF_N??_ 0 -cell $_DFFSR_???_ 0");
-            } else if (family == "qlf_k6n10" || family == "qlf_k6n10f") {
+            } else if (family == "qlf_k6n10") {
                 run("dfflegalize -cell $_DFF_P_ 0 -cell $_DFF_PP?_ 0 -cell $_DFFE_PP?P_ 0 -cell $_DFFSR_PPP_ 0 -cell $_DFFSRE_PPPP_ 0 -cell "
                     "$_DLATCHSR_PPP_ 0");
                 //    In case we add clock inversion in the future.
                 //    run("dfflegalize -cell $_DFF_?_ 0 -cell $_DFF_?P?_ 0 -cell $_DFFE_?P?P_ 0 -cell $_DFFSR_?PP_ 0 -cell $_DFFSRE_?PPP_ 0 -cell
                 //    $_DLATCH_SRPPP_ 0");
+            } else if (family == "qlf_k6n10f") {
+                run("shregmap -minlen 8 -maxlen 20");
+                run("dfflegalize -cell $_DFF_?_ 0 -cell $_DFF_???_ 0 -cell $_DFFE_????_ 0 -cell $_DFFSR_???_ 0 -cell $_DFFSRE_????_ 0 -cell "
+                    "$_DLATCHSR_PPP_ 0");
             } else if (family == "pp3") {
                 run("dfflegalize -cell $_DFFSRE_PPPP_ 0 -cell $_DLATCH_?_ x");
                 run("techmap -map +/quicklogic/" + family + "/cells_map.v");
@@ -350,7 +354,7 @@ struct SynthQuickLogicPass : public ScriptPass {
             run("opt_lut");
         }
 
-        if (check_label("map_cells") && (family == "qlf_k6n10" || family == "pp3" || family == "qlf_k6n10f")) {
+        if (check_label("map_cells") && (family == "qlf_k6n10" || family == "pp3")) {
             std::string techMapArgs;
             techMapArgs = "-map +/quicklogic/" + family + "/lut_map.v";
             run("techmap " + techMapArgs);
