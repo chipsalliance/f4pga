@@ -1237,7 +1237,7 @@ void UhdmAst::convert_packed_unpacked_range(AST::AstNode *wire_node, const std::
     size_t packed_size = 1;
     size_t unpacked_size = 1;
     std::vector<AST::AstNode *> ranges;
-    bool convert_node = packed_ranges.size() > 1 || unpacked_ranges.size() > 1 ||
+    bool convert_node = packed_ranges.size() > 1 || unpacked_ranges.size() > 1 || wire_node->type == AST::AST_PARAMETER ||
                         ((wire_node->is_input || wire_node->is_output) && ((packed_ranges.size() > 0 || unpacked_ranges.size() > 0)));
     for (auto id : identifers) {
         // if we accessing whole AST_MEMORY, we want to change AST_MEMORY to single RANGE,
@@ -2659,7 +2659,13 @@ void UhdmAst::process_parameter()
         case vpiArrayTypespec: {
             shared.report.mark_handled(typespec_h);
 #ifdef BUILD_UPSTREAM
-            visit_one_to_many({vpiRange}, typespec_h, [&](AST::AstNode *node) { packed_ranges.push_back(node); });
+            visit_one_to_one({vpiElemTypespec}, typespec_h, [&](AST::AstNode *node) {
+                if (node && node->attributes.count(ID::packed_ranges)) {
+                    for (auto r : node->attributes[ID::packed_ranges]->children) {
+                        packed_ranges.push_back(r->clone());
+                    }
+                }
+            });
 #else
             visit_one_to_one({vpiElemTypespec}, typespec_h, [&](AST::AstNode *node) {
                 if (node) {
