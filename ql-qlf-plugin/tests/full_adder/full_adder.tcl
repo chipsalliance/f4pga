@@ -60,6 +60,28 @@ select -assert-count 5 t:adder
 
 design -reset
 
+# Equivalence check for adder synthesis for qlf-k6n10
+read_verilog -icells -DWIDTH=4 $::env(DESIGN_TOP).v
+hierarchy -check -top full_adder
+yosys proc
+synth_quicklogic -family qlf_k6n10f
+yosys cd full_adder
+stat
+select -assert-count 6 t:adder_carry
+
+design -reset
+
+# Equivalence check for subtractor synthesis for qlf-k6n10
+read_verilog -icells -DWIDTH=4 $::env(DESIGN_TOP).v
+hierarchy -check -top subtractor
+yosys proc
+synth_quicklogic -family qlf_k6n10f
+yosys cd subtractor
+stat
+select -assert-count 6 t:adder_carry
+
+design -reset
+
 # Equivalence check for adder synthesis for pp3
 read_verilog -icells -DWIDTH=4 $::env(DESIGN_TOP).v
 hierarchy -check -top full_adder
