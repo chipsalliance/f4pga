@@ -2203,6 +2203,17 @@ void UhdmAst::process_function()
     visit_one_to_many({vpiVariables}, obj_h, [&](AST::AstNode *node) { current_node->children.push_back(node); });
     visit_one_to_one({vpiStmt}, obj_h, [&](AST::AstNode *node) {
         if (node) {
+            // Fix for assignments on declaration, e.g.:
+            // logic [63:0] key_out = key_in;
+            // key_out is already declared as vpiVariables, but it is also declared inside vpiStmt
+            const std::unordered_set<AST::AstNodeType> assign_types = {AST::AST_ASSIGN, AST::AST_ASSIGN_EQ, AST::AST_ASSIGN_LE};
+            for (auto c : node->children) {
+                if (assign_types.find(c->type) != assign_types.end() && c->children[0]->type == AST::AST_WIRE) {
+                    c->children[0]->type = AST::AST_IDENTIFIER;
+                    c->children[0]->attributes.erase(ID::packed_ranges);
+                    c->children[0]->attributes.erase(ID::unpacked_ranges);
+                }
+            }
             current_node->children.push_back(node);
         }
     });
