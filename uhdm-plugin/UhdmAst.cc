@@ -70,6 +70,19 @@ static std::string get_object_name(vpiHandle obj_h, const std::vector<int> &name
     return objectName;
 }
 
+static AST::AstNode *make_range(int left, int right, bool is_signed = false)
+{
+    // generate a pre-validated range node for a fixed signal range.
+    auto range = new AST::AstNode(AST::AST_RANGE);
+    range->range_left = left;
+    range->range_right = right;
+    range->range_valid = true;
+    range->children.push_back(AST::AstNode::mkconst_int(left, true));
+    range->children.push_back(AST::AstNode::mkconst_int(right, true));
+    range->is_signed = is_signed;
+    return range;
+}
+
 #ifdef BUILD_UPSTREAM
 #include "UhdmAstUpstream.cc"
 #else
@@ -767,7 +780,23 @@ void UhdmAst::process_module()
 void UhdmAst::process_struct_typespec()
 {
     current_node = make_ast_node(AST::AST_STRUCT);
-    visit_one_to_many({vpiTypespecMember}, obj_h, [&](AST::AstNode *node) { current_node->children.push_back(node); });
+    visit_one_to_many({vpiTypespecMember}, obj_h, [&](AST::AstNode *node) {
+        if (node->children.size() > 0 && node->children[0]->type == AST::AST_ENUM) {
+            log_assert(node->children.size() == 1);
+            log_assert(!node->children[0]->children.empty());
+            log_assert(!node->children[0]->children[0]->children.empty());
+            // TODO: add missing enum_type attribute
+            auto range = make_range(0, 0);
+            // check if single enum element is larger than 1 bit
+            if (node->children[0]->children[0]->children.size() == 2) {
+                range = node->children[0]->children[0]->children[1]->clone();
+            }
+            delete node->children[0];
+            node->children.clear();
+            node->children.push_back(range);
+        }
+        current_node->children.push_back(node);
+    });
 }
 
 void UhdmAst::process_array_typespec()
