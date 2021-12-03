@@ -1419,7 +1419,6 @@ AST::AstNode *UhdmAst::convert_dot(AST::AstNode *node, AST::AstNode *dot, AST::A
     // convert and resolve wiretype
     if (!wire_node->attributes.count(ID::wiretype)) {
         convert_packed_unpacked_range(wire_node, std::vector<AST::AstNode *>());
-        multirange_wires.erase(id_name);
     }
 
     AST::AstNode *struct_node = nullptr;
@@ -1515,9 +1514,7 @@ void UhdmAst::convert_multiranges(AST::AstNode *module_node)
         }
     });
     for (auto m : multirange_wires) {
-        if (!m.second.first->attributes.count(ID::wiretype)) {
-            convert_packed_unpacked_range(m.second.first, m.second.second);
-        }
+        convert_packed_unpacked_range(m.second.first, m.second.second);
     }
 }
 
@@ -1605,10 +1602,12 @@ void UhdmAst::convert_packed_unpacked_range(AST::AstNode *wire_node, const std::
     }
     // Convert only when atleast 1 of the ranges has more then 1 range
     if (convert_node) {
-        packed_size = add_multirange_attribute(wire_node, packed_ranges);
-        unpacked_size = add_multirange_attribute(wire_node, unpacked_ranges);
-        size = packed_size * unpacked_size;
-        ranges.push_back(make_range(size - 1, 0));
+        if (wire_node->multirange_dimensions.empty()) {
+            packed_size = add_multirange_attribute(wire_node, packed_ranges);
+            unpacked_size = add_multirange_attribute(wire_node, unpacked_ranges);
+            size = packed_size * unpacked_size;
+            ranges.push_back(make_range(size - 1, 0));
+        }
         if (size > 0) {
             for (auto id : identifers) {
                 if (id->children.empty())
@@ -1648,9 +1647,6 @@ void UhdmAst::convert_packed_unpacked_range(AST::AstNode *wire_node, const std::
         }
     }
 
-    // Remove now unneeded anymore attributes
-    wire_node->attributes.erase(ID::packed_ranges);
-    wire_node->attributes.erase(ID::unpacked_ranges);
     // Insert new range
     wire_node->children.insert(wire_node->children.end(), ranges.begin(), ranges.end());
 }
