@@ -3049,6 +3049,13 @@ void UhdmAst::process_parameter()
 #endif
 }
 
+void UhdmAst::process_byte_var()
+{
+    current_node = make_ast_node(AST::AST_WIRE);
+    current_node->children.push_back(make_range(7, 0));
+    current_node->is_signed = vpi_get(vpiSigned, obj_h);
+}
+
 AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
 {
     obj_h = obj_handle;
@@ -3254,6 +3261,9 @@ AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
         break;
     case vpiRepeat:
         process_repeat();
+        break;
+    case vpiByteVar:
+        process_byte_var();
         break;
     case vpiProgram:
     default:

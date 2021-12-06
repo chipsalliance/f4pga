@@ -128,6 +128,7 @@ class UhdmAst
     void process_string_var();
     void process_string_typespec();
     void process_repeat();
+    void process_byte_var();
     void process_nonsynthesizable(const UHDM::BaseClass *object);
     void visitEachDescendant(AST::AstNode *node, const std::function<void(AST::AstNode *)> &f);
 
