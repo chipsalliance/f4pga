@@ -320,6 +320,10 @@ AST::AstNode *UhdmAst::process_value(vpiHandle obj_h)
             strValType = "'h";
             break;
         }
+        case vpiOctStrVal: {
+            strValType = "'o";
+            break;
+        }
         // Surelog reports constant integers as a unsigned, but by default int is signed
         // so we are treating here UInt in the same way as if they would be Int
         case vpiUIntVal:
