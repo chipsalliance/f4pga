@@ -414,12 +414,10 @@ void UhdmAst::process_packed_array_typespec()
         } else if (node) {
             current_node->str = node->str;
 #ifdef BUILD_UPSTREAM
-            if (node->type == AST::AST_ENUM) {
-                if (!node->children.empty()) {
-                    for (auto c : node->children[0]->children) {
-                        if (c->type == AST::AST_RANGE)
-                            unpacked_ranges.push_back(c->clone());
-                    }
+            if (node->type == AST::AST_ENUM && !node->children.empty()) {
+                for (auto c : node->children[0]->children) {
+                    if (c->type == AST::AST_RANGE)
+                        unpacked_ranges.push_back(c->clone());
                 }
             }
 #endif
@@ -1263,19 +1261,6 @@ void UhdmAst::process_packed_array_net()
 #endif
 }
 
-static AST::AstNode *make_range(int left, int right, bool is_signed = false)
-{
-    // generate a pre-validated range node for a fixed signal range.
-    auto range = new AST::AstNode(AST::AST_RANGE);
-    range->range_left = left;
-    range->range_right = right;
-    range->range_valid = true;
-    range->children.push_back(AST::AstNode::mkconst_int(left, true));
-    range->children.push_back(AST::AstNode::mkconst_int(right, true));
-    range->is_signed = is_signed;
-    return range;
-}
-
 #ifdef BUILD_UPSTREAM
 size_t UhdmAst::add_multirange_attribute(AST::AstNode *wire_node, const std::vector<AST::AstNode *> ranges)
 {
@@ -1354,27 +1339,24 @@ void UhdmAst::resolve_wiretype(AST::AstNode *wire_node)
             AST_INTERNAL::current_scope[current_scope_node->str] = current_scope_node;
         }
     });
-    if (!wire_node->children.empty()) {
-        if (wire_node->children[0]->type == AST::AST_WIRETYPE) {
-            if (AST_INTERNAL::current_scope.count(wire_node->children[0]->str)) {
-                auto wiretype_node = AST_INTERNAL::current_scope[wire_node->children[0]->str];
+    if (!wire_node->children.empty() && wire_node->children[0]->type == AST::AST_WIRETYPE &&
+        AST_INTERNAL::current_scope.count(wire_node->children[0]->str)) {
+        auto wiretype_node = AST_INTERNAL::current_scope[wire_node->children[0]->str];
 
-                visitEachDescendant(wiretype_node, [&](AST::AstNode *node) {
-                    if (node->attributes.count(ID::packed_ranges)) {
-                        for (auto r : node->attributes[ID::packed_ranges]->children) {
-                            node->children.push_back(r->clone());
-                        }
-                        node->attributes.erase(ID::packed_ranges);
-                    }
-                    if (node->attributes.count(ID::unpacked_ranges)) {
-                        for (auto r : node->attributes[ID::unpacked_ranges]->children) {
-                            node->children.push_back(r->clone());
-                        }
-                        node->attributes.erase(ID::unpacked_ranges);
-                    }
-                });
+        visitEachDescendant(wiretype_node, [&](AST::AstNode *node) {
+            if (node->attributes.count(ID::packed_ranges)) {
+                for (auto r : node->attributes[ID::packed_ranges]->children) {
+                    node->children.push_back(r->clone());
+                }
+                node->attributes.erase(ID::packed_ranges);
             }
-        }
+            if (node->attributes.count(ID::unpacked_ranges)) {
+                for (auto r : node->attributes[ID::unpacked_ranges]->children) {
+                    node->children.push_back(r->clone());
+                }
+                node->attributes.erase(ID::unpacked_ranges);
+            }
+        });
     }
     AST::AstNode *wiretype_ast = nullptr;
     if (!wire_node->children.empty() && wire_node->children[0]->type == AST::AST_WIRETYPE) {
