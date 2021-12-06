@@ -1163,7 +1163,6 @@ void UhdmAst::process_packed_array_net()
     visit_one_to_many({vpiRange}, obj_h, [&](AST::AstNode *node) { current_node->children.push_back(node); });
 }
 
-#ifdef BUILD_UPSTREAM
 static AST::AstNode *make_range(int left, int right, bool is_signed = false)
 {
     // generate a pre-validated range node for a fixed signal range.
@@ -1177,6 +1176,7 @@ static AST::AstNode *make_range(int left, int right, bool is_signed = false)
     return range;
 }
 
+#ifdef BUILD_UPSTREAM
 size_t UhdmAst::add_multirange_attribute(AST::AstNode *wire_node, const std::vector<AST::AstNode *> ranges)
 {
     size_t size = 1;
