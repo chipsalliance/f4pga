@@ -1733,15 +1733,13 @@ void UhdmAst::process_always()
 {
     current_node = make_ast_node(AST::AST_ALWAYS);
     visit_one_to_one({vpiStmt}, obj_h, [&](AST::AstNode *node) {
-        if (node) {
-            AST::AstNode *block = nullptr;
-            if (node->type != AST::AST_BLOCK) {
-                block = new AST::AstNode(AST::AST_BLOCK, node);
-            } else {
-                block = node;
-            }
-            current_node->children.push_back(block);
+        AST::AstNode *block = nullptr;
+        if (node && node->type != AST::AST_BLOCK) {
+            block = new AST::AstNode(AST::AST_BLOCK, node);
+        } else {
+            block = node;
         }
+        current_node->children.push_back(block);
     });
     switch (vpi_get(vpiAlwaysType, obj_h)) {
     case vpiAlwaysComb:
@@ -2634,6 +2632,11 @@ void UhdmAst::process_immediate_assert()
 void UhdmAst::process_nonsynthesizable(const UHDM::BaseClass *object)
 {
     log_warning("%s:%d: Non-synthesizable object of type '%s'\n", object->VpiFile().c_str(), object->VpiLineNo(), UHDM::VpiTypeName(obj_h).c_str());
+    current_node = make_ast_node(AST::AST_BLOCK);
+    visit_one_to_one({vpiStmt}, obj_h, [&](AST::AstNode *node) {
+        if (node)
+            current_node->children.push_back(node);
+    });
 }
 
 void UhdmAst::process_logic_typespec()
