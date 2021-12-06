@@ -223,11 +223,13 @@ void UhdmAst::visit_one_to_one(const std::vector<int> child_node_types, vpiHandl
 }
 
 #ifdef BUILD_UPSTREAM
-void UhdmAst::add_multirange_wire(AST::AstNode *node, std::vector<AST::AstNode *> packed_ranges, std::vector<AST::AstNode *> unpacked_ranges)
+void UhdmAst::add_multirange_wire(AST::AstNode *node, std::vector<AST::AstNode *> packed_ranges, std::vector<AST::AstNode *> unpacked_ranges,
+                                  bool reverse)
 {
     node->attributes[ID::packed_ranges] = AST::AstNode::mkconst_int(1, false, 1);
     if (!packed_ranges.empty()) {
-        std::reverse(packed_ranges.begin(), packed_ranges.end());
+        if (reverse)
+            std::reverse(packed_ranges.begin(), packed_ranges.end());
         node->attributes[ID::packed_ranges]->children.insert(node->attributes[ID::packed_ranges]->children.end(), packed_ranges.begin(),
                                                              packed_ranges.end());
     }
@@ -657,6 +659,55 @@ void UhdmAst::process_design()
     }
 }
 
+#ifdef BUILD_UPSTREAM
+void UhdmAst::simplify_parameter(AST::AstNode *parameter, AST::AstNode *module_node)
+{
+    for (auto it = shared.top_nodes.begin(); it != shared.top_nodes.end(); it++) {
+        if (it->second->type == AST::AST_PACKAGE) {
+            for (auto &o : it->second->children) {
+                // import only parameters
+                if (o->type == AST::AST_TYPEDEF || o->type == AST::AST_PARAMETER || o->type == AST::AST_LOCALPARAM) {
+                    // add imported nodes to current scope
+                    AST_INTERNAL::current_scope[it->second->str + std::string("::") + o->str.substr(1)] = o;
+                    AST_INTERNAL::current_scope[o->str] = o;
+                } else if (o->type == AST::AST_ENUM) {
+                    AST_INTERNAL::current_scope[o->str] = o;
+                    for (auto c : o->children) {
+                        AST_INTERNAL::current_scope[c->str] = c;
+                    }
+                }
+            }
+        }
+    }
+    // hackish way of setting current_ast_mod as it is required
+    // for simplify to get references for already defined ids
+    log_assert(shared.current_top_node != nullptr);
+    AST_INTERNAL::current_ast_mod = shared.current_top_node;
+    visitEachDescendant(shared.current_top_node, [&](AST::AstNode *current_scope_node) {
+        if (current_scope_node->type == AST::AST_TYPEDEF || current_scope_node->type == AST::AST_PARAMETER ||
+            current_scope_node->type == AST::AST_LOCALPARAM) {
+            AST_INTERNAL::current_scope[current_scope_node->str] = current_scope_node;
+        }
+    });
+    if (module_node) {
+        visitEachDescendant(module_node, [&](AST::AstNode *current_scope_node) {
+            if (current_scope_node->type == AST::AST_TYPEDEF || current_scope_node->type == AST::AST_PARAMETER ||
+                current_scope_node->type == AST::AST_LOCALPARAM) {
+                AST_INTERNAL::current_scope[current_scope_node->str] = current_scope_node;
+            }
+        });
+    }
+    // we need to setup current top ast as this simplify
+    // needs to have access to all already definied ids
+    while (parameter->simplify(true, false, false, 1, -1, false, false)) {
+    }
+    // Remove clear current_scope from package nodes
+    AST_INTERNAL::current_scope.clear();
+    // unset current_ast_mod
+    AST_INTERNAL::current_ast_mod = nullptr;
+}
+#endif
+
 void UhdmAst::process_module()
 {
     std::string type = vpi_get_str(vpiDefName, obj_h);
@@ -713,11 +764,20 @@ void UhdmAst::process_module()
         std::string module_parameters;
         visit_one_to_many({vpiParamAssign}, obj_h, [&](AST::AstNode *node) {
             if (node && node->type == AST::AST_PARAMETER) {
-                if (shared.top_nodes.count(type) && !(!node->children.empty() && node->children[0]->type != AST::AST_CONSTANT)) {
+#ifdef BUILD_UPSTREAM
+                if (node->children[0]->type != AST::AST_CONSTANT) {
+                    if (shared.top_nodes.count(type)) {
+                        simplify_parameter(node, shared.top_nodes[type]);
+                        log_assert(node->children[0]->type == AST::AST_CONSTANT || node->children[0]->type == AST::AST_REALVALUE);
+                    }
+                }
+#endif
+                if (shared.top_nodes.count(type)) {
                     if (!node->children[0]->str.empty())
                         module_parameters += node->str + "=" + node->children[0]->str;
                     else
-                        module_parameters += node->str + "=" + std::to_string(node->children[0]->integer);
+                        module_parameters +=
+                          node->str + "=" + std::to_string(node->children[0]->bits.size()) + "'d" + std::to_string(node->children[0]->integer);
                 }
                 delete node;
             }
@@ -731,13 +791,15 @@ void UhdmAst::process_module()
         else
             module_name = type;
         auto module_node = shared.top_nodes[module_name];
+        auto cell_instance = vpi_get(vpiCellInstance, obj_h);
         if (!module_node) {
             module_node = shared.top_nodes[type];
             if (!module_node) {
                 module_node = new AST::AstNode(AST::AST_MODULE);
                 module_node->str = type;
                 module_node->attributes[ID::partial] = AST::AstNode::mkconst_int(2, false, 1);
-                shared.top_nodes[module_node->str] = module_node;
+                cell_instance = 1;
+                module_name = type;
             }
             if (!module_parameters.empty()) {
                 module_node = module_node->clone();
@@ -745,15 +807,19 @@ void UhdmAst::process_module()
         }
         module_node->str = module_name;
         shared.top_nodes[module_node->str] = module_node;
-#ifdef BUILD_UPSTREAM
-        shared.current_top_node = module_node;
-#endif
-        auto cell_instance = vpi_get(vpiCellInstance, obj_h);
         if (cell_instance) {
             module_node->attributes[ID::whitebox] = AST::AstNode::mkconst_int(1, false, 1);
         }
         visit_one_to_many({vpiParamAssign}, obj_h, [&](AST::AstNode *node) {
             if (node) {
+#ifdef BUILD_UPSTREAM
+                if (node->children[0]->type != AST::AST_CONSTANT) {
+                    if (shared.top_nodes[type]) {
+                        simplify_parameter(node, module_node);
+                        log_assert(node->children[0]->type == AST::AST_CONSTANT || node->children[0]->type == AST::AST_REALVALUE);
+                    }
+                }
+#endif
                 auto parent_node = std::find_if(module_node->children.begin(), module_node->children.end(), [&](AST::AstNode *child) -> bool {
                     return ((child->type == AST::AST_PARAMETER) || (child->type == AST::AST_LOCALPARAM)) && child->str == node->str &&
                            // skip real parameters as they are currently not working: https://github.com/alainmarcel/Surelog/issues/1035
@@ -805,6 +871,10 @@ void UhdmAst::process_module()
         auto typeNode = new AST::AstNode(AST::AST_CELLTYPE);
         typeNode->str = module_node->str;
         current_node->children.insert(current_node->children.begin(), typeNode);
+#ifdef BUILD_UPSTREAM
+        auto old_top = shared.current_top_node;
+        shared.current_top_node = module_node;
+#endif
         visit_one_to_many({vpiVariables, vpiNet, vpiArrayNet}, obj_h, [&](AST::AstNode *node) {
             if (node) {
                 add_or_replace_child(module_node, node);
@@ -816,6 +886,9 @@ void UhdmAst::process_module()
             }
         });
         make_cell(obj_h, current_node, module_node);
+#ifdef BUILD_UPSTREAM
+        shared.current_top_node = old_top;
+#endif
     }
 }
 
@@ -1156,11 +1229,14 @@ void UhdmAst::process_param_assign()
     });
     visit_one_to_one({vpiRhs}, obj_h, [&](AST::AstNode *node) {
         if (node) {
+            if (node->children.size() > 1 && (node->children[1]->type == AST::AST_PARAMETER || node->children[1]->type == AST::AST_LOCALPARAM)) {
+                node->children[1]->type = AST::AST_IDENTIFIER;
+            }
             current_node->children.insert(current_node->children.begin(), node);
         }
     });
 #ifdef BUILD_UPSTREAM
-    add_multirange_wire(current_node, packed_ranges, unpacked_ranges);
+    add_multirange_wire(current_node, packed_ranges, unpacked_ranges, false);
 #endif
 }
 
@@ -1270,6 +1346,12 @@ size_t UhdmAst::add_multirange_attribute(AST::AstNode *wire_node, const std::vec
         // for simplify to get references for already defined ids
         log_assert(shared.current_top_node != nullptr);
         AST_INTERNAL::current_ast_mod = shared.current_top_node;
+        visitEachDescendant(shared.current_top_node, [&](AST::AstNode *current_scope_node) {
+            if (current_scope_node->type == AST::AST_TYPEDEF || current_scope_node->type == AST::AST_PARAMETER ||
+                current_scope_node->type == AST::AST_LOCALPARAM) {
+                AST_INTERNAL::current_scope[current_scope_node->str] = current_scope_node;
+            }
+        });
         // we need to setup current top ast as this simplify
         // needs to have access to all already definied ids
         while (ranges[i]->simplify(true, false, false, 1, -1, false, false)) {
@@ -1439,6 +1521,7 @@ AST::AstNode *UhdmAst::convert_dot(AST::AstNode *node, AST::AstNode *dot, AST::A
 
 void UhdmAst::convert_multiranges(AST::AstNode *module_node)
 {
+    shared.current_top_node = module_node;
     std::map<std::string, std::pair<AST::AstNode *, std::vector<AST::AstNode *>>> multirange_wires;
     std::map<std::string, AST::AstNode *> wires;
     std::vector<std::string> remove_ids;
@@ -1646,6 +1729,7 @@ void UhdmAst::convert_packed_unpacked_range(AST::AstNode *wire_node, const std::
 void UhdmAst::visitEachDescendant(AST::AstNode *node, const std::function<void(AST::AstNode *)> &f)
 {
 #ifdef BUILD_UPSTREAM
+    auto last_current_top_node = shared.current_top_node;
     if (node->type == AST::AST_MODULE || node->type == AST::AST_PACKAGE) {
         shared.current_top_node = node;
     }
@@ -1661,6 +1745,7 @@ void UhdmAst::visitEachDescendant(AST::AstNode *node, const std::function<void(A
         visitEachDescendant(child, f);
     }
 #ifdef BUILD_UPSTREAM
+    shared.current_top_node = last_current_top_node;
     if (node->type == AST::AST_FUNCTION || node->type == AST::AST_BLOCK || node->type == AST::AST_GENBLOCK || node->type == AST::AST_TYPEDEF)
         if (!node->str.empty())
             shared.multirange_scope.pop_back();
@@ -2058,6 +2143,9 @@ void UhdmAst::process_operation()
             break;
         case vpiSubOp:
             current_node->type = AST::AST_SUB;
+            if (!current_node->children.empty() && current_node->children[0]->type == AST::AST_LOCALPARAM) {
+                current_node->children[0]->type = AST::AST_IDENTIFIER;
+            }
             break;
         case vpiAddOp:
             current_node->type = AST::AST_ADD;
@@ -3102,9 +3190,10 @@ void UhdmAst::process_parameter()
 #ifdef BUILD_UPSTREAM
     std::vector<AST::AstNode *> packed_ranges;   // comes before wire name
     std::vector<AST::AstNode *> unpacked_ranges; // comes after wire name
-#endif
-    // if (vpi_get_str(vpiImported, obj_h) != "") { } //currently unused
-#ifdef BUILD_UPSTREAM
+    // currently unused, but save it for future use
+    if (vpi_get_str(vpiImported, obj_h) != "") {
+        current_node->attributes[ID::is_imported] = AST::AstNode::mkconst_int(1, true);
+    }
     visit_one_to_many({vpiRange}, obj_h, [&](AST::AstNode *node) { unpacked_ranges.push_back(node); });
 #else
     std::vector<AST::AstNode *> range_nodes;

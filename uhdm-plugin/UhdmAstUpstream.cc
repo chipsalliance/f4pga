@@ -5,6 +5,7 @@ namespace ID
 IdString partial{"\\partial"};
 IdString packed_ranges{"\\packed_ranges"};
 IdString unpacked_ranges{"\\unpacked_ranges"};
+IdString is_imported{"\\is_imported"};
 } // namespace ID
 } // namespace RTLIL
 

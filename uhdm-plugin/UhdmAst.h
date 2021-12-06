@@ -130,11 +130,13 @@ class UhdmAst
     void process_repeat();
     void process_byte_var();
     void process_long_int_var();
+    void simplify_parameter(AST::AstNode *parameter, AST::AstNode *module_node = nullptr);
     void process_nonsynthesizable(const UHDM::BaseClass *object);
     void visitEachDescendant(AST::AstNode *node, const std::function<void(AST::AstNode *)> &f);
 
 #ifdef BUILD_UPSTREAM
-    void add_multirange_wire(AST::AstNode *node, std::vector<AST::AstNode *> packed_ranges, std::vector<AST::AstNode *> unpacked_ranges);
+    void add_multirange_wire(AST::AstNode *node, std::vector<AST::AstNode *> packed_ranges, std::vector<AST::AstNode *> unpacked_ranges,
+                             bool reverse = true);
     AST::AstNode *convert_range(const AST::AstNode *id, const std::vector<AST::AstNode *> &packed_ranges,
                                 const std::vector<AST::AstNode *> &unpacked_ranges, const std::vector<int> single_elem_size, int i,
                                 AST::AstNode *wire_node);
