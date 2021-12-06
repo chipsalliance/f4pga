@@ -1376,9 +1376,18 @@ void UhdmAst::resolve_wiretype(AST::AstNode *wire_node)
             }
         }
     }
+    AST::AstNode *wiretype_ast = nullptr;
+    if (!wire_node->children.empty() && wire_node->children[0]->type == AST::AST_WIRETYPE) {
+        log_assert(AST_INTERNAL::current_scope.count(wire_node->children[0]->str));
+        wiretype_ast = AST_INTERNAL::current_scope[wire_node->children[0]->str];
+    }
     // we need to setup current top ast as this simplify
     // needs to have access to all already definied ids
     while (wire_node->simplify(true, false, false, 1, -1, false, false)) {
+    }
+    if (wiretype_ast && wire_node->attributes.count(ID::wiretype)) {
+        log_assert(wiretype_ast->type == AST::AST_TYPEDEF);
+        wire_node->attributes[ID::wiretype]->id2ast = wiretype_ast->children[0];
     }
     if (wire_node->children[0]->type == AST::AST_RANGE && wire_node->multirange_dimensions.empty()) {
         packed_ranges.push_back(wire_node->children[0]);
