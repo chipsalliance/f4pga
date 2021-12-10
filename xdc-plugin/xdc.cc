@@ -342,7 +342,11 @@ struct SetProperty : public Pass {
         if (signal.is_chunk()) {
             auto chunk = signal.as_chunk();
             if (chunk.wire) {
-                return (chunk.wire->name == RTLIL::IdString(RTLIL::escape_id(port))) && (port_bit == chunk.offset);
+                // chunk.offset is always indexed from 0. Because of that port_bit must be
+                // corrected with the chunk.wire->start_offset of the port wire in case it is not 0-indexed.
+                // Not doing this would cause lack of some properties (e.g. IO_LOC_PAIRS) for
+                // non-0-indexed ports in final eblif file
+                return (chunk.wire->name == RTLIL::IdString(RTLIL::escape_id(port))) && ((port_bit - chunk.wire->start_offset) == chunk.offset);
             }
         }
         return false;
