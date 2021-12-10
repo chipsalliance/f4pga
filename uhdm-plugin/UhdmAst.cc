@@ -2722,6 +2722,12 @@ void UhdmAst::process_sys_func_call()
             current_node->children.push_back(node);
         }
     });
+
+    // skip $value$plusargs function, as it is simulation function
+    if (current_node->str == "\\$value$plusargs") {
+        delete current_node;
+        current_node = nullptr;
+    }
 }
 
 void UhdmAst::process_func_call()
