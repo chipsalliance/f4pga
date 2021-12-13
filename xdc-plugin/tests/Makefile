@@ -13,13 +13,15 @@
 # io_loc_pairs - test for LOC property being set on IOBUFs as the IO_LOC_PAIRS parameter
 # minilitex_ddr_arty - litex design with more types of IOBUFS including differential
 # package_pins - test for PACKAGE_PIN property being set on IOBUFs as the IO_LOC_PAIRS parameter
+# non_zero_port_indexes - testing IO_LOC_PAIRS for design with non-zero indexed ports
 TESTS = counter \
 	counter-dict \
 	package_pins-dict-space \
 	port_indexes \
 	io_loc_pairs \
 	minilitex_ddr_arty \
-	package_pins
+	package_pins \
+	non_zero_port_indexes
 
 include $(shell pwd)/../../Makefile_test.common
 
@@ -37,3 +39,4 @@ io_loc_pairs_verify = $(call json_test,io_loc_pairs)
 minilitex_ddr_arty_verify = $(call json_test,minilitex_ddr_arty)
 package_pins_verify = $(call json_test,package_pins)
 package_pins-dict-space_verify = $(call json_test,package_pins-dict-space)
+non_zero_port_indexes_verify = $(call json_test,non_zero_port_indexes)
