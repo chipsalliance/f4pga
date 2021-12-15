@@ -110,7 +110,7 @@ static void visitEachDescendantStatic(AST::AstNode *node, const std::function<vo
 }
 
 static void add_multirange_wire(AST::AstNode *node, std::vector<AST::AstNode *> packed_ranges, std::vector<AST::AstNode *> unpacked_ranges,
-                                  bool reverse = true)
+                                bool reverse = true)
 {
     node->attributes[ID::packed_ranges] = AST::AstNode::mkconst_int(1, false, 1);
     if (!packed_ranges.empty()) {
@@ -127,7 +127,6 @@ static void add_multirange_wire(AST::AstNode *node, std::vector<AST::AstNode *> 
     }
 }
 
-
 static size_t add_multirange_attribute(AST::AstNode *wire_node, const std::vector<AST::AstNode *> ranges)
 {
     size_t size = 1;
@@ -136,7 +135,8 @@ static size_t add_multirange_attribute(AST::AstNode *wire_node, const std::vecto
         if (ranges[i]->children.size() == 1) {
             ranges[i]->children.push_back(ranges[i]->children[0]->clone());
         }
-        while (ranges[i]->simplify(true, false, false, 1, -1, false, false)) { }
+        while (ranges[i]->simplify(true, false, false, 1, -1, false, false)) {
+        }
         log_assert(ranges[i]->children[0]->type == AST::AST_CONSTANT);
         log_assert(ranges[i]->children[1]->type == AST::AST_CONSTANT);
         wire_node->multirange_dimensions.push_back(min(ranges[i]->children[0]->integer, ranges[i]->children[1]->integer));
@@ -150,7 +150,8 @@ static size_t add_multirange_attribute(AST::AstNode *wire_node, const std::vecto
     return size;
 }
 
-static AST::AstNode *convert_range(AST::AstNode *id, const std::vector<AST::AstNode *> packed_ranges, const std::vector<AST::AstNode *> unpacked_ranges, int i)
+static AST::AstNode *convert_range(AST::AstNode *id, const std::vector<AST::AstNode *> packed_ranges,
+                                   const std::vector<AST::AstNode *> unpacked_ranges, int i)
 {
     log_assert(AST_INTERNAL::current_ast_mod);
     log_assert(AST_INTERNAL::current_scope.count(id->str));
@@ -251,13 +252,13 @@ static void resolve_wiretype(AST::AstNode *wire_node)
         if (!packed_ranges.empty()) {
             std::reverse(packed_ranges.begin(), packed_ranges.end());
             wire_node->attributes[ID::packed_ranges]->children.insert(wire_node->attributes[ID::packed_ranges]->children.end(), packed_ranges.begin(),
-                                                                 packed_ranges.end());
+                                                                      packed_ranges.end());
         }
 
         wire_node->attributes[ID::unpacked_ranges] = AST::AstNode::mkconst_int(1, false, 1);
         if (!unpacked_ranges.empty()) {
-            wire_node->attributes[ID::unpacked_ranges]->children.insert(wire_node->attributes[ID::unpacked_ranges]->children.end(), unpacked_ranges.begin(),
-                                                                   unpacked_ranges.end());
+            wire_node->attributes[ID::unpacked_ranges]->children.insert(wire_node->attributes[ID::unpacked_ranges]->children.end(),
+                                                                        unpacked_ranges.begin(), unpacked_ranges.end());
         }
     }
 }
@@ -269,24 +270,26 @@ static void add_force_convert_attribute(AST::AstNode *wire_node, int val = 1)
 
 static void check_memories(AST::AstNode *module_node)
 {
-    std::map<std::string, AST::AstNode*> memories;
+    std::map<std::string, AST::AstNode *> memories;
     visitEachDescendantStatic(module_node, [&](AST::AstNode *node) {
-            if (node->str == "\\$readmemh") {
-                add_force_convert_attribute(memories[node->children[1]->str], 0);
+        if (node->str == "\\$readmemh") {
+            add_force_convert_attribute(memories[node->children[1]->str], 0);
+        }
+        if (node->type == AST::AST_WIRE) {
+            const std::vector<AST::AstNode *> packed_ranges =
+              node->attributes.count(ID::packed_ranges) ? node->attributes[ID::packed_ranges]->children : std::vector<AST::AstNode *>();
+            const std::vector<AST::AstNode *> unpacked_ranges =
+              node->attributes.count(ID::unpacked_ranges) ? node->attributes[ID::unpacked_ranges]->children : std::vector<AST::AstNode *>();
+            if (packed_ranges.size() == 1 && unpacked_ranges.size() == 1) {
+                log_assert(!memories.count(node->str));
+                memories[node->str] = node;
             }
-            if (node->type == AST::AST_WIRE) {
-                const std::vector<AST::AstNode *> packed_ranges = node->attributes.count(ID::packed_ranges) ? node->attributes[ID::packed_ranges]->children : std::vector<AST::AstNode*>();
-                const std::vector<AST::AstNode *> unpacked_ranges = node->attributes.count(ID::unpacked_ranges) ? node->attributes[ID::unpacked_ranges]->children : std::vector<AST::AstNode*>();
-                if (packed_ranges.size() == 1 && unpacked_ranges.size() == 1) {
-                    log_assert(!memories.count(node->str));
-                    memories[node->str] = node;
-                }
+        }
+        if (node->type == AST::AST_IDENTIFIER && memories.count(node->str)) {
+            if (!memories[node->str]->attributes.count(ID::force_convert) && node->children.size() == 0) {
+                add_force_convert_attribute(memories[node->str]);
             }
-            if (node->type == AST::AST_IDENTIFIER && memories.count(node->str)) {
-                if (!memories[node->str]->attributes.count(ID::force_convert) && node->children.size() == 0) {
-                    add_force_convert_attribute(memories[node->str]);
-                }
-            }
+        }
     });
 }
 
@@ -298,8 +301,10 @@ static void convert_packed_unpacked_range(AST::AstNode *wire_node)
     if (!wire_node->children.empty() && wire_node->children[0]->type == AST::AST_WIRETYPE) {
         resolve_wiretype(wire_node);
     }
-    const std::vector<AST::AstNode *> packed_ranges = wire_node->attributes.count(ID::packed_ranges) ? wire_node->attributes[ID::packed_ranges]->children : std::vector<AST::AstNode*>();
-    const std::vector<AST::AstNode *> unpacked_ranges = wire_node->attributes.count(ID::unpacked_ranges) ? wire_node->attributes[ID::unpacked_ranges]->children : std::vector<AST::AstNode*>();
+    const std::vector<AST::AstNode *> packed_ranges =
+      wire_node->attributes.count(ID::packed_ranges) ? wire_node->attributes[ID::packed_ranges]->children : std::vector<AST::AstNode *>();
+    const std::vector<AST::AstNode *> unpacked_ranges =
+      wire_node->attributes.count(ID::unpacked_ranges) ? wire_node->attributes[ID::unpacked_ranges]->children : std::vector<AST::AstNode *>();
     if (packed_ranges.empty() && unpacked_ranges.empty()) {
         wire_node->attributes.erase(ID::packed_ranges);
         wire_node->attributes.erase(ID::unpacked_ranges);
@@ -311,7 +316,8 @@ static void convert_packed_unpacked_range(AST::AstNode *wire_node)
     std::vector<AST::AstNode *> ranges;
     bool convert_node = packed_ranges.size() > 1 || unpacked_ranges.size() > 1 || wire_node->attributes.count(ID::wiretype) ||
                         wire_node->type == AST::AST_PARAMETER || wire_node->type == AST::AST_LOCALPARAM ||
-                        ((wire_node->is_input || wire_node->is_output) && ((packed_ranges.size() > 0 || unpacked_ranges.size() > 0))) || (wire_node->attributes.count(ID::force_convert) && wire_node->attributes[ID::force_convert]->integer == 1);
+                        ((wire_node->is_input || wire_node->is_output) && ((packed_ranges.size() > 0 || unpacked_ranges.size() > 0))) ||
+                        (wire_node->attributes.count(ID::force_convert) && wire_node->attributes[ID::force_convert]->integer == 1);
     // Convert only when atleast 1 of the ranges has more then 1 range
     if (convert_node) {
         if (wire_node->multirange_dimensions.empty()) {
@@ -526,45 +532,48 @@ static void simplify(AST::AstNode *current_node, AST::AstNode *parent_node)
     switch (current_node->type) {
     case AST::AST_TYPEDEF:
     case AST::AST_ENUM:
-          AST_INTERNAL::current_scope[current_node->str] = current_node;
-          break;
+        AST_INTERNAL::current_scope[current_node->str] = current_node;
+        break;
     case AST::AST_WIRE:
     case AST::AST_PARAMETER:
     case AST::AST_LOCALPARAM:
-          AST_INTERNAL::current_scope[current_node->str] = current_node;
-          convert_packed_unpacked_range(current_node);
-          break;
+        AST_INTERNAL::current_scope[current_node->str] = current_node;
+        convert_packed_unpacked_range(current_node);
+        break;
     case AST::AST_IDENTIFIER:
-          if (!current_node->children.empty() && !current_node->basic_prep) {
-              log_assert(AST_INTERNAL::current_ast_mod);
-              log_assert(AST_INTERNAL::current_scope.count(current_node->str));
-              AST::AstNode *wire_node = AST_INTERNAL::current_scope[current_node->str];
-              const std::vector<AST::AstNode *> packed_ranges = wire_node->attributes.count(ID::packed_ranges) ? wire_node->attributes[ID::packed_ranges]->children : std::vector<AST::AstNode*>();
-              const std::vector<AST::AstNode *> unpacked_ranges = wire_node->attributes.count(ID::unpacked_ranges) ? wire_node->attributes[ID::unpacked_ranges]->children : std::vector<AST::AstNode*>();
-              if ((wire_node->type == AST::AST_WIRE || wire_node->type == AST::AST_PARAMETER || wire_node->type == AST::AST_LOCALPARAM)
-                      && !(packed_ranges.empty() && unpacked_ranges.empty())
-                      && !(packed_ranges.size() + unpacked_ranges.size() == 1)) {
-                  auto result = convert_range(current_node, packed_ranges, unpacked_ranges, 0);
-                  for (size_t i = 0; i < current_node->children.size(); i++) {
-                      delete current_node->children[i];
-                  }
-                  current_node->children.clear();
-                  current_node->children.push_back(result);
-              }
-          }
-          break;
+        if (!current_node->children.empty() && !current_node->basic_prep) {
+            log_assert(AST_INTERNAL::current_ast_mod);
+            log_assert(AST_INTERNAL::current_scope.count(current_node->str));
+            AST::AstNode *wire_node = AST_INTERNAL::current_scope[current_node->str];
+            const std::vector<AST::AstNode *> packed_ranges =
+              wire_node->attributes.count(ID::packed_ranges) ? wire_node->attributes[ID::packed_ranges]->children : std::vector<AST::AstNode *>();
+            const std::vector<AST::AstNode *> unpacked_ranges =
+              wire_node->attributes.count(ID::unpacked_ranges) ? wire_node->attributes[ID::unpacked_ranges]->children : std::vector<AST::AstNode *>();
+            if ((wire_node->type == AST::AST_WIRE || wire_node->type == AST::AST_PARAMETER || wire_node->type == AST::AST_LOCALPARAM) &&
+                !(packed_ranges.empty() && unpacked_ranges.empty()) && !(packed_ranges.size() + unpacked_ranges.size() == 1)) {
+                auto result = convert_range(current_node, packed_ranges, unpacked_ranges, 0);
+                for (size_t i = 0; i < current_node->children.size(); i++) {
+                    delete current_node->children[i];
+                }
+                current_node->children.clear();
+                current_node->children.push_back(result);
+            }
+        }
+        break;
     case AST::AST_STRUCT:
         if (!current_node->str.empty() && parent_node && parent_node->type != AST::AST_TYPEDEF && parent_node->type != AST::AST_STRUCT) {
-            while (current_node->simplify(true, false, false, 1, -1, false, false)) { }
+            while (current_node->simplify(true, false, false, 1, -1, false, false)) {
+            }
             AST_INTERNAL::current_scope[current_node->str]->attributes[ID::wiretype] = AST::AstNode::mkconst_str(current_node->str);
             AST_INTERNAL::current_scope[current_node->str]->attributes[ID::wiretype]->id2ast = current_node;
         }
         break;
-    default: break;
+    default:
+        break;
     }
 }
 
-static void clear_current_scope() 
+static void clear_current_scope()
 {
     // Remove clear current_scope from package nodes
     AST_INTERNAL::current_scope.clear();
@@ -1020,7 +1029,7 @@ void UhdmAst::process_design()
                 current_node->children.insert(current_node->children.begin(), pair.second);
             else {
 #ifdef BUILD_UPSTREAM
-                //convert_multiranges(pair.second);
+                // convert_multiranges(pair.second);
                 check_memories(pair.second);
                 setup_current_scope(shared.top_nodes, pair.second);
                 simplify(pair.second, nullptr);
