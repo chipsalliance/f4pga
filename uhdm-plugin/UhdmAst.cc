@@ -2249,9 +2249,13 @@ void UhdmAst::process_operation()
             break;
         case vpiArithLShiftOp:
             current_node->type = AST::AST_SHIFT_SLEFT;
+            log_assert(current_node->children.size() == 2);
+            current_node->children[1]->is_signed = false;
             break;
         case vpiArithRShiftOp:
             current_node->type = AST::AST_SHIFT_SRIGHT;
+            log_assert(current_node->children.size() == 2);
+            current_node->children[1]->is_signed = false;
             break;
         case vpiPowerOp:
             current_node->type = AST::AST_POW;
