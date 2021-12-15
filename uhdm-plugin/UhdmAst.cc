@@ -449,14 +449,10 @@ static AST::AstNode *expand_dot(const AST::AstNode *current_struct, const AST::A
     return new AST::AstNode(AST::AST_RANGE, left, right);
 }
 
-static AST::AstNode *convert_dot(AST::AstNode *node, AST::AstNode *dot)
+static AST::AstNode *convert_dot(AST::AstNode *wire_node, AST::AstNode *node, AST::AstNode *dot)
 {
-    AST::AstNode *wire_node = nullptr;
     std::vector<AST::AstNode *> packed_ranges;
     std::vector<AST::AstNode *> unpacked_ranges;
-    log_assert(AST_INTERNAL::current_scope.count(node->str));
-    // We found wire node
-    wire_node = AST_INTERNAL::current_scope[node->str];
 
     AST::AstNode *struct_node = nullptr;
     if (wire_node->type == AST::AST_STRUCT) {
@@ -511,12 +507,29 @@ static void setup_current_scope(std::unordered_map<std::string, AST::AstNode *> 
 static void simplify(AST::AstNode *current_node, AST::AstNode *parent_node)
 {
     AST::AstNode *expanded = nullptr;
+    AST::AstNode *dot = nullptr;
     for (auto c : current_node->children) {
         if (c->type == AST::AST_DOT && expanded == nullptr) {
-            expanded = convert_dot(current_node, c);
+            dot = c;
+            break;
         }
     }
-    if (expanded != nullptr) {
+    if (dot) {
+        if (!AST_INTERNAL::current_scope.count(current_node->str)) {
+            // TODO: this fallback only support single dot
+            // for accessing elements currently unsupported with AST_DOT
+            // fallback to "." notation
+            current_node->str += "." + dot->str.substr(1);
+            for (auto cc : current_node->children) {
+                delete cc;
+            }
+            current_node->children.clear();
+        } else {
+            auto wire_node = AST_INTERNAL::current_scope[current_node->str];
+            expanded = convert_dot(wire_node, current_node, dot);
+        }
+    }
+    if (expanded) {
         for (size_t i = 0; i < current_node->children.size(); i++) {
             delete current_node->children[i];
         }
