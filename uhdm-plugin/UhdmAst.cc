@@ -788,7 +788,7 @@ void UhdmAst::process_packed_array_typespec()
 #ifdef BUILD_UPSTREAM
             if (node->type == AST::AST_ENUM && !node->children.empty()) {
                 for (auto c : node->children[0]->children) {
-                    if (c->type == AST::AST_RANGE)
+                    if (c->type == AST::AST_RANGE && c->str.empty())
                         unpacked_ranges.push_back(c->clone());
                 }
             }
@@ -1373,6 +1373,20 @@ void UhdmAst::process_typespec_member()
                 delete node;
             } else if (node) {
                 auto str = current_node->str;
+#ifdef BUILD_UPSTREAM
+                if (node->attributes.count(ID::packed_ranges)) {
+                    for (auto r : node->attributes[ID::packed_ranges]->children) {
+                        node->children.push_back(r->clone());
+                    }
+                    node->attributes.erase(ID::packed_ranges);
+                }
+                if (node->attributes.count(ID::unpacked_ranges)) {
+                    for (auto r : node->attributes[ID::unpacked_ranges]->children) {
+                        node->children.push_back(r->clone());
+                    }
+                    node->attributes.erase(ID::unpacked_ranges);
+                }
+#endif
                 node->cloneInto(current_node);
                 current_node->str = str;
                 current_node->type = AST::AST_STRUCT_ITEM;
