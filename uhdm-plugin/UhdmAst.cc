@@ -452,11 +452,6 @@ static AST::AstNode *convert_dot(AST::AstNode *node, AST::AstNode *dot)
     // We found wire node
     wire_node = AST_INTERNAL::current_scope[node->str];
 
-    // convert and resolve wiretype
-    //if (!wire_node->attributes.count(ID::wiretype)) {
-    //    convert_packed_unpacked_range(wire_node);
-    //}
-
     AST::AstNode *struct_node = nullptr;
     if (wire_node->type == AST::AST_STRUCT) {
         struct_node = wire_node;
@@ -507,7 +502,7 @@ static void setup_current_scope(std::unordered_map<std::string, AST::AstNode *> 
     log_assert(AST_INTERNAL::current_ast_mod != nullptr);
 }
 
-static void simplify(AST::AstNode *current_node)
+static void simplify(AST::AstNode *current_node, AST::AstNode *parent_node)
 {
     AST::AstNode *expanded = nullptr;
     for (auto c : current_node->children) {
@@ -526,7 +521,7 @@ static void simplify(AST::AstNode *current_node)
     }
     // First simplify children
     for (int i = 0; i < current_node->children.size(); i++) {
-        simplify(current_node->children[i]);
+        simplify(current_node->children[i], current_node);
     }
     switch (current_node->type) {
     case AST::AST_TYPEDEF:
@@ -558,6 +553,13 @@ static void simplify(AST::AstNode *current_node)
               }
           }
           break;
+    case AST::AST_STRUCT:
+        if (!current_node->str.empty() && parent_node && parent_node->type != AST::AST_TYPEDEF && parent_node->type != AST::AST_STRUCT) {
+            while (current_node->simplify(true, false, false, 1, -1, false, false)) { }
+            AST_INTERNAL::current_scope[current_node->str]->attributes[ID::wiretype] = AST::AstNode::mkconst_str(current_node->str);
+            AST_INTERNAL::current_scope[current_node->str]->attributes[ID::wiretype]->id2ast = current_node;
+        }
+        break;
     default: break;
     }
 }
@@ -1005,7 +1007,7 @@ void UhdmAst::process_design()
         if (pair.second->type == AST::AST_PACKAGE) {
             check_memories(pair.second);
             setup_current_scope(shared.top_nodes, pair.second);
-            simplify(pair.second);
+            simplify(pair.second, nullptr);
             clear_current_scope();
         }
     }
@@ -1021,7 +1023,7 @@ void UhdmAst::process_design()
                 //convert_multiranges(pair.second);
                 check_memories(pair.second);
                 setup_current_scope(shared.top_nodes, pair.second);
-                simplify(pair.second);
+                simplify(pair.second, nullptr);
                 clear_current_scope();
 #endif
                 current_node->children.push_back(pair.second);
