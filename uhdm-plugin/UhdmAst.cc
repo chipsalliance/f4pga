@@ -1925,6 +1925,13 @@ void UhdmAst::process_begin()
             }
         }
     });
+    // TODO: find out how to set VERILOG_FRONTEND::sv_mode to true
+    // simplify checks if sv_mode is set to ture when wire is declared inside unnamed block
+    /*visit_one_to_many({vpiVariables}, obj_h, [&](AST::AstNode *node) {
+        if (node) {
+            current_node->children.push_back(node);
+        }
+    });*/
 }
 
 void UhdmAst::process_operation()
@@ -2722,6 +2729,12 @@ void UhdmAst::process_sys_func_call()
             current_node->children.push_back(node);
         }
     });
+
+    // skip $value$plusargs function, as it is simulation function
+    if (current_node->str == "\\$value$plusargs") {
+        delete current_node;
+        current_node = nullptr;
+    }
 }
 
 void UhdmAst::process_func_call()
