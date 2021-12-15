@@ -134,10 +134,6 @@ class UhdmAst
     void process_nonsynthesizable(const UHDM::BaseClass *object);
     void visitEachDescendant(AST::AstNode *node, const std::function<void(AST::AstNode *)> &f);
 
-#ifdef BUILD_UPSTREAM
-    // void convert_multiranges(AST::AstNode *module_node);
-#endif
-
     UhdmAst(UhdmAst *p, UhdmAstShared &s, const std::string &i) : parent(p), shared(s), indent(i)
     {
         if (parent)

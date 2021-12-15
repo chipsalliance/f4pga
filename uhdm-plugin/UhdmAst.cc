@@ -1042,7 +1042,6 @@ void UhdmAst::process_design()
                 current_node->children.insert(current_node->children.begin(), pair.second);
             else {
 #ifdef BUILD_UPSTREAM
-                // convert_multiranges(pair.second);
                 check_memories(pair.second);
                 setup_current_scope(shared.top_nodes, pair.second);
                 simplify(pair.second, nullptr);
@@ -1748,84 +1747,6 @@ void UhdmAst::process_packed_array_net()
     visit_one_to_many({vpiRange}, obj_h, [&](AST::AstNode *node) { current_node->children.push_back(node); });
 #endif
 }
-
-#ifdef BUILD_UPSTREAM
-
-/*void UhdmAst::convert_multiranges(AST::AstNode *module_node)
-{
-    shared.current_top_node = module_node;
-    std::map<std::string, std::pair<AST::AstNode *, std::vector<AST::AstNode *>>> multirange_wires;
-    std::map<std::string, AST::AstNode *> wires;
-    std::vector<std::string> remove_ids;
-    shared.multirange_scope.clear();
-    shared.multirange_scope.push_back("");
-    AST::AstNode *expanded = nullptr;
-    visitEachDescendant(module_node, [&](AST::AstNode *node) {
-        for (auto c : node->children) {
-            if (c->type == AST::AST_DOT && expanded == nullptr) {
-                expanded = convert_dot(node, c);
-            }
-        }
-        if (expanded != nullptr) {
-            node->children.clear();
-            node->children.push_back(expanded->clone());
-            expanded = nullptr;
-            return;
-        }
-        // TODO: this is ugly, probably this could be done better
-        // We can't convert AST_MEMORY if it is accessed by readmemh
-        if (node->str == "\\$readmemh") {
-            remove_ids.push_back(node->children[1]->str);
-            return;
-        }
-        std::string name = "";
-        for (auto s : shared.multirange_scope) {
-            name += s;
-        }
-        name += node->str;
-        if (node->type == AST::AST_WIRE && !node->str.empty()) {
-            wires[name] = node;
-        }
-        if (node->type == AST::AST_WIRE || node->type == AST::AST_PARAMETER || node->type == AST::AST_LOCALPARAM) {
-            if (node->attributes.count(ID::packed_ranges) || node->attributes.count(ID::unpacked_ranges)) {
-                if (node->attributes[ID::packed_ranges]->children.empty() && node->attributes[ID::unpacked_ranges]->children.empty()) {
-                    node->attributes.erase(ID::packed_ranges);
-                    node->attributes.erase(ID::unpacked_ranges);
-                    return;
-                }
-                // wire inside typedef, it doesn't have any ids, so convert now
-                if (node->str.empty()) {
-                    convert_packed_unpacked_range(node, std::vector<AST::AstNode *>());
-                    return;
-                }
-                log_assert(multirange_wires.count(name) == 0);
-                multirange_wires[name] = std::make_pair(node, std::vector<AST::AstNode *>());
-            }
-        }
-        if (node->type == AST::AST_IDENTIFIER && std::find(remove_ids.begin(), remove_ids.end(), node->str) == remove_ids.end()) {
-            auto current_scope = shared.multirange_scope;
-            // wire can be declared in previous scope
-            while (!current_scope.empty()) {
-                std::string id_name = "";
-                for (auto s : current_scope) {
-                    id_name += s;
-                }
-                id_name += node->str;
-                if (multirange_wires.count(id_name)) {
-                    multirange_wires[id_name].second.push_back(node);
-                    break;
-                }
-                current_scope.pop_back();
-            }
-        }
-    });
-    for (auto m : multirange_wires) {
-        convert_packed_unpacked_range(m.second.first, m.second.second);
-    }
-}
-*/
-
-#endif
 
 void UhdmAst::visitEachDescendant(AST::AstNode *node, const std::function<void(AST::AstNode *)> &f)
 {
