@@ -556,7 +556,9 @@ static void simplify(AST::AstNode *current_node, AST::AstNode *parent_node)
     case AST::AST_IDENTIFIER:
         if (!current_node->children.empty() && !current_node->basic_prep) {
             log_assert(AST_INTERNAL::current_ast_mod);
-            log_assert(AST_INTERNAL::current_scope.count(current_node->str));
+            if (!AST_INTERNAL::current_scope.count(current_node->str)) {
+                break;
+            }
             AST::AstNode *wire_node = AST_INTERNAL::current_scope[current_node->str];
             const std::vector<AST::AstNode *> packed_ranges =
               wire_node->attributes.count(ID::packed_ranges) ? wire_node->attributes[ID::packed_ranges]->children : std::vector<AST::AstNode *>();
