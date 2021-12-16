@@ -1025,6 +1025,7 @@ void UhdmAst::process_design()
             shared.top_nodes[node->str] = node;
         }
     });
+#ifdef BUILD_UPSTREAM
     for (auto pair : shared.top_nodes) {
         if (!pair.second)
             continue;
@@ -1035,6 +1036,7 @@ void UhdmAst::process_design()
             clear_current_scope();
         }
     }
+#endif
     // Once we walked everything, unroll that as children of this node
     for (auto pair : shared.top_nodes) {
         if (!pair.second)
