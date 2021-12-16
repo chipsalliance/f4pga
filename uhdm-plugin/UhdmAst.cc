@@ -122,6 +122,8 @@ static void add_multirange_wire(AST::AstNode *node, std::vector<AST::AstNode *> 
 
     node->attributes[ID::unpacked_ranges] = AST::AstNode::mkconst_int(1, false, 1);
     if (!unpacked_ranges.empty()) {
+        if (reverse)
+            std::reverse(unpacked_ranges.begin(), unpacked_ranges.end());
         node->attributes[ID::unpacked_ranges]->children.insert(node->attributes[ID::unpacked_ranges]->children.end(), unpacked_ranges.begin(),
                                                                unpacked_ranges.end());
     }
@@ -140,8 +142,6 @@ static size_t add_multirange_attribute(AST::AstNode *wire_node, const std::vecto
         log_assert(ranges[i]->children[0]->type == AST::AST_CONSTANT);
         log_assert(ranges[i]->children[1]->type == AST::AST_CONSTANT);
         wire_node->multirange_dimensions.push_back(min(ranges[i]->children[0]->integer, ranges[i]->children[1]->integer));
-        // TODO: add support for wires not starting with 0
-        log_assert(wire_node->multirange_dimensions.back() == 0);
         wire_node->multirange_dimensions.push_back(max(ranges[i]->children[0]->integer, ranges[i]->children[1]->integer) -
                                                    min(ranges[i]->children[0]->integer, ranges[i]->children[1]->integer) + 1);
         wire_node->multirange_swapped.push_back(ranges[i]->range_swapped);
@@ -160,8 +160,8 @@ static AST::AstNode *convert_range(AST::AstNode *id, const std::vector<AST::AstN
     int elem_size = 1;
     std::vector<int> single_elem_size;
     single_elem_size.push_back(elem_size);
-    for (size_t j = 1; j < wire_node->multirange_dimensions.size(); j = j + 2) {
-        elem_size *= wire_node->multirange_dimensions[j];
+    for (size_t j = 0; (j + 1) < wire_node->multirange_dimensions.size(); j = j + 2) {
+        elem_size *= wire_node->multirange_dimensions[j + 1] - wire_node->multirange_dimensions[j];
         single_elem_size.push_back(elem_size);
     }
     std::reverse(single_elem_size.begin(), single_elem_size.end());
@@ -188,13 +188,16 @@ static AST::AstNode *convert_range(AST::AstNode *id, const std::vector<AST::AstN
         if (!wire_node->multirange_swapped.empty()) {
             bool is_swapped = wire_node->multirange_swapped[wire_node->multirange_swapped.size() - i - 1];
             if (is_swapped) {
+                auto left_idx = wire_node->multirange_dimensions.size() - (i * 2) - 1;
+                auto right_idx = wire_node->multirange_dimensions.size() - (i * 2) - 2;
+                auto elem_size = wire_node->multirange_dimensions[left_idx] - wire_node->multirange_dimensions[right_idx];
                 range_left = new AST::AstNode(
                   AST::AST_SUB,
-                  AST::AstNode::mkconst_int(wire_node->multirange_dimensions[wire_node->multirange_dimensions.size() - (i * 2) - 1] - 1, false),
+                  AST::AstNode::mkconst_int(elem_size - 1, false),
                   range_left->clone());
                 range_right = new AST::AstNode(
                   AST::AST_SUB,
-                  AST::AstNode::mkconst_int(wire_node->multirange_dimensions[wire_node->multirange_dimensions.size() - (i * 2) - 1] - 1, false),
+                  AST::AstNode::mkconst_int(elem_size - 1, false),
                   range_right->clone());
             }
         }
@@ -1591,6 +1594,11 @@ void UhdmAst::process_array_var()
 #else
             visit_one_to_many({vpiRange}, reg_h, [&](AST::AstNode *node) { current_node->children.push_back(node); });
 #endif
+        } else if (vpi_get(vpiType, reg_h) == vpiIntVar) {
+#ifdef BUILD_UPSTREAM
+            packed_ranges.push_back(make_range(31, 0));
+#endif
+            visit_default_expr(reg_h);
         }
         vpi_release_handle(reg_h);
     }
