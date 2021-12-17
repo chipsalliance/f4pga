@@ -130,22 +130,9 @@ class UhdmAst
     void process_repeat();
     void process_byte_var();
     void process_long_int_var();
+    void simplify_parameter(AST::AstNode *parameter, AST::AstNode *module_node = nullptr);
     void process_nonsynthesizable(const UHDM::BaseClass *object);
     void visitEachDescendant(AST::AstNode *node, const std::function<void(AST::AstNode *)> &f);
-
-#ifdef BUILD_UPSTREAM
-    void add_multirange_wire(AST::AstNode *node, std::vector<AST::AstNode *> packed_ranges, std::vector<AST::AstNode *> unpacked_ranges);
-    AST::AstNode *convert_range(const AST::AstNode *id, const std::vector<AST::AstNode *> &packed_ranges,
-                                const std::vector<AST::AstNode *> &unpacked_ranges, const std::vector<int> single_elem_size, int i,
-                                AST::AstNode *wire_node);
-    void convert_packed_unpacked_range(AST::AstNode *wire_node, const std::vector<AST::AstNode *> identifers);
-    void convert_multiranges(AST::AstNode *module_node);
-    size_t add_multirange_attribute(AST::AstNode *wire_node, const std::vector<AST::AstNode *> ranges);
-    AST::AstNode *expand_dot(const AST::AstNode *current_struct, const AST::AstNode *search_node);
-    AST::AstNode *convert_dot(AST::AstNode *node, AST::AstNode *dot, AST::AstNode *module_node, std::map<std::string, AST::AstNode *> &wires,
-                              std::map<std::string, std::pair<AST::AstNode *, std::vector<AST::AstNode *>>> &multirange_wires);
-    void resolve_wiretype(AST::AstNode *wire_node);
-#endif
 
     UhdmAst(UhdmAst *p, UhdmAstShared &s, const std::string &i) : parent(p), shared(s), indent(i)
     {

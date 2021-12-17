@@ -5,6 +5,9 @@ namespace ID
 IdString partial{"\\partial"};
 IdString packed_ranges{"\\packed_ranges"};
 IdString unpacked_ranges{"\\unpacked_ranges"};
+IdString force_convert{
+  "\\force_convert"}; // set this attribute to force conversion of multirange wire to single range. It is useful to force-convert some memories.
+IdString is_imported{"\\is_imported"};
 } // namespace ID
 } // namespace RTLIL
 
