@@ -191,14 +191,8 @@ static AST::AstNode *convert_range(AST::AstNode *id, const std::vector<AST::AstN
                 auto left_idx = wire_node->multirange_dimensions.size() - (i * 2) - 1;
                 auto right_idx = wire_node->multirange_dimensions.size() - (i * 2) - 2;
                 auto elem_size = wire_node->multirange_dimensions[left_idx] - wire_node->multirange_dimensions[right_idx];
-                range_left = new AST::AstNode(
-                  AST::AST_SUB,
-                  AST::AstNode::mkconst_int(elem_size - 1, false),
-                  range_left->clone());
-                range_right = new AST::AstNode(
-                  AST::AST_SUB,
-                  AST::AstNode::mkconst_int(elem_size - 1, false),
-                  range_right->clone());
+                range_left = new AST::AstNode(AST::AST_SUB, AST::AstNode::mkconst_int(elem_size - 1, false), range_left->clone());
+                range_right = new AST::AstNode(AST::AST_SUB, AST::AstNode::mkconst_int(elem_size - 1, false), range_right->clone());
             }
         }
         range_left =
