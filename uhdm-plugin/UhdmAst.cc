@@ -2238,6 +2238,7 @@ void UhdmAst::process_operation()
             break;
         }
         case vpiMultiConcatOp:
+        case vpiMultiAssignmentPatternOp:
             current_node->type = AST::AST_REPLICATE;
             break;
         case vpiAssignmentOp:
