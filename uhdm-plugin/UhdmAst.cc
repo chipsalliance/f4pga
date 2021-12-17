@@ -216,6 +216,19 @@ static AST::AstNode *convert_range(AST::AstNode *id, const std::vector<AST::AstN
 
 static void resolve_wiretype(AST::AstNode *wire_node)
 {
+    AST::AstNode *wiretype_node = nullptr;
+    if (!wire_node->children.empty()) {
+        if (wire_node->children[0]->type == AST::AST_WIRETYPE) {
+            wiretype_node = wire_node->children[0];
+        }
+    }
+    if (wire_node->children.size() > 1) {
+        if (wire_node->children[1]->type == AST::AST_WIRETYPE) {
+            wiretype_node = wire_node->children[1];
+        }
+    }
+    if (wiretype_node == nullptr)
+        return;
     std::vector<AST::AstNode *> packed_ranges;
     std::vector<AST::AstNode *> unpacked_ranges;
     // First check if it has already defined ranges
@@ -230,10 +243,8 @@ static void resolve_wiretype(AST::AstNode *wire_node)
         }
     }
     AST::AstNode *wiretype_ast = nullptr;
-    if (!wire_node->children.empty() && wire_node->children[0]->type == AST::AST_WIRETYPE) {
-        log_assert(AST_INTERNAL::current_scope.count(wire_node->children[0]->str));
-        wiretype_ast = AST_INTERNAL::current_scope[wire_node->children[0]->str];
-    }
+    log_assert(AST_INTERNAL::current_scope.count(wiretype_node->str));
+    wiretype_ast = AST_INTERNAL::current_scope[wiretype_node->str];
     // we need to setup current top ast as this simplify
     // needs to have access to all already definied ids
     while (wire_node->simplify(true, false, false, 1, -1, false, false)) {
@@ -295,9 +306,7 @@ static void check_memories(AST::AstNode *module_node)
 // to correct range
 static void convert_packed_unpacked_range(AST::AstNode *wire_node)
 {
-    if (!wire_node->children.empty() && wire_node->children[0]->type == AST::AST_WIRETYPE) {
-        resolve_wiretype(wire_node);
-    }
+    resolve_wiretype(wire_node);
     const std::vector<AST::AstNode *> packed_ranges =
       wire_node->attributes.count(ID::packed_ranges) ? wire_node->attributes[ID::packed_ranges]->children : std::vector<AST::AstNode *>();
     const std::vector<AST::AstNode *> unpacked_ranges =
