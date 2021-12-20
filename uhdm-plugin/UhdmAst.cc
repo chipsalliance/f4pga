@@ -2461,6 +2461,7 @@ void UhdmAst::process_assignment_pattern_op()
         for (auto p : ordered_children) {
             current_node->children.push_back(p.second);
         }
+        std::reverse(current_node->children.begin(), current_node->children.end());
         return;
     }
     auto assign_node = find_ancestor({AST::AST_ASSIGN, AST::AST_ASSIGN_EQ, AST::AST_ASSIGN_LE});
@@ -2936,11 +2937,20 @@ void UhdmAst::process_logic_typespec()
 
 void UhdmAst::process_int_typespec()
 {
+#ifdef BUILD_UPSTREAM
+    std::vector<AST::AstNode *> packed_ranges;   // comes before wire name
+    std::vector<AST::AstNode *> unpacked_ranges; // comes after wire name
+#endif
     current_node = make_ast_node(AST::AST_WIRE);
     auto left_const = AST::AstNode::mkconst_int(31, true);
     auto right_const = AST::AstNode::mkconst_int(0, true);
     auto range = new AST::AstNode(AST::AST_RANGE, left_const, right_const);
+#ifdef BUILD_UPSTREAM
+    packed_ranges.push_back(range);
+    add_multirange_wire(current_node, packed_ranges, unpacked_ranges);
+#else
     current_node->children.push_back(range);
+#endif
     current_node->is_signed = true;
     if (!current_node->str.empty()) {
         move_type_to_new_typedef(find_ancestor({AST::AST_MODULE, AST::AST_PACKAGE}), current_node);
