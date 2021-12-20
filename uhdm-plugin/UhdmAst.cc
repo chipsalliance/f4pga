@@ -551,6 +551,7 @@ static void simplify(AST::AstNode *current_node, AST::AstNode *parent_node)
     switch (current_node->type) {
     case AST::AST_TYPEDEF:
     case AST::AST_ENUM:
+    case AST::AST_FUNCTION:
         AST_INTERNAL::current_scope[current_node->str] = current_node;
         break;
     case AST::AST_WIRE:
@@ -1155,8 +1156,8 @@ void UhdmAst::process_module()
                     move_type_to_new_typedef(current_node, node);
                 }
             });
-            visit_one_to_many({vpiModule, vpiInterface, vpiParameter, vpiParamAssign, vpiPort, vpiNet, vpiArrayNet, vpiGenScopeArray, vpiContAssign,
-                               vpiProcess, vpiTaskFunc},
+            visit_one_to_many({vpiModule, vpiInterface, vpiTaskFunc, vpiParameter, vpiParamAssign, vpiPort, vpiNet, vpiArrayNet, vpiGenScopeArray,
+                               vpiContAssign, vpiProcess},
                               obj_h, [&](AST::AstNode *node) {
                                   if (node) {
                                       if (node->type == AST::AST_ASSIGN && node->children.size() < 2)
