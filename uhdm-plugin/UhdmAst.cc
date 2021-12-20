@@ -522,10 +522,16 @@ static void simplify(AST::AstNode *current_node, AST::AstNode *parent_node)
     }
     if (dot) {
         if (!AST_INTERNAL::current_scope.count(current_node->str)) {
-            // TODO: this fallback only support single dot
             // for accessing elements currently unsupported with AST_DOT
             // fallback to "." notation
-            current_node->str += "." + dot->str.substr(1);
+            while (dot && !dot->str.empty()) {
+                current_node->str += "." + dot->str.substr(1);
+                if (!dot->children.empty()) {
+                    dot = dot->children[0];
+                } else {
+                    dot = nullptr;
+                }
+            }
             for (auto cc : current_node->children) {
                 delete cc;
             }
