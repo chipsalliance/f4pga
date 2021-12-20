@@ -1568,30 +1568,34 @@ void UhdmAst::process_array_var()
     vpiHandle itr = vpi_iterate(vpi_get(vpiType, obj_h) == vpiArrayVar ? vpiReg : vpiElement, obj_h);
     while (vpiHandle reg_h = vpi_scan(itr)) {
         if (vpi_get(vpiType, reg_h) == vpiStructVar || vpi_get(vpiType, reg_h) == vpiEnumVar) {
-            vpiHandle typespec_h = vpi_handle(vpiTypespec, reg_h);
-            std::string name = vpi_get_str(vpiName, typespec_h);
-            sanitize_symbol_name(name);
-            auto wiretype_node = new AST::AstNode(AST::AST_WIRETYPE);
-            wiretype_node->str = name;
-            current_node->children.push_back(wiretype_node);
-            current_node->is_custom_type = true;
-            shared.report.mark_handled(reg_h);
-            shared.report.mark_handled(typespec_h);
-            vpi_release_handle(typespec_h);
+            visit_one_to_one({vpiTypespec}, reg_h, [&](AST::AstNode *node) {
+                if (node->str.empty()) {
+                    // anonymous typespec, move the children to variable
+                    current_node->type = node->type;
+                    current_node->children = std::move(node->children);
+                } else {
+                    auto wiretype_node = new AST::AstNode(AST::AST_WIRETYPE);
+                    wiretype_node->str = node->str;
+                    current_node->children.push_back(wiretype_node);
+                    current_node->is_custom_type = true;
+                }
+                delete node;
+            });
         } else if (vpi_get(vpiType, reg_h) == vpiLogicVar) {
             current_node->is_logic = true;
-            vpiHandle typespec_h = vpi_handle(vpiTypespec, reg_h);
-            if (typespec_h) {
-                std::string name = vpi_get_str(vpiName, typespec_h);
-                sanitize_symbol_name(name);
-                auto wiretype_node = new AST::AstNode(AST::AST_WIRETYPE);
-                wiretype_node->str = name;
-                current_node->children.push_back(wiretype_node);
-                current_node->is_custom_type = true;
-                shared.report.mark_handled(reg_h);
-                shared.report.mark_handled(typespec_h);
-                vpi_release_handle(typespec_h);
-            }
+            visit_one_to_one({vpiTypespec}, reg_h, [&](AST::AstNode *node) {
+                if (node->str.empty()) {
+                    // anonymous typespec, move the children to variable
+                    current_node->type = node->type;
+                    current_node->children = std::move(node->children);
+                } else {
+                    auto wiretype_node = new AST::AstNode(AST::AST_WIRETYPE);
+                    wiretype_node->str = node->str;
+                    current_node->children.push_back(wiretype_node);
+                    current_node->is_custom_type = true;
+                }
+                delete node;
+            });
 #ifdef BUILD_UPSTREAM
             visit_one_to_many({vpiRange}, reg_h, [&](AST::AstNode *node) { packed_ranges.push_back(node); });
 #else
@@ -1809,16 +1813,19 @@ void UhdmAst::process_array_net()
 #endif
             shared.report.mark_handled(net_h);
         } else if (net_type == vpiStructNet) {
-            vpiHandle typespec_h = vpi_handle(vpiTypespec, net_h);
-            std::string name = vpi_get_str(vpiName, typespec_h);
-            sanitize_symbol_name(name);
-            auto wiretype_node = new AST::AstNode(AST::AST_WIRETYPE);
-            wiretype_node->str = name;
-            current_node->children.push_back(wiretype_node);
-            current_node->is_custom_type = true;
-            shared.report.mark_handled(net_h);
-            shared.report.mark_handled(typespec_h);
-            vpi_release_handle(typespec_h);
+            visit_one_to_one({vpiTypespec}, net_h, [&](AST::AstNode *node) {
+                if (node->str.empty()) {
+                    // anonymous typespec, move the children to variable
+                    current_node->type = node->type;
+                    current_node->children = std::move(node->children);
+                } else {
+                    auto wiretype_node = new AST::AstNode(AST::AST_WIRETYPE);
+                    wiretype_node->str = node->str;
+                    current_node->children.push_back(wiretype_node);
+                    current_node->is_custom_type = true;
+                }
+                delete node;
+            });
         }
         vpi_release_handle(net_h);
     }
@@ -2821,13 +2828,17 @@ void UhdmAst::process_logic_var()
     // then just setting boolean value
     // current_node->is_const = vpi_get(vpiConstantVariable, obj_h);
     visit_one_to_one({vpiTypespec}, obj_h, [&](AST::AstNode *node) {
-        if (node) {
+        if (node->str.empty()) {
+            // anonymous typespec, move the children to variable
+            current_node->type = node->type;
+            current_node->children = std::move(node->children);
+        } else {
             auto wiretype_node = new AST::AstNode(AST::AST_WIRETYPE);
             wiretype_node->str = node->str;
-            // wiretype needs to be 1st node (if port have also another range nodes)
             current_node->children.push_back(wiretype_node);
             current_node->is_custom_type = true;
         }
+        delete node;
     });
 #ifdef BUILD_UPSTREAM
     visit_one_to_many({vpiRange}, obj_h, [&](AST::AstNode *node) { packed_ranges.push_back(node); });
