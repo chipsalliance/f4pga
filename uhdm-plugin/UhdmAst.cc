@@ -3382,6 +3382,24 @@ void UhdmAst::process_immediate_cover()
     });
 }
 
+void UhdmAst::process_while()
+{
+    current_node = make_ast_node(AST::AST_WHILE);
+    visit_one_to_one({vpiCondition}, obj_h, [&](AST::AstNode *node) { current_node->children.push_back(node); });
+    visit_one_to_one({vpiStmt}, obj_h, [&](AST::AstNode *node) {
+        if (node->type != AST::AST_BLOCK) {
+            auto *statements = make_ast_node(AST::AST_BLOCK);
+            statements->str = current_node->str; // Needed in simplify step
+            statements->children.push_back(node);
+            current_node->children.push_back(statements);
+        } else {
+            if (node->str == "") {
+                node->str = current_node->str;
+            }
+        }
+    });
+}
+
 AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
 {
     obj_h = obj_handle;
@@ -3596,6 +3614,9 @@ AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
         break;
     case vpiImmediateCover:
         process_immediate_cover();
+        break;
+    case vpiWhile:
+        process_while();
         break;
     case vpiProgram:
     default:
