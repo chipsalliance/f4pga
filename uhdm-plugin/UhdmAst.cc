@@ -1027,11 +1027,12 @@ AST::AstNode *UhdmAst::find_ancestor(const std::unordered_set<AST::AstNodeType> 
 void UhdmAst::process_design()
 {
     current_node = make_ast_node(AST::AST_DESIGN);
-    visit_one_to_many({UHDM::uhdmallInterfaces, UHDM::uhdmallPackages, UHDM::uhdmallModules, UHDM::uhdmtopModules}, obj_h, [&](AST::AstNode *node) {
-        if (node) {
-            shared.top_nodes[node->str] = node;
-        }
-    });
+    visit_one_to_many({UHDM::uhdmallInterfaces, UHDM::uhdmallPackages, UHDM::uhdmallModules, UHDM::uhdmtopModules, vpiTypedef}, obj_h,
+                      [&](AST::AstNode *node) {
+                          if (node) {
+                              shared.top_nodes[node->str] = node;
+                          }
+                      });
 #ifdef BUILD_UPSTREAM
     for (auto pair : shared.top_nodes) {
         if (!pair.second)
