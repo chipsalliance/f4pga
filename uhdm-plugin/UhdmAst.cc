@@ -3382,6 +3382,16 @@ void UhdmAst::process_immediate_cover()
     });
 }
 
+void UhdmAst::process_immediate_assume()
+{
+    current_node = make_ast_node(AST::AST_ASSUME);
+    visit_one_to_one({vpiExpr}, obj_h, [&](AST::AstNode *node) {
+        if (node) {
+            current_node->children.push_back(node);
+        }
+    });
+}
+
 void UhdmAst::process_while()
 {
     current_node = make_ast_node(AST::AST_WHILE);
@@ -3614,6 +3624,9 @@ AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
         break;
     case vpiImmediateCover:
         process_immediate_cover();
+        break;
+    case vpiImmediateAssume:
+        process_immediate_assume();
         break;
     case vpiWhile:
         process_while();
