@@ -2686,10 +2686,20 @@ void UhdmAst::process_case_item()
     });
 }
 
-void UhdmAst::process_range()
+void UhdmAst::process_range(const UHDM::BaseClass *object)
 {
     current_node = make_ast_node(AST::AST_RANGE);
     visit_one_to_one({vpiLeftRange, vpiRightRange}, obj_h, [&](AST::AstNode *node) { current_node->children.push_back(node); });
+    if (current_node->children.size() > 0) {
+        if (current_node->children[0]->str == "unsized") {
+            log_error("%s:%d: Currently not supported object of type 'unsized range'\n", object->VpiFile().c_str(), object->VpiLineNo());
+        }
+    }
+    if (current_node->children.size() > 1) {
+        if (current_node->children[1]->str == "unsized") {
+            log_error("%s:%d: Currently not supported object of type 'unsized range'\n", object->VpiFile().c_str(), object->VpiLineNo());
+        }
+    }
 }
 
 void UhdmAst::process_return()
@@ -3570,7 +3580,7 @@ AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
         current_node = process_value(obj_h);
         break;
     case vpiRange:
-        process_range();
+        process_range(object);
         break;
     case vpiReturn:
         process_return();
