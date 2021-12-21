@@ -96,7 +96,7 @@ class UhdmAst
     void process_always();
     void process_event_control();
     void process_initial();
-    void process_begin();
+    void process_begin(bool is_named);
     void process_operation();
     void process_stream_op();
     void process_list_op();
