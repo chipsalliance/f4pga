@@ -94,7 +94,7 @@ class UhdmAst
     void process_modport();
     void process_io_decl();
     void process_always();
-    void process_event_control();
+    void process_event_control(const UHDM::BaseClass *object);
     void process_initial();
     void process_begin(bool is_named);
     void process_operation();
