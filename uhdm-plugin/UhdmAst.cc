@@ -2044,9 +2044,18 @@ void UhdmAst::process_initial()
     });
 }
 
-void UhdmAst::process_begin()
+void UhdmAst::process_begin(bool is_named)
 {
     current_node = make_ast_node(AST::AST_BLOCK);
+    // TODO: find out how to set VERILOG_FRONTEND::sv_mode to true
+    // simplify checks if sv_mode is set to ture when wire is declared inside unnamed block
+    if (is_named) {
+        visit_one_to_many({vpiVariables}, obj_h, [&](AST::AstNode *node) {
+            if (node) {
+                current_node->children.push_back(node);
+            }
+        });
+    }
     visit_one_to_many({vpiStmt}, obj_h, [&](AST::AstNode *node) {
         if (node) {
             if ((node->type == AST::AST_ASSIGN_EQ || node->type == AST::AST_ASSIGN_LE) && node->children.size() == 1) {
@@ -2062,15 +2071,6 @@ void UhdmAst::process_begin()
             }
         }
     });
-    // TODO: find out how to set VERILOG_FRONTEND::sv_mode to true
-    // simplify checks if sv_mode is set to ture when wire is declared inside unnamed block
-    if (!current_node->str.empty()) {
-        visit_one_to_many({vpiVariables}, obj_h, [&](AST::AstNode *node) {
-            if (node) {
-                current_node->children.push_back(node);
-            }
-        });
-    }
 }
 
 void UhdmAst::process_operation()
@@ -3505,10 +3505,10 @@ AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
         process_initial();
         break;
     case vpiNamedBegin:
-        process_begin();
+        process_begin(true);
         break;
     case vpiBegin:
-        process_begin();
+        process_begin(false);
         // for unnamed block, reset block name
         current_node->str = "";
         break;
