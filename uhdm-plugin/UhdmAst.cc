@@ -2012,12 +2012,15 @@ void UhdmAst::process_always()
     }
 }
 
-void UhdmAst::process_event_control()
+void UhdmAst::process_event_control(const UHDM::BaseClass *object)
 {
     current_node = make_ast_node(AST::AST_BLOCK);
     visit_one_to_one({vpiCondition}, obj_h, [&](AST::AstNode *node) {
         if (node) {
             auto process_node = find_ancestor({AST::AST_ALWAYS});
+            if (!process_node) {
+                log_error("%s:%d: Currently supports only event control stmts inside 'always'\n", object->VpiFile().c_str(), object->VpiLineNo());
+            }
             process_node->children.push_back(node);
         }
         // is added inside vpiOperation
@@ -3499,7 +3502,7 @@ AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
         process_always();
         break;
     case vpiEventControl:
-        process_event_control();
+        process_event_control(object);
         break;
     case vpiInitial:
         process_initial();
