@@ -1164,7 +1164,7 @@ void UhdmAst::process_module()
                 }
             });
             visit_one_to_many({vpiModule, vpiInterface, vpiTaskFunc, vpiParameter, vpiParamAssign, vpiPort, vpiNet, vpiArrayNet, vpiGenScopeArray,
-                               vpiContAssign, vpiProcess},
+                               vpiContAssign, vpiProcess, vpiClockingBlock},
                               obj_h, [&](AST::AstNode *node) {
                                   if (node) {
                                       if (node->type == AST::AST_ASSIGN && node->children.size() < 2)
@@ -3400,6 +3400,12 @@ void UhdmAst::process_while()
     });
 }
 
+void UhdmAst::process_unsupported_stmt(const UHDM::BaseClass *object)
+{
+    log_error("%s:%d: Currently not supported object of type '%s'\n", object->VpiFile().c_str(), object->VpiLineNo(),
+              UHDM::VpiTypeName(obj_h).c_str());
+}
+
 AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
 {
     obj_h = obj_handle;
@@ -3617,6 +3623,9 @@ AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
         break;
     case vpiWhile:
         process_while();
+        break;
+    case vpiClockingBlock:
+        process_unsupported_stmt(object);
         break;
     case vpiProgram:
     default:
