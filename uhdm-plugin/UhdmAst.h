@@ -114,7 +114,7 @@ class UhdmAst
     void process_gen_scope();
     void process_case();
     void process_case_item();
-    void process_range();
+    void process_range(const UHDM::BaseClass *object);
     void process_return();
     void process_function();
     void process_logic_var();
