@@ -281,6 +281,9 @@ static void check_memories(AST::AstNode *module_node)
     std::map<std::string, AST::AstNode *> memories;
     visitEachDescendantStatic(module_node, [&](AST::AstNode *node) {
         if (node->str == "\\$readmemh") {
+            if (node->children.size() != 2 || node->children[1]->str.empty() || node->children[1]->type != AST::AST_IDENTIFIER) {
+                log_error("%s:%d: Wrong usage of '\\$readmemh'\n", node->filename.c_str(), node->location.first_line);
+            }
             add_force_convert_attribute(memories[node->children[1]->str], 0);
         }
         if (node->type == AST::AST_WIRE) {
