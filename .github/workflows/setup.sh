@@ -54,6 +54,7 @@ start_section Install-Yosys
 	cd ..
 	git clone --recursive https://github.com/chipsalliance/Surelog.git -b master
 	cd Surelog
+	pip install orderedmultidict
 	cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$HOME/.local-bin -DCMAKE_POSITION_INDEPENDENT_CODE=ON -S . -B build
 	cmake --build build -j $(nproc)
 	cmake --install build
