@@ -541,6 +541,8 @@ static void simplify(AST::AstNode *current_node, AST::AstNode *parent_node)
             current_node->children.clear();
         } else {
             auto wire_node = AST_INTERNAL::current_scope[current_node->str];
+            // make sure wire_node is already simplified
+            simplify(wire_node, nullptr);
             expanded = convert_dot(wire_node, current_node, dot);
         }
     }
@@ -1080,27 +1082,7 @@ void UhdmAst::process_design()
 #ifdef BUILD_UPSTREAM
 void UhdmAst::simplify_parameter(AST::AstNode *parameter, AST::AstNode *module_node)
 {
-    for (auto it = shared.top_nodes.begin(); it != shared.top_nodes.end(); it++) {
-        if (it->second->type == AST::AST_PACKAGE) {
-            for (auto &o : it->second->children) {
-                // import only parameters
-                if (o->type == AST::AST_TYPEDEF || o->type == AST::AST_PARAMETER || o->type == AST::AST_LOCALPARAM) {
-                    // add imported nodes to current scope
-                    AST_INTERNAL::current_scope[it->second->str + std::string("::") + o->str.substr(1)] = o;
-                    AST_INTERNAL::current_scope[o->str] = o;
-                } else if (o->type == AST::AST_ENUM) {
-                    AST_INTERNAL::current_scope[o->str] = o;
-                    for (auto c : o->children) {
-                        AST_INTERNAL::current_scope[c->str] = c;
-                    }
-                }
-            }
-        }
-    }
-    // hackish way of setting current_ast_mod as it is required
-    // for simplify to get references for already defined ids
-    log_assert(shared.current_top_node != nullptr);
-    AST_INTERNAL::current_ast_mod = shared.current_top_node;
+    setup_current_scope(shared.top_nodes, shared.current_top_node);
     visitEachDescendant(shared.current_top_node, [&](AST::AstNode *current_scope_node) {
         if (current_scope_node->type == AST::AST_TYPEDEF || current_scope_node->type == AST::AST_PARAMETER ||
             current_scope_node->type == AST::AST_LOCALPARAM) {
@@ -1115,14 +1097,12 @@ void UhdmAst::simplify_parameter(AST::AstNode *parameter, AST::AstNode *module_n
             }
         });
     }
-    // we need to setup current top ast as this simplify
-    // needs to have access to all already definied ids
+    // first apply custom simplification step if needed
+    simplify(parameter, nullptr);
+    // then simplify parameter to AST_CONSTANT or AST_REALVALUE
     while (parameter->simplify(true, false, false, 1, -1, false, false)) {
     }
-    // Remove clear current_scope from package nodes
-    AST_INTERNAL::current_scope.clear();
-    // unset current_ast_mod
-    AST_INTERNAL::current_ast_mod = nullptr;
+    clear_current_scope();
 }
 #endif
 
@@ -1378,6 +1358,7 @@ void UhdmAst::process_typespec_member()
     }
     case vpiIntTypespec: {
         current_node->is_signed = true;
+        current_node->children.push_back(make_range(31, 0));
         shared.report.mark_handled(typespec_h);
         break;
     }
@@ -1661,6 +1642,9 @@ void UhdmAst::process_param_assign()
                 for (auto r : node->attributes[ID::unpacked_ranges]->children) {
                     unpacked_ranges.push_back(r->clone());
                 }
+            }
+            if (node->attributes.count(ID::is_imported)) {
+                current_node->attributes[ID::is_imported] = node->attributes[ID::is_imported]->clone();
             }
 #endif
             current_node->is_custom_type = node->is_custom_type;
