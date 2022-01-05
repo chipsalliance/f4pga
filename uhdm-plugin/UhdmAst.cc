@@ -2753,10 +2753,15 @@ void UhdmAst::process_hier_path()
             current_node->children = std::move(node->children);
             top_node = current_node;
             delete node;
-        } else { // for other nodes, change type to AST_DOT
-            node->type = static_cast<AST::AstNodeType>(AST::AST_DOT);
-            top_node->children.push_back(node);
-            top_node = node;
+        } else {
+            if (node->str.empty()) {
+                log_assert(!node->children.empty());
+                top_node->children.push_back(node->children[0]);
+            } else {
+                node->type = static_cast<AST::AstNodeType>(AST::AST_DOT);
+                top_node->children.push_back(node);
+                top_node = node;
+            }
         }
     });
 }
