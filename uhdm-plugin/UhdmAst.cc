@@ -387,7 +387,7 @@ static AST::AstNode *expand_dot(const AST::AstNode *current_struct, const AST::A
     AST::AstNode *struct_range = nullptr;
 
     for (auto c : search_node->children) {
-        if (c->type == AST::AST_DOT) {
+        if (c->type == static_cast<int>(AST::AST_DOT)) {
             // There should be only 1 AST_DOT node children
             log_assert(!sub_dot);
             sub_dot = expand_dot(current_struct_elem, c);
@@ -518,7 +518,7 @@ static void simplify(AST::AstNode *current_node, AST::AstNode *parent_node)
     AST::AstNode *expanded = nullptr;
     AST::AstNode *dot = nullptr;
     for (auto c : current_node->children) {
-        if (c->type == AST::AST_DOT && expanded == nullptr) {
+        if (c->type == static_cast<int>(AST::AST_DOT) && expanded == nullptr) {
             dot = c;
             break;
         }
@@ -556,7 +556,7 @@ static void simplify(AST::AstNode *current_node, AST::AstNode *parent_node)
         expanded = nullptr;
     }
     // First simplify children
-    for (int i = 0; i < current_node->children.size(); i++) {
+    for (size_t i = 0; i < current_node->children.size(); i++) {
         simplify(current_node->children[i], current_node);
     }
     switch (current_node->type) {
@@ -3269,7 +3269,7 @@ void UhdmAst::process_parameter()
     std::vector<AST::AstNode *> packed_ranges;   // comes before wire name
     std::vector<AST::AstNode *> unpacked_ranges; // comes after wire name
     // currently unused, but save it for future use
-    if (vpi_get_str(vpiImported, obj_h) != "") {
+    if (const char *imported = vpi_get_str(vpiImported, obj_h); imported != nullptr && strlen(imported) > 0) {
         current_node->attributes[ID::is_imported] = AST::AstNode::mkconst_int(1, true);
     }
     visit_one_to_many({vpiRange}, obj_h, [&](AST::AstNode *node) { unpacked_ranges.push_back(node); });

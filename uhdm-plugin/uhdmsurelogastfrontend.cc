@@ -42,12 +42,6 @@ extern void visit_object(vpiHandle obj_h, int indent, const char *relation, std:
 
 YOSYS_NAMESPACE_BEGIN
 
-/* Stub for AST::process */
-static void set_line_num(int) {}
-
-/* Stub for AST::process */
-static int get_line_num(void) { return 1; }
-
 std::vector<vpiHandle> executeCompilation(SURELOG::SymbolTable *symbolTable, SURELOG::ErrorContainer *errors, SURELOG::CommandLineParser *clp,
                                           SURELOG::scompiler *compiler)
 {
