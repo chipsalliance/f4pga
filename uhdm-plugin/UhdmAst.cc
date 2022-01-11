@@ -139,6 +139,17 @@ static size_t add_multirange_attribute(AST::AstNode *wire_node, const std::vecto
         }
         while (ranges[i]->simplify(true, false, false, 1, -1, false, false)) {
         }
+        // this workaround case, where yosys doesn't follow id2ast and simplifies it to resolve constant
+        if (ranges[i]->children[0]->id2ast) {
+            while (ranges[i]->children[0]->id2ast->simplify(true, false, false, 1, -1, false, false)) {
+            }
+        }
+        if (ranges[i]->children[1]->id2ast) {
+            while (ranges[i]->children[1]->id2ast->simplify(true, false, false, 1, -1, false, false)) {
+            }
+        }
+        while (ranges[i]->simplify(true, false, false, 1, -1, false, false)) {
+        }
         log_assert(ranges[i]->children[0]->type == AST::AST_CONSTANT);
         log_assert(ranges[i]->children[1]->type == AST::AST_CONSTANT);
         wire_node->multirange_dimensions.push_back(min(ranges[i]->children[0]->integer, ranges[i]->children[1]->integer));
