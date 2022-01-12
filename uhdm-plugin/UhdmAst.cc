@@ -2468,7 +2468,6 @@ void UhdmAst::process_assignment_pattern_op()
         for (auto p : ordered_children) {
             current_node->children.push_back(p.second);
         }
-        std::reverse(current_node->children.begin(), current_node->children.end());
         return;
     }
     auto assign_node = find_ancestor({AST::AST_ASSIGN, AST::AST_ASSIGN_EQ, AST::AST_ASSIGN_LE});
