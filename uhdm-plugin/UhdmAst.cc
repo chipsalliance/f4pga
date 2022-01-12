@@ -3066,8 +3066,14 @@ void UhdmAst::process_parameter()
             break;
         }
         case vpiEnumTypespec:
-        case vpiRealTypespec:
+        case vpiRealTypespec: {
+            shared.report.mark_handled(typespec_h);
+            break;
+        }
         case vpiIntTypespec: {
+#ifdef BUILD_UPSTREAM
+            packed_ranges.push_back(make_range(31, 0));
+#endif
             shared.report.mark_handled(typespec_h);
             break;
         }
@@ -3103,13 +3109,12 @@ void UhdmAst::process_parameter()
         }
         }
         vpi_release_handle(typespec_h);
-    } else {
-        AST::AstNode *constant_node = process_value(obj_h);
-        if (constant_node) {
-            constant_node->filename = current_node->filename;
-            constant_node->location = current_node->location;
-            current_node->children.push_back(constant_node);
-        }
+    }
+    AST::AstNode *constant_node = process_value(obj_h);
+    if (constant_node) {
+        constant_node->filename = current_node->filename;
+        constant_node->location = current_node->location;
+        current_node->children.push_back(constant_node);
     }
     add_multirange_wire(current_node, packed_ranges, unpacked_ranges);
 }
