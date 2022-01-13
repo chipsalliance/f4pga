@@ -136,7 +136,6 @@ class UhdmAst
     void simplify_parameter(AST::AstNode *parameter, AST::AstNode *module_node = nullptr);
     void process_nonsynthesizable(const UHDM::BaseClass *object);
     void process_unsupported_stmt(const UHDM::BaseClass *object);
-    void visitEachDescendant(AST::AstNode *node, const std::function<void(AST::AstNode *)> &f);
 
     UhdmAst(UhdmAst *p, UhdmAstShared &s, const std::string &i) : parent(p), shared(s), indent(i)
     {
