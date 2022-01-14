@@ -423,9 +423,18 @@ static AST::AstNode *expand_dot(const AST::AstNode *current_struct, const AST::A
                   AST::AST_ADD, left,
                   new AST::AstNode(AST::AST_ADD, struct_range->children[1]->clone(), new AST::AstNode(AST::AST_SUB, range_size, elem_size->clone())));
             } else if (struct_range->children.size() == 1) {
-                right = new AST::AstNode(AST::AST_ADD, right, struct_range->children[0]->clone());
-                delete left;
-                left = right->clone();
+                if (!current_struct_elem->multirange_dimensions.empty()) {
+                    right = new AST::AstNode(AST::AST_ADD, right,
+                                             new AST::AstNode(AST::AST_MUL, struct_range->children[0]->clone(),
+                                                              AST::AstNode::mkconst_int(current_struct_elem->multirange_dimensions.back(), true)));
+                    delete left;
+                    left = new AST::AstNode(AST::AST_ADD, right->clone(),
+                                            AST::AstNode::mkconst_int(current_struct_elem->multirange_dimensions.back() - 1, true));
+                } else {
+                    right = new AST::AstNode(AST::AST_ADD, right, struct_range->children[0]->clone());
+                    delete left;
+                    left = right->clone();
+                }
             } else {
                 struct_range->dumpAst(NULL, "range >");
                 log_error("Unhandled range select (AST_STRUCT_ITEM) in AST_DOT!\n");
@@ -792,6 +801,7 @@ void UhdmAst::process_packed_array_typespec()
     std::vector<AST::AstNode *> packed_ranges;
     std::vector<AST::AstNode *> unpacked_ranges;
     current_node = make_ast_node(AST::AST_WIRE);
+    visit_one_to_many({vpiRange}, obj_h, [&](AST::AstNode *node) { packed_ranges.push_back(node); });
     visit_one_to_one({vpiElemTypespec}, obj_h, [&](AST::AstNode *node) {
         if (node && node->type == AST::AST_STRUCT) {
             auto str = current_node->str;
@@ -803,13 +813,12 @@ void UhdmAst::process_packed_array_typespec()
             if (node->type == AST::AST_ENUM && !node->children.empty()) {
                 for (auto c : node->children[0]->children) {
                     if (c->type == AST::AST_RANGE && c->str.empty())
-                        unpacked_ranges.push_back(c->clone());
+                        packed_ranges.push_back(c->clone());
                 }
             }
             delete node;
         }
     });
-    visit_one_to_many({vpiRange}, obj_h, [&](AST::AstNode *node) { packed_ranges.push_back(node); });
     add_multirange_wire(current_node, packed_ranges, unpacked_ranges);
 }
 
@@ -3075,9 +3084,7 @@ void UhdmAst::process_parameter()
             break;
         }
         case vpiIntTypespec: {
-#ifdef BUILD_UPSTREAM
             packed_ranges.push_back(make_range(31, 0));
-#endif
             shared.report.mark_handled(typespec_h);
             break;
         }
