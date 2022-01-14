@@ -1534,6 +1534,67 @@ void UhdmAst::process_array_var()
     add_multirange_wire(current_node, packed_ranges, unpacked_ranges);
 }
 
+void UhdmAst::process_packed_array_var()
+{
+    current_node = make_ast_node(AST::AST_WIRE);
+    std::vector<AST::AstNode *> packed_ranges;
+    std::vector<AST::AstNode *> unpacked_ranges;
+    visit_one_to_one({vpiTypespec}, obj_h, [&](AST::AstNode *node) {
+        if (node->str.empty()) {
+            // anonymous typespec, move the children to variable
+            current_node->type = node->type;
+            current_node->children = std::move(node->children);
+        } else {
+            auto wiretype_node = new AST::AstNode(AST::AST_WIRETYPE);
+            wiretype_node->str = node->str;
+            current_node->children.push_back(wiretype_node);
+            current_node->is_custom_type = true;
+        }
+        delete node;
+    });
+    vpiHandle itr = vpi_iterate(vpi_get(vpiType, obj_h) == vpiArrayVar ? vpiReg : vpiElement, obj_h);
+    while (vpiHandle reg_h = vpi_scan(itr)) {
+        if (vpi_get(vpiType, reg_h) == vpiStructVar || vpi_get(vpiType, reg_h) == vpiEnumVar) {
+            visit_one_to_one({vpiTypespec}, reg_h, [&](AST::AstNode *node) {
+                if (node->str.empty()) {
+                    // anonymous typespec, move the children to variable
+                    current_node->type = node->type;
+                    current_node->children = std::move(node->children);
+                } else {
+                    auto wiretype_node = new AST::AstNode(AST::AST_WIRETYPE);
+                    wiretype_node->str = node->str;
+                    current_node->children.push_back(wiretype_node);
+                    current_node->is_custom_type = true;
+                }
+                delete node;
+            });
+        } else if (vpi_get(vpiType, reg_h) == vpiLogicVar) {
+            current_node->is_logic = true;
+            visit_one_to_one({vpiTypespec}, reg_h, [&](AST::AstNode *node) {
+                if (node->str.empty()) {
+                    // anonymous typespec, move the children to variable
+                    current_node->type = node->type;
+                    current_node->children = std::move(node->children);
+                } else {
+                    auto wiretype_node = new AST::AstNode(AST::AST_WIRETYPE);
+                    wiretype_node->str = node->str;
+                    current_node->children.push_back(wiretype_node);
+                    current_node->is_custom_type = true;
+                }
+                delete node;
+            });
+            visit_one_to_many({vpiRange}, reg_h, [&](AST::AstNode *node) { packed_ranges.push_back(node); });
+        } else if (vpi_get(vpiType, reg_h) == vpiIntVar) {
+            packed_ranges.push_back(make_range(31, 0));
+            visit_default_expr(reg_h);
+        }
+        vpi_release_handle(reg_h);
+    }
+    vpi_release_handle(itr);
+    visit_one_to_many({vpiRange}, obj_h, [&](AST::AstNode *node) { packed_ranges.push_back(node); });
+    add_multirange_wire(current_node, packed_ranges, unpacked_ranges);
+}
+
 void UhdmAst::process_param_assign()
 {
     current_node = make_ast_node(AST::AST_PARAMETER);
@@ -3245,6 +3306,8 @@ AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
         process_real_var();
         break;
     case vpiPackedArrayVar:
+        process_packed_array_var();
+        break;
     case vpiArrayVar:
         process_array_var();
         break;
