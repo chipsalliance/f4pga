@@ -286,7 +286,8 @@ static void check_memories(AST::AstNode *module_node)
             if (node->children.size() != 2 || node->children[1]->str.empty() || node->children[1]->type != AST::AST_IDENTIFIER) {
                 log_error("%s:%d: Wrong usage of '\\$readmemh'\n", node->filename.c_str(), node->location.first_line);
             }
-            add_force_convert_attribute(memories[node->children[1]->str], 0);
+            if (memories[node->children[1]->str])
+                add_force_convert_attribute(memories[node->children[1]->str], 0);
         }
         if (node->type == AST::AST_WIRE) {
             const std::vector<AST::AstNode *> packed_ranges =
