@@ -440,9 +440,7 @@ static AST::AstNode *expand_dot(const AST::AstNode *current_struct, const AST::A
                 log_error("Unhandled range select (AST_STRUCT_ITEM) in AST_DOT!\n");
             }
         } else if (current_struct_elem->type == AST::AST_STRUCT) {
-            if (struct_range->children.size() == 2 && struct_range->children[0]->type == AST::AST_CONSTANT &&
-                struct_range->range_left != struct_range->range_right) {
-                // TODO: check if this is correct always, for now just add to current range selected range
+            if (struct_range->children.size() == 2) {
                 right = new AST::AstNode(AST::AST_ADD, right, struct_range->children[1]->clone());
                 auto range_size = new AST::AstNode(
                   AST::AST_ADD, new AST::AstNode(AST::AST_SUB, struct_range->children[0]->clone(), struct_range->children[1]->clone()),
@@ -456,11 +454,9 @@ static AST::AstNode *expand_dot(const AST::AstNode *current_struct, const AST::A
             } else {
                 struct_range->dumpAst(NULL, "range >");
                 log_error("Unhandled range select (AST_STRUCT) in AST_DOT!\n");
-                log_assert(1 == 0); // should never happen
             }
         } else {
             log_error("Found %s elem in struct that is currently unsupported!\n", type2str(current_struct_elem->type).c_str());
-            log_assert(1 == 0); // should never happen
         }
     }
     // Return range from the begining of *current* struct
