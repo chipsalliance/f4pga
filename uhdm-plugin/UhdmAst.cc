@@ -2390,7 +2390,8 @@ void UhdmAst::process_assignment_pattern_op()
     }
     auto assign_node = find_ancestor({AST::AST_ASSIGN, AST::AST_ASSIGN_EQ, AST::AST_ASSIGN_LE});
 
-    auto proc_node = find_ancestor({AST::AST_BLOCK, AST::AST_ALWAYS, AST::AST_INITIAL, AST::AST_MODULE, AST::AST_PACKAGE, AST::AST_CELL});
+    auto proc_node =
+      find_ancestor({AST::AST_BLOCK, AST::AST_GENBLOCK, AST::AST_ALWAYS, AST::AST_INITIAL, AST::AST_MODULE, AST::AST_PACKAGE, AST::AST_CELL});
     if (proc_node && proc_node->type == AST::AST_CELL && shared.top_nodes.count(proc_node->children[0]->str)) {
         proc_node = shared.top_nodes[proc_node->children[0]->str];
     }
