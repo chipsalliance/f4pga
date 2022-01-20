@@ -152,6 +152,13 @@ class UhdmAst
 
     // Visits all VPI design objects and returns created ASTs
     AST::AstNode *visit_designs(const std::vector<vpiHandle> &designs);
+
+    static const IdString &partial();
+    static const IdString &packed_ranges();
+    static const IdString &unpacked_ranges();
+    // set this attribute to force conversion of multirange wire to single range. It is useful to force-convert some memories.
+    static const IdString &force_convert();
+    static const IdString &is_imported();
 };
 
 YOSYS_NAMESPACE_END
