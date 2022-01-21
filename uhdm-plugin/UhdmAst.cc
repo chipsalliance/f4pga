@@ -510,8 +510,8 @@ static AST::AstNode *convert_dot(AST::AstNode *wire_node, AST::AstNode *node, AS
         int struct_size_int = get_max_offset(struct_node) + 1;
         log_assert(!wire_node->multirange_dimensions.empty());
         int range = wire_node->multirange_dimensions.back() - 1;
-        if (!wire_node->attributes[ID::unpacked_ranges]->children.empty() &&
-            wire_node->attributes[ID::unpacked_ranges]->children.back()->range_left == range) {
+        if (!wire_node->attributes[UhdmAst::unpacked_ranges()]->children.empty() &&
+            wire_node->attributes[UhdmAst::unpacked_ranges()]->children.back()->range_left == range) {
             expanded->children[1] = new AST::AstNode(
               AST::AST_ADD, expanded->children[1],
               new AST::AstNode(AST::AST_MUL, AST::AstNode::mkconst_int(struct_size_int, true, 32),
