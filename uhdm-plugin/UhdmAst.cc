@@ -497,9 +497,6 @@ static AST::AstNode *expand_dot(const AST::AstNode *current_struct, const AST::A
 
 static AST::AstNode *convert_dot(AST::AstNode *wire_node, AST::AstNode *node, AST::AstNode *dot)
 {
-    std::vector<AST::AstNode *> packed_ranges;
-    std::vector<AST::AstNode *> unpacked_ranges;
-
     AST::AstNode *struct_node = nullptr;
     if (wire_node->type == AST::AST_STRUCT) {
         struct_node = wire_node;
@@ -512,15 +509,25 @@ static AST::AstNode *convert_dot(AST::AstNode *wire_node, AST::AstNode *node, AS
     if (node->children[0]->type == AST::AST_RANGE) {
         int struct_size_int = get_max_offset(struct_node) + 1;
         log_assert(!wire_node->multirange_dimensions.empty());
-        int unpacked_range = wire_node->multirange_dimensions.back() - 1;
-        expanded->children[1] = new AST::AstNode(AST::AST_ADD, expanded->children[1],
-                                                 new AST::AstNode(AST::AST_MUL, AST::AstNode::mkconst_int(struct_size_int, true, 32),
-                                                                  new AST::AstNode(AST::AST_SUB, AST::AstNode::mkconst_int(unpacked_range, true, 32),
-                                                                                   node->children[0]->children[0]->clone())));
-        expanded->children[0] = new AST::AstNode(AST::AST_ADD, expanded->children[0],
-                                                 new AST::AstNode(AST::AST_MUL, AST::AstNode::mkconst_int(struct_size_int, true, 32),
-                                                                  new AST::AstNode(AST::AST_SUB, AST::AstNode::mkconst_int(unpacked_range, true, 32),
-                                                                                   node->children[0]->children[0]->clone())));
+        int range = wire_node->multirange_dimensions.back() - 1;
+        if (!wire_node->attributes[ID::unpacked_ranges]->children.empty() &&
+            wire_node->attributes[ID::unpacked_ranges]->children.back()->range_left == range) {
+            expanded->children[1] = new AST::AstNode(
+              AST::AST_ADD, expanded->children[1],
+              new AST::AstNode(AST::AST_MUL, AST::AstNode::mkconst_int(struct_size_int, true, 32),
+                               new AST::AstNode(AST::AST_SUB, AST::AstNode::mkconst_int(range, true, 32), node->children[0]->children[0]->clone())));
+            expanded->children[0] = new AST::AstNode(
+              AST::AST_ADD, expanded->children[0],
+              new AST::AstNode(AST::AST_MUL, AST::AstNode::mkconst_int(struct_size_int, true, 32),
+                               new AST::AstNode(AST::AST_SUB, AST::AstNode::mkconst_int(range, true, 32), node->children[0]->children[0]->clone())));
+        } else {
+            expanded->children[1] = new AST::AstNode(
+              AST::AST_ADD, expanded->children[1],
+              new AST::AstNode(AST::AST_MUL, AST::AstNode::mkconst_int(struct_size_int, true, 32), AST::AstNode::mkconst_int(range, true, 32)));
+            expanded->children[0] = new AST::AstNode(
+              AST::AST_ADD, expanded->children[0],
+              new AST::AstNode(AST::AST_MUL, AST::AstNode::mkconst_int(struct_size_int, true, 32), AST::AstNode::mkconst_int(range, true, 32)));
+        }
     }
     return expanded;
 }
