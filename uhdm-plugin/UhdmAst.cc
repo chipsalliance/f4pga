@@ -2422,10 +2422,7 @@ void UhdmAst::process_assignment_pattern_op()
         for (auto p : ordered_children) {
             current_node->children.push_back(p.second);
         }
-        // flattened nodes have correct order, but unflattened ones still needs to be reversed
-        if (!(vpi_get(vpiFlattened, obj_h) == 1)) {
-            std::reverse(current_node->children.begin(), current_node->children.end());
-        }
+        std::reverse(current_node->children.begin(), current_node->children.end());
         return;
     }
     auto assign_node = find_ancestor({AST::AST_ASSIGN, AST::AST_ASSIGN_EQ, AST::AST_ASSIGN_LE});
