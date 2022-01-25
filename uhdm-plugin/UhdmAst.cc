@@ -3273,6 +3273,7 @@ void UhdmAst::process_while()
         } else {
             if (node->str == "") {
                 node->str = current_node->str;
+                current_node->children.push_back(node);
             }
         }
     });
