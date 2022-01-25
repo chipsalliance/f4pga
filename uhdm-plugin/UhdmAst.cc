@@ -2670,6 +2670,11 @@ void UhdmAst::process_function()
             current_node->children.push_back(node);
         }
     });
+    visit_one_to_many({vpiParameter, vpiParamAssign}, obj_h, [&](AST::AstNode *node) {
+        if (node) {
+            add_or_replace_child(current_node, node);
+        }
+    });
     visit_one_to_many({vpiIODecl}, obj_h, [&](AST::AstNode *node) {
         node->type = AST::AST_WIRE;
         node->port_id = shared.next_port_id();
