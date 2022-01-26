@@ -1818,7 +1818,7 @@ void UhdmAst::process_package()
         }
     });
     visit_one_to_many({vpiTypedef}, obj_h, [&](AST::AstNode *node) {
-        if (node) {
+        if (node && node->str != "") {
             move_type_to_new_typedef(current_node, node);
         }
     });
@@ -2898,7 +2898,11 @@ void UhdmAst::process_logic_typespec()
     visit_one_to_many({vpiRange}, obj_h, [&](AST::AstNode *node) { packed_ranges.push_back(node); });
     add_multirange_wire(current_node, packed_ranges, unpacked_ranges);
     if (!current_node->str.empty()) {
-        move_type_to_new_typedef(find_ancestor({AST::AST_MODULE, AST::AST_PACKAGE}), current_node->clone());
+        auto top_module = find_ancestor({AST::AST_MODULE, AST::AST_PACKAGE, AST::AST_DESIGN});
+        if (!top_module) {
+            log_error("Couldn't find top module for typedef: %s\n", current_node->str.c_str());
+        }
+        move_type_to_new_typedef(top_module, current_node->clone());
     }
 }
 
@@ -2914,7 +2918,11 @@ void UhdmAst::process_int_typespec()
     add_multirange_wire(current_node, packed_ranges, unpacked_ranges);
     current_node->is_signed = true;
     if (!current_node->str.empty()) {
-        move_type_to_new_typedef(find_ancestor({AST::AST_MODULE, AST::AST_PACKAGE}), current_node);
+        auto top_module = find_ancestor({AST::AST_MODULE, AST::AST_PACKAGE, AST::AST_DESIGN});
+        if (!top_module) {
+            log_error("Couldn't find top module for typedef: %s\n", current_node->str.c_str());
+        }
+        move_type_to_new_typedef(top_module, current_node);
     }
 }
 
