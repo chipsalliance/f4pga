@@ -2411,6 +2411,9 @@ void UhdmAst::process_assignment_pattern_op()
                 auto key = node->children[0]->str;
                 key = key.substr(key.find('.') + 1);
                 auto param_type = shared.param_types[param_node->str];
+                if (!param_type) {
+                    log_error("Couldn't find parameter type for node: %s\n", param_node->str.c_str());
+                }
                 size_t pos =
                   std::find_if(param_type->children.begin(), param_type->children.end(), [key](AST::AstNode *child) { return child->str == key; }) -
                   param_type->children.begin();
