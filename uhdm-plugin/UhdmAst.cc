@@ -2515,6 +2515,9 @@ void UhdmAst::process_if_else()
 {
     current_node = make_ast_node(AST::AST_CASE);
     visit_one_to_one({vpiCondition}, obj_h, [&](AST::AstNode *node) {
+        if (!node) {
+            log_error("Couldn't find node in if stmt. This can happend if unsupported '$value$plusargs' function is used inside if.\n");
+        }
         auto reduce_node = new AST::AstNode(AST::AST_REDUCE_BOOL, node);
         current_node->children.push_back(reduce_node);
     });
