@@ -32,7 +32,8 @@ TESTS = abc9 \
 	period_check \
 	waveform_check \
 	period_format_check \
-	get_clocks
+	get_clocks \
+	create_clock_add
 
 UNIT_TESTS = escaping
 
@@ -58,3 +59,4 @@ waveform_check_negative = 1
 period_format_check_verify = true
 period_format_check_negative = 1
 get_clocks_verify = $(call diff_test,get_clocks,txt)
+create_clock_add_verify = $(call diff_test,create_clock_add,sdc) && $(call diff_test,create_clock_add,txt)
