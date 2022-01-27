@@ -131,6 +131,9 @@ struct CreateClockCmd : public Pass {
         }
         for (argidx = 1; argidx < args.size(); argidx++) {
             std::string arg = args[argidx];
+            if (arg == "-add" && argidx + 1 < args.size()) {
+                continue;
+            }
             if (arg == "-name" && argidx + 1 < args.size()) {
                 name = args[++argidx];
                 continue;
