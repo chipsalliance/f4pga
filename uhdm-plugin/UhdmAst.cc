@@ -1808,6 +1808,11 @@ void UhdmAst::process_package()
 {
     current_node = make_ast_node(AST::AST_PACKAGE);
     shared.current_top_node = current_node;
+    visit_one_to_many({vpiTypedef}, obj_h, [&](AST::AstNode *node) {
+        if (node) {
+            move_type_to_new_typedef(current_node, node);
+        }
+    });
     visit_one_to_many({vpiParameter, vpiParamAssign}, obj_h, [&](AST::AstNode *node) {
         if (node) {
             node->str = strip_package_name(node->str);
@@ -1815,11 +1820,6 @@ void UhdmAst::process_package()
                 c->str = strip_package_name(c->str);
             }
             add_or_replace_child(current_node, node);
-        }
-    });
-    visit_one_to_many({vpiTypedef}, obj_h, [&](AST::AstNode *node) {
-        if (node && node->str != "") {
-            move_type_to_new_typedef(current_node, node);
         }
     });
     visit_one_to_many({vpiTaskFunc}, obj_h, [&](AST::AstNode *node) {
