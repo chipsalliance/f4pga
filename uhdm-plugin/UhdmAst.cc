@@ -107,7 +107,7 @@ static AST::AstNode *make_range(int left, int right, bool is_signed = false)
 
 #include "UhdmAstUpstream.cc"
 
-static int get_max_offset(AST::AstNode *node)
+static int get_max_offset_struct(AST::AstNode *node)
 {
     // get the width from the MS member in the struct
     // as members are laid out from left to right in the packed wire
@@ -169,11 +169,16 @@ static size_t add_multirange_attribute(AST::AstNode *wire_node, const std::vecto
         }
         log_assert(ranges[i]->children[0]->type == AST::AST_CONSTANT);
         log_assert(ranges[i]->children[1]->type == AST::AST_CONSTANT);
-        wire_node->multirange_dimensions.push_back(min(ranges[i]->children[0]->integer, ranges[i]->children[1]->integer));
-        wire_node->multirange_dimensions.push_back(max(ranges[i]->children[0]->integer, ranges[i]->children[1]->integer) -
-                                                   min(ranges[i]->children[0]->integer, ranges[i]->children[1]->integer) + 1);
-        wire_node->multirange_swapped.push_back(ranges[i]->range_swapped);
-        size *= wire_node->multirange_dimensions.back();
+        if (wire_node->type != AST::AST_STRUCT_ITEM) {
+            wire_node->multirange_dimensions.push_back(min(ranges[i]->children[0]->integer, ranges[i]->children[1]->integer));
+            wire_node->multirange_swapped.push_back(ranges[i]->range_swapped);
+        }
+        auto elem_size = max(ranges[i]->children[0]->integer, ranges[i]->children[1]->integer) -
+                         min(ranges[i]->children[0]->integer, ranges[i]->children[1]->integer) + 1;
+        if (wire_node->type != AST::AST_STRUCT_ITEM || (wire_node->type == AST::AST_STRUCT_ITEM && i == 0)) {
+            wire_node->multirange_dimensions.push_back(elem_size);
+        }
+        size *= elem_size;
     }
     return size;
 }
@@ -276,6 +281,12 @@ static void resolve_wiretype(AST::AstNode *wire_node)
     // we need to setup current top ast as this simplify
     // needs to have access to all already definied ids
     while (wire_node->simplify(true, false, false, 1, -1, false, false)) {
+    }
+    if (wiretype_ast->children[0]->type == AST::AST_STRUCT && wire_node->type == AST::AST_WIRE) {
+        auto struct_width = get_max_offset_struct(wiretype_ast->children[0]);
+        wire_node->range_left = struct_width;
+        wire_node->children[0]->range_left = struct_width;
+        wire_node->children[0]->children[0]->integer = struct_width;
     }
     if (wiretype_ast && wire_node->attributes.count(ID::wiretype)) {
         log_assert(wiretype_ast->type == AST::AST_TYPEDEF);
@@ -380,6 +391,11 @@ static void convert_packed_unpacked_range(AST::AstNode *wire_node)
             !wire_node->is_output) {
             wire_node->type = AST::AST_MEMORY;
         }
+    }
+
+    if (wire_node->type == AST::AST_STRUCT_ITEM || wire_node->type == AST::AST_STRUCT) {
+        wire_node->attributes.erase(UhdmAst::packed_ranges());
+        wire_node->attributes.erase(UhdmAst::unpacked_ranges());
     }
 
     // Insert new range
@@ -507,7 +523,7 @@ static AST::AstNode *convert_dot(AST::AstNode *wire_node, AST::AstNode *node, AS
     log_assert(struct_node);
     auto expanded = expand_dot(struct_node, dot);
     if (node->children[0]->type == AST::AST_RANGE) {
-        int struct_size_int = get_max_offset(struct_node) + 1;
+        int struct_size_int = get_max_offset_struct(struct_node) + 1;
         log_assert(!wire_node->multirange_dimensions.empty());
         int range = wire_node->multirange_dimensions.back() - 1;
         if (!wire_node->attributes[UhdmAst::unpacked_ranges()]->children.empty() &&
@@ -555,6 +571,181 @@ static void setup_current_scope(std::unordered_map<std::string, AST::AstNode *> 
     // for simplify to get references for already defined ids
     AST_INTERNAL::current_ast_mod = current_top_node;
     log_assert(AST_INTERNAL::current_ast_mod != nullptr);
+}
+
+static int range_width_local(AST::AstNode *node, AST::AstNode *rnode)
+{
+    log_assert(rnode->type == AST::AST_RANGE);
+    if (!rnode->range_valid) {
+        log_file_error(node->filename, node->location.first_line, "Size must be constant in packed struct/union member %s\n", node->str.c_str());
+    }
+    // note: range swapping has already been checked for
+    return rnode->range_left - rnode->range_right + 1;
+}
+
+static void save_struct_array_width_local(AST::AstNode *node, int width)
+{
+    // stash the stride for the array
+    node->multirange_dimensions.push_back(width);
+}
+
+static int simplify_struct(AST::AstNode *snode, int base_offset, AST::AstNode *parent_node)
+{
+    // Struct members will be laid out in the structure contiguously from left to right.
+    // Union members all have zero offset from the start of the union.
+    // Determine total packed size and assign offsets.  Store these in the member node.
+    bool is_union = (snode->type == AST::AST_UNION);
+    int offset = 0;
+    int packed_width = -1;
+    for (auto s : snode->children) {
+        if (s->type == AST::AST_RANGE) {
+            while (s->simplify(true, false, false, 1, -1, false, false)) {
+            };
+        }
+    }
+    // embeded struct or union with range?
+    auto it = std::remove_if(snode->children.begin(), snode->children.end(), [](AST::AstNode *node) { return node->type == AST::AST_RANGE; });
+    std::vector<AST::AstNode *> ranges(it, snode->children.end());
+    snode->children.erase(it, snode->children.end());
+    if (!ranges.empty()) {
+        if (ranges.size() > 1) {
+            log_file_error(ranges[1]->filename, ranges[1]->location.first_line,
+                           "Currently support for custom-type with range is limited to single range\n");
+        }
+        for (auto range : ranges) {
+            snode->multirange_dimensions.push_back(min(range->range_left, range->range_right));
+            snode->multirange_dimensions.push_back(max(range->range_left, range->range_right) - min(range->range_left, range->range_right) + 1);
+            snode->multirange_swapped.push_back(range->range_swapped);
+        }
+    }
+    // examine members from last to first
+    for (auto it = snode->children.rbegin(); it != snode->children.rend(); ++it) {
+        auto node = *it;
+        int width;
+        if (node->type == AST::AST_STRUCT || node->type == AST::AST_UNION) {
+            // embedded struct or union
+            width = simplify_struct(node, base_offset + offset, parent_node);
+            if (!node->multirange_dimensions.empty()) {
+                int number_of_structs = 1;
+                number_of_structs = node->multirange_dimensions.back();
+                width *= number_of_structs;
+            }
+            // set range of struct
+            node->range_right = base_offset + offset;
+            node->range_left = base_offset + offset + width - 1;
+            node->range_valid = true;
+        } else {
+            log_assert(node->type == AST::AST_STRUCT_ITEM);
+            if (node->children.size() > 0 && node->children[0]->type == AST::AST_RANGE) {
+                // member width e.g. bit [7:0] a
+                width = range_width_local(node, node->children[0]);
+                if (node->children.size() == 2) {
+                    if (node->children[1]->type == AST::AST_RANGE) {
+                        // unpacked array e.g. bit [63:0] a [0:3]
+                        auto rnode = node->children[1];
+                        int array_count = range_width_local(node, rnode);
+                        if (array_count == 1) {
+                            // C-type array size e.g. bit [63:0] a [4]
+                            array_count = rnode->range_left;
+                        }
+                        save_struct_array_width_local(node, width);
+                        width *= array_count;
+                    } else {
+                        // array element must be single bit for a packed array
+                        log_file_error(node->filename, node->location.first_line, "Unpacked array in packed struct/union member %s\n",
+                                       node->str.c_str());
+                    }
+                }
+                // range nodes are now redundant
+                for (AST::AstNode *child : node->children)
+                    delete child;
+                node->children.clear();
+            } else if (node->children.size() == 1 && node->children[0]->type == AST::AST_MULTIRANGE) {
+                // packed 2D array, e.g. bit [3:0][63:0] a
+                auto rnode = node->children[0];
+                if (rnode->children.size() != 2) {
+                    // packed arrays can only be 2D
+                    log_file_error(node->filename, node->location.first_line, "Unpacked array in packed struct/union member %s\n", node->str.c_str());
+                }
+                int array_count = range_width_local(node, rnode->children[0]);
+                width = range_width_local(node, rnode->children[1]);
+                save_struct_array_width_local(node, width);
+                width *= array_count;
+                // range nodes are now redundant
+                for (AST::AstNode *child : node->children)
+                    delete child;
+                node->children.clear();
+            } else if (node->range_left < 0) {
+                // 1 bit signal: bit, logic or reg
+                width = 1;
+            } else {
+                // already resolved and compacted
+                width = node->range_left - node->range_right + 1;
+            }
+            if (is_union) {
+                node->range_right = base_offset;
+                node->range_left = base_offset + width - 1;
+            } else {
+                node->range_right = base_offset + offset;
+                node->range_left = base_offset + offset + width - 1;
+            }
+            node->range_valid = true;
+        }
+        if (is_union) {
+            // check that all members have the same size
+            if (packed_width == -1) {
+                // first member
+                packed_width = width;
+            } else {
+                if (packed_width != width) {
+
+                    log_file_error(node->filename, node->location.first_line, "member %s of a packed union has %d bits, expecting %d\n",
+                                   node->str.c_str(), width, packed_width);
+                }
+            }
+        } else {
+            offset += width;
+        }
+    }
+    if (!snode->str.empty() && parent_node && parent_node->type != AST::AST_TYPEDEF && parent_node->type != AST::AST_STRUCT &&
+        AST_INTERNAL::current_scope.count(snode->str) != 0) {
+        AST_INTERNAL::current_scope[snode->str]->attributes[ID::wiretype] = AST::AstNode::mkconst_str(snode->str);
+        AST_INTERNAL::current_scope[snode->str]->attributes[ID::wiretype]->id2ast = snode;
+    }
+    return (is_union ? packed_width : offset);
+}
+
+static void add_members_to_scope_local(AST::AstNode *snode, std::string name)
+{
+    // add all the members in a struct or union to local scope
+    // in case later referenced in assignments
+    log_assert(snode->type == AST::AST_STRUCT || snode->type == AST::AST_UNION);
+    for (auto *node : snode->children) {
+        auto member_name = name + "." + node->str;
+        AST_INTERNAL::current_scope[member_name] = node;
+        if (node->type != AST::AST_STRUCT_ITEM) {
+            // embedded struct or union
+            add_members_to_scope_local(node, name + "." + node->str);
+        }
+    }
+}
+
+static AST::AstNode *make_packed_struct_local(AST::AstNode *template_node, std::string &name)
+{
+    // create a wire for the packed struct
+    auto wnode = new AST::AstNode(AST::AST_WIRE);
+    wnode->str = name;
+    wnode->is_logic = true;
+    wnode->range_valid = true;
+    wnode->is_signed = template_node->is_signed;
+    int offset = get_max_offset_struct(template_node);
+    auto range = make_range(offset, 0);
+    wnode->children.push_back(range);
+    // make sure this node is the one in scope for this name
+    AST_INTERNAL::current_scope[name] = wnode;
+    // add all the struct members to scope under the wire's name
+    add_members_to_scope_local(template_node, name);
+    return wnode;
 }
 
 static void simplify(AST::AstNode *current_node, AST::AstNode *parent_node)
@@ -640,12 +831,24 @@ static void simplify(AST::AstNode *current_node, AST::AstNode *parent_node)
         }
         break;
     case AST::AST_STRUCT:
-        if (!current_node->str.empty() && parent_node && parent_node->type != AST::AST_TYPEDEF && parent_node->type != AST::AST_STRUCT) {
-            while (current_node->simplify(true, false, false, 1, -1, false, false)) {
-            }
-            AST_INTERNAL::current_scope[current_node->str]->attributes[ID::wiretype] = AST::AstNode::mkconst_str(current_node->str);
-            AST_INTERNAL::current_scope[current_node->str]->attributes[ID::wiretype]->id2ast = current_node;
+        simplify_struct(current_node, 0, parent_node);
+        // instance rather than just a type in a typedef or outer struct?
+        if (!current_node->str.empty() && current_node->str[0] == '\\') {
+            // instance so add a wire for the packed structure
+            auto wnode = make_packed_struct_local(current_node, current_node->str);
+            log_assert(AST_INTERNAL::current_ast_mod);
+            AST_INTERNAL::current_ast_mod->children.push_back(wnode);
+            AST_INTERNAL::current_scope[wnode->str]->attributes[ID::wiretype] = AST::AstNode::mkconst_str(current_node->str);
+            AST_INTERNAL::current_scope[wnode->str]->attributes[ID::wiretype]->id2ast = current_node;
         }
+
+        current_node->basic_prep = true;
+        break;
+    case AST::AST_STRUCT_ITEM:
+        AST_INTERNAL::current_scope[current_node->str] = current_node;
+        convert_packed_unpacked_range(current_node);
+        while (current_node->simplify(true, false, false, 1, -1, false, false)) {
+        };
         break;
     default:
         break;
@@ -1322,6 +1525,8 @@ void UhdmAst::process_array_typespec()
 
 void UhdmAst::process_typespec_member()
 {
+    std::vector<AST::AstNode *> packed_ranges;
+    std::vector<AST::AstNode *> unpacked_ranges;
     current_node = make_ast_node(AST::AST_STRUCT_ITEM);
     current_node->str = current_node->str.substr(1);
     vpiHandle typespec_h = vpi_handle(vpiTypespec, obj_h);
@@ -1330,13 +1535,13 @@ void UhdmAst::process_typespec_member()
     case vpiBitTypespec:
     case vpiLogicTypespec: {
         current_node->is_logic = true;
-        visit_range(typespec_h, [&](AST::AstNode *node) { current_node->children.push_back(node); });
+        visit_one_to_many({vpiRange}, typespec_h, [&](AST::AstNode *node) { packed_ranges.push_back(node); });
         shared.report.mark_handled(typespec_h);
         break;
     }
     case vpiIntTypespec: {
         current_node->is_signed = true;
-        current_node->children.push_back(make_range(31, 0));
+        packed_ranges.push_back(make_range(31, 0));
         shared.report.mark_handled(typespec_h);
         break;
     }
@@ -1360,20 +1565,36 @@ void UhdmAst::process_typespec_member()
         visit_one_to_one({vpiTypespec}, obj_h, [&](AST::AstNode *node) {
             if (node && node->type == AST::AST_STRUCT) {
                 auto str = current_node->str;
+                if (node->attributes.count(UhdmAst::packed_ranges())) {
+                    for (auto r : node->attributes[UhdmAst::packed_ranges()]->children) {
+                        packed_ranges.push_back(r->clone());
+                    }
+                    std::reverse(packed_ranges.begin(), packed_ranges.end());
+                    node->attributes.erase(UhdmAst::packed_ranges());
+                }
+                if (node->attributes.count(UhdmAst::unpacked_ranges())) {
+                    for (auto r : node->attributes[UhdmAst::unpacked_ranges()]->children) {
+                        unpacked_ranges.push_back(r->clone());
+                    }
+                    node->attributes.erase(UhdmAst::unpacked_ranges());
+                }
                 node->cloneInto(current_node);
                 current_node->str = str;
+                current_node->children.insert(current_node->children.end(), packed_ranges.begin(), packed_ranges.end());
+                packed_ranges.clear();
                 delete node;
             } else if (node) {
                 auto str = current_node->str;
                 if (node->attributes.count(UhdmAst::packed_ranges())) {
                     for (auto r : node->attributes[UhdmAst::packed_ranges()]->children) {
-                        node->children.push_back(r->clone());
+                        packed_ranges.push_back(r->clone());
                     }
+                    std::reverse(packed_ranges.begin(), packed_ranges.end());
                     node->attributes.erase(UhdmAst::packed_ranges());
                 }
                 if (node->attributes.count(UhdmAst::unpacked_ranges())) {
                     for (auto r : node->attributes[UhdmAst::unpacked_ranges()]->children) {
-                        node->children.push_back(r->clone());
+                        unpacked_ranges.push_back(r->clone());
                     }
                     node->attributes.erase(UhdmAst::unpacked_ranges());
                 }
@@ -1393,18 +1614,7 @@ void UhdmAst::process_typespec_member()
     }
     }
     vpi_release_handle(typespec_h);
-    if (current_node->attributes.count(UhdmAst::packed_ranges())) {
-        for (auto r : current_node->attributes[UhdmAst::packed_ranges()]->children) {
-            current_node->children.push_back(r->clone());
-        }
-        current_node->attributes.erase(UhdmAst::packed_ranges());
-    }
-    if (current_node->attributes.count(UhdmAst::unpacked_ranges())) {
-        for (auto r : current_node->attributes[UhdmAst::unpacked_ranges()]->children) {
-            current_node->children.push_back(r->clone());
-        }
-        current_node->attributes.erase(UhdmAst::unpacked_ranges());
-    }
+    add_multirange_wire(current_node, packed_ranges, unpacked_ranges);
 }
 
 void UhdmAst::process_enum_typespec()
