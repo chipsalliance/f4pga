@@ -567,6 +567,16 @@ static void setup_current_scope(std::unordered_map<std::string, AST::AstNode *> 
             }
         }
     }
+    for (auto &o : current_top_node->children) {
+        if (o->type == AST::AST_TYPEDEF || o->type == AST::AST_PARAMETER || o->type == AST::AST_LOCALPARAM) {
+            AST_INTERNAL::current_scope[o->str] = o;
+        } else if (o->type == AST::AST_ENUM) {
+            AST_INTERNAL::current_scope[o->str] = o;
+            for (auto c : o->children) {
+                AST_INTERNAL::current_scope[c->str] = c;
+            }
+        }
+    }
     // hackish way of setting current_ast_mod as it is required
     // for simplify to get references for already defined ids
     AST_INTERNAL::current_ast_mod = current_top_node;
@@ -813,6 +823,7 @@ static void simplify(AST::AstNode *current_node, AST::AstNode *parent_node)
                 break;
             }
             AST::AstNode *wire_node = AST_INTERNAL::current_scope[current_node->str];
+            simplify(wire_node, nullptr);
             const std::vector<AST::AstNode *> packed_ranges = wire_node->attributes.count(UhdmAst::packed_ranges())
                                                                 ? wire_node->attributes[UhdmAst::packed_ranges()]->children
                                                                 : std::vector<AST::AstNode *>();
