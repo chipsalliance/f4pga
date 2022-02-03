@@ -863,6 +863,18 @@ static void clear_current_scope()
     AST_INTERNAL::current_ast_mod = nullptr;
 }
 
+static void mark_as_unsigned(AST::AstNode *node)
+{
+    if (node->children.empty() || node->children.size() == 1) {
+        node->is_signed = false;
+    } else if (node->children.size() == 2) {
+        node->children[0]->is_signed = false;
+        node->children[1]->is_signed = false;
+    } else {
+        log_error("Unsupported expression in mark_as_unsigned!\n");
+    }
+}
+
 void UhdmAst::visit_one_to_many(const std::vector<int> child_node_types, vpiHandle parent_handle, const std::function<void(AST::AstNode *)> &f)
 {
     for (auto child : child_node_types) {
@@ -2310,12 +2322,12 @@ void UhdmAst::process_operation()
         case vpiLShiftOp:
             current_node->type = AST::AST_SHIFT_LEFT;
             log_assert(current_node->children.size() == 2);
-            current_node->children[1]->is_signed = false;
+            mark_as_unsigned(current_node->children[1]);
             break;
         case vpiRShiftOp:
             current_node->type = AST::AST_SHIFT_RIGHT;
             log_assert(current_node->children.size() == 2);
-            current_node->children[1]->is_signed = false;
+            mark_as_unsigned(current_node->children[1]);
             break;
         case vpiNotOp:
             current_node->type = AST::AST_LOGIC_NOT;
@@ -2371,12 +2383,12 @@ void UhdmAst::process_operation()
         case vpiArithLShiftOp:
             current_node->type = AST::AST_SHIFT_SLEFT;
             log_assert(current_node->children.size() == 2);
-            current_node->children[1]->is_signed = false;
+            mark_as_unsigned(current_node->children[1]);
             break;
         case vpiArithRShiftOp:
             current_node->type = AST::AST_SHIFT_SRIGHT;
             log_assert(current_node->children.size() == 2);
-            current_node->children[1]->is_signed = false;
+            mark_as_unsigned(current_node->children[1]);
             break;
         case vpiPowerOp:
             current_node->type = AST::AST_POW;
