@@ -140,7 +140,10 @@ struct UhdmSurelogAstFrontend : public Frontend {
         SURELOG::SymbolTable *symbolTable = new SURELOG::SymbolTable();
         SURELOG::ErrorContainer *errors = new SURELOG::ErrorContainer(symbolTable);
         SURELOG::CommandLineParser *clp = new SURELOG::CommandLineParser(errors, symbolTable, false, false);
-        clp->parseCommandLine(cstrings.size(), &cstrings[0]);
+        bool success = clp->parseCommandLine(cstrings.size(), &cstrings[0]);
+        if (!success) {
+            log_error("Error parsing Surelog arguments!\n");
+        }
         SURELOG::scompiler *compiler = nullptr;
         const std::vector<vpiHandle> uhdm_design = executeCompilation(symbolTable, errors, clp, compiler);
         struct AST::AstNode *current_ast = uhdm_ast.visit_designs(uhdm_design);
