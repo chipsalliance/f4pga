@@ -293,7 +293,17 @@ static void resolve_wiretype(AST::AstNode *wire_node)
         wire_node->attributes[ID::wiretype]->id2ast = wiretype_ast->children[0];
     }
     if (wire_node->children[0]->type == AST::AST_RANGE && wire_node->multirange_dimensions.empty()) {
-        packed_ranges.push_back(wire_node->children[0]);
+        if (wiretype_ast && !wiretype_ast->children.empty() && wiretype_ast->children[0]->attributes.count(UhdmAst::packed_ranges()) &&
+            wiretype_ast->children[0]->attributes.count(UhdmAst::unpacked_ranges())) {
+            for (auto r : wiretype_ast->children[0]->attributes[UhdmAst::packed_ranges()]->children) {
+                packed_ranges.push_back(r->clone());
+            }
+            for (auto r : wiretype_ast->children[0]->attributes[UhdmAst::unpacked_ranges()]->children) {
+                unpacked_ranges.push_back(r->clone());
+            }
+        } else {
+            packed_ranges.push_back(wire_node->children[0]);
+        }
         wire_node->children.clear();
         wire_node->attributes[UhdmAst::packed_ranges()] = AST::AstNode::mkconst_int(1, false, 1);
         if (!packed_ranges.empty()) {
