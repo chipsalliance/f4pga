@@ -220,12 +220,17 @@ static AST::AstNode *convert_range(AST::AstNode *id, const std::vector<AST::AstN
         }
         if (!wire_node->multirange_swapped.empty()) {
             bool is_swapped = wire_node->multirange_swapped[wire_node->multirange_swapped.size() - i - 1];
+            auto right_idx = wire_node->multirange_dimensions.size() - (i * 2) - 2;
             if (is_swapped) {
                 auto left_idx = wire_node->multirange_dimensions.size() - (i * 2) - 1;
-                auto right_idx = wire_node->multirange_dimensions.size() - (i * 2) - 2;
                 auto elem_size = wire_node->multirange_dimensions[left_idx] - wire_node->multirange_dimensions[right_idx];
                 range_left = new AST::AstNode(AST::AST_SUB, AST::AstNode::mkconst_int(elem_size - 1, false), range_left->clone());
                 range_right = new AST::AstNode(AST::AST_SUB, AST::AstNode::mkconst_int(elem_size - 1, false), range_right->clone());
+            } else if (wire_node->multirange_dimensions[right_idx] != 0) {
+                range_left =
+                  new AST::AstNode(AST::AST_SUB, range_left, AST::AstNode::mkconst_int(wire_node->multirange_dimensions[right_idx], false));
+                range_right =
+                  new AST::AstNode(AST::AST_SUB, range_right, AST::AstNode::mkconst_int(wire_node->multirange_dimensions[right_idx], false));
             }
         }
         range_left =
@@ -2167,7 +2172,7 @@ void UhdmAst::process_io_decl()
             current_node->is_output = true;
         }
     }
-    add_multirange_wire(current_node, packed_ranges, unpacked_ranges);
+    add_multirange_wire(current_node, packed_ranges, unpacked_ranges, false);
 }
 
 void UhdmAst::process_always()
