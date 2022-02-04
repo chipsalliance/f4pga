@@ -293,7 +293,17 @@ static void resolve_wiretype(AST::AstNode *wire_node)
         wire_node->attributes[ID::wiretype]->id2ast = wiretype_ast->children[0];
     }
     if (wire_node->children[0]->type == AST::AST_RANGE && wire_node->multirange_dimensions.empty()) {
-        packed_ranges.push_back(wire_node->children[0]);
+        if (wiretype_ast && !wiretype_ast->children.empty() && wiretype_ast->children[0]->attributes.count(UhdmAst::packed_ranges()) &&
+            wiretype_ast->children[0]->attributes.count(UhdmAst::unpacked_ranges())) {
+            for (auto r : wiretype_ast->children[0]->attributes[UhdmAst::packed_ranges()]->children) {
+                packed_ranges.push_back(r->clone());
+            }
+            for (auto r : wiretype_ast->children[0]->attributes[UhdmAst::unpacked_ranges()]->children) {
+                unpacked_ranges.push_back(r->clone());
+            }
+        } else {
+            packed_ranges.push_back(wire_node->children[0]);
+        }
         wire_node->children.clear();
         wire_node->attributes[UhdmAst::packed_ranges()] = AST::AstNode::mkconst_int(1, false, 1);
         if (!packed_ranges.empty()) {
@@ -567,6 +577,16 @@ static void setup_current_scope(std::unordered_map<std::string, AST::AstNode *> 
             }
         }
     }
+    for (auto &o : current_top_node->children) {
+        if (o->type == AST::AST_TYPEDEF || o->type == AST::AST_PARAMETER || o->type == AST::AST_LOCALPARAM) {
+            AST_INTERNAL::current_scope[o->str] = o;
+        } else if (o->type == AST::AST_ENUM) {
+            AST_INTERNAL::current_scope[o->str] = o;
+            for (auto c : o->children) {
+                AST_INTERNAL::current_scope[c->str] = c;
+            }
+        }
+    }
     // hackish way of setting current_ast_mod as it is required
     // for simplify to get references for already defined ids
     AST_INTERNAL::current_ast_mod = current_top_node;
@@ -813,6 +833,7 @@ static void simplify(AST::AstNode *current_node, AST::AstNode *parent_node)
                 break;
             }
             AST::AstNode *wire_node = AST_INTERNAL::current_scope[current_node->str];
+            simplify(wire_node, nullptr);
             const std::vector<AST::AstNode *> packed_ranges = wire_node->attributes.count(UhdmAst::packed_ranges())
                                                                 ? wire_node->attributes[UhdmAst::packed_ranges()]->children
                                                                 : std::vector<AST::AstNode *>();
@@ -861,6 +882,18 @@ static void clear_current_scope()
     AST_INTERNAL::current_scope.clear();
     // unset current_ast_mod
     AST_INTERNAL::current_ast_mod = nullptr;
+}
+
+static void mark_as_unsigned(AST::AstNode *node)
+{
+    if (node->children.empty() || node->children.size() == 1) {
+        node->is_signed = false;
+    } else if (node->children.size() == 2) {
+        node->children[0]->is_signed = false;
+        node->children[1]->is_signed = false;
+    } else {
+        log_error("Unsupported expression in mark_as_unsigned!\n");
+    }
 }
 
 void UhdmAst::visit_one_to_many(const std::vector<int> child_node_types, vpiHandle parent_handle, const std::function<void(AST::AstNode *)> &f)
@@ -2310,12 +2343,12 @@ void UhdmAst::process_operation()
         case vpiLShiftOp:
             current_node->type = AST::AST_SHIFT_LEFT;
             log_assert(current_node->children.size() == 2);
-            current_node->children[1]->is_signed = false;
+            mark_as_unsigned(current_node->children[1]);
             break;
         case vpiRShiftOp:
             current_node->type = AST::AST_SHIFT_RIGHT;
             log_assert(current_node->children.size() == 2);
-            current_node->children[1]->is_signed = false;
+            mark_as_unsigned(current_node->children[1]);
             break;
         case vpiNotOp:
             current_node->type = AST::AST_LOGIC_NOT;
@@ -2371,12 +2404,12 @@ void UhdmAst::process_operation()
         case vpiArithLShiftOp:
             current_node->type = AST::AST_SHIFT_SLEFT;
             log_assert(current_node->children.size() == 2);
-            current_node->children[1]->is_signed = false;
+            mark_as_unsigned(current_node->children[1]);
             break;
         case vpiArithRShiftOp:
             current_node->type = AST::AST_SHIFT_SRIGHT;
             log_assert(current_node->children.size() == 2);
-            current_node->children[1]->is_signed = false;
+            mark_as_unsigned(current_node->children[1]);
             break;
         case vpiPowerOp:
             current_node->type = AST::AST_POW;
