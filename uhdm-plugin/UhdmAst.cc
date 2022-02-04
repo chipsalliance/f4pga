@@ -1536,6 +1536,28 @@ void UhdmAst::process_struct_typespec()
     });
 }
 
+void UhdmAst::process_union_typespec()
+{
+    current_node = make_ast_node(AST::AST_UNION);
+    visit_one_to_many({vpiTypespecMember}, obj_h, [&](AST::AstNode *node) {
+        if (node->children.size() > 0 && node->children[0]->type == AST::AST_ENUM) {
+            log_assert(node->children.size() == 1);
+            log_assert(!node->children[0]->children.empty());
+            log_assert(!node->children[0]->children[0]->children.empty());
+            // TODO: add missing enum_type attribute
+            auto range = make_range(0, 0);
+            // check if single enum element is larger than 1 bit
+            if (node->children[0]->children[0]->children.size() == 2) {
+                range = node->children[0]->children[0]->children[1]->clone();
+            }
+            delete node->children[0];
+            node->children.clear();
+            node->children.push_back(range);
+        }
+        current_node->children.push_back(node);
+    });
+}
+
 void UhdmAst::process_array_typespec()
 {
     current_node = make_ast_node(AST::AST_WIRE);
@@ -1579,9 +1601,10 @@ void UhdmAst::process_typespec_member()
         break;
     }
     case vpiStructTypespec:
+    case vpiUnionTypespec:
     case vpiEnumTypespec: {
         visit_one_to_one({vpiTypespec}, obj_h, [&](AST::AstNode *node) {
-            if (typespec_type == vpiStructTypespec) {
+            if (typespec_type == vpiStructTypespec || typespec_type == vpiUnionTypespec) {
                 auto str = current_node->str;
                 node->cloneInto(current_node);
                 current_node->str = str;
@@ -3578,6 +3601,9 @@ AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
         break;
     case vpiStructTypespec:
         process_struct_typespec();
+        break;
+    case vpiUnionTypespec:
+        process_union_typespec();
         break;
     case vpiPackedArrayTypespec:
         process_packed_array_typespec();

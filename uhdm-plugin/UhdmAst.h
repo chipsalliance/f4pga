@@ -72,6 +72,7 @@ class UhdmAst
     void process_port();
     void process_module();
     void process_struct_typespec();
+    void process_union_typespec();
     void process_packed_array_typespec();
     void process_array_typespec();
     void process_typespec_member();
