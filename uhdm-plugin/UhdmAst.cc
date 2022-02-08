@@ -1284,13 +1284,16 @@ AST::AstNode *UhdmAst::find_ancestor(const std::unordered_set<AST::AstNodeType> 
 void UhdmAst::process_design()
 {
     current_node = make_ast_node(AST::AST_DESIGN);
-    visit_one_to_many(
-      {UHDM::uhdmallInterfaces, UHDM::uhdmallPackages, UHDM::uhdmallModules, UHDM::uhdmtopModules, vpiTypedef, vpiParameter, vpiParamAssign}, obj_h,
-      [&](AST::AstNode *node) {
-          if (node) {
-              shared.top_nodes[node->str] = node;
-          }
-      });
+    visit_one_to_many({UHDM::uhdmallInterfaces, UHDM::uhdmallPackages, UHDM::uhdmallModules, UHDM::uhdmtopModules}, obj_h, [&](AST::AstNode *node) {
+        if (node) {
+            shared.top_nodes[node->str] = node;
+        }
+    });
+    visit_one_to_many({vpiParameter, vpiParamAssign}, obj_h, [&](AST::AstNode *node) {});
+    visit_one_to_many({vpiTypedef}, obj_h, [&](AST::AstNode *node) {
+        if (node)
+            move_type_to_new_typedef(current_node, node);
+    });
     for (auto pair : shared.top_nodes) {
         if (!pair.second)
             continue;
@@ -1577,9 +1580,6 @@ void UhdmAst::process_array_typespec()
             auto str = current_node->str;
             node->cloneInto(current_node);
             current_node->str = str;
-            delete node;
-        } else if (node) {
-            current_node->str = node->str;
             delete node;
         }
     });
