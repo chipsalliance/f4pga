@@ -1716,6 +1716,21 @@ void UhdmAst::process_enum_typespec()
             shared.report.mark_handled(typespec_h);
             break;
         }
+        case vpiBitTypespec: {
+            bool has_range = false;
+            visit_range(typespec_h, [&](AST::AstNode *node) {
+                has_range = true;
+                for (auto child : current_node->children) {
+                    child->children.push_back(node->clone());
+                }
+                delete node;
+            });
+            if (!has_range) // range is needed for simplify
+                for (auto child : current_node->children)
+                    child->children.push_back(make_ast_node(AST::AST_RANGE, {AST::AstNode::mkconst_int(0, true)}));
+            shared.report.mark_handled(typespec_h);
+            break;
+        }
         default: {
             const uhdm_handle *const handle = (const uhdm_handle *)typespec_h;
             const UHDM::BaseClass *const object = (const UHDM::BaseClass *)handle->object;
