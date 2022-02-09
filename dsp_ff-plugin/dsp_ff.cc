@@ -86,7 +86,7 @@ struct DspFF : public Pass {
 
         /// A dict of associated cell ports indexed by their function (like "clk, "rst")
         /// along with the default value to connect when unused.
-        dict<RTLIL::IdString, std::pair<RTLIL::IdString, RTLIL::State>> assoc;
+        dict<RTLIL::IdString, std::pair<RTLIL::IdString, RTLIL::Const>> assoc;
 
         struct {
             /// A dict of parameters to be set in the cell after integration
@@ -116,6 +116,7 @@ struct DspFF : public Pass {
 
     // ..........................................
 
+    /// Describes unique flip-flop configuration that is exclusive.
     struct FlopData {
         RTLIL::IdString type;
         dict<RTLIL::IdString, RTLIL::SigBit> conns;
@@ -148,7 +149,28 @@ struct DspFF : public Pass {
 
     // ..........................................
 
+    /// Loads FF and DSP integration rules from a file
     void load_rules(const std::string& a_FileName) {
+
+        // Parses a string and returns a vector of fields delimited by the
+        // given character.
+        auto getFields = [](const std::string& a_String,
+                             const char a_Delim = ' ',
+                             bool a_KeepEmpty = false)
+        {
+            std::vector<std::string> fields;
+            std::stringstream ss(a_String);
+
+            while (ss.good()) {
+                std::string field;
+                std::getline(ss, field, a_Delim);
+                if (!field.empty() || a_KeepEmpty) {
+                    fields.push_back(field);
+                }
+            }
+
+            return fields;
+        };
 
         // Parses a vector of strings like "<name>=<value>" starting from the
         // second one on the list
@@ -202,7 +224,7 @@ struct DspFF : public Pass {
             }
 
             // Split the line
-            const auto fields = get_fields(line);
+            const auto fields = getFields(line);
             log_assert(fields.size() >= 1);
 
             // DSP section
@@ -285,53 +307,71 @@ struct DspFF : public Pass {
 
             // Signals
             else if (fields[0] == "clk") {
-                if (fields.size() != 2) {
-                    log_error(" syntax error: '%s'\n", line.c_str());
-                }
                 if (tok.size() == 0 || (tok.back() != "port" && tok.back() != "ff")) {
                     log_error(" unexpected keyword '%s'\n", fields[0].c_str());
                 }
 
                 // Associated clock
                 if (tok.back() == "port") {
+                    if (fields.size() != 3) {
+                        log_error(" syntax error: '%s'\n", line.c_str());
+                    }
                     auto& ports = dspTypes.back().ports;
-                    ports.back().assoc[RTLIL::escape_id("clk")] = std::make_pair(RTLIL::escape_id(fields[1]), RTLIL::S0);
+                    ports.back().assoc[RTLIL::escape_id("clk")] = std::make_pair(
+                        RTLIL::escape_id(fields[1]),
+                        RTLIL::Const::from_string(fields[2])
+                    );
                 }
                 else if (tok.back() == "ff") {
+                    if (fields.size() != 2) {
+                        log_error(" syntax error: '%s'\n", line.c_str());
+                    }
                     flopTypes.back().ports[RTLIL::escape_id("clk")] = RTLIL::escape_id(fields[1]);
                 }
             }
             else if (fields[0] == "rst") {
-                if (fields.size() != 2) {
-                    log_error(" syntax error: '%s'\n", line.c_str());
-                }
                 if (tok.size() == 0 || (tok.back() != "port" && tok.back() != "ff")) {
                     log_error(" unexpected keyword '%s'\n", fields[0].c_str());
                 }
 
                 // Associated reset
                 if (tok.back() == "port") {
+                    if (fields.size() != 3) {
+                        log_error(" syntax error: '%s'\n", line.c_str());
+                    }
                     auto& ports = dspTypes.back().ports;
-                    ports.back().assoc[RTLIL::escape_id("rst")] = std::make_pair(RTLIL::escape_id(fields[1]), RTLIL::S0);
+                    ports.back().assoc[RTLIL::escape_id("rst")] = std::make_pair(
+                        RTLIL::escape_id(fields[1]),
+                        RTLIL::Const::from_string(fields[2])
+                    );
                 }
                 else if (tok.back() == "ff") {
+                    if (fields.size() != 2) {
+                        log_error(" syntax error: '%s'\n", line.c_str());
+                    }
                     flopTypes.back().ports[RTLIL::escape_id("rst")] = RTLIL::escape_id(fields[1]);
                 }
             }
             else if (fields[0] == "ena") {
-                if (fields.size() != 2) {
-                    log_error(" syntax error: '%s'\n", line.c_str());
-                }
                 if (tok.size() == 0 || (tok.back() != "port" && tok.back() != "ff")) {
                     log_error(" unexpected keyword '%s'\n", fields[0].c_str());
                 }
 
                 // Associated enable
                 if (tok.back() == "port") {
+                    if (fields.size() != 3) {
+                        log_error(" syntax error: '%s'\n", line.c_str());
+                    }
                     auto& ports = dspTypes.back().ports;
-                    ports.back().assoc[RTLIL::escape_id("ena")] = std::make_pair(RTLIL::escape_id(fields[1]), RTLIL::S0);
+                    ports.back().assoc[RTLIL::escape_id("ena")] = std::make_pair(
+                        RTLIL::escape_id(fields[1]),
+                        RTLIL::Const::from_string(fields[2])
+                    );
                 }
                 else if (tok.back() == "ff") {
+                    if (fields.size() != 2) {
+                        log_error(" syntax error: '%s'\n", line.c_str());
+                    }
                     flopTypes.back().ports[RTLIL::escape_id("ena")] = RTLIL::escape_id(fields[1]);
                 }
             }
@@ -441,25 +481,6 @@ struct DspFF : public Pass {
             m_FlopTypes.insert(std::make_pair(it.name, it));
         }
     } 
-
-    // TODO: make lambda
-    std::vector<std::string> get_fields(const std::string& a_String,
-                                        const char a_Delim = ' ',
-                                        bool a_KeepEmpty = false)
-    {
-        std::vector<std::string> fields;
-        std::stringstream ss(a_String);
-
-        while (ss.good()) {
-            std::string field;
-            std::getline(ss, field, a_Delim);
-            if (!field.empty() || a_KeepEmpty) {
-                fields.push_back(field);
-            }
-        }
-
-        return fields;
-    }
 
     void dump_rules() {
 
@@ -965,7 +986,7 @@ struct DspFF : public Pass {
             const auto& key  = it.first;
             const auto& port = it.second.first;
  
-            auto conn = RTLIL::SigBit(it.second.second);
+            auto conn = RTLIL::SigBit(RTLIL::SigChunk(it.second.second));
             if (flopData.conns.count(key)) {
                 conn = flopData.conns.at(key);
             }
