@@ -597,6 +597,7 @@ struct DspFF : public Pass {
         }
 
         // Load rules
+        rewrite_filename(rulesFile);
         load_rules(rulesFile);
         if (log_force_debug) {
             dump_rules();

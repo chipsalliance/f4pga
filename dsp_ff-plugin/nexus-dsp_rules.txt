@@ -1,0 +1,49 @@
+dsp MULT36X36 # 36x36 mode
+  port A
+    clk CLK 0
+    rst RSTA 0
+    ena CEA 1
+
+    set REGINPUTA=REGISTER
+    map GSR=GSR
+  endport
+  port B
+    clk CLK 0
+    rst RSTB 0
+    ena CEB 1
+
+    set REGINPUTB=REGISTER
+    map GSR=GSR
+  endport
+  port Z
+    clk CLK 0
+    rst RSTOUT 0
+    ena CEOUT 1
+
+    set REGOUTPUT=REGISTER
+    map GSR=GSR
+  endport
+enddsp
+
+ff FD1P3DX
+  clk CK
+  rst CD
+  ena SP
+  d   D
+  q   Q
+
+  match GSR
+  set RESETMODE=SYNC
+endff
+
+ff FD1P3IX
+  clk CK
+  rst CD
+  ena SP
+  d   D
+  q   Q
+
+  match GSR
+  set RESETMODE=ASYNC
+endff
+
