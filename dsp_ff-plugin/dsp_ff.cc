@@ -675,6 +675,12 @@ struct DspFF : public Pass {
         log_debug("  Checking connected flip-flop '%s' of type '%s'... ",
             a_Cell->name.c_str(), a_Cell->type.c_str());
 
+        // Must not have the "keep" attribute
+        if (a_Cell->has_keep_attr()) {
+            log_debug("\n   the 'keep' attribute is set");
+            isOk = false;
+        }
+
         // Check if required parameters are set as they should be
         for (const auto& it : flopType.params.required) {
             const auto curr = a_Cell->getParam(it.first);
@@ -866,36 +872,39 @@ struct DspFF : public Pass {
             // Get the sink, check if this is a flip-flop
             auto& other = *others.begin();
             auto* flop  = other.cell;
-            if (flop == nullptr || !m_FlopTypes.count(flop->type)) {
-                continue;
+
+            if (flop == nullptr) {
+                if (!other.port.empty()) {
+                    log_debug("  port connection reaches outside of the module, cannot integrate\n");
+                    return;
+                } else {
+                    continue;
+                }
             }
 
-            // Must not have the "keep" attribute
-            if (flop->has_keep_attr()) {
-                continue;
+            if (!m_FlopTypes.count(flop->type)) {
+                log_debug("  non-flip-flop connected, cannot integrate\n");
+                return;
             }
 
             // Check if the connection goes to the data input/output port
             const auto& flopType = m_FlopTypes.at(flop->type);
+            RTLIL::IdString flopPort;
             if (a_Cell->output(a_PortRule.name)) {
-                if (flopType.ports.at(RTLIL::escape_id("d")) != other.port) {
-                    continue;
-                }
+                flopPort = flopType.ports.at(RTLIL::escape_id("d"));
             }
             else if (a_Cell->input(a_PortRule.name)) {
-                if (flopType.ports.at(RTLIL::escape_id("q")) != other.port) {
-                    continue;
-                }
+                flopPort = flopType.ports.at(RTLIL::escape_id("q"));
             }
 
-            // Skip if the flip-flop is going to be removed
-            if (m_CellsToRemove.count(flop)) {
-                continue;
+            if (flopPort != other.port) {
+                log_debug("  connection to non-data port of a flip-flip, cannot integrate\n");
+                return;
             }
 
-            // Check the flip-flop
+            // Check the flip-flop configuration
             if (!checkFlop(flop)) {
-                continue;
+                return;
             }
 
             // Get parameters to be mapped to the DSP according to the port
@@ -1113,6 +1122,11 @@ struct DspFF : public Pass {
 
         // Look for connected sinks
         for (auto cell : module->cells()) {
+
+            if (m_CellsToRemove.count(cell)) {
+                continue;
+            }
+
             for (auto conn : cell->connections()) {
                 auto port = conn.first;
                 auto sigspec = conn.second;
@@ -1205,6 +1219,11 @@ struct DspFF : public Pass {
 
         // Look for the driver among cells
         for (auto cell : module->cells()) {
+
+            if (m_CellsToRemove.count(cell)) {
+                continue;
+            }
+
             for (auto conn : cell->connections()) {
                 auto port = conn.first;
                 auto sigspec = conn.second;
