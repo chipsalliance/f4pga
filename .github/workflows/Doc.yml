@@ -34,15 +34,15 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: Documentation-HTML
-          path: build/sphinx/html
+          path: _build/html
 
       - name: 🚀 Publish site to GitHub Pages
         if: github.event_name != 'pull_request'
         run: |
-          cd build/sphinx/html
+          cd _build/html
           touch .nojekyll
           git init
-          cp ../../../.git/config ./.git/config
+          cp ../../.git/config ./.git/config
           git add .
           git config --local user.email "BuildTheDocs@GitHubActions"
           git config --local user.name "GitHub Actions"

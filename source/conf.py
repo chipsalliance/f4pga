@@ -32,7 +32,9 @@ master_doc = 'index'
 
 today_fmt = '%Y-%m-%d'
 
-exclude_patterns = []
+exclude_patterns = [
+    'env'
+]
 
 pygments_style = 'default'
 
