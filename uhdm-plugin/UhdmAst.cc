@@ -3119,6 +3119,21 @@ void UhdmAst::process_logic_var()
 void UhdmAst::process_sys_func_call()
 {
     current_node = make_ast_node(AST::AST_FCALL);
+
+    // skip unsupported simulation functions
+    std::string to_skip[] = {
+      "\\$value$plusargs", "\\$test$plusargs", "\\$displayb", "\\$displayh",  "\\$displayo",  "\\$strobeb",  "\\$strobeh",       "\\$strobeo",
+      "\\$writeb",         "\\$writeh",        "\\$writeo",   "\\$dumplimit", "\\$dumpflush", "\\$fdisplay", "\\$fdisplayb",     "\\$fdisplayh",
+      "\\$fdisplayo",      "\\$fmonitor",      "\\$fstrobe",  "\\$fstrobeb",  "\\$fstrobeh",  "\\$fstrobeo", "\\$fwrite",        "\\$fwriteb",
+      "\\$fwriteh",        "\\$fwriteo",       "\\$ungetc",   "\\$fgetc",     "\\$fgets",     "\\$ftell",    "\\$printtimescale"};
+
+    if (std::find(std::begin(to_skip), std::end(to_skip), current_node->str) != std::end(to_skip)) {
+        log_warning("System function %s was skipped\n", current_node->str.substr(1).c_str());
+        delete current_node;
+        current_node = nullptr;
+        return;
+    }
+
     if (current_node->str == "\\$signed") {
         current_node->type = AST::AST_TO_SIGNED;
     } else if (current_node->str == "\\$unsigned") {
@@ -3135,12 +3150,6 @@ void UhdmAst::process_sys_func_call()
             current_node->children.push_back(node);
         }
     });
-
-    // skip $value$plusargs function, as it is simulation function
-    if (current_node->str == "\\$value$plusargs") {
-        delete current_node;
-        current_node = nullptr;
-    }
 }
 
 void UhdmAst::process_func_call()
