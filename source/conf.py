@@ -55,10 +55,10 @@ source_suffix = ['.rst', '.md']
 master_doc = 'index'
 
 # General information about the project.
-project = u'SymbiFlow'
-basic_filename = u'symbiflow-docs'
-authors = u'SymbiFlow'
-copyright = authors + u', 2019'
+project = 'SymbiFlow'
+basic_filename = 'symbiflow-docs'
+authors = 'F4PGA Authors'
+copyright = authors + ', 2019-2022'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
