@@ -37,16 +37,16 @@ project for several activities, the central of which pertains to the
 creation of so-called FPGA "architecture definitions",
 i.e. documentation of how specific FPGAs work internally.
 More information can be found in the :doc:`Symbiflow Architecture Definitions
-<../symbiflow-arch-defs/docs/source/index>` project.
+<arch-defs:index>` project.
 
 Those definitions and serve as input to backend tools like
 `nextpnr <https://github.com/YosysHQ/nextpnr>`_ and
 `Verilog to Routing <https://verilogtorouting.org/>`_, and frontend tools
 like `Yosys <http://www.clifford.at/yosys/>`_. They are created within separate
 collaborating projects targeting different FPGAs - :doc:`Project X-Ray
-<../prjxray/docs/index>` for Xilinx 7-Series, `Project IceStorm
+<prjxray:index>` for Xilinx 7-Series, `Project IceStorm
 <http://www.clifford.at/icestorm/>`_ for Lattice iCE40 and :doc:`Project Trellis
-<../prjtrellis/docs/index>` for Lattice ECP5 FPGAs.
+<prjtrellis:index>` for Lattice ECP5 FPGAs.
 
 .. figure:: images/parts.svg
 

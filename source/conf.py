@@ -26,6 +26,7 @@ sys.path.append(os.path.abspath('./vtr-verilog-to-routing/doc/_exts'))
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
+    'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
     'sphinx.ext.autodoc',
     'sphinx.ext.imgmath',  # breathe
@@ -350,3 +351,14 @@ def prjxray_fuzzers_and_minitests_links():
     subprocess.call(cmd, shell=True)
 
 prjxray_fuzzers_and_minitests_links()
+
+# -- Sphinx.Ext.InterSphinx --------------------------------------------------------------------------------------------
+
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3/", None),
+    "arch-defs": ("https://symbiflow.readthedocs.io/projects/arch-defs/en/latest/", None),
+    "fasm": ("https://fasm.readthedocs.io/en/latest/", None),
+    "prjtrellis": ("https://prjtrellis.readthedocs.io/en/latest/", None),
+    "prjxray": ("https://symbiflow.readthedocs.io/projects/prjxray/en/latest/", None),
+    "vtr": ("https://docs.verilogtorouting.org/en/latest/", None),
+}
