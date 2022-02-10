@@ -3123,7 +3123,7 @@ void UhdmAst::process_sys_func_call()
         current_node->type = AST::AST_TO_SIGNED;
     } else if (current_node->str == "\\$unsigned") {
         current_node->type = AST::AST_TO_UNSIGNED;
-    } else if (current_node->str == "\\$display" || current_node->str == "\\$time") {
+    } else if (current_node->str == "\\$display" || current_node->str == "\\$time" || current_node->str == "\\$monitor") {
         current_node->type = AST::AST_TCALL;
         current_node->str = current_node->str.substr(1);
     } else if (current_node->str == "\\$readmemh") {
