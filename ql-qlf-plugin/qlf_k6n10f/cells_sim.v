@@ -664,22 +664,61 @@ module TDP_BRAM36 (
 
 endmodule
 
-(* blackbox *)
-module QL_DSP1 (
-    input  [19:0] a,
-    input  [17:0] b,
-    input  clk0,
-    (* clkbuf_sink *)
-    input  clk1,
-    (* clkbuf_sink *)
-    input  [ 1:0] feedback0,
-    input  [ 1:0] feedback1,
-    input  load_acc0,
-    input  load_acc1,
-    input  reset0,
-    input  reset1,
-    output reg [37:0] z
-);
-    parameter MODE_BITS = 27'b00000000000000000000000000;
-endmodule  /* QL_DSP1 */
+//(* blackbox *)
+//module QL_DSP1 (
+//    input  [19:0] a,
+//    input  [17:0] b,
+//    input  clk0,
+//    (* clkbuf_sink *)
+//    input  clk1,
+//    (* clkbuf_sink *)
+//    input  [ 1:0] feedback0,
+//    input  [ 1:0] feedback1,
+//    input  load_acc0,
+//    input  load_acc1,
+//    input  reset0,
+//    input  reset1,
+//    output reg [37:0] z
+//);
+//    parameter MODE_BITS = 27'b00000000000000000000000000;
+//endmodule  /* QL_DSP1 */
 
+(* blackbox *) // TODO: add sim model
+module dsp_t1_20x18x64 (
+    input  [63:0] a_i,
+    input  [17:0] b_i,
+    output [63:0] z_o,
+
+    input         clock_i,
+    input         reset_i,
+    input         load_acc_i,
+
+    input         register_inputs_i,
+    input         subtraction_mode_i,
+    input  [1:0]  feedback_i,
+    input         round_i,
+    input  [5:0]  shift_right_i,
+    input         saturate_enable_i,
+    input  [1:0]  output_select_i
+);
+endmodule
+
+(* blackbox *) // TODO: add sim model
+module dsp_t1_10x9x32 (
+    input  [31:0] a_i,
+    input  [ 8:0] b_i,
+    output [31:0] z_o,
+
+    input         clock_i,
+    input         reset_i,
+    input         load_acc_i,
+
+    input         register_inputs_i,
+    input         subtraction_mode_i,
+    input  [1:0]  feedback_i,
+    input         round_i,
+    input  [5:0]  shift_right_i,
+    input         saturate_enable_i,
+    input  [1:0]  output_select_i
+);
+endmodule

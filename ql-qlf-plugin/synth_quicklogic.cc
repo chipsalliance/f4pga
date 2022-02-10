@@ -233,21 +233,61 @@ struct SynthQuickLogicPass : public ScriptPass {
             run("opt_clean");
             run("share");
 
-            if (help_mode || (!nodsp && family == "qlf_k6n10")) {
-                run("memory_dff");
-                run("wreduce t:$mul");
-                run("techmap -map +/mul2dsp.v -map +/quicklogic/" + family +
-                      "/dsp_map.v -D DSP_A_MAXWIDTH=16 -D DSP_B_MAXWIDTH=16 "
-                      "-D DSP_A_MINWIDTH=2 -D DSP_B_MINWIDTH=2 -D DSP_Y_MINWIDTH=11 "
-                      "-D DSP_NAME=$__MUL16X16",
-                    "(if -no_dsp)");
-                run("select a:mul2dsp", "              (if -no_dsp)");
-                run("setattr -unset mul2dsp", "        (if -no_dsp)");
-                run("opt_expr -fine", "                (if -no_dsp)");
-                run("wreduce", "                       (if -no_dsp)");
-                run("select -clear", "                 (if -no_dsp)");
-                run("ql_dsp", "                        (if -no_dsp)");
-                run("chtype -set $mul t:$__soft_mul", "(if -no_dsp)");
+            if (family == "qlf_k6n10") {
+                if (help_mode || !nodsp) {
+                    run("memory_dff");
+                    run("wreduce t:$mul");
+                    run("techmap -map +/mul2dsp.v -map +/quicklogic/" + family +
+                          "/dsp_map.v -D DSP_A_MAXWIDTH=16 -D DSP_B_MAXWIDTH=16 "
+                          "-D DSP_A_MINWIDTH=2 -D DSP_B_MINWIDTH=2 -D DSP_Y_MINWIDTH=11 "
+                          "-D DSP_NAME=$__MUL16X16",
+                        "(for qlf_k6n10 if not -no_dsp)");
+                    run("select a:mul2dsp", "              (for qlf_k6n10 if not -no_dsp)");
+                    run("setattr -unset mul2dsp", "        (for qlf_k6n10 if not -no_dsp)");
+                    run("opt_expr -fine", "                (for qlf_k6n10 if not -no_dsp)");
+                    run("wreduce", "                       (for qlf_k6n10 if not -no_dsp)");
+                    run("select -clear", "                 (for qlf_k6n10 if not -no_dsp)");
+                    run("ql_dsp", "                        (for qlf_k6n10 if not -no_dsp)");
+                    run("chtype -set $mul t:$__soft_mul", "(for qlf_k6n10 if not -no_dsp)");
+                }
+            }
+            else if (family == "qlf_k6n10f") {
+
+                struct DspParams {
+                    size_t a_maxwidth;
+                    size_t b_maxwidth;
+                    size_t a_minwidth;
+                    size_t b_minwidth;
+                    std::string type;
+                };
+
+                const std::vector<DspParams> dsp_rules = {
+                    {20, 18,  4,  4, "$__QL_MUL20X18"},
+                    {10,  9,  4,  4, "$__QL_MUL10X9"},
+                };
+
+                if (help_mode) {
+                    run("wreduce t:$mul", "                (for qlf_k6n10f if not -no_dsp)");
+                    run("techmap -map +/mul2dsp.v [...]", "(for qlf_k6n10f if not -no_dsp)");
+                    run("chtype -set $mul t:$__soft_mul", "(for qlf_k6n10f if not -no_dsp)");
+                    run("techmap -map +/quicklogic/" + family + "/dsp_map.v", "(for qlf_k6n10f if not -no_dsp)");
+                }
+                else if (!nodsp) {
+
+                    run("wreduce t:$mul");
+                    for (const auto &rule : dsp_rules) {
+                        run(stringf("techmap -map +/mul2dsp.v "
+                                    "-D DSP_A_MAXWIDTH=%zu -D DSP_B_MAXWIDTH=%zu "
+                                    "-D DSP_A_MINWIDTH=%zu -D DSP_B_MINWIDTH=%zu "
+                                    "-D DSP_NAME=%s",
+                            rule.a_maxwidth, rule.b_maxwidth,
+                            rule.a_minwidth, rule.b_minwidth,
+                            rule.type.c_str())
+                        );
+                        run("chtype -set $mul t:$__soft_mul");
+                    }
+                    run("techmap -map +/quicklogic/" + family + "/dsp_map.v");
+                }
             }
 
             run("techmap -map +/cmp2lut.v -D LUT_WIDTH=4");
