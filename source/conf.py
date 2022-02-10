@@ -4,6 +4,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
 import sys, os
+from pathlib import Path
 
 #sys.path.insert(0, os.path.abspath('.'))
 
@@ -59,6 +60,11 @@ html_theme_options = {
     'color_primary': 'indigo',
     'color_accent': 'blue',
 }
+
+html_static_path = ['_static']
+
+html_logo = str(Path(html_static_path[0]) / 'logo.svg')
+html_favicon = str(Path(html_static_path[0]) / 'favicon.svg')
 
 # -- Options for LaTeX output --------------------------------------------------
 
