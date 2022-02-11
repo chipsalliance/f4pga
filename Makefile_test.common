@@ -23,17 +23,17 @@ ifeq (,$(wildcard $(YOSYS_CONFIG)))
 $(error "Didn't find 'yosys-config' under '$(YOSYS_PATH)'")
 endif
 
-GTEST_DIR ?= ../../third_party/googletest
+GTEST_DIR ?= $(abspath ../../third_party/googletest)
 CXX ?= $(shell $(YOSYS_CONFIG) --cxx)
 CXXFLAGS ?= $(shell $(YOSYS_CONFIG) --cxxflags) -I.. -I$(GTEST_DIR)/googletest/include
 LDLIBS ?= $(shell $(YOSYS_CONFIG) --ldlibs) -L$(GTEST_DIR)/build/lib -lgtest -lgtest_main -lpthread
 LDFLAGS ?= $(shell $(YOSYS_CONFIG) --ldflags)
-TEST_UTILS ?= ../../../test-utils/test-utils.tcl
+TEST_UTILS ?= $(abspath ../../test-utils/test-utils.tcl)
 
 define test_tpl =
 $(1): $(1)/ok
 	@set +e; \
-	$$($(1)_verify); \
+	$$($$(subst /,-,$(1)_verify)); \
 	if [ $$$$? -eq 0 ]; then \
 		printf "Test %-18s \e[32mPASSED\e[0m @ %s\n" $(1) $(CURDIR); \
 		touch $$<; \
@@ -43,15 +43,15 @@ $(1): $(1)/ok
 		false; \
 	fi
 
-$(1)/ok: $(1)/$(1).v
+$(1)/ok: $(1)/$$(notdir $(1).v)
 	@set +e; \
 	cd $(1); \
-	echo "source $(TEST_UTILS)" > run-$(1).tcl ;\
-	echo "source $(1).tcl" >> run-$(1).tcl ;\
-	DESIGN_TOP=$(1) TEST_OUTPUT_PREFIX=./ \
-	yosys -c "run-$(1).tcl" -q -q -l $(1).log; \
+	echo "source $(TEST_UTILS)" > run-$$(notdir $(1)).tcl ;\
+	echo "source $$(notdir $(1)).tcl" >> run-$$(notdir $(1)).tcl ;\
+	DESIGN_TOP=$$(notdir $(1)) TEST_OUTPUT_PREFIX=./ \
+	yosys -c "run-$$(notdir $(1)).tcl" -q -q -l $$(notdir $(1)).log; \
 	RETVAL=$$$$?; \
-	rm -f run-$(1).tcl; \
+	rm -f run-$$(notdir $(1)).tcl; \
 	if [ ! -z "$$($(1)_negative)" ] && [ $$($(1)_negative) -eq 1 ]; then \
 		if [ $$$$RETVAL -ne 0 ]; then \
 			printf "Negative test %-18s \e[32mPASSED\e[0m @ %s\n" $(1) $(CURDIR); \
