@@ -398,6 +398,20 @@ struct DspFF : public Pass {
                 flopTypes.back().ports[RTLIL::escape_id("q")] = RTLIL::escape_id(fields[1]);
             }
 
+            // Parameters that must be set to certain values
+            else if (fields[0] == "require") {
+                if (fields.size() < 2) {
+                    log_error(" syntax error: '%s'\n", line.c_str());
+                }
+                if (tok.size() == 0 || tok.back() != "ff") {
+                    log_error(" unexpected keyword '%s'\n", fields[0].c_str());
+                }
+
+                const auto vec = parseNameValue(fields);
+                for (const auto &it : vec) {
+                    flopTypes.back().params.required.insert(std::make_pair(RTLIL::escape_id(it.first), RTLIL::Const(it.second)));
+                }
+            }
             // Parameters that has to match for a flip-flop
             else if (fields[0] == "match") {
                 if (fields.size() < 2) {
@@ -545,7 +559,13 @@ struct DspFF : public Pass {
                 log("  %.3s: %s\n", it.first.c_str(), !it.second.empty() ? it.second.c_str() : "<none>");
             }
 
-            if (!ff.params.set.empty()) {
+            if (!ff.params.required.empty()) {
+                log("  required params:\n");
+                for (const auto &it : ff.params.required) {
+                    log("   %s=%s\n", it.first.c_str(), it.second.decode_string().c_str());
+                }
+            }
+            if (!ff.params.matching.empty()) {
                 log("  params that must match:\n");
                 for (const auto &it : ff.params.matching) {
                     log("   %s\n", it.c_str());
@@ -593,6 +613,69 @@ struct DspFF : public Pass {
         log("\n");
         log("Integrates flip-flops with DSP blocks and enables their internal registers.\n");
         log("\n");
+        log("The pass loads a set of rules from the file given with the '-rules' parameter.\n");
+        log("The rules define what ports of a DSP module have internal registers and what\n");
+        log("has to be done to enable them. They also define compatible flip-flop cell\n");
+        log("types.\n");
+        log("\n");
+        log("The format of the rules file is the following:\n");
+        log("\n");
+        log("  # This is a comment\n");
+        log("\n");
+        log("  dsp <dsp_type> [<dsp_type> ...]\n");
+        log("    port <dsp_port>\n");
+        log("      clk <associated clk> <default>\n");
+        log("     [rst <associated reset>] <default>\n");
+        log("     [ena <associated enable>] <default>\n");
+        log("\n");
+        log("     [set <param>=<value> [<param>=<value> ...]]\n");
+        log("     [map <dsp_param>=<ff_param> [<dsp_param>=<ff_param> ...]]\n");
+        log("     [con <port>=<const> [<port>=<const> ...]]\n");
+        log("    endport\n");
+        log("  enddsp\n");
+        log("\n");
+        log("  ff <ff_type>\n");
+        log("    clk <clock input>\n");
+        log("   [rst <reset input>]\n");
+        log("   [ena <enable input>]\n");
+        log("    d   <data input>\n");
+        log("    q   <data output>\n");
+        log("\n");
+        log("    require <param>=<value> [<param>=<value> ...]\n");
+        log("    match   <param> [<param> ...]\n");
+        log("\n");
+        log("    set <param>=<value> [<param>=<value> ...]\n");
+        log("    map <dsp_param>=<ff_param> [<dsp_param>=<ff_param> ...]\n");
+        log("  endff\n");
+        log("\n");
+        log("Each 'dsp' section defines a DSP cell type (can apply to multiple types).\n");
+        log("Within it each 'port' section defining a data port with internal register.\n");
+        log("The port can be specified as a whole (eg. 'DATA') or as a subset of the whole\n");
+        log("(eg. 'DATA[7:0]').\n");
+        log("\n");
+        log("Statemenst 'clk', 'rst' and 'ena' define names of clock, reset and enable\n");
+        log("ports associated with the data port along with default constant values to\n");
+        log("connect them to when a given port has no counterpart in the flip-flop bein\n");
+        log("integrated.\n");
+        log("\n");
+        log("The 'set' statement tells how to set control parameter(s) of the DSP that\n");
+        log("enable the input register on the port. The 'map' statement defines how to\n");
+        log("map parameter(s) of the flip-flip being integrated to the DSP. Finally the\n");
+        log("'con' statement informs how to connected control port(s) of the DSP to enable\n");
+        log("the register.\n");
+        log("\n");
+        log("Each 'ff' section defines a flip-flop type that can be integrated into a DSP\n");
+        log("cell. Inside this section 'clk', 'rst', 'ena', 'd' and 'q' define names of\n");
+        log("clock, reset, enable, data in and data out ports of the flip-flop respectively.\n");
+        log("\n");
+        log("The 'require' statement defines parameter(s) that must have specific value\n");
+        log("for a flip-flop to be considered for integration. The 'match' statement\n");
+        log("lists names of flip-flop parameters that must match on all flip-flops connected\n");
+        log("to a single DSP data port.\n");
+        log("\n");
+        log("The 'set' and 'map' statements serve the same function as in the DSP port\n");
+        log("section but here they may differ depending on the flip-flop type being\n");
+        log("integrated.\n");
     }
 
     void execute(std::vector<std::string> a_Args, RTLIL::Design *a_Design) override
