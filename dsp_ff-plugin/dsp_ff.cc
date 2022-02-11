@@ -84,6 +84,9 @@ struct DspFF : public Pass {
     struct DspPortType {
         RTLIL::IdString name;
 
+        /// Range of port pins that have FFs (low to high, inclusive)
+        std::pair<int, int> bits;
+
         /// A dict of associated cell ports indexed by their function (like "clk, "rst")
         /// along with the default value to connect when unused.
         dict<RTLIL::IdString, std::pair<RTLIL::IdString, RTLIL::Const>> assoc;
@@ -192,6 +195,33 @@ struct DspFF : public Pass {
             return vec;
         };
 
+        // Parses port name as "<name>[<hi>:<lo>]" or just "<name>"
+        auto parsePortName = [&](const std::string& str) {
+            const std::regex expr ("^(.*)\\[([0-9]+):([0-9]+)\\]");
+            std::smatch      match;
+
+            std::tuple<std::string, int, int> data;
+            auto res = std::regex_match(str, match, expr);
+            if (res) {
+                data = std::make_tuple(
+                    std::string(match[1]),
+                    std::stoi(match[2]),
+                    std::stoi(match[3])
+                );
+    
+                if ((std::get<2>(data) > std::get<1>(data)) ||
+                    std::get<2>(data) < 0 || std::get<1>(data) < 0)
+                {
+                    log_error(" invalid port spec: '%s'\n", str.c_str());
+                }
+            }
+            else {
+                data = std::make_tuple(str, -1, -1);
+            }
+
+            return data;
+        };
+
         std::ifstream file (a_FileName);
         std::string line;
 
@@ -203,8 +233,10 @@ struct DspFF : public Pass {
         std::vector<DspType>    dspTypes;
         std::vector<FlopType>   flopTypes;
 
+        std::vector<RTLIL::IdString> dspAliases;
+
         std::vector<std::string> tok;
- 
+
         // Parse the file
         while (1) {
 
@@ -229,7 +261,7 @@ struct DspFF : public Pass {
 
             // DSP section
             if (fields[0] == "dsp") {
-                if (fields.size() != 2) {
+                if (fields.size() < 2) {
                     log_error(" syntax error: '%s'\n", line.c_str());
                 }
                 if (!tok.empty()) {
@@ -239,6 +271,11 @@ struct DspFF : public Pass {
 
                 dspTypes.resize(dspTypes.size() + 1);\
                 dspTypes.back().name = RTLIL::escape_id(fields[1]);
+
+                dspAliases.clear();
+                for (size_t i=2; i<fields.size(); ++i) {
+                    dspAliases.push_back(RTLIL::escape_id(fields[i]));
+                }
             }
             else if (fields[0] == "enddsp") {
                 if (fields.size() != 1) {
@@ -247,7 +284,13 @@ struct DspFF : public Pass {
                 if (tok.size() != 1 || tok.back() != "dsp") {
                     log_error(" unexpected keyword '%s'\n", fields[0].c_str());
                 }
-                tok.pop_back(); 
+                tok.pop_back();
+
+                const auto dspType = dspTypes.back();
+                for (const auto& alias : dspAliases) {
+                    dspTypes.push_back(dspType);
+                    dspTypes.back().name = alias;
+                }
             }
 
             // DSP port section
@@ -260,12 +303,18 @@ struct DspFF : public Pass {
                 }
                 tok.push_back(fields[0]);
 
+                auto spec = parsePortName(fields[1]);
+
                 auto& ports = dspTypes.back().ports;
                 ports.resize(ports.size() + 1);
-                ports.back().name = RTLIL::escape_id(fields[1]);
-                ports.back().assoc.insert(std::make_pair(RTLIL::escape_id("clk"), std::make_pair(RTLIL::IdString(), RTLIL::Sx)));
-                ports.back().assoc.insert(std::make_pair(RTLIL::escape_id("rst"), std::make_pair(RTLIL::IdString(), RTLIL::Sx)));
-                ports.back().assoc.insert(std::make_pair(RTLIL::escape_id("ena"), std::make_pair(RTLIL::IdString(), RTLIL::Sx)));
+                ports.back().name = RTLIL::escape_id(std::get<0>(spec));
+                ports.back().bits = std::make_pair(std::get<2>(spec), std::get<1>(spec));
+                ports.back().assoc.insert(std::make_pair(RTLIL::escape_id("clk"),
+                    std::make_pair(RTLIL::IdString(), RTLIL::Sx)));
+                ports.back().assoc.insert(std::make_pair(RTLIL::escape_id("rst"),
+                    std::make_pair(RTLIL::IdString(), RTLIL::Sx)));
+                ports.back().assoc.insert(std::make_pair(RTLIL::escape_id("ena"),
+                    std::make_pair(RTLIL::IdString(), RTLIL::Sx)));
             }
             else if (fields[0] == "endport") {
                 if (fields.size() != 1) {
@@ -289,11 +338,16 @@ struct DspFF : public Pass {
 
                 flopTypes.resize(flopTypes.size() + 1);
                 flopTypes.back().name = RTLIL::escape_id(fields[1]);
-                flopTypes.back().ports.insert(std::make_pair(RTLIL::escape_id("clk"), RTLIL::IdString()));
-                flopTypes.back().ports.insert(std::make_pair(RTLIL::escape_id("rst"), RTLIL::IdString()));
-                flopTypes.back().ports.insert(std::make_pair(RTLIL::escape_id("ena"), RTLIL::IdString()));
-                flopTypes.back().ports.insert(std::make_pair(RTLIL::escape_id("d"),   RTLIL::IdString()));
-                flopTypes.back().ports.insert(std::make_pair(RTLIL::escape_id("q"),   RTLIL::IdString()));
+                flopTypes.back().ports.insert(std::make_pair(
+                    RTLIL::escape_id("clk"), RTLIL::IdString()));
+                flopTypes.back().ports.insert(std::make_pair(
+                    RTLIL::escape_id("rst"), RTLIL::IdString()));
+                flopTypes.back().ports.insert(std::make_pair(
+                    RTLIL::escape_id("ena"), RTLIL::IdString()));
+                flopTypes.back().ports.insert(std::make_pair(
+                    RTLIL::escape_id("d"),   RTLIL::IdString()));
+                flopTypes.back().ports.insert(std::make_pair(
+                    RTLIL::escape_id("q"),   RTLIL::IdString()));
             }
             else if (fields[0] == "endff") {
                 if (fields.size() != 1) {
@@ -397,6 +451,19 @@ struct DspFF : public Pass {
                 flopTypes.back().ports[RTLIL::escape_id("q")] = RTLIL::escape_id(fields[1]);
             }
 
+            // Parameters that has to match for a flip-flop
+            else if (fields[0] == "match") {
+                if (fields.size() < 2) {
+                    log_error(" syntax error: '%s'\n", line.c_str());
+                }
+                if (tok.size() == 0 || tok.back() != "ff") {
+                    log_error(" unexpected keyword '%s'\n", fields[0].c_str());
+                }
+
+                for (size_t i=1; i<fields.size(); ++i) {
+                    flopTypes.back().params.matching.push_back(RTLIL::escape_id(fields[i]));
+                }
+            }
             // Parameters to set
             else if (fields[0] == "set") {
                 if (fields.size() < 2) {
@@ -469,15 +536,21 @@ struct DspFF : public Pass {
             }
 
             else {
-                log(" unexpected keyword '%s'\n", fields[0].c_str());
+                log_error(" unexpected keyword '%s'\n", fields[0].c_str());
             }
         }
 
         // Convert lists to maps
         for (const auto& it : dspTypes) {
+            if (m_DspTypes.count(it.name)) {
+                log_error(" duplicated rule for DSP '%s'\n", it.name.c_str());
+            }
             m_DspTypes.insert(std::make_pair(it.name, it));
         }
         for (const auto& it : flopTypes) {
+            if (m_FlopTypes.count(it.name)) {
+                log_error(" duplicated rule for flip-flop '%s'\n", it.name.c_str());
+            }
             m_FlopTypes.insert(std::make_pair(it.name, it));
         }
     } 
@@ -492,7 +565,14 @@ struct DspFF : public Pass {
 
             log(" ports:\n");
             for (const auto& port : dsp.ports) {
-                log("  %s.%s\n", dsp.name.c_str(), port.name.c_str());
+
+                std::string range;
+                if (port.bits.first != -1 && port.bits.second != -1) {
+                    range = stringf("[%d:%d]", port.bits.second, port.bits.first);
+                }
+
+                log("  %s.%s%s\n", dsp.name.c_str(), port.name.c_str(), range.c_str());
+
                 for (const auto& it : port.assoc) {
                     log("   %.3s: %s\n", it.first.c_str(), !it.second.first.empty() ? it.second.first.c_str() : "<none>");
                 }
@@ -528,6 +608,12 @@ struct DspFF : public Pass {
                 log("  %.3s: %s\n", it.first.c_str(), !it.second.empty() ? it.second.c_str() : "<none>");
             }
 
+            if (!ff.params.set.empty()) {
+                log("  params that must match:\n");
+                for (const auto& it : ff.params.matching) {
+                    log("   %s\n", it.c_str());
+                }
+            }
             if (!ff.params.set.empty()) {
                 log("  set params:\n");
                 for (const auto& it : ff.params.set) {
@@ -656,7 +742,7 @@ struct DspFF : public Pass {
     bool checkDspPort (RTLIL::Cell* a_Cell, const DspPortType& a_PortRule) {
         bool isOk = true;
 
-        // The cell parameters must not be set
+        // The cell register control parameters must not be set
         for (const auto& it : a_PortRule.params.set) {
             const auto curr = a_Cell->getParam(it.first);
             if (curr == it.second) {
@@ -790,6 +876,7 @@ struct DspFF : public Pass {
         return isOk;
     }
 
+    /// Returns a string with either wire name or constant value for a SigBit
     static std::string sigBitName (const RTLIL::SigBit& a_SigBit) {
         if (a_SigBit.is_wire()) {
             RTLIL::Wire* w = a_SigBit.wire;
@@ -816,6 +903,7 @@ struct DspFF : public Pass {
             a_Cell->type.c_str(), a_PortRule.name.c_str(), a_Cell->name.c_str());
 
         // Check if the port can be used for FF integration
+        log_assert(a_Cell->output(a_PortRule.name) || a_Cell->input(a_PortRule.name));
         if (!checkDspPort(a_Cell, a_PortRule)) {
             log_debug("  port check failed\n");
             return;
@@ -837,7 +925,12 @@ struct DspFF : public Pass {
                 continue;
             }
 
-            log_assert(a_Cell->output(a_PortRule.name) || a_Cell->input(a_PortRule.name));
+            // Skip bits out of the specified range
+            if ((a_PortRule.bits.first  >= 0 && (int)i < a_PortRule.bits.first) ||
+                (a_PortRule.bits.second >= 0 && (int)i > a_PortRule.bits.second))
+            {
+                continue;
+            }
 
             pool<CellPin> others;
 
@@ -951,6 +1044,11 @@ struct DspFF : public Pass {
                 log_debug("  %2zu. (%d) %s %s\n", i,
                     flops[i].second,
                     flops[i].first->type.c_str(), flops[i].first->name.c_str());
+            }
+            else if ((a_PortRule.bits.first  >= 0 && (int)i < a_PortRule.bits.first) ||
+                     (a_PortRule.bits.second >= 0 && (int)i > a_PortRule.bits.second))
+            {
+                log_debug("  %2zu. (excluded)\n", i);
             }
             else {
                 log_debug("  %2zu. None\n", i);
@@ -1252,7 +1350,7 @@ struct DspFF : public Pass {
             }
         }
 
-        // No driver found
+        // No driver found. FIXME: Implement a cleaner way of indicating that
         return CellPin(nullptr, RTLIL::IdString(), -1);
     }
 
