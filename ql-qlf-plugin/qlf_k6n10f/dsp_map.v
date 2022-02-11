@@ -43,7 +43,7 @@ module \$__QL_MUL20X18 (input [19:0] A, input [17:0] B, output [37:0] Y);
 
 endmodule
 
-module \$__QL_MUL20X18 (input [9:0] A, input [8:0] B, output [18:0] Y);
+module \$__QL_MUL10X9 (input [9:0] A, input [8:0] B, output [18:0] Y);
     parameter A_SIGNED = 0;
     parameter B_SIGNED = 0;
     parameter A_WIDTH = 0;

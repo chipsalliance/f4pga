@@ -262,7 +262,7 @@ struct SynthQuickLogicPass : public ScriptPass {
                 };
 
                 const std::vector<DspParams> dsp_rules = {
-                    {20, 18,  4,  4, "$__QL_MUL20X18"},
+                    {20, 18, 11, 10, "$__QL_MUL20X18"},
                     {10,  9,  4,  4, "$__QL_MUL10X9"},
                 };
 
