@@ -51,8 +51,23 @@ module \$_DFF_PN1_ (D, C, R, Q);
     dffsre _TECHMAP_REPLACE_ (.Q(Q), .D(D), .C(C), .E(1'b1), .R(1'b1), .S(R));
 endmodule
 
-// Async reset, enable
+module  \$_DFFE_PP_ (D, C, E, Q);
+    input D;
+    input C;
+    input E;
+    output Q;
+    dffsre _TECHMAP_REPLACE_ (.Q(Q), .D(D), .C(C), .E(E), .R(1'b1), .S(1'b1));
+endmodule
 
+module  \$_DFFE_PN_ (D, C, E, Q);
+    input D;
+    input C;
+    input E;
+    output Q;
+    dffsre _TECHMAP_REPLACE_ (.Q(Q), .D(D), .C(C), .E(!E), .R(1'b1), .S(1'b1));
+endmodule
+
+// Async reset, enable
 module  \$_DFFE_PP0P_ (D, C, E, R, Q);
     input D;
     input C;
@@ -62,6 +77,15 @@ module  \$_DFFE_PP0P_ (D, C, E, R, Q);
     dffsre _TECHMAP_REPLACE_ (.Q(Q), .D(D), .C(C), .E(E), .R(!R), .S(1'b1));
 endmodule
 
+module  \$_DFFE_PP0N_ (D, C, E, R, Q);
+    input D;
+    input C;
+    input E;
+    input R;
+    output Q;
+    dffsre _TECHMAP_REPLACE_ (.Q(Q), .D(D), .C(C), .E(!E), .R(!R), .S(1'b1));
+endmodule
+
 module  \$_DFFE_PN0P_ (D, C, E, R, Q);
     input D;
     input C;
@@ -69,6 +93,15 @@ module  \$_DFFE_PN0P_ (D, C, E, R, Q);
     input R;
     output Q;
     dffsre _TECHMAP_REPLACE_ (.Q(Q), .D(D), .C(C), .E(E), .R(R), .S(1'b1));
+endmodule
+
+module  \$_DFFE_PN0N_ (D, C, E, R, Q);
+    input D;
+    input C;
+    input E;
+    input R;
+    output Q;
+    dffsre _TECHMAP_REPLACE_ (.Q(Q), .D(D), .C(C), .E(!E), .R(R), .S(1'b1));
 endmodule
 // Async set, enable
 
@@ -81,6 +114,15 @@ module  \$_DFFE_PP1P_ (D, C, E, R, Q);
     dffsre _TECHMAP_REPLACE_ (.Q(Q), .D(D), .C(C), .E(E), .R(1'b1), .S(!R));
 endmodule
 
+module  \$_DFFE_PP1N_ (D, C, E, R, Q);
+    input D;
+    input C;
+    input E;
+    input R;
+    output Q;
+    dffsre _TECHMAP_REPLACE_ (.Q(Q), .D(D), .C(C), .E(!E), .R(1'b1), .S(!R));
+endmodule
+
 module  \$_DFFE_PN1P_ (D, C, E, R, Q);
     input D;
     input C;
@@ -88,6 +130,15 @@ module  \$_DFFE_PN1P_ (D, C, E, R, Q);
     input R;
     output Q;
     dffsre _TECHMAP_REPLACE_ (.Q(Q), .D(D), .C(C), .E(E), .R(1'b1), .S(R));
+endmodule
+
+module  \$_DFFE_PN1N_ (D, C, E, R, Q);
+    input D;
+    input C;
+    input E;
+    input R;
+    output Q;
+    dffsre _TECHMAP_REPLACE_ (.Q(Q), .D(D), .C(C), .E(!E), .R(1'b1), .S(R));
 endmodule
 
 // Async set & reset
@@ -301,6 +352,22 @@ module \$_DFF_NN1_ (D, C, R, Q);
     dffnsre _TECHMAP_REPLACE_ (.Q(Q), .D(D), .C(C), .E(1'b1), .R(1'b1), .S(R));
 endmodule
 
+module  \$_DFFE_NP_ (D, C, E, Q);
+    input D;
+    input C;
+    input E;
+    output Q;
+    dffnsre _TECHMAP_REPLACE_ (.Q(Q), .D(D), .C(C), .E(E), .R(1'b1), .S(1'b1));
+endmodule
+
+module  \$_DFFE_NN_ (D, C, E, Q);
+    input D;
+    input C;
+    input E;
+    output Q;
+    dffnsre _TECHMAP_REPLACE_ (.Q(Q), .D(D), .C(C), .E(!E), .R(1'b1), .S(1'b1));
+endmodule
+
 module  \$_DFFE_NP0P_ (D, C, E, R, Q);
     input D;
     input C;
@@ -309,6 +376,16 @@ module  \$_DFFE_NP0P_ (D, C, E, R, Q);
     output Q;
     parameter _TECHMAP_WIREINIT_Q_ = 1'bx;
     dffnsre _TECHMAP_REPLACE_ (.Q(Q), .D(D), .C(C), .E(E), .R(!R), .S(1'b1));
+endmodule
+
+module  \$_DFFE_NP0N_ (D, C, E, R, Q);
+    input D;
+    input C;
+    input E;
+    input R;
+    output Q;
+    parameter _TECHMAP_WIREINIT_Q_ = 1'bx;
+    dffnsre _TECHMAP_REPLACE_ (.Q(Q), .D(D), .C(C), .E(!E), .R(!R), .S(1'b1));
 endmodule
 
 module  \$_DFFE_NN0P_ (D, C, E, R, Q);
@@ -321,6 +398,16 @@ module  \$_DFFE_NN0P_ (D, C, E, R, Q);
     dffnsre _TECHMAP_REPLACE_ (.Q(Q), .D(D), .C(C), .E(E), .R(R), .S(1'b1));
 endmodule
 
+module  \$_DFFE_NN0N_ (D, C, E, R, Q);
+    input D;
+    input C;
+    input E;
+    input R;
+    output Q;
+    parameter _TECHMAP_WIREINIT_Q_ = 1'bx;
+    dffnsre _TECHMAP_REPLACE_ (.Q(Q), .D(D), .C(C), .E(!E), .R(R), .S(1'b1));
+endmodule
+
 module  \$_DFFE_NP1P_ (D, C, E, R, Q);
     input D;
     input C;
@@ -331,6 +418,16 @@ module  \$_DFFE_NP1P_ (D, C, E, R, Q);
     dffnsre _TECHMAP_REPLACE_ (.Q(Q), .D(D), .C(C), .E(E), .R(1'b1), .S(!R));
 endmodule
 
+module  \$_DFFE_NP1N_ (D, C, E, R, Q);
+    input D;
+    input C;
+    input E;
+    input R;
+    output Q;
+    parameter _TECHMAP_WIREINIT_Q_ = 1'bx;
+    dffnsre _TECHMAP_REPLACE_ (.Q(Q), .D(D), .C(C), .E(!E), .R(1'b1), .S(!R));
+endmodule
+
 module  \$_DFFE_NN1P_ (D, C, E, R, Q);
     input D;
     input C;
@@ -339,6 +436,16 @@ module  \$_DFFE_NN1P_ (D, C, E, R, Q);
     output Q;
     parameter _TECHMAP_WIREINIT_Q_ = 1'bx;
     dffnsre _TECHMAP_REPLACE_ (.Q(Q), .D(D), .C(C), .E(E), .R(1'b1), .S(R));
+endmodule
+
+module  \$_DFFE_NN1N_ (D, C, E, R, Q);
+    input D;
+    input C;
+    input E;
+    input R;
+    output Q;
+    parameter _TECHMAP_WIREINIT_Q_ = 1'bx;
+    dffnsre _TECHMAP_REPLACE_ (.Q(Q), .D(D), .C(C), .E(!E), .R(1'b1), .S(R));
 endmodule
 
 module \$_DFFSRE_NPPP_ (D, C, E, R, S, Q);
