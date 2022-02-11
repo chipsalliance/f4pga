@@ -222,6 +222,10 @@ struct SynthQuickLogicPass : public ScriptPass {
         if (family == "qlf_k4n8") {
             noDFFArgs = " -nodffe -nosdff";
         }
+    
+        if (family == "qlf_k6n10f") {
+            noDFFArgs = " -nosdff";
+        }
 
         if (check_label("coarse")) {
             run("check");
