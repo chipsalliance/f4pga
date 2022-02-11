@@ -35,11 +35,11 @@ $(1): $(1)/ok
 	@set +e; \
 	$$($(1)_verify); \
 	if [ $$$$? -eq 0 ]; then \
-		printf "Test %-18s \e[32mPASSED\e[0m @ %s\n" $(1) $(CURDIR); \
+		printf "Test %-20s \e[32mPASSED\e[0m @ %s\n" $(1) $(CURDIR); \
 		touch $$<; \
 		true; \
 	else \
-		printf "Test %-18s \e[31;1mFAILED\e[0m @ %s\n" $(1) $(CURDIR); \
+		printf "Test %-20s \e[31;1mFAILED\e[0m @ %s\n" $(1) $(CURDIR); \
 		false; \
 	fi
 
@@ -54,15 +54,15 @@ $(1)/ok: $(1)/$(1).v
 	rm -f run-$(1).tcl; \
 	if [ ! -z "$$($(1)_negative)" ] && [ $$($(1)_negative) -eq 1 ]; then \
 		if [ $$$$RETVAL -ne 0 ]; then \
-			printf "Negative test %-18s \e[32mPASSED\e[0m @ %s\n" $(1) $(CURDIR); \
+			printf "Negative test %-20s \e[32mPASSED\e[0m @ %s\n" $(1) $(CURDIR); \
 			true; \
 		else \
-			printf "Negative test %-18s \e[31;1mFAILED\e[0m @ %s\n" $(1) $(CURDIR); \
+			printf "Negative test %-20s \e[31;1mFAILED\e[0m @ %s\n" $(1) $(CURDIR); \
 			false; \
 		fi \
 	else \
 		if [ $$$$RETVAL -ne 0 ]; then \
-			echo "Unexpected runtime error"; \
+		    printf "Test %-20s \e[31;1mFAILED\e[0m @ %s\n" $(1) $(CURDIR); \
 			false; \
 		fi \
 	fi

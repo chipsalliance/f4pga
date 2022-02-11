@@ -5,7 +5,7 @@ yosys -import  ;# ingest plugin commands
 read_verilog $::env(DESIGN_TOP).v
 design -save read
 
-set TOP "mult_ireg"
+set TOP "conflict_dsp_clk"
 design -load read
 hierarchy -top ${TOP}
 synth_nexus -flatten
@@ -15,29 +15,34 @@ design -load postopt
 yosys cd ${TOP}
 stat
 select -assert-count 1 t:MULT9X9
-select -assert-count 0 t:FD1P3IX
+select -assert-count 9 t:FD1P3IX
 
-set TOP "mult_oreg"
+set TOP "conflict_ff_clk"
 design -load read
 hierarchy -top ${TOP}
 synth_nexus -flatten
 techmap -map +/nexus/cells_sim.v t:VLO t:VHI %u ;# Unmap VHI and VLO
-equiv_opt -assert -async2sync -map +/nexus/cells_sim.v debug dsp_ff -rules ../../nexus-dsp_rules.txt
-design -load postopt
-yosys cd ${TOP}
+debug dsp_ff -rules ../../nexus-dsp_rules.txt
 stat
 select -assert-count 1 t:MULT9X9
-select -assert-count 0 t:FD1P3IX
+select -assert-count 18 t:FD1P3IX
 
-set TOP "mult_all"
+set TOP "conflict_ff_rst"
 design -load read
 hierarchy -top ${TOP}
 synth_nexus -flatten
 techmap -map +/nexus/cells_sim.v t:VLO t:VHI %u ;# Unmap VHI and VLO
-equiv_opt -assert -async2sync -map +/nexus/cells_sim.v debug dsp_ff -rules ../../nexus-dsp_rules.txt
-design -load postopt
-yosys cd ${TOP}
+debug dsp_ff -rules ../../nexus-dsp_rules.txt
 stat
 select -assert-count 1 t:MULT9X9
-select -assert-count 0 t:FD1P3IX
+select -assert-count 18 t:FD1P3DX
 
+set TOP "conflict_ff_ena"
+design -load read
+hierarchy -top ${TOP}
+synth_nexus -flatten
+techmap -map +/nexus/cells_sim.v t:VLO t:VHI %u ;# Unmap VHI and VLO
+debug dsp_ff -rules ../../nexus-dsp_rules.txt
+stat
+select -assert-count 1 t:MULT9X9
+select -assert-count 18 t:FD1P3IX

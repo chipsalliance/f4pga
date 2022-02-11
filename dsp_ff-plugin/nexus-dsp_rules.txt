@@ -162,7 +162,7 @@ ff FD1P3DX
   q   Q
 
   match GSR
-  set RESETMODE=SYNC
+  set RESETMODE=ASYNC
 endff
 
 ff FD1P3IX
@@ -173,6 +173,6 @@ ff FD1P3IX
   q   Q
 
   match GSR
-  set RESETMODE=ASYNC
+  set RESETMODE=SYNC
 endff
 
