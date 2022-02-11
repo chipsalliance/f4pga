@@ -3134,14 +3134,13 @@ void UhdmAst::process_sys_func_call()
         return;
     }
 
+    std::string task_calls[] = {"\\$display", "\\$monitor", "\\$time", "\\$readmemh"};
+
     if (current_node->str == "\\$signed") {
         current_node->type = AST::AST_TO_SIGNED;
     } else if (current_node->str == "\\$unsigned") {
         current_node->type = AST::AST_TO_UNSIGNED;
-    } else if (current_node->str == "\\$display" || current_node->str == "\\$time" || current_node->str == "\\$monitor") {
-        current_node->type = AST::AST_TCALL;
-        current_node->str = current_node->str.substr(1);
-    } else if (current_node->str == "\\$readmemh") {
+    } else if (std::find(std::begin(task_calls), std::end(task_calls), current_node->str) != std::end(task_calls)) {
         current_node->type = AST::AST_TCALL;
     }
 
@@ -3150,6 +3149,12 @@ void UhdmAst::process_sys_func_call()
             current_node->children.push_back(node);
         }
     });
+
+    std::string remove_backslash[] = {"\\$display", "\\$strobe",   "\\$write",    "\\$monitor", "\\$time",    "\\$finish",
+                                      "\\$stop",    "\\$dumpfile", "\\$dumpvars", "\\$dumpon",  "\\$dumpoff", "\\$dumpall"};
+
+    if (std::find(std::begin(remove_backslash), std::end(remove_backslash), current_node->str) != std::end(remove_backslash))
+        current_node->str = current_node->str.substr(1);
 }
 
 void UhdmAst::process_func_call()
