@@ -682,6 +682,12 @@ struct DspFF : public Pass {
             log_cmd_error("No rules file specified!");
         }
 
+        // Reset state
+        m_CellsToRemove.clear();
+        m_DspChanges.clear();
+        m_DspTypes.clear();
+        m_FlopTypes.clear();
+
         // Load rules
         rewrite_filename(rulesFile);
         load_rules(rulesFile);
