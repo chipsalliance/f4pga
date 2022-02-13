@@ -25,7 +25,7 @@ all the necessary components for an end-to-end flow.
 This pertains both to ASIC and FPGA workflows, although SymbiFlow focuses
 on the latter (some parts of SymbiFlow will also be useful in the former).
 
-.. figure:: images/EDA.svg
+.. figure:: _static/images/EDA.svg
 
 Project structure
 -----------------
@@ -48,7 +48,7 @@ collaborating projects targeting different FPGAs - :doc:`Project X-Ray
 <http://www.clifford.at/icestorm/>`_ for Lattice iCE40 and :doc:`Project Trellis
 <../prjtrellis/docs/index>` for Lattice ECP5 FPGAs.
 
-.. figure:: images/parts.svg
+.. figure:: _static/images/parts.svg
 
 Current status of bitstream documentation
 -----------------------------------------

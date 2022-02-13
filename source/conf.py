@@ -11,8 +11,6 @@
 import sys, os
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
-
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -182,19 +180,19 @@ html_title = project
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #html_short_title = None
 
+# Add any paths that contain custom static files (such as style sheets) here,
+# relative to this directory. They are copied after the builtin static files,
+# so a file named "default.css" will overwrite the builtin "default.css".
+html_static_path = ['_static']
+
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-html_logo = str(ROOT / 'images/logo.svg')
+html_logo = str(Path(html_static_path[0]) / 'logo.svg')
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
-html_favicon = str(ROOT / 'images/favicon.svg')
-
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
-#html_static_path = ['_static']
+html_favicon = str(Path(html_static_path[0]) / 'favicon.svg')
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
