@@ -716,6 +716,194 @@ module QL_DSP2 ( // TODO: Name subject to change
 
 endmodule
 
+module dsp_t1_sim # (
+    parameter NBITS_ACC = 64,
+    parameter NBITS_A   = 20,
+    parameter NBITS_B   = 18,
+    parameter NBITS_Z   = 38,
+
+    parameter [0:0] SATURATE_ENABLE   = 0,
+    parameter [2:0] OUTPUT_SELECT     = 0,
+    parameter [0:0] ROUND             = 0,
+    //parameter [0:0] LOAD_ACC          = 0,
+    parameter [0:0] SUBTRACT          = 0,
+    parameter [0:0] REGISTER_INPUTS   = 0
+    //parameter [0:0] REGISTER_OUTPUTS  = 0
+)(
+    input  [NBITS_A-1:0] a_i,
+    input  [NBITS_B-1:0] b_i,
+    output [NBITS_Z-1:0] z_o,
+    output [NBITS_B-1:0] dly_b_o,
+
+    input         unsigned_a_i,
+    input         unsigned_b_i,
+
+    input         clock_i,
+    input         reset_n_i,
+
+    input         load_acc_i,
+    input [1:0]   feedback_i,
+    input [5:0]   shift_right_i
+);
+
+    if (NBITS_ACC < NBITS_A + NBITS_B)
+        $error("NBITS_ACC must be > NBITS_A + NBITS_B");
+
+    // Input registers
+    reg  [NBITS_A-1:0]  r_a;
+    reg  [NBITS_B-1:0]  r_b;
+    reg                 r_unsigned_a;
+    reg                 r_unsigned_b;
+    reg                 r_load_acc;
+    reg  [1:0]          r_feedback;
+    reg  [5:0]          r_shift_d1;
+    reg  [5:0]          r_shift_d2;
+
+    always @(posedge clock_i or negedge reset_n_i) begin
+        if (~reset_n_i) begin
+
+            r_a <= 'h0;
+            r_b <= 'h0;
+
+            r_unsigned_a <= 0;
+            r_unsigned_b <= 0;
+            r_feedback   <= 0;
+            r_shift_d1   <= 0;
+            r_shift_d2   <= 0;
+//            r_subtract   <= 0;
+            r_load_acc   <= 0;
+
+        end else begin
+
+            r_a <= a_i;
+            r_b <= b_i;
+
+            r_unsigned_a <= unsigned_a_i;
+            r_unsigned_b <= unsigned_b_i;
+            r_feedback   <= feedback_i;
+            r_shift_d1   <= shift_right_i;
+            r_shift_d2   <= r_shift_d1;
+//            r_subtract   <= subtract_i;
+            r_load_acc   <= load_acc_i;
+
+        end
+    end
+
+    // Registered / non-registered input path select
+    wire [NBITS_A-1:0]  a = REGISTER_INPUTS ? r_a : a_i;
+    wire [NBITS_B-1:0]  b = REGISTER_INPUTS ? r_b : b_i;
+
+    wire       unsigned_a = REGISTER_INPUTS ? r_unsigned_a : unsigned_a_i;
+    wire       unsigned_b = REGISTER_INPUTS ? r_unsigned_b : unsigned_b_i;
+    wire [1:0] feedback   = REGISTER_INPUTS ? r_feedback   : feedback_i;
+    wire       load_acc   = REGISTER_INPUTS ? r_load_acc   : load_acc_i;
+    //wire       subtract   = REGISTER_INPUTS ? r_subtract   : subtract_i;
+
+    // Shift right control
+    localparam SHIFT_SEL = {REGISTER_INPUTS, OUTPUT_SELECT[1]};
+    wire [5:0] shift_right = (SHIFT_SEL == 2'b00) ?   shift_right_i :
+                             (SHIFT_SEL == 2'b01) ?   r_shift_d1 :
+                             (SHIFT_SEL == 2'b10) ?   r_shift_d1 :
+                           /*(SHIFT_SEL == 2'b11) ?*/ r_shift_d2;
+
+    // Multiplier
+    wire [NBITS_A-1:0] mult_a = (feedback == 2'h3) ? acc[NBITS_A-1:0] : a;
+    wire [NBITS_B-1:0] mult_b = (feedback == 2'h2) ? {NBITS_B{1'b0}}  : b;
+
+    wire [NBITS_A-1:0] mult_sgn_a = mult_a[NBITS_A-1];
+    wire [NBITS_A-1:0] mult_mag_a = (mult_sgn_a) ? (~mult_a + 1) : mult_a;
+    wire [NBITS_B-1:0] mult_sgn_b = mult_b[NBITS_B-1];
+    wire [NBITS_B-1:0] mult_mag_b = (mult_sgn_b) ? (~mult_b + 1) : mult_b;
+
+    wire [NBITS_A+NBITS_B-1:0] mult_mag = mult_mag_a * mult_mag_b;
+    wire mult_sgn = mult_sgn_a ^ mult_sgn_b;
+
+    wire [NBITS_A+NBITS_B-1:0] mult = (unsigned_a && unsigned_b) ?
+        (mult_a * mult_b) : (mult_sgn ? (~mult_mag + 1) : mult_mag);
+
+    // Sign extension
+    wire [NBITS_ACC-1:0] mult_xtnd = (unsigned_a && unsigned_b) ?
+        {{(NBITS_ACC-NBITS_A-NBITS_B){1'b0}},                    mult[NBITS_A+NBITS_B-1:0]} :
+        {{(NBITS_ACC-NBITS_A-NBITS_B){mult[NBITS_A+NBITS_B-1]}}, mult[NBITS_A+NBITS_B-1:0]};
+
+    wire [NBITS_ACC-1:0] a_xtnd = (unsigned_a) ?
+        {{(NBITS_ACC-NBITS_A){1'b0}},         a[NBITS_A-1:0]} :
+        {{(NBITS_ACC-NBITS_A){a[NBITS_A-1]}}, a[NBITS_A-1:0]};
+
+    // Adder
+    wire [NBITS_ACC-1:0] add_a = (SUBTRACT) ? (~mult_xtnd + 1) : mult_xtnd;
+    wire [NBITS_ACC-1:0] add_b = (feedback == 2'h0) ? acc :
+                                 (feedback == 2'h1) ? {{NBITS_ACC}{1'b0}} :
+                                                      a_xtnd;
+
+    wire [NBITS_ACC-1:0] add_o = add_a + add_b;    
+
+    // Accumulator
+    reg [NBITS_ACC-1:0] acc;
+    always @(posedge clock_i or negedge reset_n_i)
+        if (~reset_n_i) acc <= 'h0;
+        else begin
+            if (load_acc)
+                acc <= add_o;
+            else
+                acc <= acc;
+        end
+
+    // Adder/accumulator output selection
+    wire [NBITS_ACC-1:0] acc_out = (OUTPUT_SELECT[1]) ? add_o : acc;
+
+    // Round, shift, saturate
+    wire [NBITS_ACC-1:0] acc_rnd = (ROUND && (shift_right != 0)) ? (acc_out + ({{(NBITS_ACC-1){1'b0}}, 1'b1} << (shift_right - 1))) :
+                                                                    acc_out;
+
+    wire [NBITS_ACC-1:0] acc_shr = (unsigned_a && unsigned_b) ? (acc_rnd  >> shift_right) :
+                                                                (acc_rnd >>> shift_right);
+
+    wire [NBITS_ACC-1:0] acc_sat_u = (acc_shr[NBITS_ACC-1:NBITS_Z] != 0) ? {{(NBITS_ACC-NBITS_Z){1'b0}},{NBITS_Z{1'b1}}} :
+                                                                           {{(NBITS_ACC-NBITS_Z){1'b0}},{acc_shr[NBITS_Z-1:0]}};
+
+    wire [NBITS_ACC-1:0] acc_sat_s = ((|acc_shr[NBITS_ACC-1:NBITS_Z-1] == 1'b0) ||
+                                      (&acc_shr[NBITS_ACC-1:NBITS_Z-1] == 1'b1)) ? {{(NBITS_ACC-NBITS_Z){1'b0}},{acc_shr[NBITS_Z-1:0]}} :
+                                                                                   {{(NBITS_ACC-NBITS_Z){1'b0}},{acc_shr[NBITS_ACC-1],{NBITS_Z-1{~acc_shr[NBITS_ACC-1]}}}};
+
+    wire [NBITS_ACC-1:0] acc_sat = (SATURATE_ENABLE) ? ((unsigned_a && unsigned_b) ? acc_sat_u : acc_sat_s) : acc_shr;
+
+    // Output signals
+    wire [NBITS_Z-1:0]  z0;
+    reg  [NBITS_Z-1:0]  z1;
+    wire [NBITS_Z-1:0]  z2;
+
+    assign z0 = mult_xtnd[NBITS_Z-1:0];
+    assign z2 = acc_sat[NBITS_Z-1:0];
+
+    always @(posedge clock_i or negedge reset_n_i)
+        if (!reset_n_i)
+            z1 <= 0;
+        else begin
+            z1 <= (OUTPUT_SELECT == 3'b100) ? z0 : z2;
+        end    
+
+    // Output mux
+    assign z_o = (OUTPUT_SELECT == 3'h0) ?   z0 :
+                 (OUTPUT_SELECT == 3'h1) ?   z2 :
+                 (OUTPUT_SELECT == 3'h2) ?   z2 :
+                 (OUTPUT_SELECT == 3'h3) ?   z2 :
+                 (OUTPUT_SELECT == 3'h4) ?   z1 :
+                 (OUTPUT_SELECT == 3'h5) ?   z1 :
+                 (OUTPUT_SELECT == 3'h6) ?   z1 :
+               /*(OUTPUT_SELECT == 3'h7) ?*/ z1;
+
+    // B input delayed passthrough
+    reg [NBITS_B-1:0] dly_b_o;
+
+    always @(posedge clock_i or negedge reset_n_i)
+        if (!reset_n_i)
+            dly_b_o <= 0;
+        else
+            dly_b_o <= b_i;
+
+endmodule
+
 (* blackbox *) // TODO: add sim model
 module dsp_t1_20x18x64 (
     input  [19:0] a_i,
