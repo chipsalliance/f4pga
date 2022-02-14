@@ -250,8 +250,7 @@ struct SynthQuickLogicPass : public ScriptPass {
                     run("ql_dsp", "                        (for qlf_k6n10 if not -no_dsp)");
                     run("chtype -set $mul t:$__soft_mul", "(for qlf_k6n10 if not -no_dsp)");
                 }
-            }
-            else if (family == "qlf_k6n10f") {
+            } else if (family == "qlf_k6n10f") {
 
                 struct DspParams {
                     size_t a_maxwidth;
@@ -262,8 +261,8 @@ struct SynthQuickLogicPass : public ScriptPass {
                 };
 
                 const std::vector<DspParams> dsp_rules = {
-                    {20, 18, 11, 10, "$__QL_MUL20X18"},
-                    {10,  9,  4,  4, "$__QL_MUL10X9"},
+                  {20, 18, 11, 10, "$__QL_MUL20X18"},
+                  {10, 9, 4, 4, "$__QL_MUL10X9"},
                 };
 
                 if (help_mode) {
@@ -271,8 +270,7 @@ struct SynthQuickLogicPass : public ScriptPass {
                     run("techmap -map +/mul2dsp.v [...]", "(for qlf_k6n10f if not -no_dsp)");
                     run("chtype -set $mul t:$__soft_mul", "(for qlf_k6n10f if not -no_dsp)");
                     run("techmap -map +/quicklogic/" + family + "/dsp_map.v", "(for qlf_k6n10f if not -no_dsp)");
-                }
-                else if (!nodsp) {
+                } else if (!nodsp) {
 
                     run("wreduce t:$mul");
                     for (const auto &rule : dsp_rules) {
@@ -280,10 +278,7 @@ struct SynthQuickLogicPass : public ScriptPass {
                                     "-D DSP_A_MAXWIDTH=%zu -D DSP_B_MAXWIDTH=%zu "
                                     "-D DSP_A_MINWIDTH=%zu -D DSP_B_MINWIDTH=%zu "
                                     "-D DSP_NAME=%s",
-                            rule.a_maxwidth, rule.b_maxwidth,
-                            rule.a_minwidth, rule.b_minwidth,
-                            rule.type.c_str())
-                        );
+                                    rule.a_maxwidth, rule.b_maxwidth, rule.a_minwidth, rule.b_minwidth, rule.type.c_str()));
                         run("chtype -set $mul t:$__soft_mul");
                     }
                     run("techmap -map +/quicklogic/" + family + "/dsp_map.v");
