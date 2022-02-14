@@ -774,6 +774,40 @@ static AST::AstNode *make_packed_struct_local(AST::AstNode *template_node, std::
     return wnode;
 }
 
+static void simplify_format_string(AST::AstNode *current_node)
+{
+    std::string sformat = current_node->children[0]->str;
+    std::string preformatted_string = "";
+    int next_arg = 1;
+    for (size_t i = 0; i < sformat.length(); i++) {
+        if (sformat[i] == '%') {
+            AST::AstNode *node_arg = current_node->children[next_arg];
+            char cformat = sformat[++i];
+            if (cformat == 'b' or cformat == 'B') {
+                node_arg->simplify(true, false, false, 1, -1, false, false);
+                if (node_arg->type != AST::AST_CONSTANT)
+                    log_file_error(current_node->filename, current_node->location.first_line,
+                                   "Failed to evaluate system task `%s' with non-constant argument.\n", current_node->str.c_str());
+
+                RTLIL::Const val = node_arg->bitsAsConst();
+                for (int j = val.size() - 1; j >= 0; j--) {
+                    // We add ACII value of 0 to convert number to character
+                    preformatted_string += ('0' + val[j]);
+                }
+                delete current_node->children[next_arg];
+                current_node->children.erase(current_node->children.begin() + next_arg);
+            } else {
+                next_arg++;
+                preformatted_string += std::string("%") + cformat;
+            }
+        } else {
+            preformatted_string += sformat[i];
+        }
+    }
+    delete current_node->children[0];
+    current_node->children[0] = AST::AstNode::mkconst_str(preformatted_string);
+}
+
 static void simplify(AST::AstNode *current_node, AST::AstNode *parent_node)
 {
     AST::AstNode *expanded = nullptr;
@@ -876,6 +910,10 @@ static void simplify(AST::AstNode *current_node, AST::AstNode *parent_node)
         convert_packed_unpacked_range(current_node);
         while (current_node->simplify(true, false, false, 1, -1, false, false)) {
         };
+        break;
+    case AST::AST_TCALL:
+        if (current_node->str == "$display" || current_node->str == "$write")
+            simplify_format_string(current_node);
         break;
     default:
         break;
@@ -3135,7 +3173,7 @@ void UhdmAst::process_sys_func_call()
         return;
     }
 
-    std::string task_calls[] = {"\\$display", "\\$monitor", "\\$time", "\\$readmemh"};
+    std::string task_calls[] = {"\\$display", "\\$monitor", "\\$write", "\\$time", "\\$readmemh"};
 
     if (current_node->str == "\\$signed") {
         current_node->type = AST::AST_TO_SIGNED;
