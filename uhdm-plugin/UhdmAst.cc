@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <cstring>
 #include <functional>
+#include <regex>
 #include <string>
 #include <vector>
 
@@ -3149,6 +3150,13 @@ void UhdmAst::process_sys_func_call()
             current_node->children.push_back(node);
         }
     });
+
+    if (current_node->str == "\\$display" || current_node->str == "\\$write") {
+        // According to standard, %h and %x mean the same, but %h is currently unsupported by mainline yosys
+        std::string replaced_string = std::regex_replace(current_node->children[0]->str, std::regex("%[h|H]"), "%x");
+        delete current_node->children[0];
+        current_node->children[0] = AST::AstNode::mkconst_str(replaced_string);
+    }
 
     std::string remove_backslash[] = {"\\$display", "\\$strobe",   "\\$write",    "\\$monitor", "\\$time",    "\\$finish",
                                       "\\$stop",    "\\$dumpfile", "\\$dumpvars", "\\$dumpon",  "\\$dumpoff", "\\$dumpall"};
