@@ -3134,7 +3134,7 @@ void UhdmAst::process_sys_func_call()
         return;
     }
 
-    std::string task_calls[] = {"\\$display", "\\$monitor", "\\$time", "\\$readmemh"};
+    std::string task_calls[] = {"\\$display", "\\$monitor", "\\$write", "\\$time", "\\$readmemh"};
 
     if (current_node->str == "\\$signed") {
         current_node->type = AST::AST_TO_SIGNED;
