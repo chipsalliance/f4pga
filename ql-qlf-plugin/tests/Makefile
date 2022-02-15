@@ -26,6 +26,11 @@ TESTS = consts \
     qlf_k6n10f/dsp_macc
 #	qlf_k6n10_bram \
 
+SIM_TESTS = \
+    qlf_k6n10f/sim_dsp_mult \
+    qlf_k6n10f/sim_dsp_mult_r \
+    qlf_k6n10f/sim_dsp_fir
+
 include $(shell pwd)/../../Makefile_test.common
 
 consts_verify = true
