@@ -65,16 +65,20 @@ struct DspFF : public Pass {
     };
 
     /// Describes a DSP cell port that has built-in register (flip-flops)
-    struct DspPortType {
+    struct PortType {
         RTLIL::IdString name;
 
         /// Range of port pins that have FFs (low to high, inclusive)
         std::pair<int, int> bits;
-
         /// A dict of associated cell ports indexed by their function (like "clk, "rst")
         /// along with the default value to connect when unused.
         dict<RTLIL::IdString, std::pair<RTLIL::IdString, RTLIL::Const>> assoc;
+    };
 
+    /// Describes a DSP register
+    struct RegisterType {
+
+        /// Control parameters
         struct {
             /// A dict of parameters to be set in the cell after integration
             dict<RTLIL::IdString, RTLIL::Const> set;
@@ -85,14 +89,26 @@ struct DspFF : public Pass {
         /// A list of ports to be connected to specific constants after flip-flop
         /// integration.
         dict<RTLIL::IdString, RTLIL::Const> connect;
+
+        unsigned int hash() const {
+            unsigned int h = 0;
+            h = mkhash_add(h, params.set.hash());
+            h = mkhash_add(h, params.map.hash());
+            h = mkhash_add(h, connect.hash());
+            return h;
+        }
+
+        bool operator == (const RegisterType& ref) const {
+            return (params.set == ref.params.set) &&
+                   (params.map == ref.params.map) &&
+                   (connect == ref.connect);
+        }
     };
 
     /// Describes a DSP cell type
     struct DspType {
         RTLIL::IdString name;
-
-        /// A list of data ports with registers
-        std::vector<DspPortType> ports;
+        dict<RegisterType, std::vector<PortType>> registers;
     };
 
     /// Describes a changes made to a DSP cell
@@ -203,7 +219,12 @@ struct DspFF : public Pass {
             log_error(" Error opening file!\n");
         }
 
-        std::vector<DspType> dspTypes;
+        // Parse each port as if it was associated with its own DSP register.
+        // Group them each time a port definition is complete.
+        PortType        portType;
+        RegisterType    registerType;
+
+        std::vector<DspType>  dspTypes;
         std::vector<FlopType> flopTypes;
 
         std::vector<RTLIL::IdString> dspAliases;
@@ -259,6 +280,7 @@ struct DspFF : public Pass {
                 tok.pop_back();
 
                 const auto dspType = dspTypes.back();
+
                 for (const auto &alias : dspAliases) {
                     dspTypes.push_back(dspType);
                     dspTypes.back().name = alias;
@@ -277,13 +299,15 @@ struct DspFF : public Pass {
 
                 auto spec = parsePortName(fields[1]);
 
-                auto &ports = dspTypes.back().ports;
-                ports.resize(ports.size() + 1);
-                ports.back().name = RTLIL::escape_id(std::get<0>(spec));
-                ports.back().bits = std::make_pair(std::get<2>(spec), std::get<1>(spec));
-                ports.back().assoc.insert(std::make_pair(RTLIL::escape_id("clk"), std::make_pair(RTLIL::IdString(), RTLIL::Sx)));
-                ports.back().assoc.insert(std::make_pair(RTLIL::escape_id("rst"), std::make_pair(RTLIL::IdString(), RTLIL::Sx)));
-                ports.back().assoc.insert(std::make_pair(RTLIL::escape_id("ena"), std::make_pair(RTLIL::IdString(), RTLIL::Sx)));
+                portType = PortType();
+                portType.name = RTLIL::escape_id(std::get<0>(spec));
+                portType.bits = std::make_pair(std::get<2>(spec), std::get<1>(spec));
+                portType.assoc.insert(std::make_pair(RTLIL::escape_id("clk"), std::make_pair(RTLIL::IdString(), RTLIL::Sx)));
+                portType.assoc.insert(std::make_pair(RTLIL::escape_id("rst"), std::make_pair(RTLIL::IdString(), RTLIL::Sx)));
+                portType.assoc.insert(std::make_pair(RTLIL::escape_id("ena"), std::make_pair(RTLIL::IdString(), RTLIL::Sx)));
+
+                registerType = RegisterType();
+
             } else if (fields[0] == "endport") {
                 if (fields.size() != 1) {
                     log_error(" syntax error: '%s'\n", line.c_str());
@@ -292,6 +316,9 @@ struct DspFF : public Pass {
                     log_error(" unexpected keyword '%s'\n", fields[0].c_str());
                 }
                 tok.pop_back();
+
+                auto& dspType = dspTypes.back();
+                dspType.registers[registerType].push_back(portType);
             }
 
             // Flip-flop type section
@@ -332,8 +359,7 @@ struct DspFF : public Pass {
                     if (fields.size() != 3) {
                         log_error(" syntax error: '%s'\n", line.c_str());
                     }
-                    auto &ports = dspTypes.back().ports;
-                    ports.back().assoc[RTLIL::escape_id("clk")] = std::make_pair(RTLIL::escape_id(fields[1]), RTLIL::Const::from_string(fields[2]));
+                    portType.assoc[RTLIL::escape_id("clk")] = std::make_pair(RTLIL::escape_id(fields[1]), RTLIL::Const::from_string(fields[2]));
                 } else if (tok.back() == "ff") {
                     if (fields.size() != 2) {
                         log_error(" syntax error: '%s'\n", line.c_str());
@@ -350,8 +376,7 @@ struct DspFF : public Pass {
                     if (fields.size() != 3) {
                         log_error(" syntax error: '%s'\n", line.c_str());
                     }
-                    auto &ports = dspTypes.back().ports;
-                    ports.back().assoc[RTLIL::escape_id("rst")] = std::make_pair(RTLIL::escape_id(fields[1]), RTLIL::Const::from_string(fields[2]));
+                    portType.assoc[RTLIL::escape_id("rst")] = std::make_pair(RTLIL::escape_id(fields[1]), RTLIL::Const::from_string(fields[2]));
                 } else if (tok.back() == "ff") {
                     if (fields.size() != 2) {
                         log_error(" syntax error: '%s'\n", line.c_str());
@@ -368,8 +393,7 @@ struct DspFF : public Pass {
                     if (fields.size() != 3) {
                         log_error(" syntax error: '%s'\n", line.c_str());
                     }
-                    auto &ports = dspTypes.back().ports;
-                    ports.back().assoc[RTLIL::escape_id("ena")] = std::make_pair(RTLIL::escape_id(fields[1]), RTLIL::Const::from_string(fields[2]));
+                    portType.assoc[RTLIL::escape_id("ena")] = std::make_pair(RTLIL::escape_id(fields[1]), RTLIL::Const::from_string(fields[2]));
                 } else if (tok.back() == "ff") {
                     if (fields.size() != 2) {
                         log_error(" syntax error: '%s'\n", line.c_str());
@@ -441,8 +465,7 @@ struct DspFF : public Pass {
                 }
 
                 if (tok.back() == "port") {
-                    auto &ports = dspTypes.back().ports;
-                    ports.back().params.set.swap(set);
+                    registerType.params.set.swap(set);
                 } else if (tok.back() == "ff") {
                     flopTypes.back().params.set.swap(set);
                 }
@@ -463,8 +486,7 @@ struct DspFF : public Pass {
                 }
 
                 if (tok.back() == "port") {
-                    auto &ports = dspTypes.back().ports;
-                    ports.back().params.map.swap(map);
+                    registerType.params.map.swap(map);
                 } else if (tok.back() == "ff") {
                     flopTypes.back().params.map.swap(map);
                 }
@@ -479,9 +501,8 @@ struct DspFF : public Pass {
                 }
 
                 const auto vec = parseNameValue(fields);
-                auto &ports = dspTypes.back().ports;
                 for (const auto &it : vec) {
-                    ports.back().connect.insert(std::make_pair(RTLIL::escape_id(it.first), RTLIL::Const(it.second)));
+                    registerType.connect.insert(std::make_pair(RTLIL::escape_id(it.first), RTLIL::Const(it.second)));
                 }
             }
 
@@ -510,40 +531,44 @@ struct DspFF : public Pass {
 
         // Dump DSP types
         log("DSP types:\n");
-        for (const auto &it : m_DspTypes) {
-            const auto &dsp = it.second;
+        for (const auto &it1 : m_DspTypes) {
+            const auto &dsp = it1.second;
             log(" %s\n", dsp.name.c_str());
 
-            log(" ports:\n");
-            for (const auto &port : dsp.ports) {
+            for (const auto& it2 : dsp.registers) {
+                const auto& reg   = it2.first;
+                const auto& ports = it2.second;
+                log(" ports:\n");
+                for (const auto &port : ports) {
 
-                std::string range;
-                if (port.bits.first != -1 && port.bits.second != -1) {
-                    range = stringf("[%d:%d]", port.bits.second, port.bits.first);
-                }
-
-                log("  %s.%s%s\n", dsp.name.c_str(), port.name.c_str(), range.c_str());
-
-                for (const auto &it : port.assoc) {
-                    log("   %.3s: %s\n", it.first.c_str(), !it.second.first.empty() ? it.second.first.c_str() : "<none>");
-                }
-
-                if (!port.params.set.empty()) {
-                    log("   set params:\n");
-                    for (const auto &it : port.params.set) {
-                        log("    %s=%s\n", it.first.c_str(), it.second.decode_string().c_str());
+                    std::string range;
+                    if (port.bits.first != -1 && port.bits.second != -1) {
+                        range = stringf("[%d:%d]", port.bits.second, port.bits.first);
                     }
-                }
-                if (!port.params.map.empty()) {
-                    log("   map params:\n");
-                    for (const auto &it : port.params.map) {
-                        log("    %s=%s\n", it.first.c_str(), it.second.c_str());
+
+                    log("  %s.%s%s\n", dsp.name.c_str(), port.name.c_str(), range.c_str());
+
+                    for (const auto &it : port.assoc) {
+                        log("   %.3s: %s\n", it.first.c_str(), !it.second.first.empty() ? it.second.first.c_str() : "<none>");
                     }
-                }
-                if (!port.connect.empty()) {
-                    log("   connect ports:\n");
-                    for (const auto &it : port.connect) {
-                        log("    %s.%s=%s\n", dsp.name.c_str(), it.first.c_str(), it.second.as_string().c_str());
+
+                    if (!reg.params.set.empty()) {
+                        log("   set params:\n");
+                        for (const auto &it : reg.params.set) {
+                            log("    %s=%s\n", it.first.c_str(), it.second.decode_string().c_str());
+                        }
+                    }
+                    if (!reg.params.map.empty()) {
+                        log("   map params:\n");
+                        for (const auto &it : reg.params.map) {
+                            log("    %s=%s\n", it.first.c_str(), it.second.c_str());
+                        }
+                    }
+                    if (!reg.connect.empty()) {
+                        log("   connect ports:\n");
+                        for (const auto &it : reg.connect) {
+                            log("    %s.%s=%s\n", dsp.name.c_str(), it.first.c_str(), it.second.as_string().c_str());
+                        }
                     }
                 }
             }
@@ -732,17 +757,10 @@ struct DspFF : public Pass {
                     continue;
                 }
 
-                // Check ports
-                auto &rule = m_DspTypes.at(cell->type);
-                for (auto &portRule : rule.ports) {
-
-                    // Sanity check
-                    if (!cell->hasPort(portRule.name)) {
-                        log(" The DSP cell '%s' does not have a port named '%s'!\n", cell->type.c_str(), portRule.name.c_str());
-                        continue;
-                    }
-
-                    processPort(cell, portRule);
+                // Process all registers
+                auto &dspType = m_DspTypes.at(cell->type);
+                for (auto& rule : dspType.registers) {
+                    processRegister(cell, rule.first, rule.second);
                 }
             }
 
@@ -763,28 +781,12 @@ struct DspFF : public Pass {
     //        // TODO:
     //    }
 
-    bool checkDspPort(RTLIL::Cell *a_Cell, const DspPortType &a_PortRule)
-    {
-        bool isOk = true;
-
-        // The cell register control parameters must not be set
-        for (const auto &it : a_PortRule.params.set) {
-            const auto curr = a_Cell->getParam(it.first);
-            if (curr == it.second) {
-                log_debug("  the param '%s' is already set to '%s'\n", it.first.c_str(), it.second.decode_string().c_str());
-                isOk = false;
-            }
-        }
-
-        return isOk;
-    }
-
     bool checkFlop(RTLIL::Cell *a_Cell)
     {
         const auto &flopType = m_FlopTypes.at(a_Cell->type);
         bool isOk = true;
 
-        log_debug("  Checking connected flip-flop '%s' of type '%s'... ", a_Cell->name.c_str(), a_Cell->type.c_str());
+        log_debug("  checking connected flip-flop '%s' of type '%s'... ", a_Cell->name.c_str(), a_Cell->type.c_str());
 
         // Must not have the "keep" attribute
         if (a_Cell->has_keep_attr()) {
@@ -810,33 +812,37 @@ struct DspFF : public Pass {
         return isOk;
     }
 
-    bool checkFlopDataAgainstDspPort(const FlopData &a_FlopData, RTLIL::Cell *a_Cell, const DspPortType &a_PortRule)
+    bool checkFlopDataAgainstDspRegister(const FlopData &a_FlopData, RTLIL::Cell *a_Cell,
+                                         const RegisterType &a_Register,
+                                         const std::vector<PortType>& a_Ports)
     {
         const auto &flopType = m_FlopTypes.at(a_FlopData.type);
         const auto &changes = m_DspChanges[a_Cell];
         bool isOk = true;
 
-        log_debug("  Checking connected flip-flop settings against the DSP port... ");
+        log_debug("  checking connected flip-flop settings against the DSP register... ");
 
         // Check control signal connections
-        for (const auto &it : a_PortRule.assoc) {
-            const auto &key = it.first;
-            const auto &port = it.second.first;
+        for (const auto& port : a_Ports) {
+            for (const auto &it : port.assoc) {
+                const auto &key = it.first;
+                const auto &port = it.second.first;
 
-            SigBit conn(RTLIL::Sx);
-            if (!port.empty() && a_Cell->hasPort(port)) {
-                auto sigspec = a_Cell->getPort(port);
-                auto sigbits = sigspec.bits();
-                log_assert(sigbits.size() <= 1);
-                if (!sigbits.empty()) {
-                    conn = m_SigMap(sigbits[0]);
+                SigBit conn(RTLIL::Sx);
+                if (!port.empty() && a_Cell->hasPort(port)) {
+                    auto sigspec = a_Cell->getPort(port);
+                    auto sigbits = sigspec.bits();
+                    log_assert(sigbits.size() <= 1);
+                    if (!sigbits.empty()) {
+                        conn = m_SigMap(sigbits[0]);
+                    }
                 }
-            }
 
-            if (conn.is_wire() || (!conn.is_wire() && conn.data != RTLIL::Sx)) {
-                if (conn != a_FlopData.conns.at(key)) {
-                    log_debug("\n   connection to port '%s' mismatch", port.c_str());
-                    isOk = false;
+                if (conn.is_wire() || (!conn.is_wire() && conn.data != RTLIL::Sx)) {
+                    if (conn != a_FlopData.conns.at(key)) {
+                        log_debug("\n   connection to port '%s' mismatch", port.c_str());
+                        isOk = false;
+                    }
                 }
             }
         }
@@ -852,7 +858,7 @@ struct DspFF : public Pass {
         };
 
         // Check parameters to be mapped (by the port rule)
-        for (const auto &it : a_PortRule.params.map) {
+        for (const auto &it : a_Register.params.map) {
             if (a_Cell->hasParam(it.first) && a_FlopData.params.dsp.count(it.second)) {
                 const auto curr = a_Cell->getParam(it.first);
                 const auto flop = a_FlopData.params.dsp.at(it.second);
@@ -861,7 +867,7 @@ struct DspFF : public Pass {
         }
 
         // Check parameters to be set (by the port rule)
-        for (const auto &it : a_PortRule.params.set) {
+        for (const auto &it : a_Register.params.set) {
             if (a_Cell->hasParam(it.first)) {
                 const auto curr = a_Cell->getParam(it.first);
                 checkParam(it.first, curr, it.second);
@@ -920,212 +926,243 @@ struct DspFF : public Pass {
 
     // ..........................................
 
-    void processPort(RTLIL::Cell *a_Cell, const DspPortType &a_PortRule)
+    void processRegister(RTLIL::Cell *a_Cell, const RegisterType& a_Register,
+                                              const std::vector<PortType>& a_Ports)
     {
 
-        log_debug(" Attempting flip-flop integration for %s.%s of %s\n", a_Cell->type.c_str(), a_PortRule.name.c_str(), a_Cell->name.c_str());
-
-        // Check if the port can be used for FF integration
-        log_assert(a_Cell->output(a_PortRule.name) || a_Cell->input(a_PortRule.name));
-        if (!checkDspPort(a_Cell, a_PortRule)) {
-            log_debug("  port check failed\n");
-            return;
+        // The cell register control parameter(s) must not be set
+        for (const auto &it : a_Register.params.set) {
+            const auto curr = a_Cell->getParam(it.first);
+            if (curr == it.second) {
+                log_debug(" the param '%s' is already set to '%s'\n", it.first.c_str(), it.second.decode_string().c_str());
+                return;
+            }
         }
 
-        // Get port connections
-        auto sigspec = a_Cell->getPort(a_PortRule.name);
-        auto sigbits = sigspec.bits();
+        pool<FlopData> groups;
+        dict<RTLIL::IdString, std::vector<RTLIL::Cell*>> flops;
 
-        // Collect flip-flops, identify their group count
-        dict<FlopData, int> groups;
+        // Process ports
+        bool flopsOk = true;
+        for (const auto& port : a_Ports) {
+            log_debug(" attempting flip-flop integration for %s.%s of %s\n", a_Cell->type.c_str(), port.name.c_str(), a_Cell->name.c_str());
+            log_assert(a_Cell->output(port.name) || a_Cell->input(port.name));
 
-        std::vector<std::pair<RTLIL::Cell *, int>> flops(sigbits.size(), std::make_pair(nullptr, -1));
+            // Get port connections
+            auto sigspec = a_Cell->getPort(port.name);
+            auto sigbits = sigspec.bits();
 
-        for (size_t i = 0; i < sigbits.size(); ++i) {
-            auto sigbit = sigbits[i];
-            if (!sigbit.wire) {
-                continue;
-            }
-
-            // Skip bits out of the specified range
-            if ((a_PortRule.bits.first >= 0 && (int)i < a_PortRule.bits.first) || (a_PortRule.bits.second >= 0 && (int)i > a_PortRule.bits.second)) {
-                continue;
-            }
-
-            pool<CellPin> others;
-
-            // Get sinks(s), discard the port completely if more than one sink
-            // is found.
-            if (a_Cell->output(a_PortRule.name)) {
-                others = getSinks(CellPin(a_Cell, a_PortRule.name, i));
-                if (others.size() > 1) {
-                    log_debug("  multiple sinks found, cannot integrate.\n");
-                    return;
-                }
-            }
-            // Get driver. Discard if the driver drives something else too
-            // TODO: This is slow - we are first looking for a driver and then
-            // for all its sinks.
-            else if (a_Cell->input(a_PortRule.name)) {
-                auto driver = getDriver(CellPin(a_Cell, a_PortRule.name, i));
-                if (driver.cell != nullptr) {
-                    auto sinks = getSinks(driver);
-                    if (sinks.size() > 1) {
-                        log_debug("  multiple sinks found, cannot integrate.\n");
-                        return;
-                    }
-                }
-                others.insert(driver);
-            }
-
-            // No others - unconnected
-            if (others.empty()) {
-                continue;
-            }
-
-            // Get the sink, check if this is a flip-flop
-            auto &other = *others.begin();
-            auto *flop = other.cell;
-
-            if (flop == nullptr) {
-                if (!other.port.empty()) {
-                    log_debug("  port connection reaches outside of the module, cannot integrate\n");
-                    return;
-                } else {
+            flops[port.name] = std::vector<RTLIL::Cell*>(sigbits.size(), nullptr);
+            for (size_t i = 0; i < sigbits.size(); ++i) {
+                auto sigbit = sigbits[i];
+                if (!sigbit.wire) {
                     continue;
                 }
-            }
 
-            if (!m_FlopTypes.count(flop->type)) {
-                log_debug("  non-flip-flop connected, cannot integrate\n");
-                return;
-            }
-
-            // Check if the connection goes to the data input/output port
-            const auto &flopType = m_FlopTypes.at(flop->type);
-            RTLIL::IdString flopPort;
-            if (a_Cell->output(a_PortRule.name)) {
-                flopPort = flopType.ports.at(RTLIL::escape_id("d"));
-            } else if (a_Cell->input(a_PortRule.name)) {
-                flopPort = flopType.ports.at(RTLIL::escape_id("q"));
-            }
-
-            if (flopPort != other.port) {
-                log_debug("  connection to non-data port of a flip-flip, cannot integrate\n");
-                return;
-            }
-
-            // Check the flip-flop configuration
-            if (!checkFlop(flop)) {
-                return;
-            }
-
-            // Get parameters to be mapped to the DSP according to the port
-            // rule.
-            dict<RTLIL::IdString, RTLIL::Const> mappedParams;
-            for (const auto &it : a_PortRule.params.map) {
-                if (flop->hasParam(it.second)) {
-                    const auto &value = flop->getParam(it.second);
-                    mappedParams.insert(std::make_pair(it.first, value));
+                // Skip bits out of the specified range
+                if ((port.bits.first >= 0 && (int)i < port.bits.first) || (port.bits.second >= 0 && (int)i > port.bits.second)) {
+                    continue;
                 }
-            }
 
-            // Store the flop and its data
-            auto res = groups.insert(std::make_pair(getFlopData(flop, mappedParams), groups.size()));
-            flops[i] = std::make_pair(flop, res.first->second);
+                pool<CellPin> others;
+
+                // Get sinks(s), discard the port completely if more than one sink
+                // is found.
+                if (a_Cell->output(port.name)) {
+                    others = getSinks(CellPin(a_Cell, port.name, i));
+                    if (others.size() > 1) {
+                        log_debug("  multiple sinks found\n");
+                        flopsOk = false;
+                        continue;
+                    }
+                }
+                // Get driver. Discard if the driver drives something else too
+                // TODO: This is slow - we are first looking for a driver and then
+                // for all its sinks.
+                else if (a_Cell->input(port.name)) {
+                    auto driver = getDriver(CellPin(a_Cell, port.name, i));
+                    if (driver.cell != nullptr) {
+                        auto sinks = getSinks(driver);
+                        if (sinks.size() > 1) {
+                            log_debug("  multiple sinks found\n");
+                            flopsOk = false;
+                            continue;
+                        }
+                    }
+                    others.insert(driver);
+                }
+
+                // No others - unconnected
+                if (others.empty()) {
+                    continue;
+                }
+
+                // Get the sink, check if this is a flip-flop
+                auto &other = *others.begin();
+                auto *flop  = other.cell;
+
+                if (flop == nullptr) {
+                    if (!other.port.empty()) {
+                        log_debug("  port connection reaches outside of the module\n");
+                        flopsOk = false;
+                    }
+                    continue;
+                }
+
+                if (!m_FlopTypes.count(flop->type)) {
+                    log_debug("  non-flip-flop connected\n");
+                    flopsOk = false;
+                    continue;
+                }
+
+                // Check if the connection goes to the data input/output port
+                const auto &flopType = m_FlopTypes.at(flop->type);
+                RTLIL::IdString flopPort;
+                if (a_Cell->output(port.name)) {
+                    flopPort = flopType.ports.at(RTLIL::escape_id("d"));
+                } else if (a_Cell->input(port.name)) {
+                    flopPort = flopType.ports.at(RTLIL::escape_id("q"));
+                }
+
+                if (flopPort != other.port) {
+                    log_debug("  connection to non-data port of a flip-flip");
+                    flopsOk = false;
+                    continue;
+                }
+
+                // Check the flip-flop configuration
+                if (!checkFlop(flop)) {
+                    flopsOk = false;
+                    continue;
+                }
+
+                // Get parameters to be mapped to the DSP according to the port
+                // rule.
+                dict<RTLIL::IdString, RTLIL::Const> mappedParams;
+                for (const auto &it : a_Register.params.map) {
+                    if (flop->hasParam(it.second)) {
+                        const auto &value = flop->getParam(it.second);
+                        mappedParams.insert(std::make_pair(it.first, value));
+                    }
+                }
+
+                // Store the flop and its data
+                groups.insert(getFlopData(flop, mappedParams));
+                flops[port.name][i] = flop;
+            }
+        }
+
+        // Cannot integrate for various reasons
+        if (!flopsOk) {
+            log_debug(" cannot use the DSP register\n");
+            return;
         }
 
         // No matching flip-flop groups
         if (groups.empty()) {
-            log_debug("  no matching flip-flops found\n");
+            log_debug(" no matching flip-flops found\n");
             return;
         }
 
         // Do not allow more than a single group
         if (groups.size() != 1) {
-            log_debug("  %zu flip-flop groups, only a single one allowed\n", groups.size());
+            log_debug(" %zu flip-flop groups, only a single one allowed\n", groups.size());
             return;
         }
 
         // Validate the flip flop data agains the DSP cell
-        const auto &flopData = groups.begin()->first;
-        if (!checkFlopDataAgainstDspPort(flopData, a_Cell, a_PortRule)) {
-            log_debug("  flip-flop vs. DSP check failed\n");
+        const auto &flopData = *groups.begin();
+        if (!checkFlopDataAgainstDspRegister(flopData, a_Cell, a_Register, a_Ports)) {
+            log_debug(" flip-flops vs. DSP check failed\n");
             return;
         }
 
         // Debug log
-        log(" %s %s.%s\n", a_Cell->type.c_str(), a_Cell->name.c_str(), a_PortRule.name.c_str());
-        for (size_t i = 0; i < flops.size(); ++i) {
-            if (flops[i].first != nullptr) {
-                log_debug("  %2zu. (%d) %s %s\n", i, flops[i].second, flops[i].first->type.c_str(), flops[i].first->name.c_str());
-            } else if ((a_PortRule.bits.first >= 0 && (int)i < a_PortRule.bits.first) ||
-                       (a_PortRule.bits.second >= 0 && (int)i > a_PortRule.bits.second)) {
-                log_debug("  %2zu. (excluded)\n", i);
-            } else {
-                log_debug("  %2zu. None\n", i);
+        for (const auto& port : a_Ports) {
+            log(" %s %s.%s\n", a_Cell->type.c_str(), a_Cell->name.c_str(), port.name.c_str());
+
+            const auto& conns = flops.at(port.name);
+            for (size_t i = 0; i < conns.size(); ++i) {
+                if (conns[i] != nullptr) {
+                    log_debug("  %2zu. %s %s\n", i, conns[i]->type.c_str(), conns[i]->name.c_str());
+                } else if ((port.bits.first  >= 0 && (int)i < port.bits.first) ||
+                           (port.bits.second >= 0 && (int)i > port.bits.second)) {
+                    log_debug("  %2zu. (excluded)\n", i);
+                } else {
+                    log_debug("  %2zu. None\n", i);
+                }
             }
         }
 
         // Reconnect data signals, mark the flip-flop for removal
         const auto &flopType = m_FlopTypes.at(flopData.type);
-        for (size_t i = 0; i < flops.size(); ++i) {
+        for (const auto& port : a_Ports) {
 
-            auto *flop = flops[i].first;
-            if (flop == nullptr) {
-                continue;
+            const auto& conns = flops.at(port.name);
+            auto sigspec = a_Cell->getPort(port.name);
+            auto sigbits = sigspec.bits();
+
+            for (size_t i = 0; i < conns.size(); ++i) {
+
+                auto *flop = conns[i];
+                if (flop == nullptr) {
+                    continue;
+                }
+
+                RTLIL::IdString flopPort;
+                if (a_Cell->output(port.name)) {
+                    flopPort = flopType.ports.at(RTLIL::escape_id("q"));
+                } else if (a_Cell->input(port.name)) {
+                    flopPort = flopType.ports.at(RTLIL::escape_id("d"));
+                }
+
+                if (!flop->hasPort(flopPort)) {
+                    log_error("cell '%s' does not have port '%s'!\n", flop->type.c_str(), flopPort.c_str());
+                }
+
+                sigbits[i] = SigBit(RTLIL::Sx);
+                auto sigspec = flop->getPort(flopPort);
+                log_assert(sigspec.bits().size() <= 1);
+                if (sigspec.bits().size() == 1) {
+                    sigbits[i] = sigspec.bits()[0];
+                }
+
+                m_CellsToRemove.insert(flop);
             }
 
-            RTLIL::IdString port;
-            if (a_Cell->output(a_PortRule.name)) {
-                port = flopType.ports.at(RTLIL::escape_id("q"));
-            } else if (a_Cell->input(a_PortRule.name)) {
-                port = flopType.ports.at(RTLIL::escape_id("d"));
-            }
-
-            if (!flop->hasPort(port)) {
-                log_error("  cell '%s' does not have port '%s'!\n", flop->type.c_str(), port.c_str());
-            }
-
-            sigbits[i] = SigBit(RTLIL::Sx);
-            auto sigspec = flop->getPort(port);
-            log_assert(sigspec.bits().size() <= 1);
-            if (sigspec.bits().size() == 1) {
-                sigbits[i] = sigspec.bits()[0];
-            }
-
-            m_CellsToRemove.insert(flop);
+            a_Cell->setPort(port.name, RTLIL::SigSpec(sigbits));
         }
-        a_Cell->setPort(a_PortRule.name, RTLIL::SigSpec(sigbits));
 
         // Reconnect (map) control signals. Connect the default value if
         // a particular signal is not present in the flip-flop.
-        for (const auto &it : a_PortRule.assoc) {
-            const auto &key = it.first;
-            const auto &port = it.second.first;
+        for (const auto& port : a_Ports) {
+            for (const auto &it : port.assoc) {
+                const auto &key = it.first;
+                const auto &port = it.second.first;
 
-            auto conn = RTLIL::SigBit(RTLIL::SigChunk(it.second.second));
-            if (flopData.conns.count(key)) {
-                conn = flopData.conns.at(key);
+                auto conn = RTLIL::SigBit(RTLIL::SigChunk(it.second.second));
+                if (flopData.conns.count(key)) {
+                    conn = flopData.conns.at(key);
+                }
+
+                log_debug(" connecting %s.%s to %s\n", a_Cell->type.c_str(), port.c_str(), sigBitName(conn).c_str());
+                a_Cell->setPort(port, conn);
+                m_DspChanges[a_Cell].conns.insert(port);
             }
-
-            log_debug("  connecting %s.%s to %s\n", a_Cell->type.c_str(), port.c_str(), sigBitName(conn).c_str());
-            a_Cell->setPort(port, conn);
-            m_DspChanges[a_Cell].conns.insert(port);
         }
 
-        // Connect control signals according to DSP port rule
-        for (const auto &it : a_PortRule.connect) {
-            log_debug("  connecting %s.%s to %s\n", a_Cell->type.c_str(), it.first.c_str(), it.second.as_string().c_str());
+        // Connect control signals according to the register rule
+        for (const auto &it : a_Register.connect) {
+            log_debug(" connecting %s.%s to %s\n", a_Cell->type.c_str(), it.first.c_str(), it.second.as_string().c_str());
             a_Cell->setPort(it.first, it.second);
             m_DspChanges[a_Cell].conns.insert(it.first);
         }
 
-        // Map parameters (port rule)
-        for (const auto &it : a_PortRule.params.map) {
+        // Map parameters (register rule)
+        for (const auto &it : a_Register.params.map) {
             if (flopData.params.dsp.count(it.second)) {
                 const auto &param = flopData.params.dsp.at(it.second);
-                log_debug("  setting param '%s' to '%s'\n", it.first.c_str(), param.decode_string().c_str());
+                log_debug(" setting param '%s' to '%s'\n", it.first.c_str(), param.decode_string().c_str());
                 a_Cell->setParam(it.first, param);
                 m_DspChanges[a_Cell].params.insert(it.first);
             }
@@ -1135,22 +1172,22 @@ struct DspFF : public Pass {
         for (const auto &it : flopType.params.map) {
             if (flopData.params.dsp.count(it.second)) {
                 const auto &param = flopData.params.dsp.at(it.second);
-                log_debug("  setting param '%s' to '%s'\n", it.first.c_str(), param.decode_string().c_str());
+                log_debug(" setting param '%s' to '%s'\n", it.first.c_str(), param.decode_string().c_str());
                 a_Cell->setParam(it.first, param);
                 m_DspChanges[a_Cell].params.insert(it.first);
             }
         }
 
         // Set parameters (port rule)
-        for (const auto &it : a_PortRule.params.set) {
-            log_debug("  setting param '%s' to '%s'\n", it.first.c_str(), it.second.decode_string().c_str());
+        for (const auto &it : a_Register.params.set) {
+            log_debug(" setting param '%s' to '%s'\n", it.first.c_str(), it.second.decode_string().c_str());
             a_Cell->setParam(it.first, it.second);
             m_DspChanges[a_Cell].params.insert(it.first);
         }
 
         // Set parameters (flip-flop rule)
         for (const auto &it : flopType.params.set) {
-            log_debug("  setting param '%s' to '%s'\n", it.first.c_str(), it.second.decode_string().c_str());
+            log_debug(" setting param '%s' to '%s'\n", it.first.c_str(), it.second.decode_string().c_str());
             a_Cell->setParam(it.first, it.second);
             m_DspChanges[a_Cell].params.insert(it.first);
         }
