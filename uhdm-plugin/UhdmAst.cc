@@ -2212,7 +2212,7 @@ void UhdmAst::process_io_decl()
     visit_one_to_one({vpiExpr}, obj_h, [&](AST::AstNode *node) { current_node = node; });
     if (current_node == nullptr) {
         current_node = make_ast_node(AST::AST_MODPORTMEMBER);
-        visit_one_to_many({vpiRange}, obj_h, [&](AST::AstNode *node) { packed_ranges.push_back(node); });
+        visit_one_to_many({vpiRange}, obj_h, [&](AST::AstNode *node) { unpacked_ranges.push_back(node); });
     }
     visit_one_to_one({vpiTypedef}, obj_h, [&](AST::AstNode *node) {
         if (node) {
