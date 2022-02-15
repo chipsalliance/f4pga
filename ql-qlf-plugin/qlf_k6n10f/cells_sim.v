@@ -746,8 +746,12 @@ module dsp_t1_sim # (
     input [5:0]   shift_right_i
 );
 
+// FIXME: The version of Icarus Verilog from Conda seems not to recognize the
+// $error macro. Disable this sanity check for now because of that.
+`ifndef __ICARUS__
     if (NBITS_ACC < NBITS_A + NBITS_B)
         $error("NBITS_ACC must be > NBITS_A + NBITS_B");
+`endif
 
     // Input registers
     reg  [NBITS_A-1:0]  r_a;
