@@ -8,6 +8,7 @@
 
 TESTS = \
     nexus_mult \
+    nexus_mult_wide \
     nexus_fftypes \
     nexus_conn_conflict \
     nexus_conn_share \
@@ -16,6 +17,7 @@ TESTS = \
 include $(shell pwd)/../../Makefile_test.common
 
 nexus_mult_verify = true
+nexus_mult_wide_verify = true
 nexus_fftypes_verify = true
 nexus_conn_conflict_verify = true
 nexus_conn_share_verify = true

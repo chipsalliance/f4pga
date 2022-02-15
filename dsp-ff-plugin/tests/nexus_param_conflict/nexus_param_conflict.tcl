@@ -25,7 +25,7 @@ design -load postopt
 yosys cd ${TOP}
 stat
 select -assert-count 1 t:MULT9X9
-select -assert-count 9 t:FD1P3IX t:DS1P3DX %u
+select -assert-count 9 t:FD1P3IX t:FD1P3DX %u
 
 set TOP "conflict_ff_param"
 design -load read

@@ -68,91 +68,88 @@ dsp MULTPREADD9X9 MULTPREADD18X18 MULTADDSUB18X18 MULTADDSUB36X36
   endport
 enddsp
 
-# TODO: Uncomment when support for multiple port registers controlled by
-# a common parameter is added:
+dsp MULTADDSUB9X9WIDE
+  port A0
+    clk CLK 0
+    rst RSTA0A1 0
+    ena CEA0A1 1
 
-#dsp MULTADDSUB9X9WIDE
-#  port A0
-#    clk CLK 0
-#    rst RSTA0A1 0
-#    ena CEA0A1 1
-#
-#    set REGINPUTAB0=REGISTER
-#    map GSR=GSR
-#  endport
-#  port A1
-#    clk CLK 0
-#    rst RSTA0A1 0
-#    ena CEA0A1 1
-#
-#    set REGINPUTAB1=REGISTER
-#    map GSR=GSR
-#  endport
-#  port A2
-#    clk CLK 0
-#    rst RSTA2A3 0
-#    ena CEA2A3 1
-#
-#    set REGINPUTAB2=REGISTER
-#    map GSR=GSR
-#  endport
-#  port A3
-#    clk CLK 0
-#    rst RSTA2A3 0
-#    ena CEA2A3 1
-#
-#    set REGINPUTAB3=REGISTER
-#    map GSR=GSR
-#  endport
-#  port B0
-#    clk CLK 0
-#    rst RSTB0B1 0
-#    ena CEB0B1 1
-#
-#    set REGINPUTAB0=REGISTER
-#    map GSR=GSR
-#  endport
-#  port B1
-#    clk CLK 0
-#    rst RSTB0B1 0
-#    ena CEB0B1 1
-#
-#    set REGINPUTAB1=REGISTER
-#    map GSR=GSR
-#  endport
-#  port B2
-#    clk CLK 0
-#    rst RSTB2B3 0
-#    ena CEB2B3 1
-#
-#    set REGINPUTAB2=REGISTER
-#    map GSR=GSR
-#  endport
-#  port B3
-#    clk CLK 0
-#    rst RSTB2B3 0
-#    ena CEB2B3 1
-#
-#    set REGINPUTAB3=REGISTER
-#    map GSR=GSR
-#  endport
-#  port C
-#    clk CLK 0
-#    rst RSTC0
-#    ena CEC 1
-#
-#    set REGINPUTC=REGISTER
-#    map GSR=GSR
-#  endport
-#  port Z
-#    clk CLK 0
-#    rst RSTOUT 0
-#    ena CEOUT 1
-#
-#    set REGOUTPUT=REGISTER
-#    map GSR=GSR
-#  endport
-#enddsp
+    set REGINPUTAB0=REGISTER
+    map GSR=GSR
+  endport
+  port A1
+    clk CLK 0
+    rst RSTA0A1 0
+    ena CEA0A1 1
+
+    set REGINPUTAB1=REGISTER
+    map GSR=GSR
+  endport
+  port A2
+    clk CLK 0
+    rst RSTA2A3 0
+    ena CEA2A3 1
+
+    set REGINPUTAB2=REGISTER
+    map GSR=GSR
+  endport
+  port A3
+    clk CLK 0
+    rst RSTA2A3 0
+    ena CEA2A3 1
+
+    set REGINPUTAB3=REGISTER
+    map GSR=GSR
+  endport
+  port B0
+    clk CLK 0
+    rst RSTB0B1 0
+    ena CEB0B1 1
+
+    set REGINPUTAB0=REGISTER
+    map GSR=GSR
+  endport
+  port B1
+    clk CLK 0
+    rst RSTB0B1 0
+    ena CEB0B1 1
+
+    set REGINPUTAB1=REGISTER
+    map GSR=GSR
+  endport
+  port B2
+    clk CLK 0
+    rst RSTB2B3 0
+    ena CEB2B3 1
+
+    set REGINPUTAB2=REGISTER
+    map GSR=GSR
+  endport
+  port B3
+    clk CLK 0
+    rst RSTB2B3 0
+    ena CEB2B3 1
+
+    set REGINPUTAB3=REGISTER
+    map GSR=GSR
+  endport
+  port C
+    clk CLK 0
+    rst RSTC 0
+    ena CEC 1
+
+    set REGINPUTC=REGISTER
+    map GSR=GSR
+  endport
+  port Z
+    clk CLK 0
+    rst RSTOUT 0
+    ena CEOUT 1
+
+    set REGOUTPUT=REGISTER
+    map GSR=GSR
+  endport
+enddsp
 
 ff FD1P3DX
   clk CK
