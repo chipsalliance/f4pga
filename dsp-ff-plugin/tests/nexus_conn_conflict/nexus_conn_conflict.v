@@ -125,4 +125,27 @@ module conflict_ff_ena (
 
 endmodule
 
+module conflict_dsp_port (
+    input  wire        CLK_A,
+    input  wire [ 8:0] A,
+    input  wire        SA,
+    input  wire [ 8:0] B,
+    output wire [17:0] Z
+);
 
+    reg [8:0] ra;
+    always @(posedge CLK_A)
+        ra <= A;
+
+    MULT9X9 # (
+        .REGINPUTA("BYPASS"),
+        .REGINPUTB("BYPASS"),
+        .REGOUTPUT("BYPASS")
+    ) mult (
+        .A       (ra),
+        .SIGNEDA (SA),
+        .B       (B),
+        .Z       (Z)
+    );
+
+endmodule

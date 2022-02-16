@@ -41,3 +41,18 @@ stat
 select -assert-count 1 t:MULT9X9
 select -assert-count 0 t:FD1P3IX
 
+# The test cannot be run because the equivalence check fails at some internal
+# wires of the DSP simulation model which ends up dangling. So that's not a
+# real issue but makes the test fail.
+
+#set TOP "mult_ctrl"
+#design -load read
+#hierarchy -top ${TOP}
+#synth_nexus -flatten
+#techmap -map +/nexus/cells_sim.v t:VLO t:VHI %u ;# Unmap VHI and VLO
+#equiv_opt -assert -async2sync -map +/nexus/cells_sim.v debug dsp_ff -rules ../../nexus-dsp_rules.txt
+#design -load postopt
+#yosys cd ${TOP}
+#stat
+#select -assert-count 1 t:MULT9X9
+#select -assert-count 0 t:FD1P3IX

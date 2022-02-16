@@ -46,3 +46,13 @@ debug dsp_ff -rules ../../nexus-dsp_rules.txt
 stat
 select -assert-count 1 t:MULT9X9
 select -assert-count 18 t:FD1P3IX
+
+set TOP "conflict_dsp_port"
+design -load read
+hierarchy -top ${TOP}
+synth_nexus -flatten
+techmap -map +/nexus/cells_sim.v t:VLO t:VHI %u ;# Unmap VHI and VLO
+debug dsp_ff -rules ../../nexus-dsp_rules.txt
+stat
+select -assert-count 1 t:MULT9X9
+select -assert-count 9 t:FD1P3IX

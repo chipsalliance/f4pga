@@ -82,3 +82,33 @@ module mult_all (
     );
 
 endmodule
+
+module mult_ctrl (
+    input  wire        CLK,
+    input  wire [ 8:0] A,
+    input  wire        SA,
+    input  wire [ 8:0] B,
+    output wire [17:0] Z
+);
+
+    reg [8:0] ra;
+    reg       rsa;
+
+    always @(posedge CLK) begin
+        ra  <= A;
+        rsa <= SA;
+    end
+
+    MULT9X9 # (
+        .REGINPUTA("BYPASS"),
+        .REGINPUTB("BYPASS"),
+        .REGOUTPUT("BYPASS")
+    ) mult (
+        .A          (ra),
+        .SIGNEDA    (rsa),
+        .B          (B),
+        .Z          (Z)
+    );
+
+endmodule
+
