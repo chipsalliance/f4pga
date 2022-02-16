@@ -689,6 +689,7 @@ module dsp_t1_20x18x64 (
     input  [17:0] b_i,
     output [63:0] z_o,
 
+    (* clkbuf_sink *)
     input         clock_i,
     input         reset_i,
     input         load_acc_i,
@@ -709,6 +710,7 @@ module dsp_t1_10x9x32 (
     input  [ 8:0] b_i,
     output [31:0] z_o,
 
+    (* clkbuf_sink *)
     input         clock_i,
     input         reset_i,
     input         load_acc_i,
