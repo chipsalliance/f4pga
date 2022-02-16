@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html style=min-height:100%; lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>F4PGA - Getting Started</title>
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="assets/css/getting-started.css">
+</head>
+
+<body>
+
+  <nav class="nav">
+    <div class="nav__wrapper">
+      <a href="index.html">
+        <img class="nav__logo" src="assets/img/f4pga.svg" alt="F4PGA">
+      </a>
+
+      <div class="nav__toggle">
+        <button class="hamburger hamburger--squeeze" type="button">
+          <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+          </span>
+        </button>
+      </div>
+      <ul class="nav__links">
+        <li><a href="index.html#hero">Home</a></li>
+        <li><a href="getting-started.html" class="current-page">Start using</a></li>
+        <li><a href="developers.html">Contribute now</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="getting-wrapper">
+    <section class="row getting" id="getting">
+      <h2 class="row__header getting__header">
+        <span class="underline">Getting started</span>
+      </h2>
+      <div class="getting__content">
+        <p class="getting__paragraph">
+          To begin using F4PGA, you might want to take a look at the
+          tutorials below, which make for a good starting point. They will guide
+          you through the process of using the toolchain, explaining how to
+          generate and load a bitstream into your FPGA.
+        </p>
+      <h3> User guide and examples how to use the toolchain: </h3>
+      </div>
+      <div class="getting__buttons">
+        <a href="https://f4pga-examples.readthedocs.io/en/latest/">
+          <div class="btn">F4PGA Examples</div>
+        </a>
+      </div>
+      <div class="getting__content">
+      <h3> Other resources (for toolchain developers): </h3>
+      </div>
+      <div class="getting__buttons">
+        <a href="https://f4pga.readthedocs.io/en/latest/toolchain-desc.html">
+          <div class="btn">Toolchain Description</div>
+        </a>
+
+        <a href="https://f4pga.readthedocs.io/en/latest/prjxray/docs/db_dev_process/readme.html#quickstart-guide">
+          <div class="btn">X-Ray Quickstart</div>
+        </a>
+
+        <a href="https://chipsalliance.github.io/f4pga-database-visualizer/">
+          <div class="btn">F4PGA Architectures Visualizer</div>
+        </a>
+
+      </div>
+    </section>
+
+    <div class="getting-bg"></div>
+  </div>
+
+  <footer class="footer getting-footer">
+    <div class="footer__wrapper">
+        <span class="footer__copy">
+         © 2022 F4PGA
+        </span>
+
+      <div class="chips__alliance">
+        <a  href="https://chipsalliance.com">
+        <img src="assets/img/chips-alliance.svg" />
+        </a>
+      </div>
+
+      <span class="footer__social">
+        <a href="https://github.com/F4PGA/" target="_blank">
+          <img class="social__icon" src="assets/img/github.svg" alt="GitHub">
+        </a>
+      </span>
+    </div>
+  </footer>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/cferdinandi/smooth-scroll/dist/smooth-scroll.polyfills.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@glidejs/glide"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/mustache.js/0.7.2/mustache.min.js"></script>
+  <script src="assets/js/github-activity.js"></script>
+  <script src="assets/js/script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>F4PGA - the GCC of FPGAs</title>
+
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+  <!-- Glide.js -->
+  <link rel="stylesheet" href="assets/css/glide.core.min.css" />
+  <link rel="stylesheet" href="assets/css/glide.theme.min.css" />
+  <!-- glightbox -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" />
+  <!-- Github Feed -->
+  <link rel="stylesheet" href="assets/css/github-activity.css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/octicons/2.0.2/octicons.min.css" />
+
+  <link rel="stylesheet" href="assets/css/main.css" />
+</head>
+
+<body>
+
+<!--
+  <div class="gsoc-banner">
+    <span class="gsoc-banner__caption">F4PGA is participating in </span>
+    <a href="https://summerofcode.withgoogle.com/organizations/6224851964002304/">
+      <img class="gsoc-banner__logo" src="assets/img/gsoc-logo.svg" alt="Google's Summer of Code website" />
+    </a>
+  </div>
+-->
+
+  <nav class="nav">
+    <div class="nav__wrapper">
+      <a href="index.html">
+        <img class="nav__logo" src="assets/img/f4pga.svg" alt="F4PGA" />
+      </a>
+
+      <div class="nav__toggle">
+        <button class="hamburger hamburger--squeeze" type="button">
+          <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+          </span>
+        </button>
+      </div>
+      <ul class="nav__links">
+        <li><a href="#hero" class="current-page">Home</a></li>
+        <li><a href="getting-started.html">Start using</a></li>
+        <li><a href="developers.html">Contribute now</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="row hero" id="hero">
+    <div class="hero__container">
+    <div class="hero_left">
+      <h1 class="hero__header">
+        <span class="underline">Innovate</span> by reaching for the open source FPGA tooling
+      </h1>
+      <h4 class="hero__subheader">
+        F4PGA is a fully open source toolchain for the development of FPGAs
+        of multiple vendors. Currently, it targets the Xilinx 7-Series,
+        Lattice iCE40, Lattice ECP5 FPGAs, QuickLogic EOS S3 and is gradually
+        being expanded to provide a comprehensive end-to-end FPGA synthesis flow.
+      </h4>
+      <div class="hero__btns">
+        <a href="getting-started.html">
+          <div class="hero__btn">
+            Getting Started
+          </div>
+        </a>
+        <a href="developers.html">
+          <div class="hero__btn">
+            Help contribute
+          </div>
+        </a>
+      </div>
+    </div>
+    <div class="hero_right">
+    <img class="hero__image" src="assets/img/hero-image.svg" />
+  </div>
+</div>
+  </section>
+
+  <section class="row news" id="news">
+    <h2 class="row__header talks__header">
+        <span class="underline">What's new</span>
+    </h2>
+    <div class="talks">
+      <div class="glide">
+        <div class="glide__track" data-glide-el="track">
+          <ul class="glide__slides">
+            {{#each talks}}
+            <li class="glide__slide talks__talk">
+              <div class="talks__img_container">
+                <a href="{{url}}" class="glightbox2">
+                  <img class="talks__img" src="assets/img/talks/{{image}}" />
+                  <img class="talks__playbtn" src="assets/img/play_btn.svg" />
+                </a>
+              </div>
+              <h4>{{title}}</h4>
+              <p>{{details}}</p>
+            </li>
+            {{/each}}
+          </ul>
+        </div>
+
+      <div class="glide__bullets" data-glide-el="controls[nav]">
+        {{#each talks}}
+        <button class="glide__bullet" data-glide-dir="={{@index}}"></button>
+        {{/each}}
+      </div>
+      </div>
+    </div>
+
+    <div class="news__container">
+      <div class="news__twitter">
+        <div class="news__header">
+          <div class="news__header_container">
+            <img src="assets/img/news_twitter.svg" />
+            <a href="https://twitter.com/f4pga">F4PGA Twitter</a>
+          </div>
+        </div>
+        <a class="twitter-timeline" href="https://twitter.com/f4pga?ref_src=twsrc%5Etfw"
+          data-height="500"
+          data-tweet-limit="3"
+          data-chrome="noscrollbar nofooter noheader">
+          Tweets by F4PGA
+        </a>
+        <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+      </div>
+      <div class="news__github">
+          <div class="news__header">
+            <div class="news__header_container">
+              <img src="assets/img/news_github.svg" />
+              <a href="https://github.com/F4PGA/">F4PGA GitHub</a>
+            </div>
+          </div>
+          <div id="feed"></div>
+      </div>
+    </div>
+ </section>
+
+  <section class="row comm" id="channels">
+    <h2 class="row__header comm__header">
+      <span class="underline">Community Channels</span>
+    </h2>
+    <div class="downloads__links comm__links">
+      <a class="downloads__anchor" href="https://kiwiirc.com/nextclient/#irc://irc.libera.chat/#F4PGA">
+        <div class="btn btn--inverted">
+          IRC
+        </div>
+      </a>
+      <a class="downloads__anchor" href="https://lists.chipsalliance.org/g/f4pga">
+        <div class="btn btn--inverted">
+          Mailing list
+        </div>
+      </a>
+      <a class="downloads__anchor" href="https://F4PGA.slack.com">
+        <div class="btn btn--inverted">
+          Slack
+        </div>
+      </a>
+    </div>
+    <div class="comm__register">
+      To register to F4PGA's Slack workspace, use the following
+      <a class="inline-link" href="https://join.slack.com/t/F4PGA/shared_invite/enQtNTkyMjcyNTkzOTY4LTU0MzhmYWNjOGMyMTkyNjA0MmEyMWM5OWY3ZDg5MWQ3ODlmOWQwZjk2YzBmMDBjMzkzMzNjYjkwYjAxZTMyNjQ">
+        Slack Invite
+      </a>.
+    </div>
+  </section>
+
+  <section class="row about" id="about">
+    <h2 class="row__header about__header">
+      <span class="underline">Why F4PGA?</span>
+    </h2>
+    <div class="about__content">
+      <p class="about__paragraph">
+        F4PGA aims to push FPGAs towards more widespread adoption by
+        optimising and automating FPGA development workflows with a set of
+        pluggable open source tools.
+      </p>
+      <p>
+        Its goal is to become a complete FOSS toolchain that is:
+      </p>
+      </div>
+    </div>
+    <div class="about__icon_container">
+
+      <div class="about__icon">
+        <img src="assets/img/icons_os_free.svg" alt="" />
+        <h4> Free &amp; Open Source </h4>
+      </div>
+
+      <div class="about__icon">
+        <img src="assets/img/icons_multi_platform.svg" alt="" />
+        <h4> Multi-platform </h4>
+      </div>
+
+      <div class="about__icon">
+        <img src="assets/img/icons_vendor_neutral.svg" alt="" />
+        <h4> Vendor-neutral </h4>
+      </div>
+
+      <div class="about__icon">
+        <img src="assets/img/icons_interchangeable_tools.svg" alt="" />
+        <h4> Interchangeable <br /> tool suite </h4>
+      </div>
+
+      <div class="about__icon">
+        <img src="assets/img/icons_community.svg" alt="" />
+        <h4> Growing <br /> community </h4>
+      </div>
+
+      <div class="about__icon">
+        <img src="assets/img/icons_learn.svg" alt="" />
+        <h4> Look inside <br /> and improve </h4>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="row diagrams">
+    <h2 class="row__header diagrams__header">
+      <span class="underline">How it works</span>
+    </h2>
+    <p class="diagrams__paragraph_intro">
+      To understand how F4PGA works, it is best to start with an overview of <br />
+      the general EDA tooling ecosystem and then proceed to see what <br />
+      the F4PGA project consists of.
+    </p>
+    <div class="diagrams__diagram" id="eda-ecosystem">
+      <h3 class="diagram__header">
+        EDA Tooling Ecosystem
+      </h3>
+      <div class="diagrams__content">
+        <div class="diagrams__paragraph">
+          <p>
+            For both ASIC- and FPGA-oriented EDA tooling,
+            there are three major areas:
+          </p>
+          <ul>
+            <li> hardware description </li>
+            <li> frontend </li>
+            <li> backend </li>
+          </ul>
+        </div>
+        <p class="diagrams__paragraph">
+          While there are a number of open hardware description languages, such as
+          Verilog, VHDL, Chisel, Migen and Amaranth HDL, the frontend and backend
+          tooling has been lacking established standard, vendor-neutral solutions.
+          F4PGA focuses on filling this gap.
+        </p>
+      </div>
+      <div class="diagram__diagram">
+        <img src="assets/img/EDA.svg" alt="" />
+      </div>
+    </div>
+    <div class="diagrams__diagram" id="structure">
+      <h3 class="diagram__header">
+        F4PGA project structure
+      </h3>
+      <div class="diagrams__content">
+      <p class="diagrams__paragraph">
+        To become a complete FOSS FPGA toolchain, F4PGA needs a number of
+        tools and projects to be in place to provide an end-to-end flow.
+        Thus, F4PGA serves as an umbrella framework for several activities,
+        the central of which focuses on the creation of FPGA
+        F4PGA Architecture Definitions, i.e. documentation of how specific
+        FPGAs work internally.
+      </p>
+      <p class="diagrams__paragraph">
+        Those definitions and serve as input to backend tools like nextpnr and
+        Verilog to Routing, and frontend tools like Yosys. They are created
+        within separate collaborating projects targeting different FPGAs -
+        <a href="https://github.com/F4PGA/prjxray">Project X-Ray</a> for Xilinx 7-Series,
+        <a href="https://github.com/F4PGA/icestorm">Project IceStorm</a> for Lattice iCE40 and
+        <a href="https://github.com/F4PGA/prjtrellis">Project Trellis</a> for Lattice ECP5 FPGAs.
+      </p>
+      </div>
+      <div class="diagram__diagram">
+        <img src="assets/img/parts.svg" />
+      </div>
+    </div>
+    <h3 class="diagram__header">
+      Current status
+    </h3>
+    <div class="diagram__diagram">
+      <div class="diagram__status">
+        <div class="diagram__container">
+          <table class="diagram__table">
+            <thead>
+              <tr>
+                <td></td>
+                <td>
+                  <a class="diagram__link" href="https://github.com/F4PGA/icestorm">
+                    Project Icestorm
+                  </a>
+                </td>
+                <td>
+                  <a class="diagram__link" href="https://github.com/F4PGA/prjtrellis">
+                    Project Trellis
+                  </a>
+                </td>
+                <td>
+                   <a class="diagram__link" href="https://github.com/F4PGA/prjxray">
+                    Project X-Ray
+                  </a>
+                </td>
+                <td>
+                  <a class="diagram__link" href="https://www.quicklogic.com/products/eos-s3/">
+                    QuickLogic Database
+                  </a>
+                </td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  Basic&nbsp;Tiles:
+                  <ul>
+                    <li>Logic</li>
+                    <li>Block&nbsp;RAM</li>
+                  </ul>
+                </td>
+       <!-- icestorm -->
+                <td>
+                  <img class="icon icon--large" src="assets/img/tick.svg" alt="" />
+                  <img class="icon icon--small" src="assets/img/tick.svg" alt="" />
+                  <img class="icon icon--small" src="assets/img/tick.svg" alt="" />
+                </td>
+       <!-- trellis -->
+                <td>
+                  <img class="icon icon--large" src="assets/img/tick.svg" alt="" />
+                  <img class="icon icon--small" src="assets/img/tick.svg" alt="" />
+                  <img class="icon icon--small" src="assets/img/tick.svg" alt="" />
+                </td>
+      <!-- x-ray -->
+                <td>
+                  <img class="icon icon--large" src="assets/img/tick.svg" alt="" />
+                  <img class="icon icon--small" src="assets/img/tick.svg" alt="" />
+                  <img class="icon icon--small" src="assets/img/partial.svg" alt="" />
+                </td>
+      <!-- quicklogic -->
+                <td>
+                  <img class="icon icon--large" src="assets/img/tick.svg" alt="" />
+                  <img class="icon icon--small" src="assets/img/tick.svg" alt="" />
+                  <img class="icon icon--small" src="assets/img/tick.svg" alt="" />
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Advanced&nbsp;Tiles:
+                  <ul>
+                    <li>DSP</li>
+                    <li>Hard&nbsp;Blocks</li>
+                    <li>Clock&nbsp;Tiles</li>
+                    <li>IO&nbsp;Tiles</li>
+                  </ul>
+                </td>
+      <!-- icestorm -->
+                <td>
+                  <img class="icon icon--large" src="assets/img/tick.svg" alt="" />
+                  <img class="icon icon--small" src="assets/img/tick.svg" alt="" />
+                  <img class="icon icon--small" src="assets/img/tick.svg" alt="" />
+                  <img class="icon icon--small" src="assets/img/tick.svg" alt="" />
+                  <img class="icon icon--small" src="assets/img/tick.svg" alt="" />
+                </td>
+      <!-- trellis -->
+                <td>
+                  <img class="icon icon--large" src="assets/img/tick.svg" alt="" />
+                  <img class="icon icon--small" src="assets/img/tick.svg" alt="" />
+                  <img class="icon icon--small" src="assets/img/tick.svg" alt="" />
+                  <img class="icon icon--small" src="assets/img/tick.svg" alt="" />
+                  <img class="icon icon--small" src="assets/img/tick.svg" alt="" />
+                </td>
+     <!-- x-ray -->
+                <td>
+                  <img class="icon icon--large" src="assets/img/partial.svg" alt="" />
+                  <img class="icon icon--small" src="assets/img/cross.svg" alt="" />
+                  <img class="icon icon--small" src="assets/img/cross.svg" alt="" />
+                  <img class="icon icon--small" src="assets/img/tick.svg" alt="" />
+                  <img class="icon icon--small" src="assets/img/tick.svg" alt="" />
+                </td>
+      <!-- quicklogic -->
+                <td>
+                  <img class="icon icon--large" src="assets/img/tick.svg" alt="" />
+                  <img class="icon icon--small" src="assets/img/tick.svg" alt="" />
+                  <img class="icon icon--small" src="assets/img/tick.svg" alt="" />
+                  <img class="icon icon--small" src="assets/img/tick.svg" alt="" />
+                  <img class="icon icon--small" src="assets/img/tick.svg" alt="" />
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Routing:
+                  <ul>
+                    <li>Logic</li>
+                    <li>Clock</li>
+                  </ul>
+                </td>
+                <td>
+      <!-- icestorm -->
+                  <img class="icon icon--large" src="assets/img/tick.svg" alt="" />
+                  <img class="icon icon--small" src="assets/img/tick.svg" alt="" />
+                  <img class="icon icon--small" src="assets/img/tick.svg" alt="" />
+                </td>
+      <!-- trellis -->
+                <td>
+                  <img class="icon icon--large" src="assets/img/tick.svg" alt="" />
+                  <img class="icon icon--small" src="assets/img/tick.svg" alt="" />
+                  <img class="icon icon--small" src="assets/img/tick.svg" alt="" />
+                </td>
+      <!-- x-ray -->
+                <td>
+                  <img class="icon icon--large" src="assets/img/tick.svg" alt="" />
+                  <img class="icon icon--small" src="assets/img/tick.svg" alt="" />
+                  <img class="icon icon--small" src="assets/img/tick.svg" alt="" />
+                </td>
+      <!-- quicklogic -->
+                <td>
+                  <img class="icon icon--large" src="assets/img/tick.svg" alt="" />
+                  <img class="icon icon--small" src="assets/img/tick.svg" alt="" />
+                  <img class="icon icon--small" src="assets/img/tick.svg" alt="" />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="row subprojects" id="subprojects">
+    <h2 class="row__header subprojects__header">
+      <span class="underline">  Supported Architectures</span>
+    </h2>
+    <div class="subprojects__tiles">
+      <div class="subproject__tile">
+        <div class="subproject__details">
+          <h4>Xilinx 7-Series </h4>
+          <p class="subproject__description">
+            The most popular Xilinx <br /> FPGA family
+          </p>
+          <a class="subproject__more inline-link" target="_blank"
+             href="https://www.xilinx.com/video/fpga/7-series-fpga-overview.html">learn more</a>
+        </div>
+      </div>
+
+      <div class="subproject__tile">
+        <div class="subproject__details">
+          <h4>Lattice ice40 </h4>
+          <p class="subproject__description">
+            World's smallest FPGAs <br /> for mobile devices
+          </p>
+          <a class="subproject__more inline-link" target="_blank"
+             href="http://www.latticesemi.com/iCE40">learn more</a>
+        </div>
+      </div>
+
+      <div class="subproject__tile">
+        <div class="subproject__details">
+          <h4>Lattice ecp5 </h4>
+          <p class="subproject__description">
+            Low cost FPGAs with <br /> high performance features
+          </p>
+          <a class="subproject__more inline-link" target="_blank"
+             href="https://www.latticesemi.com/Products/FPGAandCPLD/ECP5">learn more</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="subprojects__tiles">
+
+      <div class="subproject__tile">
+        <div class="subproject__details">
+          <h4>QuickLogic EOS S3</h4>
+          <p class="subproject__description">
+            FPGA + CPU <br /> sensor processing platform
+          </p>
+          <a class="subproject__more inline-link" target="_blank"
+             href="https://www.quicklogic.com/products/eos-s3/">learn more
+          </a>
+        </div>
+      </div>
+
+      <div class="subproject__tile">
+        <div class="subproject__details">
+          <h4>QuickLogic QLF K4N8</h4>
+          <p class="subproject__description">
+            A 24x24 eFPGA with <br /> 6144 flip-flops, 4608 LUT4s, <br /> adder and shift-register support
+          </p>
+          <a class="subproject__more inline-link" target="_blank"
+             href="https://www.quicklogic.com/products/efpga/efpga-ip-software/">learn more
+          </a>
+        </div>
+      </div>
+
+      <div class="subproject__tile">
+        <div class="subproject__details">
+          <h4>Do you want to <br /> add more?</h4>
+          <p class="subproject__description">Help us!</p>
+          <a class="subproject__more inline-link" href="developers.html">learn more</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="row boards" id="boards">
+    <h2 class="row__header boards__header">
+        <span class="underline">Supported boards</span>
+    </h2>
+
+    <div class="boards__container boards__showcase">
+        {{#each boards}}
+
+        {{#lte @index 2}}
+        <a class="boards__anchor" href="{{url}}" target="_blank">
+        {{/lte}}
+
+        {{#gt @index 2}}
+        <a class="boards__anchor boards__showcase-d-none boards__showcase-hidden boards__showcase-delayed" href="{{url}}" target="_blank">
+        {{/gt}}
+
+            <li class="boards__board">
+                <img class="boards__img" src="assets/img/boards/{{image}}" alt="{{{name}}}" />
+                <span class="boards__name">{{{name}}}</span>
+                <span class="boards__fpga">{{{FPGA}}}</span>
+            </li>
+        </a>
+        {{/each}}
+    </div>
+  </section>
+
+  <div class="downloads__wrapper">
+    <section class="row downloads" id="downloads">
+      <h2 class="row__header downloads__header">
+        Links
+      </h2>
+      <p class="downloads__paragraph">
+        F4PGA is a collaborative project and we welcome your contributions.
+        The code is available on GitHub, while the HTML documentation
+        is available on Read The Docs.
+      </p>
+      <div class="downloads__links">
+        <a class="downloads__anchor" href="https://github.com/F4PGA" target="_blank">
+          <div class="btn">
+            Visit our GitHub
+          </div>
+        </a>
+        <a class="downloads__anchor" href="getting-started.html">
+          <div class="btn">
+            Getting Started
+          </div>
+        </a>
+        <a class="downloads__anchor" href="https://F4PGA.readthedocs.io/en/latest/" target="_blank">
+          <div class="btn">
+            Developer docs
+          </div>
+        </a>
+      </div>
+    </section>
+    <div class="downloads__bg"></div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer__wrapper">
+        <span class="footer__copy">
+          © 2022 F4PGA
+        </span>
+
+        <div class="chips__alliance">
+          <a  href="https://chipsalliance.com">
+          <img src="assets/img/chips-alliance.svg" />
+          </a>
+        </div>
+
+      <span class="footer__social">
+        <a href="https://github.com/F4PGA/" target="_blank">
+          <img class="social__icon" src="assets/img/github.svg" alt="GitHub" />
+        </a>
+      </span>
+    </div>
+  </footer>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/cferdinandi/smooth-scroll/dist/smooth-scroll.polyfills.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/mcstudios/glightbox/dist/js/glightbox.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@glidejs/glide"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/0.7.2/mustache.min.js"></script>
+  <script src="assets/js/github-activity.js"></script>
+  <script src="assets/js/script.js"></script>
+  <script src="assets/js/main.js"></script>
+</body>
+
+</html>

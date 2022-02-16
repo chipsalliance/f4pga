@@ -1,0 +1,88 @@
+@import 'partials/hamburgers';
+@import 'partials/glide.core.min';
+@import 'partials/variables';
+@import 'partials/functions';
+@import 'partials/mixins';
+
+// ***********************
+// Getting-Started
+// ***********************
+
+.btn {
+  width: 100%;
+}
+
+.getting-wrapper {
+  height: 100%;
+  position: relative;
+}
+
+.getting {
+  margin: 230px auto 0px;
+  padding: 200px 0 180px;
+  position:relative;
+  @include tilted-bg;
+  @media screen and (max-width: 500px) {
+    &::after {
+      top: 50%;
+    }
+  }
+}
+
+.getting-bg {
+  position: absolute;
+  bottom: 0;
+  margin: 0;
+  padding: 0;
+  height: 180px;
+  width: 100%;
+  background-color: $bg-secondary;
+}
+
+.getting__header {
+  position: relative;
+  z-index: 1;
+  color: $text-tertiary;
+}
+
+.getting__content {
+  position: relative;
+  margin: 80px auto 0;
+  color: $text-tertiary;
+}
+
+.getting__content p {
+  width: 60%;
+
+  @media screen and (max-width: 1000px) {
+    width: 100%;
+  }
+}
+
+.getting__content h3 {
+  margin: 100px 0 30px;
+  color: $text-tertiary;
+  font-size: 23px;
+}
+
+.getting__buttons {
+  position: relative;
+  padding: 0;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  grid-auto-flow: dense;
+  grid-gap: 30px;
+
+  @media screen and (max-width: 700px) {
+    grid-template-columns: 100%;
+  }
+}
+
+.getting__buttons a:hover {
+  opacity: 1;
+}
+
+.getting__button .btn {
+  width: 100%;
+}
