@@ -90,7 +90,8 @@ struct DspFF : public Pass {
         /// integration.
         dict<RTLIL::IdString, RTLIL::Const> connect;
 
-        unsigned int hash() const {
+        unsigned int hash() const
+        {
             unsigned int h = 0;
             h = mkhash_add(h, params.set.hash());
             h = mkhash_add(h, params.map.hash());
@@ -98,10 +99,9 @@ struct DspFF : public Pass {
             return h;
         }
 
-        bool operator == (const RegisterType& ref) const {
-            return (params.set == ref.params.set) &&
-                   (params.map == ref.params.map) &&
-                   (connect == ref.connect);
+        bool operator==(const RegisterType &ref) const
+        {
+            return (params.set == ref.params.set) && (params.map == ref.params.map) && (connect == ref.connect);
         }
     };
 
@@ -221,13 +221,14 @@ struct DspFF : public Pass {
 
         // Parse each port as if it was associated with its own DSP register.
         // Group them each time a port definition is complete.
-        PortType        portType;
-        RegisterType    registerType;
+        PortType portType;
+        RegisterType registerType;
 
-        std::vector<DspType>  dspTypes;
+        std::vector<DspType> dspTypes;
         std::vector<FlopType> flopTypes;
 
         std::vector<RTLIL::IdString> dspAliases;
+        std::vector<std::string> portNames;
 
         std::vector<std::string> tok;
 
@@ -289,7 +290,7 @@ struct DspFF : public Pass {
 
             // DSP port section
             else if (fields[0] == "port") {
-                if (fields.size() != 2) {
+                if (fields.size() < 2) {
                     log_error(" syntax error: '%s'\n", line.c_str());
                 }
                 if (tok.size() != 1 || tok.back() != "dsp") {
@@ -308,6 +309,11 @@ struct DspFF : public Pass {
 
                 registerType = RegisterType();
 
+                portNames.clear();
+                for (size_t i = 2; i < fields.size(); ++i) {
+                    portNames.push_back(fields[i]);
+                }
+
             } else if (fields[0] == "endport") {
                 if (fields.size() != 1) {
                     log_error(" syntax error: '%s'\n", line.c_str());
@@ -317,8 +323,20 @@ struct DspFF : public Pass {
                 }
                 tok.pop_back();
 
-                auto& dspType = dspTypes.back();
+                // Store the DSP port
+                auto &dspType = dspTypes.back();
                 dspType.registers[registerType].push_back(portType);
+
+                // Store any extra DSP ports belonging to the same register
+                for (const auto &name : portNames) {
+                    auto spec = parsePortName(name);
+
+                    PortType portTypeCopy = portType;
+                    portTypeCopy.name = RTLIL::escape_id(std::get<0>(spec));
+                    portTypeCopy.bits = std::make_pair(std::get<2>(spec), std::get<1>(spec));
+
+                    dspType.registers[registerType].push_back(portTypeCopy);
+                }
             }
 
             // Flip-flop type section
@@ -535,9 +553,9 @@ struct DspFF : public Pass {
             const auto &dsp = it1.second;
             log(" %s\n", dsp.name.c_str());
 
-            for (const auto& it2 : dsp.registers) {
-                const auto& reg   = it2.first;
-                const auto& ports = it2.second;
+            for (const auto &it2 : dsp.registers) {
+                const auto &reg = it2.first;
+                const auto &ports = it2.second;
                 log(" ports:\n");
                 for (const auto &port : ports) {
 
@@ -648,7 +666,7 @@ struct DspFF : public Pass {
         log("  # This is a comment\n");
         log("\n");
         log("  dsp <dsp_type> [<dsp_type> ...]\n");
-        log("    port <dsp_port>\n");
+        log("    port <dsp_port> [<dsp_port> ...]\n");
         log("      clk <associated clk> <default>\n");
         log("     [rst <associated reset>] <default>\n");
         log("     [ena <associated enable>] <default>\n");
@@ -675,6 +693,7 @@ struct DspFF : public Pass {
         log("\n");
         log("Each 'dsp' section defines a DSP cell type (can apply to multiple types).\n");
         log("Within it each 'port' section defining a data port with internal register.\n");
+        log("There can be multiple port names given if they belong to the same control register.\n");
         log("The port can be specified as a whole (eg. 'DATA') or as a subset of the whole\n");
         log("(eg. 'DATA[7:0]').\n");
         log("\n");
@@ -759,7 +778,7 @@ struct DspFF : public Pass {
 
                 // Process all registers
                 auto &dspType = m_DspTypes.at(cell->type);
-                for (auto& rule : dspType.registers) {
+                for (auto &rule : dspType.registers) {
                     processRegister(cell, rule.first, rule.second);
                 }
             }
@@ -812,9 +831,8 @@ struct DspFF : public Pass {
         return isOk;
     }
 
-    bool checkFlopDataAgainstDspRegister(const FlopData &a_FlopData, RTLIL::Cell *a_Cell,
-                                         const RegisterType &a_Register,
-                                         const std::vector<PortType>& a_Ports)
+    bool checkFlopDataAgainstDspRegister(const FlopData &a_FlopData, RTLIL::Cell *a_Cell, const RegisterType &a_Register,
+                                         const std::vector<PortType> &a_Ports)
     {
         const auto &flopType = m_FlopTypes.at(a_FlopData.type);
         const auto &changes = m_DspChanges[a_Cell];
@@ -823,7 +841,7 @@ struct DspFF : public Pass {
         log_debug("  checking connected flip-flop settings against the DSP register... ");
 
         // Check control signal connections
-        for (const auto& port : a_Ports) {
+        for (const auto &port : a_Ports) {
             for (const auto &it : port.assoc) {
                 const auto &key = it.first;
                 const auto &port = it.second.first;
@@ -926,8 +944,7 @@ struct DspFF : public Pass {
 
     // ..........................................
 
-    void processRegister(RTLIL::Cell *a_Cell, const RegisterType& a_Register,
-                                              const std::vector<PortType>& a_Ports)
+    void processRegister(RTLIL::Cell *a_Cell, const RegisterType &a_Register, const std::vector<PortType> &a_Ports)
     {
 
         // The cell register control parameter(s) must not be set
@@ -940,21 +957,28 @@ struct DspFF : public Pass {
         }
 
         pool<FlopData> groups;
-        dict<RTLIL::IdString, std::vector<RTLIL::Cell*>> flops;
+        dict<RTLIL::IdString, std::vector<RTLIL::Cell *>> flops;
 
         // Process ports
         bool flopsOk = true;
-        for (const auto& port : a_Ports) {
+        for (const auto &port : a_Ports) {
             log_debug(" attempting flip-flop integration for %s.%s of %s\n", a_Cell->type.c_str(), port.name.c_str(), a_Cell->name.c_str());
+
+            if (!a_Cell->hasPort(port.name)) {
+                log_debug("  port unconnected.\n");
+                continue;
+            }
             log_assert(a_Cell->output(port.name) || a_Cell->input(port.name));
 
             // Get port connections
             auto sigspec = a_Cell->getPort(port.name);
             auto sigbits = sigspec.bits();
 
-            flops[port.name] = std::vector<RTLIL::Cell*>(sigbits.size(), nullptr);
+            flops[port.name] = std::vector<RTLIL::Cell *>(sigbits.size(), nullptr);
             for (size_t i = 0; i < sigbits.size(); ++i) {
                 auto sigbit = sigbits[i];
+
+                // Port connected to a const.
                 if (!sigbit.wire) {
                     continue;
                 }
@@ -999,7 +1023,7 @@ struct DspFF : public Pass {
 
                 // Get the sink, check if this is a flip-flop
                 auto &other = *others.begin();
-                auto *flop  = other.cell;
+                auto *flop = other.cell;
 
                 if (flop == nullptr) {
                     if (!other.port.empty()) {
@@ -1078,15 +1102,19 @@ struct DspFF : public Pass {
         }
 
         // Debug log
-        for (const auto& port : a_Ports) {
+        for (const auto &port : a_Ports) {
+
+            if (!flops.count(port.name)) {
+                continue;
+            }
+
             log(" %s %s.%s\n", a_Cell->type.c_str(), a_Cell->name.c_str(), port.name.c_str());
 
-            const auto& conns = flops.at(port.name);
+            const auto &conns = flops.at(port.name);
             for (size_t i = 0; i < conns.size(); ++i) {
                 if (conns[i] != nullptr) {
                     log_debug("  %2zu. %s %s\n", i, conns[i]->type.c_str(), conns[i]->name.c_str());
-                } else if ((port.bits.first  >= 0 && (int)i < port.bits.first) ||
-                           (port.bits.second >= 0 && (int)i > port.bits.second)) {
+                } else if ((port.bits.first >= 0 && (int)i < port.bits.first) || (port.bits.second >= 0 && (int)i > port.bits.second)) {
                     log_debug("  %2zu. (excluded)\n", i);
                 } else {
                     log_debug("  %2zu. None\n", i);
@@ -1096,9 +1124,13 @@ struct DspFF : public Pass {
 
         // Reconnect data signals, mark the flip-flop for removal
         const auto &flopType = m_FlopTypes.at(flopData.type);
-        for (const auto& port : a_Ports) {
+        for (const auto &port : a_Ports) {
 
-            const auto& conns = flops.at(port.name);
+            if (!flops.count(port.name)) {
+                continue;
+            }
+
+            const auto &conns = flops.at(port.name);
             auto sigspec = a_Cell->getPort(port.name);
             auto sigbits = sigspec.bits();
 
@@ -1135,7 +1167,7 @@ struct DspFF : public Pass {
 
         // Reconnect (map) control signals. Connect the default value if
         // a particular signal is not present in the flip-flop.
-        for (const auto& port : a_Ports) {
+        for (const auto &port : a_Ports) {
             for (const auto &it : port.assoc) {
                 const auto &key = it.first;
                 const auto &port = it.second.first;
