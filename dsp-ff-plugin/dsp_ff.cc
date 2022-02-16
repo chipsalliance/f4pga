@@ -805,7 +805,7 @@ struct DspFF : public Pass {
         const auto &flopType = m_FlopTypes.at(a_Cell->type);
         bool isOk = true;
 
-        log_debug("  checking connected flip-flop '%s' of type '%s'... ", a_Cell->name.c_str(), a_Cell->type.c_str());
+        log_debug("checking connected flip-flop '%s' of type '%s'... ", a_Cell->name.c_str(), a_Cell->type.c_str());
 
         // Must not have the "keep" attribute
         if (a_Cell->has_keep_attr()) {
@@ -978,13 +978,17 @@ struct DspFF : public Pass {
             for (size_t i = 0; i < sigbits.size(); ++i) {
                 auto sigbit = sigbits[i];
 
+                log_debug("  %2zu. ", i);
+
                 // Port connected to a const.
                 if (!sigbit.wire) {
+                    log_debug("constant\n");
                     continue;
                 }
 
                 // Skip bits out of the specified range
                 if ((port.bits.first >= 0 && (int)i < port.bits.first) || (port.bits.second >= 0 && (int)i > port.bits.second)) {
+                    log_debug("(excluded)\n");
                     continue;
                 }
 
@@ -995,7 +999,7 @@ struct DspFF : public Pass {
                 if (a_Cell->output(port.name)) {
                     others = getSinks(CellPin(a_Cell, port.name, i));
                     if (others.size() > 1) {
-                        log_debug("  multiple sinks found\n");
+                        log_debug("multiple sinks\n");
                         flopsOk = false;
                         continue;
                     }
@@ -1008,7 +1012,7 @@ struct DspFF : public Pass {
                     if (driver.cell != nullptr) {
                         auto sinks = getSinks(driver);
                         if (sinks.size() > 1) {
-                            log_debug("  multiple sinks found\n");
+                            log_debug("multiple sinks\n");
                             flopsOk = false;
                             continue;
                         }
@@ -1018,6 +1022,7 @@ struct DspFF : public Pass {
 
                 // No others - unconnected
                 if (others.empty()) {
+                    log_debug("unconnected\n");
                     continue;
                 }
 
@@ -1027,14 +1032,15 @@ struct DspFF : public Pass {
 
                 if (flop == nullptr) {
                     if (!other.port.empty()) {
-                        log_debug("  port connection reaches outside of the module\n");
+                        log_debug("connection reaches module edge\n");
                         flopsOk = false;
                     }
+                    log_debug("unconnected\n");
                     continue;
                 }
 
                 if (!m_FlopTypes.count(flop->type)) {
-                    log_debug("  non-flip-flop connected\n");
+                    log_debug("non-flip-flop connected\n");
                     flopsOk = false;
                     continue;
                 }
@@ -1049,7 +1055,7 @@ struct DspFF : public Pass {
                 }
 
                 if (flopPort != other.port) {
-                    log_debug("  connection to non-data port of a flip-flip");
+                    log_debug("connection to non-data port of a flip-flip");
                     flopsOk = false;
                     continue;
                 }
@@ -1101,7 +1107,7 @@ struct DspFF : public Pass {
             return;
         }
 
-        // Debug log
+        // Log connections
         for (const auto &port : a_Ports) {
 
             if (!flops.count(port.name)) {
