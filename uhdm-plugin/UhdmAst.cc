@@ -106,6 +106,24 @@ static AST::AstNode *make_range(int left, int right, bool is_signed = false)
     return range;
 }
 
+static void copy_packed_unpacked_attribute(AST::AstNode *from, AST::AstNode *to)
+{
+    if (!to->attributes.count(UhdmAst::packed_ranges()))
+        to->attributes[UhdmAst::packed_ranges()] = AST::AstNode::mkconst_int(1, false, 1);
+    if (!to->attributes.count(UhdmAst::unpacked_ranges()))
+        to->attributes[UhdmAst::unpacked_ranges()] = AST::AstNode::mkconst_int(1, false, 1);
+    if (from->attributes.count(UhdmAst::packed_ranges())) {
+        for (auto r : from->attributes[UhdmAst::packed_ranges()]->children) {
+            to->attributes[UhdmAst::packed_ranges()]->children.push_back(r->clone());
+        }
+    }
+    if (from->attributes.count(UhdmAst::unpacked_ranges())) {
+        for (auto r : from->attributes[UhdmAst::unpacked_ranges()]->children) {
+            to->attributes[UhdmAst::unpacked_ranges()]->children.push_back(r->clone());
+        }
+    }
+}
+
 #include "UhdmAstUpstream.cc"
 
 static int get_max_offset_struct(AST::AstNode *node)
@@ -555,10 +573,10 @@ static AST::AstNode *convert_dot(AST::AstNode *wire_node, AST::AstNode *node, AS
         } else {
             expanded->children[1] = new AST::AstNode(
               AST::AST_ADD, expanded->children[1],
-              new AST::AstNode(AST::AST_MUL, AST::AstNode::mkconst_int(struct_size_int, true, 32), AST::AstNode::mkconst_int(range, true, 32)));
+              new AST::AstNode(AST::AST_MUL, AST::AstNode::mkconst_int(struct_size_int, true, 32), node->children[0]->children[0]->clone()));
             expanded->children[0] = new AST::AstNode(
               AST::AST_ADD, expanded->children[0],
-              new AST::AstNode(AST::AST_MUL, AST::AstNode::mkconst_int(struct_size_int, true, 32), AST::AstNode::mkconst_int(range, true, 32)));
+              new AST::AstNode(AST::AST_MUL, AST::AstNode::mkconst_int(struct_size_int, true, 32), node->children[0]->children[0]->clone()));
         }
     }
     return expanded;
@@ -766,7 +784,8 @@ static AST::AstNode *make_packed_struct_local(AST::AstNode *template_node, std::
     wnode->is_signed = template_node->is_signed;
     int offset = get_max_offset_struct(template_node);
     auto range = make_range(offset, 0);
-    wnode->children.push_back(range);
+    copy_packed_unpacked_attribute(template_node, wnode);
+    wnode->attributes[UhdmAst::packed_ranges()]->children.insert(wnode->attributes[UhdmAst::packed_ranges()]->children.begin(), range);
     // make sure this node is the one in scope for this name
     AST_INTERNAL::current_scope[name] = wnode;
     // add all the struct members to scope under the wire's name
@@ -897,6 +916,7 @@ static void simplify(AST::AstNode *current_node, AST::AstNode *parent_node)
         if (!current_node->str.empty() && current_node->str[0] == '\\') {
             // instance so add a wire for the packed structure
             auto wnode = make_packed_struct_local(current_node, current_node->str);
+            convert_packed_unpacked_range(wnode);
             log_assert(AST_INTERNAL::current_ast_mod);
             AST_INTERNAL::current_ast_mod->children.push_back(wnode);
             AST_INTERNAL::current_scope[wnode->str]->attributes[ID::wiretype] = AST::AstNode::mkconst_str(current_node->str);
@@ -1800,6 +1820,7 @@ void UhdmAst::process_custom_var()
         if (node->str.empty()) {
             // anonymous typespec, move the children to variable
             current_node->type = node->type;
+            copy_packed_unpacked_attribute(node, current_node);
             current_node->children = std::move(node->children);
         } else {
             auto wiretype_node = new AST::AstNode(AST::AST_WIRETYPE);
