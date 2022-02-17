@@ -38,6 +38,7 @@ jobs:
         run: |
           export ROOT=$(pwd)
           cd /tmp/website-build/
+          touch .nojekyll
           git init
           cp $ROOT/.git/config ./.git/config
           git add .
