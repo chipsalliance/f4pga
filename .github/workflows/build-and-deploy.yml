@@ -39,6 +39,7 @@ jobs:
           export ROOT=$(pwd)
           cd /tmp/website-build/
           touch .nojekyll
+          echo 'f4pga.org' > CNAME
           git init
           cp $ROOT/.git/config ./.git/config
           git add .
