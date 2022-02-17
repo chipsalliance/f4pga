@@ -45,6 +45,79 @@ struct DspFF : public Pass {
 
     // ..........................................
 
+    /// Connection map
+    struct ConnMap {
+
+        /// Maps source SigBit to all sinks it drives CellPin.
+        dict<RTLIL::SigBit, std::vector<CellPin>> sinks;
+        /// Maps source SigBit to its driver CellPin
+        dict<RTLIL::SigBit, CellPin> drivers;
+
+        /// Builds the map
+        void build(RTLIL::Module *module, const SigMap &sigmap)
+        {
+            clear();
+
+            // Scan cell ports
+            for (auto *cell : module->cells()) {
+                for (const auto &it : cell->connections_) {
+                    const auto &port = it.first;
+                    const auto &sigbits = it.second.bits();
+                    for (size_t i = 0; i < sigbits.size(); ++i) {
+                        auto sigbit = sigmap(sigbits[i]);
+
+                        // This is an input port (sink))
+                        if (cell->input(port)) {
+                            auto &vec = sinks[sigbit];
+                            vec.push_back(CellPin(cell, port, i));
+                        }
+                        // This is a source
+                        if (cell->output(port)) {
+                            drivers.insert(std::make_pair(sigbit, CellPin(cell, port, i)));
+                        }
+                    }
+                }
+            }
+
+            // Scan top-level ports
+            for (auto &it : module->wires_) {
+                auto *wire = it.second;
+
+                if (!wire->port_input && !wire->port_output) {
+                    continue;
+                }
+
+                RTLIL::SigSpec sigspec(wire, wire->start_offset, wire->width);
+                const auto &sigbits = sigspec.bits();
+                for (size_t i = 0; i < sigbits.size(); ++i) {
+                    auto sigbit = sigbits[i];
+                    if (!sigbit.wire) {
+                        continue;
+                    }
+
+                    // Output port (sink)
+                    if (sigbit.wire->port_output) {
+                        auto &vec = sinks[sigmap(sigbit)];
+                        vec.push_back(CellPin(nullptr, sigbit.wire->name, i));
+                    }
+                    // Input port (source)
+                    if (sigbit.wire->port_input) {
+                        drivers.insert(std::make_pair(sigbit, CellPin(nullptr, sigbit.wire->name, i)));
+                    }
+                }
+            }
+        }
+
+        /// Clears the map
+        void clear()
+        {
+            sinks.clear();
+            drivers.clear();
+        };
+    };
+
+    // ..........................................
+
     /// Describes a flip-flop type that can be integrated with a DSP cell
     struct FlopType {
         RTLIL::IdString name;
@@ -633,8 +706,9 @@ struct DspFF : public Pass {
 
     /// Temporary SigBit to SigBit helper map.
     SigMap m_SigMap;
-    //    /// Net map
-    //    dict<RTLIL::SigBit, RTLIL::SigBit> m_NetMap;
+    /// Module connection map
+    ConnMap m_ConnMap;
+
     /// Cells to be removed (per module!)
     pool<RTLIL::Cell *> m_CellsToRemove;
     /// DSP cells that got changed
@@ -765,8 +839,9 @@ struct DspFF : public Pass {
             m_SigMap.clear();
             m_SigMap.set(module);
 
-            //            // Build the net map
-            //            buildNetMap(module);
+            // Build the connection map
+            m_ConnMap.clear();
+            m_ConnMap.build(module, m_SigMap);
 
             // Look for DSP cells
             for (auto cell : module->cells()) {
@@ -792,13 +867,10 @@ struct DspFF : public Pass {
 
         // Clear maps
         m_SigMap.clear();
+        m_ConnMap.clear();
     }
 
     // ..........................................
-
-    //    void buildNetMap (RTLIL::Module* a_Module) {
-    //        // TODO:
-    //    }
 
     bool checkFlop(RTLIL::Cell *a_Cell)
     {
@@ -976,7 +1048,7 @@ struct DspFF : public Pass {
 
             flops[port.name] = std::vector<RTLIL::Cell *>(sigbits.size(), nullptr);
             for (size_t i = 0; i < sigbits.size(); ++i) {
-                auto sigbit = sigbits[i];
+                auto sigbit = m_SigMap(sigbits[i]);
 
                 log_debug("  %2zu. ", i);
 
@@ -997,32 +1069,43 @@ struct DspFF : public Pass {
                 // Get sinks(s), discard the port completely if more than one sink
                 // is found.
                 if (a_Cell->output(port.name)) {
-                    others = getSinks(CellPin(a_Cell, port.name, i));
-                    if (others.size() > 1) {
-                        log_debug("multiple sinks\n");
-                        flopsOk = false;
-                        continue;
-                    }
-                }
-                // Get driver. Discard if the driver drives something else too
-                // TODO: This is slow - we are first looking for a driver and then
-                // for all its sinks.
-                else if (a_Cell->input(port.name)) {
-                    auto driver = getDriver(CellPin(a_Cell, port.name, i));
-                    if (driver.cell != nullptr) {
-                        auto sinks = getSinks(driver);
-                        if (sinks.size() > 1) {
-                            log_debug("multiple sinks\n");
-                            flopsOk = false;
-                            continue;
+                    if (m_ConnMap.sinks.count(sigbit)) {
+                        for (const auto &sink : m_ConnMap.sinks.at(sigbit)) {
+                            if (sink.cell != nullptr && m_CellsToRemove.count(sink.cell)) {
+                                continue;
+                            }
+                            others.insert(sink);
                         }
                     }
-                    others.insert(driver);
+
+                }
+                // Get driver. Discard if the driver drives something else too
+                else if (a_Cell->input(port.name)) {
+                    if (m_ConnMap.drivers.count(sigbit)) {
+                        auto driver = m_ConnMap.drivers.at(sigbit);
+
+                        if (m_ConnMap.sinks.count(sigbit)) {
+                            auto sinks = m_ConnMap.sinks.at(sigbit);
+                            if (sinks.size() > 1) {
+                                log_debug("multiple sinks (%zu)\n", others.size());
+                                flopsOk = false;
+                                continue;
+                            }
+                        }
+
+                        others.insert(driver);
+                    }
                 }
 
                 // No others - unconnected
                 if (others.empty()) {
                     log_debug("unconnected\n");
+                    continue;
+                }
+
+                if (others.size() > 1) {
+                    log_debug("multiple sinks (%zu)\n", others.size());
+                    flopsOk = false;
                     continue;
                 }
 
@@ -1283,157 +1366,6 @@ struct DspFF : public Pass {
         }
 
         return data;
-    }
-
-    /// Retrieves a list of sinks driven by the given cell pin.
-    /// TODO: This is slow, need to make a lookup for that.
-    pool<CellPin> getSinks(const CellPin &a_Driver)
-    {
-
-        auto module = a_Driver.cell->module;
-        pool<CellPin> sinks;
-
-        // The driver has to be an output pin
-        log_assert(a_Driver.cell->output(a_Driver.port));
-
-        // Get the driver sigbit
-        auto driverSigspec = a_Driver.cell->getPort(a_Driver.port);
-        auto driverSigbit = m_SigMap(driverSigspec.bits().at(a_Driver.bit));
-
-        // Look for connected sinks
-        for (auto cell : module->cells()) {
-
-            if (m_CellsToRemove.count(cell)) {
-                continue;
-            }
-
-            for (auto conn : cell->connections()) {
-                auto port = conn.first;
-                auto sigspec = conn.second;
-
-                // Consider only sinks (inputs)
-                if (!cell->input(port)) {
-                    continue;
-                }
-
-                // Check all sigbits
-                auto sigbits = sigspec.bits();
-                for (size_t bit = 0; bit < sigbits.size(); ++bit) {
-
-                    auto sigbit = sigbits[bit];
-                    if (!sigbit.wire) {
-                        continue;
-                    }
-
-                    // Got a sink pin of another cell
-                    sigbit = m_SigMap(sigbit);
-                    if (sigbit == driverSigbit) {
-                        sinks.insert(CellPin(cell, port, bit));
-                    }
-                }
-            }
-        }
-
-        // Look for connected top-level output ports
-        for (auto conn : module->connections()) {
-            auto dst = conn.first;
-            auto src = conn.second;
-
-            auto sigbits = dst.bits();
-            for (size_t bit = 0; bit < sigbits.size(); ++bit) {
-
-                auto sigbit = sigbits[bit];
-                if (!sigbit.wire) {
-                    continue;
-                }
-
-                if (!sigbit.wire->port_output) {
-                    continue;
-                }
-
-                sigbit = m_SigMap(sigbit);
-                if (sigbit == driverSigbit) {
-                    sinks.insert(CellPin(nullptr, sigbit.wire->name, bit));
-                }
-            }
-        }
-
-        return sinks;
-    }
-
-    /// Finds a driver for the given cell pin
-    /// TODO: This is slow, need to make a lookup for that.
-    CellPin getDriver(const CellPin &a_Sink)
-    {
-        auto module = a_Sink.cell->module;
-
-        // The sink has to be an input pin
-        log_assert(a_Sink.cell->input(a_Sink.port));
-
-        // Get the sink sigbit
-        auto sinkSigspec = a_Sink.cell->getPort(a_Sink.port);
-        auto sinkSigbit = m_SigMap(sinkSigspec.bits().at(a_Sink.bit));
-
-        // Look for connected top-level input ports
-        for (auto conn : module->connections()) {
-            auto dst = conn.first;
-            auto src = conn.second;
-
-            auto sigbits = dst.bits();
-            for (size_t bit = 0; bit < sigbits.size(); ++bit) {
-
-                auto sigbit = sigbits[bit];
-                if (!sigbit.wire) {
-                    continue;
-                }
-
-                if (!sigbit.wire->port_input) {
-                    continue;
-                }
-
-                sigbit = m_SigMap(sigbit);
-                if (sigbit == sinkSigbit) {
-                    CellPin(nullptr, sigbit.wire->name, bit);
-                }
-            }
-        }
-
-        // Look for the driver among cells
-        for (auto cell : module->cells()) {
-
-            if (m_CellsToRemove.count(cell)) {
-                continue;
-            }
-
-            for (auto conn : cell->connections()) {
-                auto port = conn.first;
-                auto sigspec = conn.second;
-
-                // Consider only outputs
-                if (!cell->output(port)) {
-                    continue;
-                }
-
-                // Check all sigbits
-                auto sigbits = sigspec.bits();
-                for (size_t bit = 0; bit < sigbits.size(); ++bit) {
-
-                    auto sigbit = sigbits[bit];
-                    if (!sigbit.wire) {
-                        continue;
-                    }
-
-                    // Got a driver pin of another cell
-                    sigbit = m_SigMap(sigbit);
-                    if (sigbit == sinkSigbit) {
-                        return CellPin(cell, port, bit);
-                    }
-                }
-            }
-        }
-
-        // No driver found. FIXME: Implement a cleaner way of indicating that
-        return CellPin(nullptr, RTLIL::IdString(), -1);
     }
 
 } DspFF;
