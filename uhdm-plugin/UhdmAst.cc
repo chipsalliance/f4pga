@@ -1082,8 +1082,8 @@ AST::AstNode *UhdmAst::process_value(vpiHandle obj_h)
             if (size == 64) {
                 size = 32;
             }
-            auto c = AST::AstNode::mkconst_int(val.value.integer, true, size ? size : 32);
-            if (size == 0)
+            auto c = AST::AstNode::mkconst_int(val.value.integer, true, size > 0 ? size : 32);
+            if (size == 0 || size == -1)
                 c->is_unsized = true;
             return c;
         }
