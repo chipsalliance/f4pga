@@ -9,6 +9,7 @@
 NAME = uhdm
 SOURCES = UhdmAst.cc \
 	  uhdmastfrontend.cc \
+	  uhdmcommonfrontend.cc \
 	  uhdmsurelogastfrontend.cc \
 	  uhdmastreport.cc
 
