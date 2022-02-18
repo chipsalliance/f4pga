@@ -55,8 +55,9 @@ void UhdmCommonFrontend::help()
 
 void UhdmCommonFrontend::execute(std::istream *&f, std::string filename, std::vector<std::string> args, RTLIL::Design *design)
 {
-    bool defer = false;
+    this->args = args;
 
+    bool defer = false;
     std::string report_directory;
     for (size_t i = 1; i < args.size(); i++) {
         if (args[i] == "-debug") {

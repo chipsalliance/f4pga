@@ -22,6 +22,7 @@
 #include "UhdmAst.h"
 #include "frontends/ast/ast.h"
 #include "kernel/yosys.h"
+#include "uhdmcommonfrontend.h"
 
 #if defined(_MSC_VER)
 #include <direct.h>
@@ -76,8 +77,8 @@ std::vector<vpiHandle> executeCompilation(SURELOG::SymbolTable *symbolTable, SUR
     return the_design;
 }
 
-struct UhdmSurelogAstFrontend : public Frontend {
-    UhdmSurelogAstFrontend() : Frontend("verilog_with_uhdm", "generate/read UHDM file") {}
+struct UhdmSurelogAstFrontend : public UhdmCommonFrontend {
+    UhdmSurelogAstFrontend() : UhdmCommonFrontend("verilog_with_uhdm", "generate/read UHDM file") {}
     void help()
     {
         //   |---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|
@@ -104,38 +105,12 @@ struct UhdmSurelogAstFrontend : public Frontend {
         log("        parameters of modules yield invalid or not synthesizable code.\n");
         log("\n");
     }
-    void execute(std::istream *&f, std::string filename, std::vector<std::string> args, RTLIL::Design *design)
+    AST::AstNode *parse(std::string filename)
     {
-        log_header(design, "Executing Verilog with UHDM frontend.\n");
-
-        UhdmAstShared shared;
-        UhdmAst uhdm_ast(shared);
-        bool defer = false;
-
-        std::string report_directory;
-        auto it = args.begin();
-        while (it != args.end()) {
-            if (*it == "-debug") {
-                shared.debug_flag = true;
-                it = args.erase(it);
-            } else if (*it == "-report" && (it = args.erase(it)) < args.end()) {
-                report_directory = *it;
-                shared.stop_on_error = false;
-                it = args.erase(it);
-            } else if (*it == "-noassert") {
-                shared.no_assert = true;
-                it = args.erase(it);
-            } else if (*it == "-defer") {
-                defer = true;
-                it = args.erase(it);
-            } else {
-                ++it;
-            }
-        }
         std::vector<const char *> cstrings;
-        cstrings.reserve(args.size());
-        for (size_t i = 0; i < args.size(); ++i)
-            cstrings.push_back(const_cast<char *>(args[i].c_str()));
+        cstrings.reserve(this->args.size());
+        for (size_t i = 0; i < this->args.size(); ++i)
+            cstrings.push_back(const_cast<char *>(this->args[i].c_str()));
 
         SURELOG::SymbolTable *symbolTable = new SURELOG::SymbolTable();
         SURELOG::ErrorContainer *errors = new SURELOG::ErrorContainer(symbolTable);
@@ -146,21 +121,19 @@ struct UhdmSurelogAstFrontend : public Frontend {
         }
         SURELOG::scompiler *compiler = nullptr;
         const std::vector<vpiHandle> uhdm_design = executeCompilation(symbolTable, errors, clp, compiler);
-        struct AST::AstNode *current_ast = uhdm_ast.visit_designs(uhdm_design);
-        if (report_directory != "") {
-            shared.report.write(report_directory);
-        }
-        bool dump_ast1 = shared.debug_flag;
-        bool dump_ast2 = shared.debug_flag;
-        bool dont_redefine = false;
-        bool default_nettype_wire = true;
-        AST::process(design, current_ast, dump_ast1, dump_ast2, false, false, false, false, false, false, false, false, false, false, false, false,
-                     false, false, dont_redefine, false, defer, default_nettype_wire);
-        delete current_ast;
+
         SURELOG::shutdown_compiler(compiler);
         delete clp;
         delete symbolTable;
         delete errors;
+
+        UhdmAst uhdm_ast(this->shared);
+        AST::AstNode *current_ast = uhdm_ast.visit_designs(uhdm_design);
+        if (report_directory != "") {
+            shared.report.write(report_directory);
+        }
+
+        return current_ast;
     }
 } UhdmSurelogAstFrontend;
 
