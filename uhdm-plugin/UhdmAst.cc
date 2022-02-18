@@ -2130,7 +2130,7 @@ void UhdmAst::process_array_net()
         if (net_type == vpiLogicNet) {
             current_node->is_logic = true;
             current_node->is_signed = vpi_get(vpiSigned, net_h);
-            visit_range(net_h, [&](AST::AstNode *node) { packed_ranges.push_back(node); });
+            visit_one_to_many({vpiRange}, net_h, [&](AST::AstNode *node) { packed_ranges.push_back(node); });
             shared.report.mark_handled(net_h);
         } else if (net_type == vpiStructNet) {
             visit_one_to_one({vpiTypespec}, net_h, [&](AST::AstNode *node) {
