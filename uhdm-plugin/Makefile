@@ -16,7 +16,7 @@ include ../Makefile_plugin.common
 
 CPPFLAGS += -std=c++17 -Wall -W -Wextra -Werror \
               -I${UHDM_INSTALL_DIR}/include \
-	      -I${UHDM_INSTALL_DIR}/include/surelog
+	      -I${UHDM_INSTALL_DIR}/include/Surelog
 
 CXXFLAGS += -Wno-unused-parameter
 LDFLAGS += -L${UHDM_INSTALL_DIR}/lib/uhdm -L${UHDM_INSTALL_DIR}/lib/surelog -L${UHDM_INSTALL_DIR}/lib -L${UHDM_INSTALL_DIR}/lib64/uhdm -L${UHDM_INSTALL_DIR}/lib64/surelog -L${UHDM_INSTALL_DIR}/lib64

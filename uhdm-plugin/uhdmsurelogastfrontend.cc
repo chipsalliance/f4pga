@@ -31,8 +31,8 @@
 #include <unistd.h>
 #endif
 
-#include "surelog/ErrorReporting/Report.h"
-#include "surelog/surelog.h"
+#include "ErrorReporting/Report.h"
+#include "surelog.h"
 
 namespace UHDM
 {
