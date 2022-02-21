@@ -1,7 +1,7 @@
 Introduction
 ============
 
-SymbiFlow is a Open Source Verilog-to-Bitstream FPGA synthesis flow,
+F4PGA is a Open Source Verilog-to-Bitstream FPGA synthesis flow,
 currently targeting Xilinx 7-Series, Lattice iCE40 and Lattice ECP5 FPGAs.
 Think of it as the GCC of FPGAs.
 
@@ -22,22 +22,19 @@ The major problem lies however in the front- and backend, where previously
 there was no established standard, vendor-neutral tooling that would cover
 all the necessary components for an end-to-end flow.
 
-This pertains both to ASIC and FPGA workflows, although SymbiFlow focuses
-on the latter (some parts of SymbiFlow will also be useful in the former).
+This pertains both to ASIC and FPGA workflows, although F4PGA focuses
+on the latter (some parts of F4PGA will also be useful in the former).
 
 .. figure:: _static/images/EDA.svg
 
 Project structure
 -----------------
 
-To achieve SymbiFlow's goal of a complete FOSS FPGA toolchain,
-a number of tools and projects are necessary to provide all the needed
-components of an end-to-end flow. Thus, SymbiFlow serves as an umbrella
-project for several activities, the central of which pertains to the
-creation of so-called FPGA "architecture definitions",
-i.e. documentation of how specific FPGAs work internally.
-More information can be found in the :doc:`Symbiflow Architecture Definitions
-<arch-defs:index>` project.
+To achieve F4PGA's goal of a complete FOSS FPGA toolchain, a number of tools and projects are necessary to provide all
+the needed components of an end-to-end flow.
+Thus, F4PGA serves as an umbrella project for several activities, the central of which pertains to the creation of
+so-called FPGA "architecture definitions", i.e. documentation of how specific FPGAs work internally.
+More information can be found in the :doc:`F4PGA Architecture Definitions <arch-defs:index>` project.
 
 Those definitions and serve as input to backend tools like
 `nextpnr <https://github.com/YosysHQ/nextpnr>`_ and

@@ -1,7 +1,7 @@
 FPGA Design Flow
 ================
 
-SymbiFlow is an end-to-end FPGA synthesis toolchain, because of that it provides
+F4PGA is an end-to-end FPGA synthesis toolchain, because of that it provides
 all the necessary tools to convert input Verilog design into a final bitstream.
 It is simple to use however, the whole synthesis and implementation process
 is not trivial.
@@ -11,14 +11,14 @@ What's more, every platform has different resources and even if some of them
 provide similar functionality, they can be implemented in a different way.
 In order to be able to match all that variety of possible situations,
 the creation of the final bitstream is divided into few steps.
-SymbiFlow uses different programs to create the bitstream and is
+F4PGA uses different programs to create the bitstream and is
 responsible for their proper integration. The procedure of converting
 Verilog file into the bitstream is described in the next sections.
 
 .. figure:: ../_static/images/toolchain-flow.svg
     :align: center
 
-    Symbiflow Toolchain design flow
+    F4PGA Toolchain design flow
 
 Synthesis
 ---------
@@ -78,10 +78,10 @@ in terms of fewer, different gates. However, some operations can be performed
 only after certain steps i.e. after technology mapping.
 As a result, optimization is an integral part of most of the synthesis steps.
 
-Synthesis in SymbiFlow
+Synthesis in F4PGA
 ++++++++++++++++++++++
 
-In the SymbiFlow toolchain synthesis is made with the use of Yosys,
+In the F4PGA toolchain synthesis is made with the use of Yosys,
 that is able to perform all the mentioned steps and convert Verilog to netlist
 description. The result of these steps is written to a file in ``.eblif``
 format.
@@ -135,10 +135,10 @@ Analysis
 This last step usually checks the whole design in terms of timings and power
 consumption.
 
-Place & Route in SymbiFlow
-++++++++++++++++++++++++++
+Place & Route in F4PGA
+++++++++++++++++++++++
 
-The SymbiFlow Project uses two different tools for the PnR process - ``nextpnr``
+The F4PGA Project uses two different tools for the PnR process - ``nextpnr``
 and ``Versatile Place and Route`` (VPR). Both of them write their final result
 to a file in the ``.fasm`` format.
 
@@ -156,4 +156,4 @@ That final file contains instructions readable by the configuration block of
 the desired chip.
 
 Documenting the bitstream format for different FPGA chips is one of the
-most important tasks in the SymbiFlow Project!
+most important tasks in the F4PGA Project!
