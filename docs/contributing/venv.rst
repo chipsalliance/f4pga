@@ -1,25 +1,5 @@
-===============
-Getting Started
-===============
-
-Building documentation
-----------------------
-
-Activate the virtual environment and install dependencies::
-
-    make env
-    make enter
-
-Build the whole documentation::
-
-    make html
-
-For more options see::
-
-    make help
-
 Packages in virtual environment
--------------------------------
+###############################
 
 To install packages in conda environment you can use both
 ``conda`` and ``pip``.

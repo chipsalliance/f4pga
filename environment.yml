@@ -8,4 +8,4 @@ dependencies:
   - pygobject
   - pip
   - pip:
-    - -r requirements.txt
+    - -r docs/requirements.txt

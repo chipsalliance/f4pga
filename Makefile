@@ -3,7 +3,7 @@
 TOP_DIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 
 # A pip `requirements.txt` file.
-REQUIREMENTS_FILE := requirements.txt
+REQUIREMENTS_FILE := docs/requirements.txt
 
 # A conda `environment.yml` file.
 ENVIRONMENT_FILE := environment.yml
@@ -21,7 +21,7 @@ BUILDDIR      = _build
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
-ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) source
+ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) docs
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
