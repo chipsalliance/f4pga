@@ -1,4 +1,4 @@
-build/
-env/
+/source/_build/
+/source/env/
 *.pyc
 *.sw*

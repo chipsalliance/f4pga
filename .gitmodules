@@ -1,20 +1,3 @@
-[submodule "source/prjtrellis"]
-	path = source/prjtrellis
-	url = ../prjtrellis
-        branch = master
-[submodule "source/symbiflow-arch-defs"]
-	path = source/symbiflow-arch-defs
-	url = ../symbiflow-arch-defs
-        branch = master
-[submodule "source/prjxray"]
-	path = source/prjxray
-	url = ../prjxray
-[submodule "source/fasm"]
-	path = source/fasm
-	url = ../fasm
-[submodule "source/vtr-verilog-to-routing"]
-	path = source/vtr-verilog-to-routing
-	url = ../vtr-verilog-to-routing
 [submodule "third_party/make-env"]
 	path = third_party/make-env
 	url = https://github.com/SymbiFlow/make-env/
