@@ -49,8 +49,7 @@ void UhdmCommonFrontend::print_read_options()
 
 void UhdmCommonFrontend::execute(std::istream *&f, std::string filename, std::vector<std::string> args, RTLIL::Design *design)
 {
-    log_header(design, this->log_header_message);
-
+    this->call_log_header(design);
     this->args = args;
 
     bool defer = false;

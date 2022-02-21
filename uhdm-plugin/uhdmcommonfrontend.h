@@ -30,12 +30,12 @@ YOSYS_NAMESPACE_BEGIN
 struct UhdmCommonFrontend : public Frontend {
     UhdmAstShared shared;
     std::string report_directory;
-    const char *log_header_message;
     std::vector<std::string> args;
     UhdmCommonFrontend(std::string name, std::string short_help) : Frontend(name, short_help) {}
     virtual void print_read_options();
     virtual void help() = 0;
     virtual AST::AstNode *parse(std::string filename) = 0;
+    virtual void call_log_header(RTLIL::Design *design) = 0;
     void execute(std::istream *&f, std::string filename, std::vector<std::string> args, RTLIL::Design *design);
 };
 

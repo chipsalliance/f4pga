@@ -30,7 +30,7 @@ extern void visit_object(vpiHandle obj_h, int indent, const char *relation, std:
 YOSYS_NAMESPACE_BEGIN
 
 struct UhdmAstFrontend : public UhdmCommonFrontend {
-    UhdmAstFrontend() : UhdmCommonFrontend("uhdm", "read UHDM file") { this->log_header_message = "Executing UHDM frontend.\n"; }
+    UhdmAstFrontend() : UhdmCommonFrontend("uhdm", "read UHDM file") {}
     void help() override
     {
         //   |---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|
@@ -59,6 +59,7 @@ struct UhdmAstFrontend : public UhdmCommonFrontend {
             vpi_release_handle(design);
         return current_ast;
     }
+    void call_log_header(RTLIL::Design *design) override { log_header(design, "Executing UHDM frontend.\n"); }
 } UhdmAstFrontend;
 
 YOSYS_NAMESPACE_END

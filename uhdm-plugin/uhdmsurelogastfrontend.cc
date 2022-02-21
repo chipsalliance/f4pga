@@ -78,10 +78,7 @@ std::vector<vpiHandle> executeCompilation(SURELOG::SymbolTable *symbolTable, SUR
 }
 
 struct UhdmSurelogAstFrontend : public UhdmCommonFrontend {
-    UhdmSurelogAstFrontend() : UhdmCommonFrontend("verilog_with_uhdm", "generate/read UHDM file")
-    {
-        this->log_header_message = "Executing Verilog with UHDM frontend.\n";
-    }
+    UhdmSurelogAstFrontend() : UhdmCommonFrontend("verilog_with_uhdm", "generate/read UHDM file") {}
     void print_read_options() override
     {
         log("    -process\n");
@@ -129,6 +126,7 @@ struct UhdmSurelogAstFrontend : public UhdmCommonFrontend {
 
         return current_ast;
     }
+    void call_log_header(RTLIL::Design *design) override { log_header(design, "Executing Verilog with UHDM frontend.\n"); }
 } UhdmSurelogAstFrontend;
 
 YOSYS_NAMESPACE_END
