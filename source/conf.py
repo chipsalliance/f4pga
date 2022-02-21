@@ -4,15 +4,16 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
 import sys, os
+from pathlib import Path
 
 #sys.path.insert(0, os.path.abspath('.'))
 
 # -- General configuration -----------------------------------------------------
 
-project = u'SymbiFlow'
-basic_filename = u'symbiflow-docs'
-authors = u'SymbiFlow'
-copyright = authors + u', 2019'
+project = 'F4PGA'
+basic_filename = 'f4pga-docs'
+authors = 'F4PGA Authors'
+copyright = f'{authors}, 2019 - 2022'
 
 version = ''
 release = '' # The full version, including alpha/beta/rc tags.
@@ -48,63 +49,22 @@ rst_prolog = """
 
 # -- Options for HTML output ---------------------------------------------------
 
-html_theme = "sphinx_symbiflow_theme"
+html_show_sourcelink = True
+
+html_theme = 'sphinx_symbiflow_theme'
 
 html_theme_options = {
-    # Specify a list of menu in Header.
-    # Tuples forms:
-    #  ('Name', 'external url or path of pages in the document', boolean, 'icon name')
-    #
-    # Third argument:
-    # True indicates an external link.
-    # False indicates path of pages in the document.
-    #
-    # Fourth argument:
-    # Specify the icon name.
-    # For details see link.
-    # https://material.io/icons/
-    'header_links' : [
-        ('Home', 'index', False, 'home'),
-        ("Website", "https://symbiflow.github.io", True, 'launch'),
-        ("GitHub", "https://github.com/SymbiFlow", True, 'code')
-    ],
-
-    # Customize css colors.
-    # For details see link.
-    # https://getmdl.io/customize/index.html
-    #
-    # Values: amber, blue, brown, cyan deep_orange, deep_purple, green, grey, indigo, light_blue,
-    #         light_green, lime, orange, pink, purple, red, teal, yellow(Default: indigo)
-    'primary_color': 'deep_purple',
-    # Values: Same as primary_color. (Default: pink)
-    'accent_color': 'purple',
-
-    # Customize layout.
-    # For details see link.
-    # https://getmdl.io/components/index.html#layout-section
-    'fixed_drawer': True,
-    'fixed_header': True,
-    'header_waterfall': True,
-    'header_scroll': False,
-
-    # Render title in header.
-    # Values: True, False (Default: False)
-    'show_header_title': False,
-    # Render title in drawer.
-    # Values: True, False (Default: True)
-    'show_drawer_title': True,
-    # Render footer.
-    # Values: True, False (Default: True)
-    'show_footer': True
+    'repo_name': 'chipsalliance/f4pga-docs',
+    'github_url' : 'https://github.com/chipsalliance/f4pga-docs',
+    'globaltoc_collapse': True,
+    'color_primary': 'indigo',
+    'color_accent': 'blue',
 }
 
-html_title = project
+html_static_path = ['_static']
 
-html_last_updated_fmt = today_fmt
-
-html_show_sphinx = False
-
-htmlhelp_basename = basic_filename
+html_logo = str(Path(html_static_path[0]) / 'logo.svg')
+html_favicon = str(Path(html_static_path[0]) / 'favicon.svg')
 
 # -- Options for LaTeX output --------------------------------------------------
 

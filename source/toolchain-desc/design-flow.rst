@@ -15,7 +15,7 @@ SymbiFlow uses different programs to create the bitstream and is
 responsible for their proper integration. The procedure of converting
 Verilog file into the bitstream is described in the next sections.
 
-.. figure:: ../images/toolchain-flow.svg
+.. figure:: ../_static/images/toolchain-flow.svg
     :align: center
 
     Symbiflow Toolchain design flow
