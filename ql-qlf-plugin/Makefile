@@ -11,14 +11,15 @@ SOURCES = synth_quicklogic.cc \
           ql-dsp.cc \
           pp3_braminit.cc \
           quicklogic_eqn.cc \
-          ql-edif.cc
+          ql-edif.cc \
+          ql-dsp-simd.cc
 
 include ../Makefile_plugin.common
 
 COMMON          = common
 QLF_K4N8_DIR    = qlf_k4n8
 QLF_K6N10_DIR   = qlf_k6n10
-QLF_K6N10F_DIR   = qlf_k6n10f
+QLF_K6N10F_DIR  = qlf_k6n10f
 PP3_DIR         = pp3
 VERILOG_MODULES = $(COMMON)/cells_sim.v         \
                   $(QLF_K4N8_DIR)/arith_map.v   \
