@@ -30,8 +30,18 @@ extern void visit_object(vpiHandle obj_h, int indent, const char *relation, std:
 YOSYS_NAMESPACE_BEGIN
 
 struct UhdmAstFrontend : public UhdmCommonFrontend {
-    UhdmAstFrontend() : UhdmCommonFrontend("uhdm", "read UHDM file") {}
-    AST::AstNode *parse(std::string filename)
+    UhdmAstFrontend() : UhdmCommonFrontend("uhdm", "read UHDM file") { this->log_header_message = "Executing UHDM frontend.\n"; }
+    void help() override
+    {
+        //   |---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|
+        log("\n");
+        log("    read_uhdm [options] [filename]\n");
+        log("\n");
+        log("Load design from a UHDM file into the current design\n");
+        log("\n");
+        this->print_read_options();
+    }
+    AST::AstNode *parse(std::string filename) override
     {
         UHDM::Serializer serializer;
 

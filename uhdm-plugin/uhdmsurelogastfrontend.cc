@@ -78,8 +78,18 @@ std::vector<vpiHandle> executeCompilation(SURELOG::SymbolTable *symbolTable, SUR
 }
 
 struct UhdmSurelogAstFrontend : public UhdmCommonFrontend {
-    UhdmSurelogAstFrontend() : UhdmCommonFrontend("verilog_with_uhdm", "generate/read UHDM file") {}
-    void help()
+    UhdmSurelogAstFrontend() : UhdmCommonFrontend("verilog_with_uhdm", "generate/read UHDM file")
+    {
+        this->log_header_message = "Executing Verilog with UHDM frontend.\n";
+    }
+    void print_read_options() override
+    {
+        log("    -process\n");
+        log("        loads design from given UHDM file\n");
+        log("\n");
+        UhdmCommonFrontend::print_read_options();
+    }
+    void help() override
     {
         //   |---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|
         log("\n");
@@ -87,25 +97,9 @@ struct UhdmSurelogAstFrontend : public UhdmCommonFrontend {
         log("\n");
         log("Generate or load design from a UHDM file into the current design\n");
         log("\n");
-        log("    -process\n");
-        log("        loads design from given UHDM file\n");
-        log("\n");
-        log("    -noassert\n");
-        log("        ignore assert() statements");
-        log("\n");
-        log("    -debug\n");
-        log("        print debug info to stdout");
-        log("\n");
-        log("    -report [directory]\n");
-        log("        write a coverage report for the UHDM file\n");
-        log("\n");
-        log("    -defer\n");
-        log("        only read the abstract syntax tree and defer actual compilation\n");
-        log("        to a later 'hierarchy' command. Useful in cases where the default\n");
-        log("        parameters of modules yield invalid or not synthesizable code.\n");
-        log("\n");
+        this->print_read_options();
     }
-    AST::AstNode *parse(std::string filename)
+    AST::AstNode *parse(std::string filename) override
     {
         std::vector<const char *> cstrings;
         cstrings.reserve(this->args.size());

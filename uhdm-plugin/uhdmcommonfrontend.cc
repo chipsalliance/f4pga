@@ -29,14 +29,8 @@ static void set_line_num(int) {}
 /* Stub for AST::process */
 static int get_line_num(void) { return 1; }
 
-void UhdmCommonFrontend::help()
+void UhdmCommonFrontend::print_read_options()
 {
-    //   |---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|
-    log("\n");
-    log("    read_uhdm [options] [filename]\n");
-    log("\n");
-    log("Load design from a UHDM file into the current design\n");
-    log("\n");
     log("    -noassert\n");
     log("        ignore assert() statements");
     log("\n");
@@ -55,10 +49,11 @@ void UhdmCommonFrontend::help()
 
 void UhdmCommonFrontend::execute(std::istream *&f, std::string filename, std::vector<std::string> args, RTLIL::Design *design)
 {
+    log_header(design, this->log_header_message);
+
     this->args = args;
 
     bool defer = false;
-    std::string report_directory;
     for (size_t i = 1; i < args.size(); i++) {
         if (args[i] == "-debug") {
             this->shared.debug_flag = true;
