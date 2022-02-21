@@ -27,7 +27,7 @@ jobs:
 
       - name: 📓 Build the documentation
         run: |
-          . ./env/conda/bin/activate symbiflow-docs
+          . ./env/conda/bin/activate f4pga-docs
           make html
 
       - name: '📤 Upload artifact: Sphinx HTML'

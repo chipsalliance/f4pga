@@ -1,6 +1,5 @@
-=======================
-SymbiFlow documentation
-=======================
+F4PGA documentation
+###################
 
 .. toctree::
    :maxdepth: 3
