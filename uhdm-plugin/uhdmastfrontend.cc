@@ -19,9 +19,7 @@
  *
  */
 
-#include "UhdmAst.h"
-#include "frontends/ast/ast.h"
-#include "kernel/yosys.h"
+#include "uhdmcommonfrontend.h"
 
 namespace UHDM
 {
@@ -31,15 +29,9 @@ extern void visit_object(vpiHandle obj_h, int indent, const char *relation, std:
 
 YOSYS_NAMESPACE_BEGIN
 
-/* Stub for AST::process */
-static void set_line_num(int) {}
-
-/* Stub for AST::process */
-static int get_line_num(void) { return 1; }
-
-struct UhdmAstFrontend : public Frontend {
-    UhdmAstFrontend() : Frontend("uhdm", "read UHDM file") {}
-    void help()
+struct UhdmAstFrontend : public UhdmCommonFrontend {
+    UhdmAstFrontend() : UhdmCommonFrontend("uhdm", "read UHDM file") {}
+    void help() override
     {
         //   |---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|
         log("\n");
@@ -47,70 +39,27 @@ struct UhdmAstFrontend : public Frontend {
         log("\n");
         log("Load design from a UHDM file into the current design\n");
         log("\n");
-        log("    -noassert\n");
-        log("        ignore assert() statements");
-        log("\n");
-        log("    -debug\n");
-        log("        print debug info to stdout");
-        log("\n");
-        log("    -report [directory]\n");
-        log("        write a coverage report for the UHDM file\n");
-        log("\n");
-        log("    -defer\n");
-        log("        only read the abstract syntax tree and defer actual compilation\n");
-        log("        to a later 'hierarchy' command. Useful in cases where the default\n");
-        log("        parameters of modules yield invalid or not synthesizable code.\n");
-        log("\n");
+        this->print_read_options();
     }
-    void execute(std::istream *&f, std::string filename, std::vector<std::string> args, RTLIL::Design *design)
+    AST::AstNode *parse(std::string filename) override
     {
-        log_header(design, "Executing UHDM frontend.\n");
-
-        UhdmAstShared shared;
-        UhdmAst uhdm_ast(shared);
-        bool defer = false;
-
-        std::string report_directory;
-        for (size_t i = 1; i < args.size(); i++) {
-            if (args[i] == "-debug") {
-                shared.debug_flag = true;
-            } else if (args[i] == "-report" && ++i < args.size()) {
-                report_directory = args[i];
-                shared.stop_on_error = false;
-            } else if (args[i] == "-noassert") {
-                shared.no_assert = true;
-            } else if (args[i] == "-defer") {
-                defer = true;
-            }
-        }
-        extra_args(f, filename, args, args.size() - 1);
-
-        AST::current_filename = filename;
-        AST::set_line_num = &set_line_num;
-        AST::get_line_num = &get_line_num;
-        struct AST::AstNode *current_ast;
-
         UHDM::Serializer serializer;
 
         std::vector<vpiHandle> restoredDesigns = serializer.Restore(filename);
         for (auto design : restoredDesigns) {
             std::stringstream strstr;
-            UHDM::visit_object(design, 1, "", &shared.report.unhandled, shared.debug_flag ? std::cout : strstr);
+            UHDM::visit_object(design, 1, "", &this->shared.report.unhandled, this->shared.debug_flag ? std::cout : strstr);
         }
-        current_ast = uhdm_ast.visit_designs(restoredDesigns);
-        if (!report_directory.empty()) {
-            shared.report.write(report_directory);
+        UhdmAst uhdm_ast(this->shared);
+        AST::AstNode *current_ast = uhdm_ast.visit_designs(restoredDesigns);
+        if (!this->report_directory.empty()) {
+            this->shared.report.write(this->report_directory);
         }
         for (auto design : restoredDesigns)
             vpi_release_handle(design);
-        bool dump_ast1 = shared.debug_flag;
-        bool dump_ast2 = shared.debug_flag;
-        bool dont_redefine = false;
-        bool default_nettype_wire = true;
-        AST::process(design, current_ast, dump_ast1, dump_ast2, false, false, false, false, false, false, false, false, false, false, false, false,
-                     false, false, dont_redefine, false, defer, default_nettype_wire);
-        delete current_ast;
+        return current_ast;
     }
+    void call_log_header(RTLIL::Design *design) override { log_header(design, "Executing UHDM frontend.\n"); }
 } UhdmAstFrontend;
 
 YOSYS_NAMESPACE_END
