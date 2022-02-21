@@ -59,7 +59,9 @@ module TDP18Kx18_FIFO (
 	input wire WEN_B;
 	input wire REN_A;
 	input wire REN_B;
+	(* clkbuf_sink *)
 	input wire CLK_A;
+	(* clkbuf_sink *)
 	input wire CLK_B;
 	input wire [1:0] BE_A;
 	input wire [1:0] BE_B;

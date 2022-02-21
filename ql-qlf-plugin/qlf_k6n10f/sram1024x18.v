@@ -22,6 +22,7 @@ module sram1024x18 (
 	wdata_b,
 	rdata_b
 );
+	(* clkbuf_sink *)
 	input wire clk_a;
 	input wire cen_a;
 	input wire wen_a;
@@ -29,6 +30,7 @@ module sram1024x18 (
 	input wire [17:0] wmsk_a;
 	input wire [17:0] wdata_a;
 	output reg [17:0] rdata_a;
+	(* clkbuf_sink *)
 	input wire clk_b;
 	input wire cen_b;
 	input wire wen_b;

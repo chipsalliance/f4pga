@@ -34,8 +34,10 @@ module fifo_ctl (
 	input wire [2:0] depth;
 	input wire [1:0] rmode;
 	input wire [1:0] wmode;
+	(* clkbuf_sink *)
 	input wire rclk;
 	input wire rst_R_n;
+	(* clkbuf_sink *)
 	input wire wclk;
 	input wire rst_W_n;
 	input wire ren;

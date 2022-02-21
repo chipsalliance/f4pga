@@ -561,7 +561,9 @@ module TDP_BRAM36 (
 	input wire WEN_B1;
 	input wire REN_A1;
 	input wire REN_B1;
+	(* clkbuf_sink *)
 	input wire CLK_A1;
+	(* clkbuf_sink *)
 	input wire CLK_B1;
 	input wire [1:0] BE_A1;
 	input wire [1:0] BE_B1;
@@ -587,7 +589,9 @@ module TDP_BRAM36 (
 	input wire WEN_B2;
 	input wire REN_A2;
 	input wire REN_B2;
+	(* clkbuf_sink *)
 	input wire CLK_A2;
+	(* clkbuf_sink *)
 	input wire CLK_B2;
 	input wire [1:0] BE_A2;
 	input wire [1:0] BE_B2;
