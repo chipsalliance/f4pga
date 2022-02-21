@@ -1,16 +1,13 @@
 Yosys
 =====
 
-Yosys is a Free and Open Source Verilog HDL synthesis tool. It was designed
-to be highly extensible and multiplatform. In SymbiFlow toolchain,
-it is responsible for the whole synthesis process described in `FPGA Design Flow
-<./design-flow.html>`_
+Yosys is a Free and Open Source Verilog HDL synthesis tool.
+It was designed to be highly extensible and multiplatform.
+In F4PGA toolchain, it is responsible for the whole synthesis process described in `FPGA Design Flow <./design-flow.html>`_
 
-It is not necessary to call Yosys directly using the SymbiFlow
-toolchain. Nevertheless, the following description, should provide
-sufficient introduction to Yosys usage inside the project.
-It is also a good starting point for a deeper understanding of the whole
-toolchain.
+It is not necessary to call Yosys directly using F4PGA.
+Nevertheless, the following description, should provide sufficient introduction to Yosys usage inside the project.
+It is also a good starting point for a deeper understanding of the whole toolchain.
 
 Short description
 -----------------
@@ -34,9 +31,9 @@ Recommended synthesis flows for different FPGAs are combined into
 macros i.e. ``synth_ice40`` (for Lattice iCE40 FPGA) or ``synth_xilinx``
 (for Xilinx 7-series FPGAs).
 
-The *backend* on the other hand, is responsible
-for converting internal Yosys representation into one of the standardized
-formats. Symbiflow uses ``.eblif`` as its output file format.
+The *backend* on the other hand, is responsible for converting internal Yosys representation into one of the
+standardized formats.
+F4PGA uses ``.eblif`` as its output file format.
 
 Usage in Toolchain
 ------------------
@@ -64,7 +61,7 @@ It can be seen that this script performs a platform-specific process of
 synthesis, some optimization steps (``opt_`` commands), and writes the final file in
 ``.eblif`` and Verilog formats. Yosys synthesis configuration scripts are platform-specific
 and can by found in ``<platform-dir>/yosys/synth.tcl``
-in the `Symbiflow Architecture Definitions <https://github.com/SymbiFlow/symbiflow-arch-defs>`_
+in the `F4PGA Architecture Definitions <https://github.com/SymbiFlow/f4pga-arch-defs>`_
 repository.
 
 To understand performed operations, view the log file. It is usually generated
@@ -127,15 +124,15 @@ chosen platform:
 The same structure is described by the ``.eblif`` file.
 
 
-Technology mapping in SymbiFlow toolchain
------------------------------------------
+Technology mapping in F4PGA toolchain
+-------------------------------------
 
 .. _Xilinx 7 Series FPGAs Clocking Resources User Guide: https://www.xilinx.com/support/documentation/user_guides/ug472_7Series_Clocking.pdf#page=38
 .. _VTR FPGA Architecture Description: https://docs.verilogtorouting.org/en/latest/arch/
 .. _techmap section in the Yosys Manual: http://www.clifford.at/yosys/files/yosys_manual.pdf#page=153
 
 It is important to understand the connection between the synthesis and
-implementation tools used in the SymbiFlow toolchain. As mentioned before,
+implementation tools used in the F4PGA toolchain. As mentioned before,
 synthesis tools like Yosys take the design description from the source files
 and convert them into a netlist that consists of the primitives used by
 the implementation tool. Usually, to support multiple implementation tools,
@@ -148,7 +145,7 @@ Technology mapping for VPR
 --------------------------
 
 As mentioned before, VPR is one of the implementation tools (often referred to
-as Place & Route or P&R tools) used in SymbiFlow. By default, the SymbiFlow
+as Place & Route or P&R tools) used in F4PGA. By default, the F4PGA
 toolchain uses it during bitstream generation for, i.e., Xilinx 7-Series
 devices. Since the architecture models for this FPGA family were created from
 scratch, appropriate techmaps were needed to instruct Yosys on translating
@@ -362,7 +359,7 @@ the ``BUFGCTRL_VPR``:
 
 .. note::
 
-   All SymbiFlow techmaps for Xilinx 7-Series devices use special inverter
+   All F4PGA techmaps for Xilinx 7-Series devices use special inverter
    logic that converts constant 0 signals at the BEL to constant-1 signals
    at the site. This behavior is desired since VCC is the default signal in
    7-Series and US/US+ devices. The presented solution matches the conventions
@@ -372,7 +369,7 @@ the ``BUFGCTRL_VPR``:
 Yosys provides special techmapping naming conventions for wires,
 parameters, and modules. The special names that start with ``_TECHMAP_``
 can be used to force certain behavior during the techmapping process.
-Currently, the following special names are used in SymbiFlow techmaps:
+Currently, the following special names are used in F4PGA techmaps:
 
 - ``_TECHMAP_REPLACE_`` is used as a name for an instantiated module, which will
   replace the one used in the original design. This special name causes

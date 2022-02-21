@@ -1,4 +1,4 @@
-name: symbiflow-docs
+name: f4pga-docs
 channels:
   - symbiflow
   - conda-forge
