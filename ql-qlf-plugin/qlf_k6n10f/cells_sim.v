@@ -668,10 +668,10 @@ endmodule
 module QL_DSP1 (
     input  [19:0] a,
     input  [17:0] b,
+    (* clkbuf_sink *)
     input  clk0,
     (* clkbuf_sink *)
     input  clk1,
-    (* clkbuf_sink *)
     input  [ 1:0] feedback0,
     input  [ 1:0] feedback1,
     input  load_acc0,
@@ -683,3 +683,94 @@ module QL_DSP1 (
     parameter MODE_BITS = 27'b00000000000000000000000000;
 endmodule  /* QL_DSP1 */
 
+(* blackbox *)
+module QL_DSP2 ( // TODO: Name subject to change
+    input  [19:0] a,
+    input  [17:0] b,
+    input  [ 3:0] acc_fir,
+    output [37:0] z,
+    output [17:0] dly_b,
+
+    (* clkbuf_sink *)
+    input         clk,
+    input         reset,
+
+    input  [1:0]  feedback,
+    input         load_acc,
+    input         unsigned_a,
+    input         unsigned_b,
+
+    input         f_mode,
+    input  [2:0]  output_select,
+    input         saturate_enable,
+    input  [5:0]  shift_right,
+    input         round,
+    input         subtract,
+    input         register_inputs,
+    input  [19:0] coeff_0,
+    input  [19:0] coeff_1,
+    input  [19:0] coeff_2,
+    input  [19:0] coeff_3
+);
+
+endmodule
+
+(* blackbox *) // TODO: add sim model
+module dsp_t1_20x18x64 (
+    input  [19:0] a_i,
+    input  [17:0] b_i,
+    input  [ 3:0] acc_fir_i,
+    output [37:0] z_o,
+    output [17:0] dly_b_o,
+
+    (* clkbuf_sink *)
+    input         clock_i,
+    input         reset_i,
+
+    input  [1:0]  feedback_i,
+    input         load_acc_i,
+    input         unsigned_a_i,
+    input         unsigned_b_i,
+
+    input  [2:0]  output_select_i,
+    input         saturate_enable_i,
+    input  [5:0]  shift_right_i,
+    input         round_i,
+    input         subtract_i,
+    input         register_inputs_i,
+    input  [19:0] coeff_0_i,
+    input  [19:0] coeff_1_i,
+    input  [19:0] coeff_2_i,
+    input  [19:0] coeff_3_i
+);
+endmodule
+
+(* blackbox *) // TODO: add sim model
+module dsp_t1_10x9x32 (
+    input  [ 9:0] a_i,
+    input  [ 8:0] b_i,
+    input  [ 3:0] acc_fir_i,
+    output [18:0] z_o,
+    output [ 8:0] dly_b_o,
+
+    (* clkbuf_sink *)
+    input         clock_i,
+    input         reset_i,
+
+    input  [1:0]  feedback_i,
+    input         load_acc_i,
+    input         unsigned_a_i,
+    input         unsigned_b_i,
+
+    input  [2:0]  output_select_i,
+    input         saturate_enable_i,
+    input  [5:0]  shift_right_i,
+    input         round_i,
+    input         subtract_i,
+    input         register_inputs_i,
+    input  [ 9:0] coeff_0_i,
+    input  [ 9:0] coeff_1_i,
+    input  [ 9:0] coeff_2_i,
+    input  [ 9:0] coeff_3_i
+);
+endmodule
