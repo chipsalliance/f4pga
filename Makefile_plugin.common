@@ -55,7 +55,7 @@ PLUGINS_DIR ?= $(shell $(YOSYS_CONFIG) --datdir)/plugins
 DATA_DIR ?= $(shell $(YOSYS_CONFIG) --datdir)
 EXTRA_FLAGS ?=
 
-OBJS := $(SOURCES:cc=o)
+OBJS := $(patsubst %.cc,%.o,$(SOURCES))
 
 all: $(NAME).so
 

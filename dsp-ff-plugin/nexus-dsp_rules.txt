@@ -1,0 +1,175 @@
+# Copyright (C) 2020-2022  The SymbiFlow Authors.
+#
+# Use of this source code is governed by a ISC-style
+# license that can be found in the LICENSE file or at
+# https://opensource.org/licenses/ISC
+#
+# SPDX-License-Identifier:ISC
+
+dsp MULT9X9 MULT18X18 MULT18X36 MULT36X36
+  port A SIGNEDA
+    clk CLK 0
+    rst RSTA 0
+    ena CEA 1
+
+    set REGINPUTA=REGISTER
+    map GSR=GSR
+  endport
+  port B SIGNEDB
+    clk CLK 0
+    rst RSTB 0
+    ena CEB 1
+
+    set REGINPUTB=REGISTER
+    map GSR=GSR
+  endport
+  port Z
+    clk CLK 0
+    rst RSTOUT 0
+    ena CEOUT 1
+
+    set REGOUTPUT=REGISTER
+    map GSR=GSR
+  endport
+enddsp
+
+dsp MULTPREADD9X9 MULTPREADD18X18 MULTADDSUB18X18 MULTADDSUB36X36
+  port A SIGNEDA
+    clk CLK 0
+    rst RSTA 0
+    ena CEA 1
+
+    set REGINPUTA=REGISTER
+    map GSR=GSR
+  endport
+  port B SIGNEDB
+    clk CLK 0
+    rst RSTB 0
+    ena CEB 1
+
+    set REGINPUTB=REGISTER
+    map GSR=GSR
+  endport
+  port C SIGNEDC
+    clk CLK 0
+    rst RSTC 0
+    ena CEC 1
+
+    set REGINPUTC=REGISTER
+    map GSR=GSR
+  endport
+  port Z
+    clk CLK 0
+    rst RSTOUT 0
+    ena CEOUT 1
+
+    set REGOUTPUT=REGISTER
+    map GSR=GSR
+  endport
+enddsp
+
+dsp MULTADDSUB9X9WIDE
+  port A0 SIGNED
+    clk CLK 0
+    rst RSTA0A1 0
+    ena CEA0A1 1
+
+    set REGINPUTAB0=REGISTER
+    map GSR=GSR
+  endport
+  port A1 SIGNED
+    clk CLK 0
+    rst RSTA0A1 0
+    ena CEA0A1 1
+
+    set REGINPUTAB1=REGISTER
+    map GSR=GSR
+  endport
+  port A2 SIGNED
+    clk CLK 0
+    rst RSTA2A3 0
+    ena CEA2A3 1
+
+    set REGINPUTAB2=REGISTER
+    map GSR=GSR
+  endport
+  port A3 SIGNED
+    clk CLK 0
+    rst RSTA2A3 0
+    ena CEA2A3 1
+
+    set REGINPUTAB3=REGISTER
+    map GSR=GSR
+  endport
+  port B0 SIGNED
+    clk CLK 0
+    rst RSTB0B1 0
+    ena CEB0B1 1
+
+    set REGINPUTAB0=REGISTER
+    map GSR=GSR
+  endport
+  port B1 SIGNED
+    clk CLK 0
+    rst RSTB0B1 0
+    ena CEB0B1 1
+
+    set REGINPUTAB1=REGISTER
+    map GSR=GSR
+  endport
+  port B2 SIGNED
+    clk CLK 0
+    rst RSTB2B3 0
+    ena CEB2B3 1
+
+    set REGINPUTAB2=REGISTER
+    map GSR=GSR
+  endport
+  port B3 SIGNED
+    clk CLK 0
+    rst RSTB2B3 0
+    ena CEB2B3 1
+
+    set REGINPUTAB3=REGISTER
+    map GSR=GSR
+  endport
+  port C SIGNED
+    clk CLK 0
+    rst RSTC 0
+    ena CEC 1
+
+    set REGINPUTC=REGISTER
+    map GSR=GSR
+  endport
+  port Z
+    clk CLK 0
+    rst RSTOUT 0
+    ena CEOUT 1
+
+    set REGOUTPUT=REGISTER
+    map GSR=GSR
+  endport
+enddsp
+
+ff FD1P3DX
+  clk CK
+  rst CD
+  ena SP
+  d   D
+  q   Q
+
+  match GSR
+  set RESETMODE=ASYNC
+endff
+
+ff FD1P3IX
+  clk CK
+  rst CD
+  ena SP
+  d   D
+  q   Q
+
+  match GSR
+  set RESETMODE=SYNC
+endff
+
