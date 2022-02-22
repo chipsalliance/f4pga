@@ -766,14 +766,14 @@ struct DspFF : public Pass {
         log("  endff\n");
         log("\n");
         log("Each 'dsp' section defines a DSP cell type (can apply to multiple types).\n");
-        log("Within it each 'port' section defining a data port with internal register.\n");
+        log("Within it each 'port' section defines a data port with internal register.\n");
         log("There can be multiple port names given if they belong to the same control register.\n");
         log("The port can be specified as a whole (eg. 'DATA') or as a subset of the whole\n");
         log("(eg. 'DATA[7:0]').\n");
         log("\n");
         log("Statemenst 'clk', 'rst' and 'ena' define names of clock, reset and enable\n");
         log("ports associated with the data port along with default constant values to\n");
-        log("connect them to when a given port has no counterpart in the flip-flop bein\n");
+        log("connect them to when a given port has no counterpart in the flip-flop being\n");
         log("integrated.\n");
         log("\n");
         log("The 'set' statement tells how to set control parameter(s) of the DSP that\n");
