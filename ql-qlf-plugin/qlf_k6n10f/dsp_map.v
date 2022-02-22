@@ -74,7 +74,7 @@ module \$__QL_MUL10X9 (input [9:0] A, input [8:0] B, output [18:0] Y);
     dsp_t1_10x9x32 _TECHMAP_REPLACE_ (
         .a_i                (a),
         .b_i                (b),
-        .acc_fir_i          (4'd0),
+        .acc_fir_i          (2'd0),
         .z_o                (z),
 
         .feedback_i         (2'd0),
