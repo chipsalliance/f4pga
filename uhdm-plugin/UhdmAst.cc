@@ -1399,8 +1399,6 @@ void UhdmAst::simplify_parameter(AST::AstNode *parameter, AST::AstNode *module_n
         visitEachDescendant(module_node, [&](AST::AstNode *current_scope_node) {
             if (current_scope_node->type == AST::AST_TYPEDEF || current_scope_node->type == AST::AST_PARAMETER ||
                 current_scope_node->type == AST::AST_LOCALPARAM) {
-                if (current_scope_node->type == AST::AST_TYPEDEF)
-                    simplify(current_scope_node, nullptr);
                 AST_INTERNAL::current_scope[current_scope_node->str] = current_scope_node;
             }
         });
