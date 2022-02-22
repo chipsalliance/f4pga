@@ -164,31 +164,32 @@ struct QlDspSimdPass : public Pass {
                         auto sport = RTLIL::escape_id(it.first);
                         auto dport = RTLIL::escape_id(it.second);
 
+                        size_t width;
+                        bool isOutput;
+
+                        std::tie(width, isOutput) = getPortInfo(simd, dport);
+
+                        auto getConnection = [&](const RTLIL::Cell *cell) {
+                            RTLIL::SigSpec sigspec;
+                            if (cell->hasPort(sport)) {
+                                const auto &sig = cell->getPort(sport);
+                                sigspec.append(sig);
+                            }
+                            if (sigspec.bits().size() < width / 2) {
+                                if (isOutput) {
+                                    for (size_t i = 0; i < width / 2 - sigspec.bits().size(); ++i) {
+                                        sigspec.append(RTLIL::SigSpec());
+                                    }
+                                } else {
+                                    sigspec.append(RTLIL::SigSpec(RTLIL::Sx, width / 2 - sigspec.bits().size()));
+                                }
+                            }
+                            return sigspec;
+                        };
+
                         RTLIL::SigSpec sigspec;
-                        size_t width = getPortWidth(simd, dport);
-
-                        // A part
-                        if (dsp_a->hasPort(sport)) {
-                            const auto &sig = dsp_a->getPort(sport);
-                            sigspec.append(sig);
-                            if (sig.bits().size() < width / 2) {
-                                sigspec.append(RTLIL::SigSpec(RTLIL::Sx, sig.bits().size() - width / 2));
-                            }
-                        } else {
-                            sigspec.append(RTLIL::SigSpec(RTLIL::Sx, width / 2));
-                        }
-
-                        // B part
-                        if (dsp_b->hasPort(sport)) {
-                            const auto &sig = dsp_b->getPort(sport);
-                            sigspec.append(sig);
-                            if (sig.bits().size() < width / 2) {
-                                sigspec.append(RTLIL::SigSpec(RTLIL::Sx, sig.bits().size() - width / 2));
-                            }
-                        } else {
-                            sigspec.append(RTLIL::SigSpec(RTLIL::Sx, width / 2));
-                        }
-
+                        sigspec.append(getConnection(dsp_a));
+                        sigspec.append(getConnection(dsp_b));
                         simd->setPort(dport, sigspec);
                     }
 
@@ -214,29 +215,28 @@ struct QlDspSimdPass : public Pass {
 
     // ..........................................
 
-    /// Looks up port width in the cell definition and returns it. Returns 0
-    /// if it cannot be determined.
-    size_t getPortWidth(RTLIL::Cell *a_Cell, RTLIL::IdString a_Port)
+    /// Looks up port width and direction in the cell definition and returns it.
+    /// Returns (0, false) if it cannot be determined.
+    std::pair<size_t, bool> getPortInfo(RTLIL::Cell *a_Cell, RTLIL::IdString a_Port)
     {
-
         if (!a_Cell->known()) {
-            return 0;
+            return std::make_pair(0, false);
         }
 
         // Get the module defining the cell (the previous condition ensures
         // that the pointers are valid)
         RTLIL::Module *mod = a_Cell->module->design->module(a_Cell->type);
         if (mod == nullptr) {
-            return 0;
+            return std::make_pair(0, false);
         }
 
         // Get the wire representing the port
         RTLIL::Wire *wire = mod->wire(a_Port);
         if (wire == nullptr) {
-            return 0;
+            return std::make_pair(0, false);
         }
 
-        return wire->width;
+        return std::make_pair(wire->width, wire->port_output);
     }
 
     /// Given a DSP cell populates and returns a DspConfig struct for it.
