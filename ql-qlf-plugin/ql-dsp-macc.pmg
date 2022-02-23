@@ -1,0 +1,39 @@
+pattern ql_dsp_macc
+
+state <IdString> add_ab
+state <IdString> add_ba
+
+match mul
+    select mul->type.in($mul)
+    select nusers(port(mul, \Y)) <= 3
+endmatch
+
+match add
+    select add->type.in($add, $sub)
+    choice <IdString> AB {\A, \B}
+    define <IdString> BA (AB == \A ? \B : \A)
+    index <SigSpec> port(add, AB) === port(mul, \Y)
+    select nusers(port(add, \Y)) == 2
+    set add_ab AB
+    set add_ba BA
+endmatch
+
+match mux
+    select mux->type.in($mux)
+    choice <IdString> AB {\A, \B}
+    define <IdString> BA (AB == \A ? \B : \A)
+    index <SigSpec> port(mux, AB) === port(mul, \Y)
+    index <SigSpec> port(mux, BA) === port(add, \Y)
+    select nusers(port(mux, \Y)) == 2
+    optional
+endmatch
+
+match ff
+    select ff->type.in($dff, $adff)
+    index <SigSpec> port(ff, \D) === (mux == nullptr ? port(add, \Y) : port(mux, \Y))
+    index <SigSpec> port(ff, \Q) === port(add, add_ba)
+endmatch
+
+code
+    accept;
+endcode

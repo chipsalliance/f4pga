@@ -12,7 +12,8 @@ SOURCES = synth_quicklogic.cc \
           pp3_braminit.cc \
           quicklogic_eqn.cc \
           ql-edif.cc \
-          ql-dsp-simd.cc
+          ql-dsp-simd.cc \
+          ql-dsp-macc.cc
 
 include ../Makefile_plugin.common
 
@@ -60,6 +61,7 @@ VERILOG_MODULES = $(COMMON)/cells_sim.v         \
 retrieve-pmgen:=$(shell mkdir -p pmgen && wget -nc -O pmgen/pmgen.py https://raw.githubusercontent.com/SymbiFlow/yosys/master%2Bwip/passes/pmgen/pmgen.py)
 
 pre-build:=$(shell python3 pmgen/pmgen.py -o pmgen/ql-dsp-pm.h -p ql_dsp ql_dsp.pmg)
+pre-build2:=$(shell python3 pmgen/pmgen.py -o pmgen/ql-dsp-macc.h -p ql_dsp_macc ql-dsp-macc.pmg)
 
 install_modules: $(VERILOG_MODULES)
 	$(foreach f,$^,install -D $(f) $(DATA_DIR)/quicklogic/$(f);)
