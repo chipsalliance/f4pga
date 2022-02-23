@@ -2234,6 +2234,8 @@ void UhdmAst::process_io_decl()
         current_node = make_ast_node(AST::AST_MODPORTMEMBER);
         visit_one_to_many({vpiRange}, obj_h, [&](AST::AstNode *node) { unpacked_ranges.push_back(node); });
     }
+    std::reverse(unpacked_ranges.begin(), unpacked_ranges.end());
+
     visit_one_to_one({vpiTypedef}, obj_h, [&](AST::AstNode *node) {
         if (node) {
             if (!node->str.empty()) {
