@@ -3127,7 +3127,11 @@ void UhdmAst::process_tagged_pattern()
         lhs_node = assign_node->children[0];
     } else {
         lhs_node = new AST::AstNode(AST::AST_IDENTIFIER);
-        lhs_node->str = find_ancestor({AST::AST_WIRE, AST::AST_MEMORY, AST::AST_PARAMETER, AST::AST_LOCALPARAM})->str;
+        auto ancestor = find_ancestor({AST::AST_WIRE, AST::AST_MEMORY, AST::AST_PARAMETER, AST::AST_LOCALPARAM});
+        if (!ancestor) {
+            log_error("Couldn't find ancestor for tagged pattern!\n");
+        }
+        lhs_node->str = ancestor->str;
     }
     current_node = new AST::AstNode(assign_type);
     current_node->children.push_back(lhs_node->clone());
@@ -3596,6 +3600,15 @@ void UhdmAst::process_parameter()
         case vpiArrayTypespec: {
             shared.report.mark_handled(typespec_h);
             visit_one_to_one({vpiElemTypespec}, typespec_h, [&](AST::AstNode *node) {
+                if (!node->str.empty()) {
+                    auto wiretype_node = make_ast_node(AST::AST_WIRETYPE);
+                    wiretype_node->str = node->str;
+                    current_node->children.push_back(wiretype_node);
+                    current_node->is_custom_type = true;
+                    auto it = shared.param_types.find(current_node->str);
+                    if (it == shared.param_types.end())
+                        shared.param_types.insert(std::make_pair(current_node->str, node));
+                }
                 if (node && node->attributes.count(UhdmAst::packed_ranges())) {
                     for (auto r : node->attributes[UhdmAst::packed_ranges()]->children) {
                         packed_ranges.push_back(r->clone());
