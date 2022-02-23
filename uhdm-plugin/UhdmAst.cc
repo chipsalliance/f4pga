@@ -1980,6 +1980,7 @@ void UhdmAst::process_packed_array_var()
     vpi_release_handle(itr);
     visit_one_to_many({vpiRange}, obj_h, [&](AST::AstNode *node) { packed_ranges.push_back(node); });
     add_multirange_wire(current_node, packed_ranges, unpacked_ranges);
+    visit_default_expr(obj_h);
 }
 
 void UhdmAst::process_param_assign()
