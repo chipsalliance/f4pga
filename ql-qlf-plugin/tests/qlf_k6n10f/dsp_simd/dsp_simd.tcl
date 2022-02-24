@@ -14,6 +14,15 @@ select -assert-count 0 t:dsp_t1_20x18x64
 select -assert-count 0 t:dsp_t1_10x9x32
 select -assert-count 1 t:QL_DSP2
 
+set TOP "simd_mult_inferred"
+design -load read
+hierarchy -top $TOP
+synth_quicklogic -family qlf_k6n10f -top $TOP
+yosys cd $TOP
+select -assert-count 0 t:dsp_t1_20x18x64
+select -assert-count 0 t:dsp_t1_10x9x32
+select -assert-count 1 t:QL_DSP2
+
 set TOP "simd_mult_odd"
 design -load read
 hierarchy -top $TOP
