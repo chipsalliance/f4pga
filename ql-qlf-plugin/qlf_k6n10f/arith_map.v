@@ -26,6 +26,7 @@ module _80_quicklogic_alu (A, B, CI, BI, X, Y, CO);
 	(* force_downto *)
 	output [Y_WIDTH-1:0] CO;
 
+
 	wire _TECHMAP_FAIL_ = Y_WIDTH <= 2;
 
 	(* force_downto *)
@@ -45,6 +46,8 @@ module _80_quicklogic_alu (A, B, CI, BI, X, Y, CO);
 	wire [Y_WIDTH:0] C;
 	(* force_downto *)
 	wire [Y_WIDTH-1:0] S  = {AA ^ BB};
+	
+	assign CO[Y_WIDTH-1:0] = C[Y_WIDTH:1];
 
 	generate
 	     adder_carry intermediate_adder (

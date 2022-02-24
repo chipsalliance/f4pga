@@ -64,7 +64,8 @@ design -reset
 read_verilog -icells -DWIDTH=4 $::env(DESIGN_TOP).v
 hierarchy -check -top full_adder
 yosys proc
-synth_quicklogic -family qlf_k6n10f
+equiv_opt -assert  -map +/quicklogic/qlf_k6n10f/cells_sim.v synth_quicklogic -family qlf_k6n10f
+design -load postopt
 yosys cd full_adder
 stat
 select -assert-count 6 t:adder_carry
@@ -75,10 +76,23 @@ design -reset
 read_verilog -icells -DWIDTH=4 $::env(DESIGN_TOP).v
 hierarchy -check -top subtractor
 yosys proc
-synth_quicklogic -family qlf_k6n10f
+equiv_opt -assert  -map +/quicklogic/qlf_k6n10f/cells_sim.v synth_quicklogic -family qlf_k6n10f
+design -load postopt
 yosys cd subtractor
 stat
 select -assert-count 6 t:adder_carry
+
+design -reset
+
+# Equivalence check for comparator synthesis for qlf-k6n10
+read_verilog -icells -DWIDTH=4 $::env(DESIGN_TOP).v
+hierarchy -check -top comparator
+yosys proc
+equiv_opt -assert  -map +/quicklogic/qlf_k6n10f/cells_sim.v synth_quicklogic -family qlf_k6n10f
+design -load postopt
+yosys cd comparator
+stat
+select -assert-count 5 t:adder_carry
 
 design -reset
 
