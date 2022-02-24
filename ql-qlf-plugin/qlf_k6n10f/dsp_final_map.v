@@ -16,7 +16,7 @@ module dsp_t1_20x18x64 (
     input         clock_i,
     input         reset_i,
 
-    input  [1:0]  feedback_i,
+    input  [2:0]  feedback_i,
     input         load_acc_i,
     input         unsigned_a_i,
     input         unsigned_b_i,
@@ -74,7 +74,7 @@ module dsp_t1_10x9x32 (
     input         clock_i,
     input         reset_i,
 
-    input  [1:0]  feedback_i,
+    input  [2:0]  feedback_i,
     input         load_acc_i,
     input         unsigned_a_i,
     input         unsigned_b_i,

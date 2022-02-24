@@ -25,7 +25,7 @@ module simd_mult (
 
         .clock_i            (clk),
 
-        .feedback_i         (2'd0),
+        .feedback_i         (3'd0),
         .load_acc_i         (1'b0),
         .unsigned_a_i       (1'b1),
         .unsigned_b_i       (1'b1),
@@ -45,7 +45,7 @@ module simd_mult (
 
         .clock_i            (clk),
 
-        .feedback_i         (2'd0),
+        .feedback_i         (3'd0),
         .load_acc_i         (1'b0),
         .unsigned_a_i       (1'b1),
         .unsigned_b_i       (1'b1),
@@ -103,7 +103,7 @@ module simd_mult_odd (
 
         .clock_i            (clk),
 
-        .feedback_i         (2'd0),
+        .feedback_i         (3'd0),
         .load_acc_i         (1'b0),
         .unsigned_a_i       (1'b1),
         .unsigned_b_i       (1'b1),
@@ -123,7 +123,7 @@ module simd_mult_odd (
 
         .clock_i            (clk),
 
-        .feedback_i         (2'd0),
+        .feedback_i         (3'd0),
         .load_acc_i         (1'b0),
         .unsigned_a_i       (1'b1),
         .unsigned_b_i       (1'b1),
@@ -143,7 +143,7 @@ module simd_mult_odd (
 
         .clock_i            (clk),
 
-        .feedback_i         (2'd0),
+        .feedback_i         (3'd0),
         .load_acc_i         (1'b0),
         .unsigned_a_i       (1'b1),
         .unsigned_b_i       (1'b1),
@@ -178,7 +178,7 @@ module simd_mult_conflict (
 
         .clock_i            (clk0),
 
-        .feedback_i         (2'd0),
+        .feedback_i         (3'd0),
         .load_acc_i         (1'b0),
         .unsigned_a_i       (1'b1),
         .unsigned_b_i       (1'b1),
@@ -198,7 +198,7 @@ module simd_mult_conflict (
 
         .clock_i            (clk1),
 
-        .feedback_i         (2'd0),
+        .feedback_i         (3'd0),
         .load_acc_i         (1'b0),
         .unsigned_a_i       (1'b1),
         .unsigned_b_i       (1'b1),
