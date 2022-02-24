@@ -15,6 +15,9 @@ SOURCES = synth_quicklogic.cc \
           ql-dsp-simd.cc \
           ql-dsp-macc.cc
 
+DEPS = pmgen/ql-dsp-pm.h \
+       pmgen/ql-dsp-macc.h
+
 include ../Makefile_plugin.common
 
 COMMON          = common
@@ -58,10 +61,19 @@ VERILOG_MODULES = $(COMMON)/cells_sim.v         \
                   $(PP3_DIR)/mult_sim.v        \
                   $(PP3_DIR)/qlal3_sim.v       \
 
-retrieve-pmgen:=$(shell mkdir -p pmgen && wget -nc -O pmgen/pmgen.py https://raw.githubusercontent.com/SymbiFlow/yosys/master%2Bwip/passes/pmgen/pmgen.py)
+#retrieve-pmgen:=$(shell mkdir -p pmgen && wget -nc -O pmgen/pmgen.py https://raw.githubusercontent.com/SymbiFlow/yosys/master%2Bwip/passes/pmgen/pmgen.py)
 
-pre-build:=$(shell python3 pmgen/pmgen.py -o pmgen/ql-dsp-pm.h -p ql_dsp ql_dsp.pmg)
-pre-build2:=$(shell python3 pmgen/pmgen.py -o pmgen/ql-dsp-macc.h -p ql_dsp_macc ql-dsp-macc.pmg)
+#pre-build:=$(shell python3 pmgen/pmgen.py -o pmgen/ql-dsp-pm.h -p ql_dsp ql_dsp.pmg)
+#pre-build2:=$(shell python3 pmgen/pmgen.py -o pmgen/ql-dsp-macc.h -p ql_dsp_macc ql-dsp-macc.pmg)
+
+pmgen:
+	mkdir -p pmgen
+
+pmgen/ql-dsp-pm.h: ../pmgen.py ql_dsp.pmg | pmgen
+	python3 ../pmgen.py -o $@ -p ql_dsp ql_dsp.pmg
+
+pmgen/ql-dsp-macc.h: ../pmgen.py ql-dsp-macc.pmg | pmgen
+	python3 ../pmgen.py -o $@ -p ql_dsp_macc ql-dsp-macc.pmg
 
 install_modules: $(VERILOG_MODULES)
 	$(foreach f,$^,install -D $(f) $(DATA_DIR)/quicklogic/$(f);)
@@ -70,4 +82,4 @@ install: install_modules
 
 clean:
 	$(MAKE) -f ../Makefile_plugin.common $@
-	rm -f *pm.h
+	rm -rf pmgen
