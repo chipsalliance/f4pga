@@ -861,13 +861,13 @@ module dsp_t1_sim # (
         {{(NBITS_ACC-NBITS_A-NBITS_B){mult[NBITS_A+NBITS_B-1]}}, mult[NBITS_A+NBITS_B-1:0]};
 
     wire [NBITS_ACC-1:0] a_xtnd = (unsigned_a) ?
-			      {{(NBITS_ACC-NBITS_A-NBITS_AF){1'b0}}, acc_fir, {a}} :
-			      {{(NBITS_ACC-NBITS_A-NBITS_AF){acc_fir[NBITS_AF-1]}}, acc_fir, {a[NBITS_A-1:0]}};
+			      { {(NBITS_ACC - NBITS_A - NBITS_AF){1'b0}}, acc_fir, {a} } :
+			      { {(NBITS_ACC - NBITS_A - NBITS_AF){acc_fir[NBITS_AF-1]}}, acc_fir, {a[NBITS_A-1:0]} };
 
     // Adder
     wire [NBITS_ACC-1:0] add_a = (subtract_i) ? (~mult_xtnd + 1) : mult_xtnd;
-    wire [NBITS_ACC-1:0] add_b = (feedback_i == 2'h0) ? acc :
-                                 (feedback_i == 2'h1) ? {{NBITS_ACC}{1'b0}} : a_xtnd;
+    wire [NBITS_ACC-1:0] add_b = (feedback_i == 3'h0) ? acc :
+                                 (feedback_i == 3'h1) ? {{NBITS_ACC}{1'b0}} : a_xtnd;
 
     wire [NBITS_ACC-1:0] add_o = add_a + add_b;
 
@@ -937,7 +937,6 @@ module dsp_t1_sim # (
 
 endmodule
 
-(* blackbox *) // TODO: add sim model
 module dsp_t1_20x18x64 (
     input  [19:0] a_i,
     input  [17:0] b_i,
@@ -949,7 +948,7 @@ module dsp_t1_20x18x64 (
     input         clock_i,
     input         reset_i,
 
-    input  [1:0]  feedback_i,
+    input  [2:0]  feedback_i,
     input         load_acc_i,
     input         unsigned_a_i,
     input         unsigned_b_i,
@@ -967,9 +966,42 @@ module dsp_t1_20x18x64 (
     parameter [19:0] COEFF_2 = 20'd0;
     parameter [19:0] COEFF_3 = 20'd0;
 
+    dsp_t1_sim #(
+	.NBITS_ACC(64),
+	.NBITS_A(20),
+	.NBITS_B(18),
+	.NBITS_Z(38),
+	.NBITS_COEF(20),
+	.NBITS_AF(4)
+    ) dsp (
+	.a_i(a_i),
+	.b_i(b_i),
+	.z_o(z_o),
+	.dly_b_o(dly_b_o),
+
+	.acc_fir_i(acc_fir_i),
+	.feedback_i(feedback_i),
+	.load_acc_i(load_acc_i),
+
+	.unsigned_a_i(unsigned_a_i),
+	.unsigned_b_i(unsigned_b_i),
+
+	.clock_i(clock_i),
+	.reset_n_i(~reset_i),
+
+	.saturate_enable_i(saturate_enable_i),
+	.output_select_i(output_select_i),
+	.round_i(round_i),
+	.shift_right_i(shift_right_i),
+	.subtract_i(subtract_i),
+	.register_inputs_i(register_inputs_i),
+	.coef_0_i(coeff_0_i),
+	.coef_1_i(coeff_1_i),
+	.coef_2_i(coeff_2_i),
+	.coef_3_i(coeff_3_i)
+    );
 endmodule
 
-(* blackbox *) // TODO: add sim model
 module dsp_t1_10x9x32 (
     input  [ 9:0] a_i,
     input  [ 8:0] b_i,
@@ -981,7 +1013,7 @@ module dsp_t1_10x9x32 (
     input         clock_i,
     input         reset_i,
 
-    input  [1:0]  feedback_i,
+    input  [2:0]  feedback_i,
     input         load_acc_i,
     input         unsigned_a_i,
     input         unsigned_b_i,
@@ -999,4 +1031,38 @@ module dsp_t1_10x9x32 (
     parameter [9:0] COEFF_2 = 10'd0;
     parameter [9:0] COEFF_3 = 10'd0;
 
+    dsp_t1_sim #(
+	.NBITS_ACC(32),
+	.NBITS_A(10),
+	.NBITS_B(9),
+	.NBITS_Z(19),
+	.NBITS_COEF(10),
+	.NBITS_AF(2)
+    ) dsp (
+	.a_i(a_i),
+	.b_i(b_i),
+	.z_o(z_o),
+	.dly_b_o(dly_b_o),
+
+	.acc_fir_i(acc_fir_i),
+	.feedback_i(feedback_i),
+	.load_acc_i(load_acc_i),
+
+	.unsigned_a_i(unsigned_a_i),
+	.unsigned_b_i(unsigned_b_i),
+
+	.clock_i(clock_i),
+	.reset_n_i(~reset_i),
+
+	.saturate_enable_i(saturate_enable_i),
+	.output_select_i(output_select_i),
+	.round_i(round_i),
+	.shift_right_i(shift_right_i),
+	.subtract_i(subtract_i),
+	.register_inputs_i(register_inputs_i),
+	.coef_0_i(coeff_0_i),
+	.coef_1_i(coeff_1_i),
+	.coef_2_i(coeff_2_i),
+	.coef_3_i(coeff_3_i)
+    );
 endmodule
