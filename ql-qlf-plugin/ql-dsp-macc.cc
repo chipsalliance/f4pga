@@ -8,8 +8,9 @@ PRIVATE_NAMESPACE_BEGIN
 
 // ============================================================================
 
-void create_ql_macc_dsp (ql_dsp_macc_pm& pm) {
-    auto& st = pm.st_ql_dsp_macc;
+void create_ql_macc_dsp(ql_dsp_macc_pm &pm)
+{
+    auto &st = pm.st_ql_dsp_macc;
 
     // Get port widths
     size_t a_width = GetSize(st.mul->getPort(ID(A)));
@@ -32,33 +33,26 @@ void create_ql_macc_dsp (ql_dsp_macc_pm& pm) {
     if (min_width <= 2 && max_width <= 2 && z_width <= 4) {
         // Too narrow
         return;
-    }
-    else if (min_width <=  9 && max_width <= 10 && z_width <= 19) {
+    } else if (min_width <= 9 && max_width <= 10 && z_width <= 19) {
         type = RTLIL::escape_id("dsp_t1_10x9x32");
         tgt_a_width = 10;
         tgt_b_width = 9;
         tgt_z_width = 19;
-    }
-    else if (min_width <= 18 && max_width <= 20 && z_width <= 38) {
+    } else if (min_width <= 18 && max_width <= 20 && z_width <= 38) {
         type = RTLIL::escape_id("dsp_t1_20x18x64");
         tgt_a_width = 20;
         tgt_b_width = 18;
         tgt_z_width = 38;
-    }
-    else {
+    } else {
         // Too wide
         return;
     }
 
-    log("Inferring MACC %zux%zu->%zu as %s from:\n",
-        a_width, b_width, z_width, RTLIL::unescape_id(type).c_str());
+    log("Inferring MACC %zux%zu->%zu as %s from:\n", a_width, b_width, z_width, RTLIL::unescape_id(type).c_str());
 
     for (auto cell : {st.mul, st.add, st.mux, st.ff}) {
         if (cell != nullptr) {
-            log(" %s (%s)\n",
-                RTLIL::unescape_id(cell->name).c_str(),
-                RTLIL::unescape_id(cell->type).c_str()
-            );
+            log(" %s (%s)\n", RTLIL::unescape_id(cell->name).c_str(), RTLIL::unescape_id(cell->type).c_str());
         }
     }
 
@@ -72,7 +66,7 @@ void create_ql_macc_dsp (ql_dsp_macc_pm& pm) {
     name += RTLIL::unescape_id(st.ff->name);
 
     // Add the DSP cell
-    RTLIL::Cell* cell = pm.module->addCell(RTLIL::escape_id(name), type);
+    RTLIL::Cell *cell = pm.module->addCell(RTLIL::escape_id(name), type);
 
     // Get input/output data signals
     RTLIL::SigSpec sig_a;
@@ -96,7 +90,7 @@ void create_ql_macc_dsp (ql_dsp_macc_pm& pm) {
 
     // Connect output data port, pad if needed
     if ((size_t)GetSize(sig_z) < tgt_z_width) {
-        auto* wire = pm.module->addWire(NEW_ID, tgt_z_width - GetSize(sig_z));
+        auto *wire = pm.module->addWire(NEW_ID, tgt_z_width - GetSize(sig_z));
         sig_z.append(wire);
     }
     cell->setPort(RTLIL::escape_id("z_o"), sig_z);
@@ -158,13 +152,15 @@ struct QlDspMacc : public Pass {
 
     QlDspMacc() : Pass("ql_dsp_macc", "Does something") {}
 
-    void help() override {
+    void help() override
+    {
         log("\n");
         log("    ql_dsp_macc [options] [selection]\n");
         log("\n");
     }
 
-    void execute (std::vector<std::string> a_Args, RTLIL::Design *a_Design) override {
+    void execute(std::vector<std::string> a_Args, RTLIL::Design *a_Design) override
+    {
         log_header(a_Design, "Executing QL_DSP_MACC pass.\n");
 
         size_t argidx;
