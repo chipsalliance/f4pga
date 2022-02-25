@@ -21,7 +21,8 @@ TESTS = consts \
 	tribuf \
 	fsm \
 	pp3_bram \
-    qlf_k6n10f/dsp_mult
+    qlf_k6n10f/dsp_mult \
+    qlf_k6n10f/dsp_simd
 #	qlf_k6n10_bram \
 
 include $(shell pwd)/../../Makefile_test.common
@@ -40,4 +41,5 @@ tribuf_verify = true
 fsm_verify = true
 pp3_bram_verify = true
 qlf_k6n10f-dsp_mult_verify = true
+qlf_k6n10f-dsp_simd_verify = true
 #qlf_k6n10_bram_verify = true

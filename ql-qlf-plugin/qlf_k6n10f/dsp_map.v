@@ -31,7 +31,7 @@ module \$__QL_MUL20X18 (input [19:0] A, input [17:0] B, output [37:0] Y);
         .acc_fir_i          (4'd0),
         .z_o                (z),
 
-        .feedback_i         (2'd0),
+        .feedback_i         (3'd0),
         .load_acc_i         (1'b0),
         .unsigned_a_i       (!A_SIGNED),
         .unsigned_b_i       (!B_SIGNED),
@@ -74,7 +74,7 @@ module \$__QL_MUL10X9 (input [9:0] A, input [8:0] B, output [18:0] Y);
     dsp_t1_10x9x32 _TECHMAP_REPLACE_ (
         .a_i                (a),
         .b_i                (b),
-        .acc_fir_i          (4'd0),
+        .acc_fir_i          (3'd0),
         .z_o                (z),
 
         .feedback_i         (2'd0),
