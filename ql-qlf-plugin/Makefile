@@ -61,11 +61,6 @@ VERILOG_MODULES = $(COMMON)/cells_sim.v         \
                   $(PP3_DIR)/mult_sim.v        \
                   $(PP3_DIR)/qlal3_sim.v       \
 
-#retrieve-pmgen:=$(shell mkdir -p pmgen && wget -nc -O pmgen/pmgen.py https://raw.githubusercontent.com/SymbiFlow/yosys/master%2Bwip/passes/pmgen/pmgen.py)
-
-#pre-build:=$(shell python3 pmgen/pmgen.py -o pmgen/ql-dsp-pm.h -p ql_dsp ql_dsp.pmg)
-#pre-build2:=$(shell python3 pmgen/pmgen.py -o pmgen/ql-dsp-macc.h -p ql_dsp_macc ql-dsp-macc.pmg)
-
 pmgen:
 	mkdir -p pmgen
 
