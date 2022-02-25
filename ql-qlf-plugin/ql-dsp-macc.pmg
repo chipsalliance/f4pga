@@ -38,7 +38,7 @@ match mux
 endmatch
 
 match ff
-    select ff->type.in($dff, $adff)
+    select ff->type.in($dff, $adff, $dffe, $adffe)
     index <SigSpec> port(ff, \D) === (mux == nullptr ? port(add, \Y) : port(mux, \Y))
     index <SigSpec> port(ff, \Q) === port(add, add_ba)
     set ff_d_nusers nusers(port(ff, \D))

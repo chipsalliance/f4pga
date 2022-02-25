@@ -46,10 +46,24 @@ module macc_simple_arst (
 
 endmodule
 
-module macc_simple_arst_clr (
+module macc_simple_ena (
+    input  wire        clk,
+    input  wire        ena,
+    input  wire [ 7:0] A,
+    input  wire [ 7:0] B,
+    output reg  [15:0] Z
+);
+
+    always @(posedge clk)
+        if (ena) Z <= Z + (A * B);
+
+endmodule
+
+module macc_simple_arst_clr_ena (
     input  wire        clk,
     input  wire        rst,
     input  wire        clr,
+    input  wire        ena,
     input  wire [ 7:0] A,
     input  wire [ 7:0] B,
     output reg  [15:0] Z
@@ -57,7 +71,7 @@ module macc_simple_arst_clr (
 
     always @(posedge clk or posedge rst)
         if (rst)     Z <= 0;
-        else begin
+        else if (ena) begin
             if (clr) Z <=     (A * B);
             else     Z <= Z + (A * B);
         end

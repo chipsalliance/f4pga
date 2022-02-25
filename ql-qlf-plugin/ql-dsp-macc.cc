@@ -139,13 +139,26 @@ void create_ql_macc_dsp(ql_dsp_macc_pm &pm)
     }
     cell->setPort(RTLIL::escape_id("z_o"), sig_z);
 
-    // Connect clock and reset
+    // Connect clock, reset and enable
     cell->setPort(RTLIL::escape_id("clock_i"), st.ff->getPort(ID(CLK)));
-    if (st.ff->type == RTLIL::escape_id("$adff")) {
-        cell->setPort(RTLIL::escape_id("reset_i"), st.ff->getPort(ID(ARST)));
+
+    RTLIL::SigSpec rst;
+    RTLIL::SigSpec ena;
+
+    if (st.ff->hasPort(ID(ARST))) {
+        rst = st.ff->getPort(ID(ARST));
     } else {
-        cell->setPort(RTLIL::escape_id("reset_i"), RTLIL::SigSpec(RTLIL::S0));
+        rst = RTLIL::SigSpec(RTLIL::S0);
     }
+
+    if (st.ff->hasPort(ID(EN))) {
+        ena = st.ff->getPort(ID(EN));
+    } else {
+        ena = RTLIL::SigSpec(RTLIL::S1);
+    }
+
+    cell->setPort(RTLIL::escape_id("reset_i"), rst);
+    cell->setPort(RTLIL::escape_id("load_acc_i"), ena);
 
     // Insert feedback_i control logic used for clearing / loading the accumulator
     if (st.mux != nullptr) {
@@ -169,7 +182,6 @@ void create_ql_macc_dsp(ql_dsp_macc_pm &pm)
     }
 
     // Connect control ports
-    cell->setPort(RTLIL::escape_id("load_acc_i"), RTLIL::SigSpec(RTLIL::S1));
     cell->setPort(RTLIL::escape_id("unsigned_a_i"), RTLIL::SigSpec(a_signed ? RTLIL::S0 : RTLIL::S1));
     cell->setPort(RTLIL::escape_id("unsigned_b_i"), RTLIL::SigSpec(b_signed ? RTLIL::S0 : RTLIL::S1));
 

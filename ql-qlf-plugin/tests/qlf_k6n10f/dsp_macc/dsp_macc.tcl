@@ -30,7 +30,15 @@ yosys cd $TOP
 select -assert-count 1 t:dsp_t1_10x9x32
 select -assert-count 1 t:*
 
-set TOP "macc_simple_arst_clr"
+set TOP "macc_simple_ena"
+design -load read
+hierarchy -top $TOP
+synth_quicklogic -family qlf_k6n10f -top $TOP
+yosys cd $TOP
+select -assert-count 1 t:dsp_t1_10x9x32
+select -assert-count 1 t:*
+
+set TOP "macc_simple_arst_clr_ena"
 design -load read
 hierarchy -top $TOP
 synth_quicklogic -family qlf_k6n10f -top $TOP
