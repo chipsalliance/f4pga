@@ -7,6 +7,7 @@
 // SPDX-License-Identifier:ISC
 
 `include "qlf_k6n10f/cells_sim.v"
+`timescale 1ns/1ps
 
 module tb();
 
@@ -64,7 +65,7 @@ module tb();
     initial begin
         $dumpfile(`VCD_FILE);
         $dumpvars(0, tb);
-        #100 $finish_and_return( (error_count == 0) ? 0 : -1 );
+        #10000 $finish_and_return( (error_count == 0) ? 0 : -1 );
     end
 
 endmodule
