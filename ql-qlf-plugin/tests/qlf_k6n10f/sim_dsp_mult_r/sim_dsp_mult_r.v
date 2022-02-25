@@ -61,7 +61,7 @@ module tb();
     always @(posedge clk)
         r_C <= C;
 
-    wire error = (Z != r_C);
+    wire error = (Z !== r_C);
 
     // Error counting
     integer error_count;

@@ -52,7 +52,7 @@ module tb();
     );
 
     // Error detection
-    wire error = (Z != C);
+    wire error = (Z !== C);
 
     // Error counting
     integer error_count;

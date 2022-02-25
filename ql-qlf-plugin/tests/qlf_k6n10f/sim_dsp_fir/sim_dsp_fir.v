@@ -124,7 +124,7 @@ module tb();
     endcase
 
     // Error detection
-    wire error = stb && (odata != Z[31:0]);
+    wire error = stb && (odata !== Z[31:0]);
 
     // Error counting
     integer error_count;
