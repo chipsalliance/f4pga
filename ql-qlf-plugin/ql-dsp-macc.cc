@@ -19,17 +19,31 @@ void create_ql_macc_dsp (ql_dsp_macc_pm& pm) {
     size_t min_width = std::min(a_width, b_width);
     size_t max_width = std::max(a_width, b_width);
 
+    // Signed / unsigned
+    bool a_signed = st.mul->getParam(ID(A_SIGNED)).as_bool();
+    bool b_signed = st.mul->getParam(ID(B_SIGNED)).as_bool();
+
     // Determine DSP type or discard if too narrow / wide
     RTLIL::IdString type;
+    size_t tgt_a_width;
+    size_t tgt_b_width;
+    size_t tgt_z_width;
+
     if (min_width <= 2 && max_width <= 2 && z_width <= 4) {
         // Too narrow
         return;
     }
     else if (min_width <=  9 && max_width <= 10 && z_width <= 19) {
         type = RTLIL::escape_id("dsp_t1_10x9x32");
+        tgt_a_width = 10;
+        tgt_b_width = 9;
+        tgt_z_width = 19;
     }
     else if (min_width <= 18 && max_width <= 20 && z_width <= 38) {
         type = RTLIL::escape_id("dsp_t1_20x18x64");
+        tgt_a_width = 20;
+        tgt_b_width = 18;
+        tgt_z_width = 38;
     }
     else {
         // Too wide
@@ -60,15 +74,32 @@ void create_ql_macc_dsp (ql_dsp_macc_pm& pm) {
     // Add the DSP cell
     RTLIL::Cell* cell = pm.module->addCell(RTLIL::escape_id(name), type);
 
-    // Connect data ports
+    // Get input/output data signals
+    RTLIL::SigSpec sig_a;
+    RTLIL::SigSpec sig_b;
+    RTLIL::SigSpec sig_z;
+
     if (a_width >= b_width) {
-        cell->setPort(RTLIL::escape_id("a_i"), st.mul->getPort(ID(A)));
-        cell->setPort(RTLIL::escape_id("b_i"), st.mul->getPort(ID(B)));
+        sig_a = st.mul->getPort(ID(A));
+        sig_b = st.mul->getPort(ID(B));
     } else {
-        cell->setPort(RTLIL::escape_id("a_i"), st.mul->getPort(ID(B)));
-        cell->setPort(RTLIL::escape_id("b_i"), st.mul->getPort(ID(A)));
+        sig_a = st.mul->getPort(ID(B));
+        sig_b = st.mul->getPort(ID(A));
     }
-    cell->setPort(RTLIL::escape_id("z_o"),     st.ff->getPort(ID(Q)));
+    sig_z = st.ff->getPort(ID(Q));
+
+    // Connect input data ports, sign extend / pad with zeros
+    sig_a.extend_u0(tgt_a_width, a_signed);
+    sig_b.extend_u0(tgt_b_width, b_signed);
+    cell->setPort(RTLIL::escape_id("a_i"), sig_a);
+    cell->setPort(RTLIL::escape_id("b_i"), sig_b);
+
+    // Connect output data port, pad if needed
+    if ((size_t)GetSize(sig_z) < tgt_z_width) {
+        auto* wire = pm.module->addWire(NEW_ID, tgt_z_width - GetSize(sig_z));
+        sig_z.append(wire);
+    }
+    cell->setPort(RTLIL::escape_id("z_o"), sig_z);
 
     // Connect clock and reset
     cell->setPort(RTLIL::escape_id("clock_i"), st.ff->getPort(ID(CLK)));
@@ -89,10 +120,7 @@ void create_ql_macc_dsp (ql_dsp_macc_pm& pm) {
 
     // Connect control ports
     cell->setPort(RTLIL::escape_id("load_acc_i"), RTLIL::SigSpec(RTLIL::S1));
-
-    bool a_signed = st.mul->getParam(ID(A_SIGNED)).as_bool();
     cell->setPort(RTLIL::escape_id("unsigned_a_i"), RTLIL::SigSpec(a_signed ? RTLIL::S0 : RTLIL::S1));
-    bool b_signed = st.mul->getParam(ID(B_SIGNED)).as_bool();
     cell->setPort(RTLIL::escape_id("unsigned_b_i"), RTLIL::SigSpec(b_signed ? RTLIL::S0 : RTLIL::S1));
 
     // Connect config ports
