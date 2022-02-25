@@ -111,11 +111,23 @@ void create_ql_macc_dsp (ql_dsp_macc_pm& pm) {
 
     // Insert feedback_i control logic used for clearing / loading the accumulator
     if (st.mux != nullptr) {
-        // TODO:
+        RTLIL::SigSpec sig_s = st.mux->getPort(ID(S));
+
+        // Depending on the mux port ordering insert inverter if needed
+        log_assert(st.mux_ab == ID(A) || st.mux_ab == ID(B));
+        if (st.mux_ab == ID(B)) {
+            sig_s = pm.module->Not(NEW_ID, sig_s);
+        }
+
+        // Assemble the full control signal for the feedback_i port
+        RTLIL::SigSpec sig_f;
+        sig_f.append(RTLIL::S0);
+        sig_f.append(sig_s);
+        cell->setPort(RTLIL::escape_id("feedback_i"), sig_f);
     }
     // No acc clear/load
     else {
-        cell->setPort(RTLIL::escape_id("feedback_i"), RTLIL::SigSpec(RTLIL::S0, 3));
+        cell->setPort(RTLIL::escape_id("feedback_i"), RTLIL::SigSpec(RTLIL::S0, 2));
     }
 
     // Connect control ports

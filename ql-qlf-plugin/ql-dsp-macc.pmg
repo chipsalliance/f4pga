@@ -2,6 +2,7 @@ pattern ql_dsp_macc
 
 state <IdString> add_ab
 state <IdString> add_ba
+state <IdString> mux_ab
 
 match mul
     select mul->type.in($mul)
@@ -25,6 +26,7 @@ match mux
     index <SigSpec> port(mux, AB) === port(mul, \Y)
     index <SigSpec> port(mux, BA) === port(add, \Y)
     select nusers(port(mux, \Y)) == 2
+    set mux_ab AB
     optional
 endmatch
 
