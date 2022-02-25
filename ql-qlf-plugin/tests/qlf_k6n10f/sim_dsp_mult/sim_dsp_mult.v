@@ -22,7 +22,7 @@ module tb();
         #1  rst <= 1'b1;
         #2  rst <= 1'b0;
     end
-    
+
     // Input data / reference
     reg signed [19:0] A;
     reg signed [17:0] B;
@@ -39,15 +39,15 @@ module tb();
     wire signed [37:0] Z;
 
     dsp_t1_sim # (
-        .REGISTER_INPUTS    (1'b0),
-        .OUTPUT_SELECT      (3'h0)
     ) uut (
-        .a_i            (A),
-        .b_i            (B),
-        .unsigned_a_i   (1'b0),
-        .unsigned_b_i   (1'b0),
-        .feedback_i     (0),
-        .z_o            (Z)
+        .a_i            	(A),
+        .b_i            	(B),
+        .unsigned_a_i   	(1'h0),
+        .unsigned_b_i   	(1'h0),
+        .feedback_i     	(3'h0),
+	.register_inputs_i	(1'h0),
+	.output_select_i	(3'h0),
+        .z_o            	(Z)
     );
 
     // Error detection
