@@ -52,6 +52,7 @@ module tb();
         .feedback_i		(3'h0),
 	.register_inputs_i	(1'h1),
 	.output_select_i	(3'h0),
+	.clock_i		(clk),
         .z_o			(Z)
     );
 
