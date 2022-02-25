@@ -22,17 +22,22 @@ module tb();
         #1  rst <= 1'b1;
         #2  rst <= 1'b0;
     end
-    
+
     // Input data / reference
     reg signed [19:0] A;
     reg signed [17:0] B;
     reg signed [37:0] C;
 
-    always @(posedge clk) begin
+    // Shift data change half a clock cycle
+    // to make registered inputs apparent
+    initial begin
+	forever begin
         A = $random;
         B = $random;
 
         C <= A * B;
+	#1.5;
+	end
     end
 
     // UUT
