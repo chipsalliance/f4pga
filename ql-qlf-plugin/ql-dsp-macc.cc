@@ -12,6 +12,49 @@ void create_ql_macc_dsp(ql_dsp_macc_pm &pm)
 {
     auto &st = pm.st_ql_dsp_macc;
 
+    // Reject if multiplier drives anything else than either $add or $add and
+    // $mux
+    if (st.mux == nullptr && st.mul_nusers > 2) {
+        return;
+    }
+
+    // Determine whether the output is taken from before or after the ff
+    bool out_ff;
+    if (st.ff_d_nusers == 2 && st.ff_q_nusers == 3) {
+        out_ff = true;
+    } else if (st.ff_d_nusers == 3 && st.ff_q_nusers == 2) {
+        out_ff = false;
+    } else {
+        // Illegal, cannot take the two outputs simulataneously
+        return;
+    }
+
+    // No mux, the adder can driver either the ff or the ff + output
+    if (st.mux == nullptr) {
+        if (out_ff && st.add_nusers != 2) {
+            return;
+        }
+        if (!out_ff && st.add_nusers != 3) {
+            return;
+        }
+    }
+    // Mux present, the adder cannot drive anything else
+    else {
+        if (st.add_nusers != 2) {
+            return;
+        }
+    }
+
+    // Mux can driver either the ff or the ff + output
+    if (st.mux != nullptr) {
+        if (out_ff && st.mux_nusers != 2) {
+            return;
+        }
+        if (!out_ff && st.mux_nusers != 3) {
+            return;
+        }
+    }
+
     // Get port widths
     size_t a_width = GetSize(st.mul->getPort(ID(A)));
     size_t b_width = GetSize(st.mul->getPort(ID(B)));
@@ -80,7 +123,8 @@ void create_ql_macc_dsp(ql_dsp_macc_pm &pm)
         sig_a = st.mul->getPort(ID(B));
         sig_b = st.mul->getPort(ID(A));
     }
-    sig_z = st.ff->getPort(ID(Q));
+
+    sig_z = out_ff ? st.ff->getPort(ID(Q)) : st.ff->getPort(ID(D));
 
     // Connect input data ports, sign extend / pad with zeros
     sig_a.extend_u0(tgt_a_width, a_signed);
@@ -130,7 +174,6 @@ void create_ql_macc_dsp(ql_dsp_macc_pm &pm)
     cell->setPort(RTLIL::escape_id("unsigned_b_i"), RTLIL::SigSpec(b_signed ? RTLIL::S0 : RTLIL::S1));
 
     // Connect config ports
-    cell->setPort(RTLIL::escape_id("output_select_i"), RTLIL::SigSpec({RTLIL::S0, RTLIL::S1, RTLIL::S0}));
     cell->setPort(RTLIL::escape_id("saturate_enable_i"), RTLIL::SigSpec(RTLIL::S0));
     cell->setPort(RTLIL::escape_id("shift_right_i"), RTLIL::SigSpec(RTLIL::S0, 6));
     cell->setPort(RTLIL::escape_id("round_i"), RTLIL::SigSpec(RTLIL::S0));
@@ -138,6 +181,10 @@ void create_ql_macc_dsp(ql_dsp_macc_pm &pm)
 
     bool subtract = (st.add->type == RTLIL::escape_id("$sub"));
     cell->setPort(RTLIL::escape_id("subtract_i"), RTLIL::SigSpec(subtract ? RTLIL::S1 : RTLIL::S0));
+
+    // 3 - output post acc
+    // 1 - output pre acc
+    cell->setPort(RTLIL::escape_id("output_select_i"), out_ff ? RTLIL::Const(3, 3) : RTLIL::Const(1, 3));
 
     // Mark the cells for removal
     pm.autoremove(st.mul);

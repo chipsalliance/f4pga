@@ -39,3 +39,20 @@ select -assert-count 1 t:dsp_t1_10x9x32
 select -assert-count 1 t:\$lut
 select -assert-count 2 t:*
 
+set TOP "macc_simple_preacc"
+design -load read
+hierarchy -top $TOP
+synth_quicklogic -family qlf_k6n10f -top $TOP
+yosys cd $TOP
+select -assert-count 1 t:dsp_t1_10x9x32
+select -assert-count 1 t:*
+
+set TOP "macc_simple_preacc_clr"
+design -load read
+hierarchy -top $TOP
+synth_quicklogic -family qlf_k6n10f -top $TOP
+yosys cd $TOP
+select -assert-count 1 t:dsp_t1_10x9x32
+select -assert-count 1 t:\$lut
+select -assert-count 2 t:*
+
