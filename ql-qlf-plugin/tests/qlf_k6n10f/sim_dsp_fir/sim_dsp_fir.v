@@ -76,26 +76,29 @@ module tb();
     endcase
 
     // UUT
+    wire signed [3:0] acc_fir_i = 4'h0;
     wire signed [19:0] A = coeff;
     wire signed [17:0] B = data;
     wire signed [37:0] Z;
 
     dsp_t1_sim # (
-        .REGISTER_INPUTS    (1'b0),
-        .OUTPUT_SELECT      (3'h1),
-        .ROUND              (1'b1),
-        .SATURATE_ENABLE    (1'b1)
     ) uut (
-        .clock_i        (clk),
-        .reset_n_i      (~rst),
-        .a_i            ((!stb) ? A : 'h0),
-        .b_i            ((!stb) ? B : 'h0),
-        .unsigned_a_i   (1'b0),
-        .unsigned_b_i   (1'b0),
-        .feedback_i     (stb),
-        .load_acc_i     (1'b1),
-        .shift_right_i  (6'd10),
-        .z_o            (Z)
+        .clock_i		(clk),
+        .reset_n_i		(~rst),
+        .a_i			((!stb) ? A : 20'h0),
+        .b_i			((!stb) ? B : 18'h0),
+        .acc_fir_i		((!stb) ? acc_fir_i : 4'h0),
+        .unsigned_a_i		(1'b0),
+        .unsigned_b_i		(1'b0),
+        .feedback_i		(stb),
+        .load_acc_i		(1'b1),
+        .shift_right_i		(6'd10),
+	.register_inputs_i	(1'b0),
+	.output_select_i	(3'h1),
+	.round_i		(1'b1),
+	.saturate_enable_i	(1'b1),
+	.subtract_i		(1'b0),
+        .z_o			(Z)
     );
 
     // Output counter
