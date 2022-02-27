@@ -1,0 +1,98 @@
+name: Pipeline
+
+on:
+  workflow_call:
+
+jobs:
+
+  Docs:
+    runs-on: ubuntu-latest
+    name: '📓 Docs'
+    steps:
+
+      - name: '🧰 Checkout'
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: 🛠️ Setup environment
+        run: |
+          sudo apt update -qq
+          sudo apt install -y make
+          make env
+
+      - name: 📓 Build the documentation
+        run: |
+          . ./env/conda/bin/activate f4pga-docs
+          make html
+
+      - name: '📤 Upload artifact: Sphinx HTML'
+        uses: actions/upload-artifact@v3
+        with:
+          name: Documentation-HTML
+          path: _build/html
+
+      - name: 🚀 Publish site to GitHub Pages
+        if: github.event_name != 'pull_request'
+        run: |
+          cd _build/html
+          touch .nojekyll
+          git init
+          cp ../../.git/config ./.git/config
+          git add .
+          git config --local user.email "BuildTheDocs@GitHubActions"
+          git config --local user.name "GitHub Actions"
+          git commit -a -m "update ${{ github.sha }}"
+          git push -u origin +HEAD:gh-pages
+
+
+  Example:
+    runs-on: ubuntu-latest
+    name: '🐍 Example'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { fam: xc7, example: counter_test }
+          - { fam: eos-s3, example: btn_counter }
+    env:
+      F4PGA_INSTALL_DIR: /opt/f4pga
+      F4PGA_FAM: ${{ matrix.fam }}
+
+    steps:
+
+      - name: '🧰 Checkout'
+        uses: actions/checkout@v3
+
+      - name: '🔧 Prepare environment'
+        run: ./.github/scripts/prepare_environment.sh
+
+      - name: '🚧 Test make example'
+        run: |
+          . ./.github/scripts/activate.sh
+
+          export VPRPATH=$(f4pga-env bin)
+
+          cd f4pga-examples
+          cd ${{ matrix.fam }}
+
+          case '${{ matrix.fam }}' in
+            xc7) TARGET="arty_35" make -C counter_test;;
+            eos-s3) make -C btn_counter;;
+          esac
+
+      - name: '📤 Upload artifact: Arty 35 bitstream'
+        if: matrix.fam == 'xc7'
+        uses: actions/upload-artifact@v3
+        with:
+          name: arty_35-Bitstream
+          path: f4pga-examples/xc7/counter_test/build/arty_35/top.bit
+          if-no-files-found: error
+
+      - name: '📤 Upload artifact: QuickLogic bitstream'
+        if: matrix.fam == 'eos-s3'
+        uses: actions/upload-artifact@v3
+        with:
+          name: eos-s3-Bitstream
+          path: f4pga-examples/eos-s3/btn_counter/build/top.bit
+          if-no-files-found: error

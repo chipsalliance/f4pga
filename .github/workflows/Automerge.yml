@@ -12,7 +12,7 @@ jobs:
 
   Pipeline:
     if: ${{ !(github.event_name != 'pull_request' && github.actor == 'dependabot[bot]') }}
-    uses: ./.github/workflows/Doc.yml
+    uses: ./.github/workflows/Pipeline.yml
 
 
   Automerge:
