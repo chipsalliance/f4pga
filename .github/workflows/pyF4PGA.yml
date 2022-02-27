@@ -1,0 +1,26 @@
+name: py4FPGA
+
+on:
+  push:
+  pull_request:
+
+jobs:
+
+  Run-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+
+    steps:
+
+      - uses: actions/checkout@v2
+#        with:
+#          submodules: recursive
+
+      - name: Test py4FPGA
+        run: |
+          pip3 install -r f4pga/requirements.txt
+
+          PYTHONPATH=$(pwd)/f4pga python3 f4pga/sfbuild.py
+
+          PYTHONPATH=$(pwd)/f4pga python3 f4pga/sfbuild.py -h
