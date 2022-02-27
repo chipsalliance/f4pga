@@ -47,7 +47,7 @@ echo '::endgroup::'
 cd ..
 
 
-echo '::group::Add f4pga-env'
+echo '::group::🗑️ Remove the wrappers (pre-packaged from arch-defs) and add f4pga-env'
 
 case "$F4PGA_FAM" in
   xc7) F4PGA_DIR_ROOT='install';;
@@ -57,6 +57,33 @@ esac
 F4PGA_DIR_BIN="$F4PGA_INSTALL_DIR_FAM/$F4PGA_DIR_ROOT"/bin/
 cp $(dirname "$0")/../../f4pga-env "$F4PGA_DIR_BIN"
 cd "$F4PGA_DIR_BIN"
+
+case "$F4PGA_FAM" in
+  xc7)
+    rm -vrf \
+      env \
+      symbiflow_generate_constraints \
+      symbiflow_pack \
+      symbiflow_place \
+      symbiflow_route \
+      symbiflow_synth \
+      symbiflow_write_bitstream \
+      symbiflow_write_fasm \
+      vpr_common
+  ;;
+  eos-s3)
+    sed -i 's#${MYPATH}/../share#'"$(./f4pga-env share)"'#' vpr_common
+    rm -vrf \
+      symbiflow_pack \
+      symbiflow_place \
+      symbiflow_route \
+      symbiflow_write_fasm \
+      symbiflow_analysis \
+      symbiflow_repack \
+      symbiflow_generate_bitstream \
+      symbiflow_generate_libfile
+  ;;
+esac
 
 ls -lah
 
