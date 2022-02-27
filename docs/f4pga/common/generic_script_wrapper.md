@@ -1,15 +1,9 @@
-# sfbuild module "generic_script_wrapper"
-
-##### _Category: Common_
-
--------------------------------
+# generic_script_wrapper
 
 This module provides a way to integrate an external command into an sfbuild flow.
 Its inputs and outputs are fully defined by the author of flow definition.
 
-## Setup
-
-### 1. Parameters
+## Parameters
 
 Parameters are everything when it comes to this module:
 
@@ -29,7 +23,7 @@ Parameters are everything when it comes to this module:
     dependency alsogets two extra values associated with it:
     `:dependency_name[noext]`, which contains the path to the dependency the
     extension with anything after last "." removed and `:dependency_name[dir]` which
-    contains directory paths of the dependency. This is useful for deriving an output 
+    contains directory paths of the dependency. This is useful for deriving an output
     name from the input.
   * `meta` (string, optional): Description of the output dependency.
 * `inputs` (dict[string -> string | bool], mandatory):

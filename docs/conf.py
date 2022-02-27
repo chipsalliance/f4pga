@@ -47,6 +47,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx_verilog_domain',
     'sphinxcontrib.bibtex',
+    'recommonmark'
 ]
 
 bibtex_default_style = 'plain'
@@ -56,7 +57,10 @@ numfig = True
 
 templates_path = ['_templates']
 
-source_suffix = ['.rst', '.md']
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.md': 'markdown'
+}
 
 master_doc = 'index'
 

@@ -3,7 +3,7 @@
 Targets and values are named with some conventions.
 Below are lists of the target and value names along with their meanings"
 
-### Common targets that need to be provided by the user:
+## Common targets that need to be provided by the user:
 
 | Target name | list | Description |
 |-------------|:----:|-------------|
@@ -12,7 +12,7 @@ Below are lists of the target and value names along with their meanings"
 | `xdc` | yes | Xilinx Design Constraints (available only for Xilinx platforms) |
 | `pcf` | no | Physical Constraints File |
 
-### Commonly requested targets (available in most flows):
+## Commonly requested targets (available in most flows):
 
 | Target name | list | Description |
 |-------------|:----:|-------------|
@@ -23,7 +23,7 @@ Below are lists of the target and value names along with their meanings"
 | `fasm_extra` | no | Additional FPGA assembly that may be generated during synthesis |
 | `build_dir` | no | A directory to put the output files in |
 
-### Built-in values
+## Built-in values
 
 | Value name | type | Description |
 |------------|------|-------------|
@@ -32,7 +32,7 @@ Below are lists of the target and value names along with their meanings"
 | `noisyWarnings` | `string` | Path to noisy warnings log (should be deprecated) |
 | `prjxray_db` | `string` | Path to Project X-Ray database |
 
-### Values commonly used in flow definitions:
+## Values commonly used in flow definitions:
 
 | Value name | type | Description |
 |------------|------|-------------|

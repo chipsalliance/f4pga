@@ -1,8 +1,4 @@
-# sfbuild module "synth"
-
-##### _Category: Common_
-
--------------------------------
+# synth
 
 The _synth_ module is meant to be used to execute YOSYS synthesis.
 
@@ -16,8 +12,6 @@ The module should guarantee the following outputs:
 For detailed information about these targets, please refer to
 `docs/common targets and variables.md`
 
-## Setup
-
 What files and how are they generated is dependendent on TCL scripts executed
 withing YOSYS and the script vary depending on the target platform. Due to this
 design choice it is required for the author of the flow defnition to parametrize
@@ -26,13 +20,13 @@ will be generated upon a successful YOSYS run.
 
 The setup of the synth module follows the following specifications:
 
-### 1. Module parameters:
+## Parameters:
 
 The `params` section of a stage configuration may contain a `produces` list.
 The list should specify additional targets that will be generated
 (`?` qualifier is allowedd).
 
-### 2. Values:
+## Values:
 
 The `synth` module requires the following values:
 
