@@ -1,4 +1,4 @@
-# sfbuild
+# Usage
 
 ## Getting started
 
@@ -27,8 +27,6 @@ flow completes. Look for a line like this one on stdout.:
 ```
 Target `bitstream` -> build/arty_35/top.bit
 ```
-
--------------------------------------------------------------------------------------
 
 ## Fundamental concepts
 
@@ -66,7 +64,7 @@ as well as provide information about files required and produced by the tool.
 ### Dependecies
 
 A **dependency** is any file, directory or a list of such that a **module** takes as
-its input or produces on its output. 
+its input or produces on its output.
 
 Modules specify their dependencies by using symbolic names instead of file paths.
 The files they produce are also given symbolic names and paths which are either set
@@ -142,7 +140,7 @@ here and there.
 Typically **projects's flow configuration** will be used to resolve dependencies
 for _HDL source code_ and _device constraints_.
 
-## Using sfbuild to build a target
+## Build a target
 
 To build a **target** "`target_name`", use the following command:
 ```
@@ -188,7 +186,7 @@ not exist, `mkdirs` will create it and provide as `build_dir` dependency.
 building a bitstream for *x7a50t* would look like that:
 
 With this flow configuration, you can build a bitstream for arty_35 using the
-following command: 
+following command:
 
 ```
 $ python3 /path/to/sfbuild.py flow.json -p x7a50t -t bitstream
@@ -282,7 +280,7 @@ to the box.
    dependency was necessary or not.
  * **O** - dependency present, unchanged. This dependency is already built and is
    confirmed to stay unchanged during flow execution.
- * **N** - dependency present, new/changed. This dependency is already present on 
+ * **N** - dependency present, new/changed. This dependency is already present on
    the persistent storage, but it was either missing earlier, or
    its content changed from the last time.
    (WARNING: it won't continue to be reported as "**N**" after a successful build of
@@ -290,7 +288,7 @@ to the box.
    should be fixed in the future.)
  * **S** - depenendency not present, resolved. This dependency is not
   currently available on the persistent storage, however it will be produced within
-  flow's execution. 
+  flow's execution.
  * **R** - depenendency present, resolved, requires rebuild. This dependency is
   currently available on the persistent storage, however it has to be rebuilt due
   to the changes in the project.
@@ -313,3 +311,48 @@ colon:
 In the example above file `counter.v` has been modified and is now marked as
 "**N**". This couses a bunch of other dependencies to be reqbuilt ("**R**").
 `build_dir` and `xdc` were already present, so they are marked as "**O**".
+
+## Common targets and values
+
+Targets and values are named with some conventions.
+Below are lists of the target and value names along with their meanings"
+
+### Need to be provided by the user
+
+| Target name | list | Description |
+|-------------|:----:|-------------|
+| `sources` | yes | Verilog sources |
+| `sdc` | no | Synopsys Design Constraints |
+| `xdc` | yes | Xilinx Design Constraints (available only for Xilinx platforms) |
+| `pcf` | no | Physical Constraints File |
+
+### Available in most flows
+
+| Target name | list | Description |
+|-------------|:----:|-------------|
+| `eblif` | no | Extended blif file |
+| `bitstream` | no | Bitstream |
+| `net` | no | Netlist |
+| `fasm` | no | Final FPGA Assembly |
+| `fasm_extra` | no | Additional FPGA assembly that may be generated during synthesis |
+| `build_dir` | no | A directory to put the output files in |
+
+### Built-in values
+
+| Value name | type | Description |
+|------------|------|-------------|
+| `shareDir` | `string` | Path to symbiflow's installation "share" directory |
+| `python3` | `string` | Path to Python 3 executable |
+| `noisyWarnings` | `string` | Path to noisy warnings log (should be deprecated) |
+| `prjxray_db` | `string` | Path to Project X-Ray database |
+
+### Used in flow definitions
+
+| Value name | type | Description |
+|------------|------|-------------|
+| `top` | `string` | Top module name |
+| `build_dir` | `string` | Path to build directory (should be optional) |
+| `device` | `string` | Name of the device |
+| `vpr_options` | `dict[string -> string \| number]` | Named ptions passed to VPR. No `--` prefix included. |
+| `part_name` | `string` | Name of the chip used. The distinction between `device` and `part_name` is ambiguous at the moment and should be addressed in the future. |
+| `arch_def` | `string` | Path to an XML file containing architecture definition. |

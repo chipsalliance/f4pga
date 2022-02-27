@@ -44,13 +44,12 @@ The project aims to design tools that are highly extendable and multiplatform.
 
 
 .. toctree::
-  :caption: pyF4PGA Reference
+  :caption: Python utils
   :maxdepth: 2
 
-  f4pga/GettingStarted
-  f4pga/CommonTargetsAndVariables
-  f4pga/Module
-  f4pga/common/index
+  f4pga/index
+  f4pga/Usage
+  f4pga/modules/index
   f4pga/DevNotes
 
 
