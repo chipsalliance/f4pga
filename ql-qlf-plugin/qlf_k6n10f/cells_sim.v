@@ -488,59 +488,59 @@ module TDP_BRAM18 (
 endmodule
 
 module TDP_BRAM36 (
-	WEN_A1,
-	WEN_B1,
-	REN_A1,
-	REN_B1,
-	CLK_A1,
-	CLK_B1,
-	BE_A1,
-	BE_B1,
-	ADDR_A1,
-	ADDR_B1,
-	WDATA_A1,
-	WDATA_B1,
-	RDATA_A1,
-	RDATA_B1,
-	FLUSH1,
-	SYNC_FIFO1,
-	RMODE_A1,
-	RMODE_B1,
-	WMODE_A1,
-	WMODE_B1,
-	FMODE1,
-	POWERDN1,
-	SLEEP1,
-	PROTECT1,
-	UPAE1,
-	UPAF1,
-	WEN_A2,
-	WEN_B2,
-	REN_A2,
-	REN_B2,
-	CLK_A2,
-	CLK_B2,
-	BE_A2,
-	BE_B2,
-	ADDR_A2,
-	ADDR_B2,
-	WDATA_A2,
-	WDATA_B2,
-	RDATA_A2,
-	RDATA_B2,
-	FLUSH2,
-	SYNC_FIFO2,
-	RMODE_A2,
-	RMODE_B2,
-	WMODE_A2,
-	WMODE_B2,
-	FMODE2,
-	POWERDN2,
-	SLEEP2,
-	PROTECT2,
-	UPAE2,
-	UPAF2,
-	SPLIT,
+	WEN_A1_i,
+	WEN_B1_i,
+	REN_A1_i,
+	REN_B1_i,
+	CLK_A1_i,
+	CLK_B1_i,
+	BE_A1_i,
+	BE_B1_i,
+	ADDR_A1_i,
+	ADDR_B1_i,
+	WDATA_A1_i,
+	WDATA_B1_i,
+	RDATA_A1_o,
+	RDATA_B1_o,
+	FLUSH1_i,
+	SYNC_FIFO1_i,
+	RMODE_A1_i,
+	RMODE_B1_i,
+	WMODE_A1_i,
+	WMODE_B1_i,
+	FMODE1_i,
+	POWERDN1_i,
+	SLEEP1_i,
+	PROTECT1_i,
+	UPAE1_i,
+	UPAF1_i,
+	WEN_A2_i,
+	WEN_B2_i,
+	REN_A2_i,
+	REN_B2_i,
+	CLK_A2_i,
+	CLK_B2_i,
+	BE_A2_i,
+	BE_B2_i,
+	ADDR_A2_i,
+	ADDR_B2_i,
+	WDATA_A2_i,
+	WDATA_B2_i,
+	RDATA_A2_o,
+	RDATA_B2_o,
+	FLUSH2_i,
+	SYNC_FIFO2_i,
+	RMODE_A2_i,
+	RMODE_B2_i,
+	WMODE_A2_i,
+	WMODE_B2_i,
+	FMODE2_i,
+	POWERDN2_i,
+	SLEEP2_i,
+	PROTECT2_i,
+	UPAE2_i,
+	UPAF2_i,
+	SPLIT_i,
 	RAM_ID_i,
 	PL_INIT_i,
 	PL_ENA_i,
@@ -702,78 +702,78 @@ module TDP_BRAM36 (
 	parameter INIT_7E = 256'h0000000000000000000000000000000000000000000000000000000000000000;
 	parameter INIT_7F = 256'h0000000000000000000000000000000000000000000000000000000000000000;
 
-	input wire WEN_A1;
-	input wire WEN_B1;
-	input wire REN_A1;
-	input wire REN_B1;
+	input wire WEN_A1_i;
+	input wire WEN_B1_i;
+	input wire REN_A1_i;
+	input wire REN_B1_i;
 	(* clkbuf_sink *)
-	input wire CLK_A1;
+	input wire CLK_A1_i;
 	(* clkbuf_sink *)
-	input wire CLK_B1;
-	input wire [1:0] BE_A1;
-	input wire [1:0] BE_B1;
-	input wire [14:0] ADDR_A1;
-	input wire [14:0] ADDR_B1;
-	input wire [17:0] WDATA_A1;
-	input wire [17:0] WDATA_B1;
-	output reg [17:0] RDATA_A1;
-	output reg [17:0] RDATA_B1;
-	input wire FLUSH1;
-	input wire SYNC_FIFO1;
-	input wire [2:0] RMODE_A1;
-	input wire [2:0] RMODE_B1;
-	input wire [2:0] WMODE_A1;
-	input wire [2:0] WMODE_B1;
-	input wire FMODE1;
-	input wire POWERDN1;
-	input wire SLEEP1;
-	input wire PROTECT1;
-	input wire [10:0] UPAE1;
-	input wire [10:0] UPAF1;
-	input wire WEN_A2;
-	input wire WEN_B2;
-	input wire REN_A2;
-	input wire REN_B2;
+	input wire CLK_B1_i;
+	input wire [1:0] BE_A1_i;
+	input wire [1:0] BE_B1_i;
+	input wire [14:0] ADDR_A1_i;
+	input wire [14:0] ADDR_B1_i;
+	input wire [17:0] WDATA_A1_i;
+	input wire [17:0] WDATA_B1_i;
+	output reg [17:0] RDATA_A1_o;
+	output reg [17:0] RDATA_B1_o;
+	input wire FLUSH1_i;
+	input wire SYNC_FIFO1_i;
+	input wire [2:0] RMODE_A1_i;
+	input wire [2:0] RMODE_B1_i;
+	input wire [2:0] WMODE_A1_i;
+	input wire [2:0] WMODE_B1_i;
+	input wire FMODE1_i;
+	input wire POWERDN1_i;
+	input wire SLEEP1_i;
+	input wire PROTECT1_i;
+	input wire [11:0] UPAE1_i;
+	input wire [11:0] UPAF1_i;
+	input wire WEN_A2_i;
+	input wire WEN_B2_i;
+	input wire REN_A2_i;
+	input wire REN_B2_i;
 	(* clkbuf_sink *)
-	input wire CLK_A2;
+	input wire CLK_A2_i;
 	(* clkbuf_sink *)
-	input wire CLK_B2;
-	input wire [1:0] BE_A2;
-	input wire [1:0] BE_B2;
-	input wire [13:0] ADDR_A2;
-	input wire [13:0] ADDR_B2;
-	input wire [17:0] WDATA_A2;
-	input wire [17:0] WDATA_B2;
-	output reg [17:0] RDATA_A2;
-	output reg [17:0] RDATA_B2;
-	input wire FLUSH2;
-	input wire SYNC_FIFO2;
-	input wire [2:0] RMODE_A2;
-	input wire [2:0] RMODE_B2;
-	input wire [2:0] WMODE_A2;
-	input wire [2:0] WMODE_B2;
-	input wire FMODE2;
-	input wire POWERDN2;
-	input wire SLEEP2;
-	input wire PROTECT2;
-	input wire [10:0] UPAE2;
-	input wire [10:0] UPAF2;
-	input SPLIT;
-	input [8:0] RAM_ID_i;
+	input wire CLK_B2_i;
+	input wire [1:0] BE_A2_i;
+	input wire [1:0] BE_B2_i;
+	input wire [13:0] ADDR_A2_i;
+	input wire [13:0] ADDR_B2_i;
+	input wire [17:0] WDATA_A2_i;
+	input wire [17:0] WDATA_B2_i;
+	output reg [17:0] RDATA_A2_o;
+	output reg [17:0] RDATA_B2_o;
+	input wire FLUSH2_i;
+	input wire SYNC_FIFO2_i;
+	input wire [2:0] RMODE_A2_i;
+	input wire [2:0] RMODE_B2_i;
+	input wire [2:0] WMODE_A2_i;
+	input wire [2:0] WMODE_B2_i;
+	input wire FMODE2_i;
+	input wire POWERDN2_i;
+	input wire SLEEP2_i;
+	input wire PROTECT2_i;
+	input wire [10:0] UPAE2_i;
+	input wire [10:0] UPAF2_i;
+	input SPLIT_i;
+	input [15:0] RAM_ID_i;
 	input wire PL_INIT_i;
 	input wire PL_ENA_i;
 	input wire PL_REN_i;
 	input wire PL_CLK_i;
 	input wire [1:0] PL_WEN_i;
-	input wire [23:0] PL_ADDR_i;
+	input wire [31:0] PL_ADDR_i;
 	input wire [35:0] PL_DATA_i;
 	output reg PL_INIT_o;
 	output reg PL_ENA_o;
 	output reg PL_REN_o;
 	output reg PL_CLK_o;
 	output reg [1:0] PL_WEN_o;
-	output reg [23:0] PL_ADDR_o;
-	output wire [35:0] PL_DATA_o;
+	output reg [31:0] PL_ADDR_o;
+	output reg [35:0] PL_DATA_o;
 	wire EMPTY2;
 	wire EPO2;
 	wire EWM2;
@@ -845,162 +845,176 @@ module TDP_BRAM36 (
 	reg [1:0] fifo_rmode;
 	reg [1:0] fifo_wmode;
 	wire [1:0] bwl;
-	assign ram_fmode1 = FMODE1 & SPLIT;
-	assign ram_fmode2 = FMODE2 & SPLIT;
-	assign smux_clk_a1 = CLK_A1;
-	assign smux_clk_b1 = (FMODE1 ? (SYNC_FIFO1 ? CLK_A1 : CLK_B1) : CLK_B1);
-	assign smux_clk_a2 = (SPLIT ? CLK_A2 : CLK_A1);
-	assign smux_clk_b2 = (SPLIT ? CLK_B2 : (FMODE1 ? (SYNC_FIFO1 ? CLK_A1 : CLK_B1) : CLK_B1));
-	assign ram_ren_a1 = (SPLIT ? REN_A1 : (FMODE1 ? 0 : REN_A1));
-	assign ram_ren_a2 = (SPLIT ? REN_A2 : (FMODE1 ? 0 : REN_A1));
-	assign ram_ren_b1 = (SPLIT ? REN_B1 : (FMODE1 ? ren_o : REN_B1));
-	assign ram_ren_b2 = (SPLIT ? REN_B2 : (FMODE1 ? ren_o : REN_B1));
-	assign ram_wen_a1 = (SPLIT ? WEN_A1 : (FMODE1 ? ~FULL3 & WEN_A1 : WEN_A1 & ~ADDR_A1[4]));
-	assign ram_wen_a2 = (SPLIT ? WEN_A2 : (FMODE1 ? ~FULL3 & WEN_A1 : WEN_A1 & ADDR_A1[4]));
+	wire [17:0] pl_dout0;
+	wire [17:0] pl_dout1;
+	assign ram_fmode1 = FMODE1_i & SPLIT_i;
+	assign ram_fmode2 = FMODE2_i & SPLIT_i;
+	assign smux_clk_a1 = CLK_A1_i;
+	assign smux_clk_b1 = (FMODE1_i ? (SYNC_FIFO1_i ? CLK_A1_i : CLK_B1_i) : CLK_B1_i);
+	assign smux_clk_a2 = (SPLIT_i ? CLK_A2_i : CLK_A1_i);
+	assign smux_clk_b2 = (SPLIT_i ? CLK_B2_i : (FMODE1_i ? (SYNC_FIFO1_i ? CLK_A1_i : CLK_B1_i) : CLK_B1_i));
+	assign ram_ren_a1 = (SPLIT_i ? REN_A1_i : (FMODE1_i ? 0 : REN_A1_i));
+	assign ram_ren_a2 = (SPLIT_i ? REN_A2_i : (FMODE1_i ? 0 : REN_A1_i));
+	assign ram_ren_b1 = (SPLIT_i ? REN_B1_i : (FMODE1_i ? ren_o : REN_B1_i));
+	assign ram_ren_b2 = (SPLIT_i ? REN_B2_i : (FMODE1_i ? ren_o : REN_B1_i));
 	localparam MODE_36 = 3'b111;
-	assign ram_wen_b1 = (SPLIT ? WEN_B1 : (WMODE_B1 == MODE_36 ? WEN_B1 : WEN_B1 & ~ADDR_B1[4]));
-	assign ram_wen_b2 = (SPLIT ? WEN_B2 : (WMODE_B1 == MODE_36 ? WEN_B1 : WEN_B1 & ADDR_B1[4]));
-	assign ram_addr_a1 = (SPLIT ? ADDR_A1[13:0] : (FMODE1 ? {ff_waddr[11:2], ff_waddr[0], 3'b000} : {ADDR_A1[14:5], ADDR_A1[3:0]}));
-	assign ram_addr_b1 = (SPLIT ? ADDR_B1[13:0] : (FMODE1 ? {ff_raddr[11:2], ff_raddr[0], 3'b000} : {ADDR_B1[14:5], ADDR_B1[3:0]}));
-	assign ram_addr_a2 = (SPLIT ? ADDR_A2[13:0] : (FMODE1 ? {ff_waddr[11:2], ff_waddr[0], 3'b000} : {ADDR_A1[14:5], ADDR_A1[3:0]}));
-	assign ram_addr_b2 = (SPLIT ? ADDR_B2[13:0] : (FMODE1 ? {ff_raddr[11:2], ff_raddr[0], 3'b000} : {ADDR_B1[14:5], ADDR_B1[3:0]}));
-	assign bwl = (SPLIT ? ADDR_A1[4:3] : (FMODE1 ? ff_waddr[1:0] : ADDR_A1[4:3]));
+	assign ram_wen_a1 = (SPLIT_i ? WEN_A1_i : (FMODE1_i ? ~FULL3 & WEN_A1_i : (WMODE_A1_i == MODE_36 ? WEN_A1_i : WEN_A1_i & ~ADDR_A1_i[4])));
+	assign ram_wen_a2 = (SPLIT_i ? WEN_A2_i : (FMODE1_i ? ~FULL3 & WEN_A1_i : (WMODE_A1_i == MODE_36 ? WEN_A1_i : WEN_A1_i & ADDR_A1_i[4])));
+	assign ram_wen_b1 = (SPLIT_i ? WEN_B1_i : (WMODE_B1_i == MODE_36 ? WEN_B1_i : WEN_B1_i & ~ADDR_B1_i[4]));
+	assign ram_wen_b2 = (SPLIT_i ? WEN_B2_i : (WMODE_B1_i == MODE_36 ? WEN_B1_i : WEN_B1_i & ADDR_B1_i[4]));
+	assign ram_addr_a1 = (SPLIT_i ? ADDR_A1_i[13:0] : (FMODE1_i ? {ff_waddr[11:2], ff_waddr[0], 3'b000} : {ADDR_A1_i[14:5], ADDR_A1_i[3:0]}));
+	assign ram_addr_b1 = (SPLIT_i ? ADDR_B1_i[13:0] : (FMODE1_i ? {ff_raddr[11:2], ff_raddr[0], 3'b000} : {ADDR_B1_i[14:5], ADDR_B1_i[3:0]}));
+	assign ram_addr_a2 = (SPLIT_i ? ADDR_A2_i[13:0] : (FMODE1_i ? {ff_waddr[11:2], ff_waddr[0], 3'b000} : {ADDR_A1_i[14:5], ADDR_A1_i[3:0]}));
+	assign ram_addr_b2 = (SPLIT_i ? ADDR_B2_i[13:0] : (FMODE1_i ? {ff_raddr[11:2], ff_raddr[0], 3'b000} : {ADDR_B1_i[14:5], ADDR_B1_i[3:0]}));
+	assign bwl = (SPLIT_i ? ADDR_A1_i[4:3] : (FMODE1_i ? ff_waddr[1:0] : ADDR_A1_i[4:3]));
 	localparam MODE_18 = 3'b110;
 	localparam MODE_9 = 3'b101;
 	always @(*) begin : WDATA_SEL
-		case (SPLIT)
+		case (SPLIT_i)
 			1: begin
-				ram_wdata_a1 = WDATA_A1;
-				ram_wdata_a2 = WDATA_A2;
-				ram_wdata_b1 = WDATA_B1;
-				ram_wdata_b2 = WDATA_B2;
-				ram_be_a2 = BE_A2;
-				ram_be_b2 = BE_B2;
-				ram_be_a1 = BE_A1;
-				ram_be_b1 = BE_B1;
+				ram_wdata_a1 = WDATA_A1_i;
+				ram_wdata_a2 = WDATA_A2_i;
+				ram_wdata_b1 = WDATA_B1_i;
+				ram_wdata_b2 = WDATA_B2_i;
+				ram_be_a2 = BE_A2_i;
+				ram_be_b2 = BE_B2_i;
+				ram_be_a1 = BE_A1_i;
+				ram_be_b1 = BE_B1_i;
 			end
 			0: begin
-				case (WMODE_A1)
+				case (WMODE_A1_i)
 					MODE_36: begin
-						ram_wdata_a1 = {WDATA_A2[15:14], WDATA_A1[15:0]};
-						ram_wdata_a2 = {WDATA_A2[17:16], WDATA_A2[13:0], WDATA_A1[17:16]};
-						ram_be_a2 = (FMODE1 ? 2'b11 : BE_A2);
-						ram_be_a1 = (FMODE1 ? 2'b11 : BE_A1);
+						ram_wdata_a1 = {WDATA_A2_i[15:14], WDATA_A1_i[15:0]};
+						ram_wdata_a2 = {WDATA_A2_i[17:16], WDATA_A2_i[13:0], WDATA_A1_i[17:16]};
+						ram_be_a2 = (FMODE1_i ? 2'b11 : BE_A2_i);
+						ram_be_a1 = (FMODE1_i ? 2'b11 : BE_A1_i);
 					end
 					MODE_18: begin
-						ram_wdata_a1 = WDATA_A1;
-						ram_wdata_a2 = WDATA_A1;
-						ram_be_a1 = (FMODE1 ? (ff_waddr[1] ? 2'b00 : 2'b11) : BE_A1);
-						ram_be_a2 = (FMODE1 ? (ff_waddr[1] ? 2'b11 : 2'b00) : BE_A1);
+						ram_wdata_a1 = WDATA_A1_i;
+						ram_wdata_a2 = WDATA_A1_i;
+						ram_be_a1 = (FMODE1_i ? (ff_waddr[1] ? 2'b00 : 2'b11) : BE_A1_i);
+						ram_be_a2 = (FMODE1_i ? (ff_waddr[1] ? 2'b11 : 2'b00) : BE_A1_i);
 					end
 					MODE_9:
 						case (bwl)
 							0: begin
-								{ram_wdata_a1[16], ram_wdata_a1[7:0]} = WDATA_A1[8:0];
-								{ram_wdata_a1[17], ram_wdata_a1[15:8]} = 9'b000000000;
-								{ram_wdata_a2[16], ram_wdata_a2[7:0]} = 9'b000000000;
-								{ram_wdata_a2[17], ram_wdata_a2[15:8]} = 9'b000000000;
-								ram_be_a1[0] = (FMODE1 ? (ff_waddr[1:0] == 0 ? 1'b1 : 1'b0) : 1'b1);
-								ram_be_a1[1] = (FMODE1 ? (ff_waddr[1:0] == 1 ? 1'b1 : 1'b0) : 1'b0);
-								ram_be_a2[0] = (FMODE1 ? (ff_waddr[1:0] == 2 ? 1'b1 : 1'b0) : 1'b0);
-								ram_be_a2[1] = (FMODE1 ? (ff_waddr[1:0] == 3 ? 1'b1 : 1'b0) : 1'b0);
+								ram_wdata_a1[8:0] = (FMODE1_i ? {WDATA_A1_i[0], WDATA_A1_i[7:0]} : WDATA_A1_i[8:0]);
+								ram_wdata_a1[17:9] = (FMODE1_i ? {{2 {WDATA_A1_i[8]}}, WDATA_A1_i[7:1]} : 9'b000000000);
+								ram_wdata_a2[8:0] = (FMODE1_i ? {WDATA_A1_i[0], WDATA_A1_i[7:0]} : 9'b000000000);
+								ram_wdata_a2[17:9] = (FMODE1_i ? {{2 {WDATA_A1_i[8]}}, WDATA_A1_i[7:1]} : 9'b000000000);
+								ram_be_a1[0] = (FMODE1_i ? (ff_waddr[1:0] == 0 ? 1'b1 : 1'b0) : 1'b1);
+								ram_be_a1[1] = (FMODE1_i ? (ff_waddr[1:0] == 1 ? 1'b1 : 1'b0) : 1'b0);
+								ram_be_a2[0] = (FMODE1_i ? (ff_waddr[1:0] == 2 ? 1'b1 : 1'b0) : 1'b0);
+								ram_be_a2[1] = (FMODE1_i ? (ff_waddr[1:0] == 3 ? 1'b1 : 1'b0) : 1'b0);
 							end
 							1: begin
-								{ram_wdata_a1[16], ram_wdata_a1[7:0]} = 9'b000000000;
-								{ram_wdata_a1[17], ram_wdata_a1[15:8]} = {WDATA_A1[8:0]};
-								{ram_wdata_a2[16], ram_wdata_a2[7:0]} = 9'b000000000;
-								{ram_wdata_a2[17], ram_wdata_a2[15:8]} = 9'b000000000;
+								ram_wdata_a1[8:0] = (FMODE1_i ? {WDATA_A1_i[0], WDATA_A1_i[7:0]} : WDATA_A1_i[8:0]);
+								ram_wdata_a1[17:9] = (FMODE1_i ? {{2 {WDATA_A1_i[8]}}, WDATA_A1_i[7:1]} : 9'b000000000);
+								ram_wdata_a2[8:0] = (FMODE1_i ? {WDATA_A1_i[0], WDATA_A1_i[7:0]} : 9'b000000000);
+								ram_wdata_a2[17:9] = (FMODE1_i ? {{2 {WDATA_A1_i[8]}}, WDATA_A1_i[7:1]} : 9'b000000000);
 								{ram_be_a2, ram_be_a1} = 4'b0010;
 							end
 							2: begin
-								{ram_wdata_a1[16], ram_wdata_a1[7:0]} = 9'b000000000;
-								{ram_wdata_a1[17], ram_wdata_a1[15:8]} = 9'b000000000;
-								{ram_wdata_a2[16], ram_wdata_a2[7:0]} = {WDATA_A1[8:0]};
-								{ram_wdata_a2[17], ram_wdata_a2[15:8]} = 9'b000000000;
+								ram_wdata_a1[8:0] = (FMODE1_i ? {WDATA_A1_i[0], WDATA_A1_i[7:0]} : 9'b000000000);
+								ram_wdata_a1[17:9] = (FMODE1_i ? {{2 {WDATA_A1_i[8]}}, WDATA_A1_i[7:1]} : 9'b000000000);
+								ram_wdata_a2[8:0] = (FMODE1_i ? {WDATA_A1_i[0], WDATA_A1_i[7:0]} : WDATA_A1_i[8:0]);
+								ram_wdata_a2[17:9] = (FMODE1_i ? {{2 {WDATA_A1_i[8]}}, WDATA_A1_i[7:1]} : 9'b000000000);
 								{ram_be_a2, ram_be_a1} = 4'b0100;
 							end
 							3: begin
-								{ram_wdata_a1[16], ram_wdata_a1[7:0]} = 9'b000000000;
-								{ram_wdata_a1[17], ram_wdata_a1[15:8]} = 9'b000000000;
-								{ram_wdata_a2[16], ram_wdata_a2[7:0]} = 9'b000000000;
-								{ram_wdata_a2[17], ram_wdata_a2[15:8]} = {WDATA_A1[8:0]};
+								ram_wdata_a1[8:0] = (FMODE1_i ? {WDATA_A1_i[0], WDATA_A1_i[7:0]} : 9'b000000000);
+								ram_wdata_a1[17:9] = (FMODE1_i ? {{2 {WDATA_A1_i[8]}}, WDATA_A1_i[7:1]} : 9'b000000000);
+								ram_wdata_a2[8:0] = (FMODE1_i ? {WDATA_A1_i[0], WDATA_A1_i[7:0]} : WDATA_A1_i[8:0]);
+								ram_wdata_a2[17:9] = (FMODE1_i ? {{2 {WDATA_A1_i[8]}}, WDATA_A1_i[7:1]} : 9'b000000000);
 								{ram_be_a2, ram_be_a1} = 4'b1000;
 							end
 						endcase
+					default: begin
+						ram_wdata_a1 = WDATA_A1_i;
+						ram_wdata_a2 = WDATA_A1_i;
+						ram_be_a2 = (FMODE1_i ? 2'b11 : BE_A1_i);
+						ram_be_a1 = (FMODE1_i ? 2'b11 : BE_A1_i);
+					end
 				endcase
-				case (WMODE_B1)
+				case (WMODE_B1_i)
 					MODE_36: begin
-						ram_wdata_b1 = (FMODE1 ? 18'b000000000000000000 : {WDATA_B2[15:14], WDATA_B1[15:0]});
-						ram_wdata_b2 = (FMODE1 ? 18'b000000000000000000 : {WDATA_B2[17:16], WDATA_B2[13:0], WDATA_B1[17:16]});
-						ram_be_b2 = BE_B2;
-						ram_be_b1 = BE_B1;
+						ram_wdata_b1 = (FMODE1_i ? 18'b000000000000000000 : {WDATA_B2_i[15:14], WDATA_B1_i[15:0]});
+						ram_wdata_b2 = (FMODE1_i ? 18'b000000000000000000 : {WDATA_B2_i[17:16], WDATA_B2_i[13:0], WDATA_B1_i[17:16]});
+						ram_be_b2 = BE_B2_i;
+						ram_be_b1 = BE_B1_i;
 					end
 					MODE_18: begin
-						ram_wdata_b1 = (FMODE1 ? 18'b000000000000000000 : WDATA_B1);
-						ram_wdata_b2 = (FMODE1 ? 18'b000000000000000000 : WDATA_B1);
-						ram_be_b1 = BE_B1;
-						ram_be_b2 = BE_B1;
+						ram_wdata_b1 = (FMODE1_i ? 18'b000000000000000000 : WDATA_B1_i);
+						ram_wdata_b2 = (FMODE1_i ? 18'b000000000000000000 : WDATA_B1_i);
+						ram_be_b1 = BE_B1_i;
+						ram_be_b2 = BE_B1_i;
 					end
 					MODE_9:
-						case (ram_addr_b1[4:3])
+						case (ADDR_B1_i[4:3])
 							0: begin
-								{ram_wdata_b1[16], ram_wdata_b1[7:0]} = {ram_wdata_b1[16], ram_wdata_b1[7:0]};
-								{ram_wdata_b1[17], ram_wdata_b1[15:8]} = 9'b000000000;
-								{ram_wdata_b2[16], ram_wdata_b2[7:0]} = 9'b000000000;
-								{ram_wdata_b2[17], ram_wdata_b2[15:8]} = 9'b000000000;
+								ram_wdata_b1[8:0] = WDATA_B1_i[8:0];
+								ram_wdata_b1[17:9] = 9'b000000000;
+								ram_wdata_b2[8:0] = 9'b000000000;
+								ram_wdata_b2[17:9] = 9'b000000000;
 								{ram_be_b2, ram_be_b1} = 4'b0001;
 							end
 							1: begin
-								{ram_wdata_b1[16], ram_wdata_b1[7:0]} = 9'b000000000;
-								{ram_wdata_b1[17], ram_wdata_b1[15:8]} = {ram_wdata_b1[16], ram_wdata_b1[7:0]};
-								{ram_wdata_b2[16], ram_wdata_b2[7:0]} = 9'b000000000;
-								{ram_wdata_b2[17], ram_wdata_b2[15:8]} = 9'b000000000;
+								ram_wdata_b1[8:0] = WDATA_B1_i[8:0];
+								ram_wdata_b1[17:9] = 9'b000000000;
+								ram_wdata_b2[8:0] = 9'b000000000;
+								ram_wdata_b2[17:9] = 9'b000000000;
 								{ram_be_b2, ram_be_b1} = 4'b0010;
 							end
 							2: begin
-								{ram_wdata_b1[16], ram_wdata_b1[7:0]} = 9'b000000000;
-								{ram_wdata_b1[17], ram_wdata_b1[15:8]} = 9'b000000000;
-								{ram_wdata_b2[16], ram_wdata_b2[7:0]} = {ram_wdata_b1[16], ram_wdata_b1[7:0]};
-								{ram_wdata_b2[17], ram_wdata_b2[15:8]} = 9'b000000000;
+								ram_wdata_b1[8:0] = 9'b000000000;
+								ram_wdata_b1[17:9] = 9'b000000000;
+								ram_wdata_b2[8:0] = WDATA_B1_i[8:0];
+								ram_wdata_b2[17:9] = 9'b000000000;
 								{ram_be_b2, ram_be_b1} = 4'b0100;
 							end
 							3: begin
-								{ram_wdata_b1[16], ram_wdata_b1[7:0]} = 9'b000000000;
-								{ram_wdata_b1[17], ram_wdata_b1[15:8]} = 9'b000000000;
-								{ram_wdata_b2[16], ram_wdata_b2[7:0]} = 9'b000000000;
-								{ram_wdata_b2[17], ram_wdata_b2[15:8]} = {ram_wdata_b1[16], ram_wdata_b1[7:0]};
+								ram_wdata_b1[8:0] = 9'b000000000;
+								ram_wdata_b1[17:9] = 9'b000000000;
+								ram_wdata_b2[8:0] = WDATA_B1_i[8:0];
+								ram_wdata_b2[17:9] = 9'b000000000;
 								{ram_be_b2, ram_be_b1} = 4'b1000;
 							end
 						endcase
+					default: begin
+						ram_wdata_b1 = (FMODE1_i ? 18'b000000000000000000 : WDATA_B1_i);
+						ram_wdata_b2 = (FMODE1_i ? 18'b000000000000000000 : WDATA_B1_i);
+						ram_be_b2 = BE_B1_i;
+						ram_be_b1 = BE_B1_i;
+					end
 				endcase
 			end
 		endcase
 	end
 	always @(*)
-		case (SPLIT)
+		case (SPLIT_i)
 			0: begin
-				ram_rmode_a1 = (RMODE_A1 == MODE_36 ? MODE_18 : RMODE_A1);
-				ram_rmode_a2 = (RMODE_A1 == MODE_36 ? MODE_18 : RMODE_A1);
-				ram_wmode_a1 = (WMODE_A1 == MODE_36 ? MODE_18 : (FMODE1 ? MODE_18 : WMODE_A1));
-				ram_wmode_a2 = (WMODE_A1 == MODE_36 ? MODE_18 : (FMODE1 ? MODE_18 : WMODE_A1));
-				ram_rmode_b1 = (RMODE_B1 == MODE_36 ? MODE_18 : (FMODE1 ? MODE_18 : RMODE_B1));
-				ram_rmode_b2 = (RMODE_B1 == MODE_36 ? MODE_18 : (FMODE1 ? MODE_18 : RMODE_B1));
-				ram_wmode_b1 = (WMODE_B1 == MODE_36 ? MODE_18 : WMODE_B1);
-				ram_wmode_b2 = (WMODE_B1 == MODE_36 ? MODE_18 : RMODE_B1);
+				ram_rmode_a1 = (RMODE_A1_i == MODE_36 ? MODE_18 : RMODE_A1_i);
+				ram_rmode_a2 = (RMODE_A1_i == MODE_36 ? MODE_18 : RMODE_A1_i);
+				ram_wmode_a1 = (WMODE_A1_i == MODE_36 ? MODE_18 : (FMODE1_i ? MODE_18 : WMODE_A1_i));
+				ram_wmode_a2 = (WMODE_A1_i == MODE_36 ? MODE_18 : (FMODE1_i ? MODE_18 : WMODE_A1_i));
+				ram_rmode_b1 = (RMODE_B1_i == MODE_36 ? MODE_18 : (FMODE1_i ? MODE_18 : RMODE_B1_i));
+				ram_rmode_b2 = (RMODE_B1_i == MODE_36 ? MODE_18 : (FMODE1_i ? MODE_18 : RMODE_B1_i));
+				ram_wmode_b1 = (WMODE_B1_i == MODE_36 ? MODE_18 : WMODE_B1_i);
+				ram_wmode_b2 = (WMODE_B1_i == MODE_36 ? MODE_18 : WMODE_B1_i);
 			end
 			1: begin
-				ram_rmode_a1 = (RMODE_A1 == MODE_36 ? MODE_18 : RMODE_A1);
-				ram_rmode_a2 = (RMODE_A2 == MODE_36 ? MODE_18 : RMODE_A2);
-				ram_wmode_a1 = (WMODE_A1 == MODE_36 ? MODE_18 : WMODE_A1);
-				ram_wmode_a2 = (WMODE_A2 == MODE_36 ? MODE_18 : WMODE_A2);
-				ram_rmode_b1 = (RMODE_B1 == MODE_36 ? MODE_18 : RMODE_B1);
-				ram_rmode_b2 = (RMODE_B2 == MODE_36 ? MODE_18 : RMODE_B2);
-				ram_wmode_b1 = (WMODE_B1 == MODE_36 ? MODE_18 : WMODE_B1);
-				ram_wmode_b2 = (WMODE_B2 == MODE_36 ? MODE_18 : WMODE_B2);
+				ram_rmode_a1 = (RMODE_A1_i == MODE_36 ? MODE_18 : RMODE_A1_i);
+				ram_rmode_a2 = (RMODE_A2_i == MODE_36 ? MODE_18 : RMODE_A2_i);
+				ram_wmode_a1 = (WMODE_A1_i == MODE_36 ? MODE_18 : WMODE_A1_i);
+				ram_wmode_a2 = (WMODE_A2_i == MODE_36 ? MODE_18 : WMODE_A2_i);
+				ram_rmode_b1 = (RMODE_B1_i == MODE_36 ? MODE_18 : RMODE_B1_i);
+				ram_rmode_b2 = (RMODE_B2_i == MODE_36 ? MODE_18 : RMODE_B2_i);
+				ram_wmode_b1 = (WMODE_B1_i == MODE_36 ? MODE_18 : WMODE_B1_i);
+				ram_wmode_b2 = (WMODE_B2_i == MODE_36 ? MODE_18 : WMODE_B2_i);
 			end
 		endcase
 	always @(*) begin : FIFO_READ_SEL
-		case (RMODE_B1)
+		case (RMODE_B1_i)
 			MODE_36: fifo_rdata = {ram_rdata_b2[17:16], ram_rdata_b1[17:16], ram_rdata_b2[15:0], ram_rdata_b1[15:0]};
 			MODE_18: fifo_rdata = (ff_raddr[1] ? {18'b000000000000000000, ram_rdata_b2} : {18'b000000000000000000, ram_rdata_b1});
 			MODE_9:
@@ -1010,96 +1024,105 @@ module TDP_BRAM36 (
 					2: fifo_rdata = {27'b000000000000000000000000000, ram_rdata_b2[16], ram_rdata_b2[7:0]};
 					3: fifo_rdata = {27'b000000000000000000000000000, ram_rdata_b2[17], ram_rdata_b2[15:8]};
 				endcase
+			default: fifo_rdata = {ram_rdata_b2[17:16], ram_rdata_b1[17:16], ram_rdata_b2[15:0], ram_rdata_b1[15:0]};
 		endcase
 	end
 	localparam MODE_1 = 3'b001;
 	localparam MODE_2 = 3'b010;
 	localparam MODE_4 = 3'b100;
 	always @(*) begin : RDATA_SEL
-		case (SPLIT)
+		case (SPLIT_i)
 			1: begin
-				RDATA_A1 = (FMODE1 ? {10'b0000000000, EMPTY1, EPO1, EWM1, UNDERRUN1, FULL1, FMO1, FWM1, OVERRUN1} : ram_rdata_a1);
-				RDATA_B1 = ram_rdata_b1;
-				RDATA_A2 = (FMODE2 ? {10'b0000000000, EMPTY2, EPO2, EWM2, UNDERRUN2, FULL2, FMO2, FWM2, OVERRUN2} : ram_rdata_a2);
-				RDATA_B2 = ram_rdata_b2;
+				RDATA_A1_o = (FMODE1_i ? {10'b0000000000, EMPTY1, EPO1, EWM1, UNDERRUN1, FULL1, FMO1, FWM1, OVERRUN1} : ram_rdata_a1);
+				RDATA_B1_o = ram_rdata_b1;
+				RDATA_A2_o = (FMODE2_i ? {10'b0000000000, EMPTY2, EPO2, EWM2, UNDERRUN2, FULL2, FMO2, FWM2, OVERRUN2} : ram_rdata_a2);
+				RDATA_B2_o = ram_rdata_b2;
 			end
 			0: begin
-				if (FMODE1) begin
-					RDATA_A1 = {10'b0000000000, EMPTY3, EPO3, EWM3, UNDERRUN3, FULL3, FMO3, FWM3, OVERRUN3};
-					RDATA_A2 = 18'b000000000000000000;
+				if (FMODE1_i) begin
+					RDATA_A1_o = {10'b0000000000, EMPTY3, EPO3, EWM3, UNDERRUN3, FULL3, FMO3, FWM3, OVERRUN3};
+					RDATA_A2_o = 18'b000000000000000000;
 				end
 				else
-					case (RMODE_A1)
+					case (RMODE_A1_i)
 						MODE_36: begin
-							RDATA_A1 = {ram_rdata_a2[1:0], ram_rdata_a1[15:0]};
-							RDATA_A2 = {ram_rdata_a2[17:16], ram_rdata_a1[17:16], ram_rdata_a2[15:2]};
+							RDATA_A1_o = {ram_rdata_a2[1:0], ram_rdata_a1[15:0]};
+							RDATA_A2_o = {ram_rdata_a2[17:16], ram_rdata_a1[17:16], ram_rdata_a2[15:2]};
 						end
 						MODE_18: begin
-							RDATA_A1 = (laddr_a1[4] ? ram_rdata_a2 : ram_rdata_a1);
-							RDATA_A2 = 18'b000000000000000000;
+							RDATA_A1_o = (laddr_a1[4] ? ram_rdata_a2 : ram_rdata_a1);
+							RDATA_A2_o = 18'b000000000000000000;
 						end
 						MODE_9: begin
-							RDATA_A1 = (laddr_a1[4] ? {9'b000000000, ram_rdata_a2[8:0]} : {9'b000000000, ram_rdata_a1[8:0]});
-							RDATA_A2 = 18'b000000000000000000;
+							RDATA_A1_o = (laddr_a1[4] ? {9'b000000000, ram_rdata_a2[8:0]} : {9'b000000000, ram_rdata_a1[8:0]});
+							RDATA_A2_o = 18'b000000000000000000;
 						end
 						MODE_4: begin
-							RDATA_A2 = 18'b000000000000000000;
-							RDATA_A1[17:4] = 14'b00000000000000;
-							RDATA_A1[3:0] = (laddr_a1[4] ? ram_rdata_a2[3:0] : ram_rdata_a1[3:0]);
+							RDATA_A2_o = 18'b000000000000000000;
+							RDATA_A1_o[17:4] = 14'b00000000000000;
+							RDATA_A1_o[3:0] = (laddr_a1[4] ? ram_rdata_a2[3:0] : ram_rdata_a1[3:0]);
 						end
 						MODE_2: begin
-							RDATA_A2 = 18'b000000000000000000;
-							RDATA_A1[17:2] = 16'b0000000000000000;
-							RDATA_A1[1:0] = (laddr_a1[4] ? ram_rdata_a2[1:0] : ram_rdata_a1[1:0]);
+							RDATA_A2_o = 18'b000000000000000000;
+							RDATA_A1_o[17:2] = 16'b0000000000000000;
+							RDATA_A1_o[1:0] = (laddr_a1[4] ? ram_rdata_a2[1:0] : ram_rdata_a1[1:0]);
 						end
 						MODE_1: begin
-							RDATA_A2 = 18'b000000000000000000;
-							RDATA_A1[17:1] = 17'b00000000000000000;
-							RDATA_A1[0] = (laddr_a1[4] ? ram_rdata_a2[0] : ram_rdata_a1[0]);
+							RDATA_A2_o = 18'b000000000000000000;
+							RDATA_A1_o[17:1] = 17'b00000000000000000;
+							RDATA_A1_o[0] = (laddr_a1[4] ? ram_rdata_a2[0] : ram_rdata_a1[0]);
+						end
+						default: begin
+							RDATA_A1_o = {ram_rdata_a2[1:0], ram_rdata_a1[15:0]};
+							RDATA_A2_o = {ram_rdata_a2[17:16], ram_rdata_a1[17:16], ram_rdata_a2[15:2]};
 						end
 					endcase
-				case (RMODE_B1)
+				case (RMODE_B1_i)
 					MODE_36: begin
-						RDATA_B1 = {ram_rdata_b2[1:0], ram_rdata_b1[15:0]};
-						RDATA_B2 = {ram_rdata_b2[17:16], ram_rdata_b1[17:16], ram_rdata_b2[15:2]};
+						RDATA_B1_o = {ram_rdata_b2[1:0], ram_rdata_b1[15:0]};
+						RDATA_B2_o = {ram_rdata_b2[17:16], ram_rdata_b1[17:16], ram_rdata_b2[15:2]};
 					end
 					MODE_18: begin
-						RDATA_B1 = (FMODE1 ? fifo_rdata[17:0] : (laddr_b1[4] ? ram_rdata_b2 : ram_rdata_b1));
-						RDATA_B2 = 18'b000000000000000000;
+						RDATA_B1_o = (FMODE1_i ? fifo_rdata[17:0] : (laddr_b1[4] ? ram_rdata_b2 : ram_rdata_b1));
+						RDATA_B2_o = 18'b000000000000000000;
 					end
 					MODE_9: begin
-						RDATA_B1 = (FMODE1 ? {9'b000000000, fifo_rdata[8:0]} : (laddr_b1[4] ? {9'b000000000, ram_rdata_b2[8:0]} : {9'b000000000, ram_rdata_b1[8:0]}));
-						RDATA_B2 = 18'b000000000000000000;
+						RDATA_B1_o = (FMODE1_i ? {9'b000000000, fifo_rdata[8:0]} : (laddr_b1[4] ? {9'b000000000, ram_rdata_b2[8:0]} : {9'b000000000, ram_rdata_b1[8:0]}));
+						RDATA_B2_o = 18'b000000000000000000;
 					end
 					MODE_4: begin
-						RDATA_B2 = 18'b000000000000000000;
-						RDATA_B1[17:4] = 14'b00000000000000;
-						RDATA_B1[3:0] = (laddr_b1[4] ? ram_rdata_b2[3:0] : ram_rdata_b1[3:0]);
+						RDATA_B2_o = 18'b000000000000000000;
+						RDATA_B1_o[17:4] = 14'b00000000000000;
+						RDATA_B1_o[3:0] = (laddr_b1[4] ? ram_rdata_b2[3:0] : ram_rdata_b1[3:0]);
 					end
 					MODE_2: begin
-						RDATA_B2 = 18'b000000000000000000;
-						RDATA_B1[17:2] = 16'b0000000000000000;
-						RDATA_B1[1:0] = (laddr_b1[4] ? ram_rdata_b2[1:0] : ram_rdata_b1[1:0]);
+						RDATA_B2_o = 18'b000000000000000000;
+						RDATA_B1_o[17:2] = 16'b0000000000000000;
+						RDATA_B1_o[1:0] = (laddr_b1[4] ? ram_rdata_b2[1:0] : ram_rdata_b1[1:0]);
 					end
 					MODE_1: begin
-						RDATA_B2 = 18'b000000000000000000;
-						RDATA_B1[17:1] = 17'b00000000000000000;
-						RDATA_B1[0] = (laddr_b1[4] ? ram_rdata_b2[0] : ram_rdata_b1[0]);
+						RDATA_B2_o = 18'b000000000000000000;
+						RDATA_B1_o[17:1] = 17'b00000000000000000;
+						RDATA_B1_o[0] = (laddr_b1[4] ? ram_rdata_b2[0] : ram_rdata_b1[0]);
+					end
+					default: begin
+						RDATA_B1_o = {ram_rdata_b2[1:0], ram_rdata_b1[15:0]};
+						RDATA_B2_o = {ram_rdata_b2[17:16], ram_rdata_b1[17:16], ram_rdata_b2[15:2]};
 					end
 				endcase
 			end
 		endcase
 	end
-	always @(posedge CLK_A1) laddr_a1 <= ADDR_A1;
-	always @(posedge CLK_B1) laddr_b1 <= ADDR_B1;
+	always @(posedge CLK_A1_i) laddr_a1 <= ADDR_A1_i;
+	always @(posedge CLK_B1_i) laddr_b1 <= ADDR_B1_i;
 	always @(*) begin
-		case (WMODE_A1)
+		case (WMODE_A1_i)
 			default: fifo_wmode = 2'b00;
 			MODE_36: fifo_wmode = 2'b00;
 			MODE_18: fifo_wmode = 2'b01;
 			MODE_9: fifo_wmode = 2'b10;
 		endcase
-		case (RMODE_B1)
+		case (RMODE_B1_i)
 			default: fifo_rmode = 2'b00;
 			MODE_36: fifo_rmode = 2'b00;
 			MODE_18: fifo_rmode = 2'b01;
@@ -1111,12 +1134,12 @@ module TDP_BRAM36 (
 		.FIFO_WIDTH(3'd4)
 	) fifo36_ctl(
 		.rclk(smux_clk_b1),
-		.rst_R_n(~FLUSH1),
+		.rst_R_n(~FLUSH1_i),
 		.wclk(smux_clk_a1),
-		.rst_W_n(~FLUSH1),
-		.ren(REN_B1),
+		.rst_W_n(~FLUSH1_i),
+		.ren(REN_B1_i),
 		.wen(ram_wen_a1),
-		.sync(SYNC_FIFO1),
+		.sync(SYNC_FIFO1_i),
 		.depth(3'b111),
 		.rmode(fifo_rmode),
 		.wmode(fifo_wmode),
@@ -1124,10 +1147,10 @@ module TDP_BRAM36 (
 		.fflags({FULL3, FMO3, FWM3, OVERRUN3, EMPTY3, EPO3, EWM3, UNDERRUN3}),
 		.raddr(ff_raddr),
 		.waddr(ff_waddr),
-		.upaf({1'b0, UPAF1}),
-		.upae({1'b0, UPAE1})
+		.upaf(UPAF1_i),
+		.upae(UPAE1_i)
 	);
-	TDP18Kx18_FIFO u1(
+	TDP18K_FIFO u1(
 		.RMODE_A(ram_rmode_a1),
 		.RMODE_B(ram_rmode_b1),
 		.WMODE_A(ram_wmode_a1),
@@ -1154,14 +1177,14 @@ module TDP_BRAM36 (
 		.FMO(FMO1),
 		.FWM(FWM1),
 		.OVERRUN(OVERRUN1),
-		.FLUSH(FLUSH1),
+		.FLUSH(FLUSH1_i),
 		.FMODE(ram_fmode1),
-		.UPAF(UPAF1),
-		.UPAE(UPAE1),
-		.SYNC_FIFO(SYNC_FIFO1),
-		.POWERDN(POWERDN1),
-		.SLEEP(SLEEP1),
-		.PROTECT(PROTECT1),
+		.UPAF(UPAF1_i[10:0]),
+		.UPAE(UPAE1_i[10:0]),
+		.SYNC_FIFO(SYNC_FIFO1_i),
+		.POWERDN(POWERDN1_i),
+		.SLEEP(SLEEP1_i),
+		.PROTECT(PROTECT1_i),
 		.PL_INIT(PL_INIT_i),
 		.PL_ENA(PL_ENA_i),
 		.PL_WEN(PL_WEN_i[0]),
@@ -1169,10 +1192,10 @@ module TDP_BRAM36 (
 		.PL_CLK(PL_CLK_i),
 		.PL_ADDR(PL_ADDR_i),
 		.PL_DATA_IN({PL_DATA_i[33:32], PL_DATA_i[15:0]}),
-		.PL_DATA_OUT({PL_DATA_o[33:32], PL_DATA_o[15:0]}),
+		.PL_DATA_OUT(pl_dout0),
 		.RAM_ID({RAM_ID_i})
 	);
-	TDP18Kx18_FIFO u2(
+	TDP18K_FIFO u2(
 		.RMODE_A(ram_rmode_a2),
 		.RMODE_B(ram_rmode_b2),
 		.WMODE_A(ram_wmode_a2),
@@ -1199,14 +1222,14 @@ module TDP_BRAM36 (
 		.FMO(FMO2),
 		.FWM(FWM2),
 		.OVERRUN(OVERRUN2),
-		.FLUSH(FLUSH2),
+		.FLUSH(FLUSH2_i),
 		.FMODE(ram_fmode2),
-		.UPAF(UPAF2),
-		.UPAE(UPAE2),
-		.SYNC_FIFO(SYNC_FIFO2),
-		.POWERDN(POWERDN2),
-		.SLEEP(SLEEP2),
-		.PROTECT(PROTECT2),
+		.UPAF(UPAF2_i),
+		.UPAE(UPAE2_i),
+		.SYNC_FIFO(SYNC_FIFO2_i),
+		.POWERDN(POWERDN2_i),
+		.SLEEP(SLEEP2_i),
+		.PROTECT(PROTECT2_i),
 		.PL_INIT(PL_INIT_i),
 		.PL_ENA(PL_ENA_i),
 		.PL_WEN(PL_WEN_i[1]),
@@ -1214,10 +1237,14 @@ module TDP_BRAM36 (
 		.PL_CLK(PL_CLK_i),
 		.PL_ADDR(PL_ADDR_i),
 		.PL_DATA_IN({PL_DATA_i[35:34], PL_DATA_i[31:16]}),
-		.PL_DATA_OUT({PL_DATA_o[35:34], PL_DATA_o[31:16]}),
+		.PL_DATA_OUT(pl_dout1),
 		.RAM_ID(RAM_ID_i)
 	);
 	always @(*) begin
+		if (RAM_ID_i == PL_ADDR_i[31:16])
+			PL_DATA_o = (PL_REN_i ? {pl_dout1[17:16], pl_dout0[17:16], pl_dout1[15:0], pl_dout0[15:0]} : PL_DATA_i);
+		else
+			PL_DATA_o = PL_DATA_i;
 		PL_ADDR_o = PL_ADDR_i;
 		PL_INIT_o = PL_INIT_i;
 		PL_ENA_o = PL_ENA_i;

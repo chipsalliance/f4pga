@@ -1,4 +1,4 @@
-// Copyright (C) 2020-2021  The SymbiFlow Authors.
+// Copyright (C) 2022  The SymbiFlow Authors.
 //
 // Use of this source code is governed by a ISC-style
 // license that can be found in the LICENSE file or at
@@ -26,6 +26,7 @@ module fifo_ctl (
 );
 	parameter ADDR_WIDTH = 11;
 	parameter FIFO_WIDTH = 3'd2;
+	localparam ADDR_PLUS_ONE = ADDR_WIDTH + 1;
 	output wire [ADDR_WIDTH - 1:0] raddr;
 	output wire [ADDR_WIDTH - 1:0] waddr;
 	output wire [7:0] fflags;
@@ -56,8 +57,8 @@ module fifo_ctl (
 	assign smux_pushtopop = (sync ? pushtopop0 : pushtopop2);
 	always @(posedge rclk or negedge rst_R_n)
 		if (~rst_R_n) begin
-			pushtopop1 <= #(1) 12'h000;
-			pushtopop2 <= #(1) 12'h000;
+			pushtopop1 <= #(1) {ADDR_WIDTH + 1{1'h0}};
+			pushtopop2 <= #(1) {ADDR_WIDTH + 1{1'h0}};
 		end
 		else begin
 			pushtopop1 <= #(1) pushtopop0;
@@ -65,8 +66,8 @@ module fifo_ctl (
 		end
 	always @(posedge wclk or negedge rst_W_n)
 		if (~rst_W_n) begin
-			poptopush1 <= #(1) 12'h000;
-			poptopush2 <= #(1) 12'h000;
+			poptopush1 <= #(1) {ADDR_WIDTH + 1{1'h0}};
+			poptopush2 <= #(1) {ADDR_WIDTH + 1{1'h0}};
 		end
 		else begin
 			poptopush1 <= #(1) poptopush0;
@@ -162,14 +163,14 @@ module fifo_push (
 	assign count = fbytes - (waddr >= raddr ? waddr - raddr : (~raddr + waddr) + 1);
 	always @(*) begin
 		case (depth)
-			3'b000: fbytes = 12'd2048;
-			3'b001: fbytes = 12'd1024;
-			3'b010: fbytes = 12'd512;
-			3'b011: fbytes = 12'd256;
-			3'b100: fbytes = 12'd128;
-			3'b101: fbytes = 12'd64;
-			3'b110: fbytes = 12'd32;
-			3'b111: fbytes = 13'd4096;
+			3'b000: fbytes = {ADDR_WIDTH + 1{1'h0}} | 12'd2048;
+			3'b001: fbytes = {ADDR_WIDTH + 1{1'h0}} | 11'd1024;
+			3'b010: fbytes = {ADDR_WIDTH + 1{1'h0}} | 10'd512;
+			3'b011: fbytes = {ADDR_WIDTH + 1{1'h0}} | 9'd256;
+			3'b100: fbytes = {ADDR_WIDTH + 1{1'h0}} | 8'd128;
+			3'b101: fbytes = {ADDR_WIDTH + 1{1'h0}} | 7'd64;
+			3'b110: fbytes = {ADDR_WIDTH + 1{1'h0}} | 6'd32;
+			3'b111: fbytes = {ADDR_WIDTH + 1{1'h0}} | 13'd4096;
 		endcase
 		paf_thresh = (wmode ? (wmode[0] ? upaf << 1 : upaf) : upaf << 2);
 	end
@@ -499,7 +500,7 @@ module fifo_pop (
 			3'b110: fbytes = 'd32;
 			3'b111: fbytes = 'd4096;
 		endcase
-	always @(*) pae_thresh = (rmode ? (rmode[0] ? upae < 1 : upae) : upae << 2);
+	always @(*) pae_thresh = rmode ? (rmode[0] ? upae << 1 : upae) : upae << 2;
 	assign ren_out = (empty ? 1'b1 : ren_in);
 	always @(*)
 		case (rmode)

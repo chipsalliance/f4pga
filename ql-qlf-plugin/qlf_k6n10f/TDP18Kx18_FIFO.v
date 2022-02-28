@@ -1,4 +1,4 @@
-// Copyright (C) 2020-2021  The SymbiFlow Authors.
+// Copyright (C) 2022  The SymbiFlow Authors.
 //
 // Use of this source code is governed by a ISC-style
 // license that can be found in the LICENSE file or at
@@ -6,7 +6,7 @@
 //
 // SPDX-License-Identifier:ISC
 
-module TDP18Kx18_FIFO (
+module TDP18K_FIFO (
 	RMODE_A,
 	RMODE_B,
 	WMODE_A,
@@ -92,10 +92,10 @@ module TDP18Kx18_FIFO (
 	input PL_WEN;
 	input PL_REN;
 	input PL_CLK;
-	input [23:0] PL_ADDR;
+	input [31:0] PL_ADDR;
 	input [17:0] PL_DATA_IN;
 	output reg [17:0] PL_DATA_OUT;
-	input [8:0] RAM_ID;
+	input [15:0] RAM_ID;
 	reg [17:0] wmsk_a;
 	reg [17:0] wmsk_b;
 	wire [8:0] addr_a;
@@ -111,6 +111,8 @@ module TDP18Kx18_FIFO (
 	wire [10:0] ff_waddr;
 	wire [13:0] ram_addr_a;
 	wire [13:0] ram_addr_b;
+	wire [3:0] ram_waddr_a;
+	wire [3:0] ram_waddr_b;
 	wire preload;
 	wire my_id;
 	wire initn;
@@ -133,7 +135,7 @@ module TDP18Kx18_FIFO (
 		fifo_rmode = (RMODE_B == MODE_9 ? 2'b10 : 2'b01);
 		fifo_wmode = (WMODE_A == MODE_9 ? 2'b10 : 2'b01);
 	end
-	assign my_id = (PL_ADDR[23:14] == RAM_ID) | PL_INIT;
+	assign my_id = (PL_ADDR[31:16] == RAM_ID) | PL_INIT;
 	assign preload = (PROTECT ? 1'b0 : my_id & PL_ENA);
 	assign smux_clk_a = (preload ? PL_CLK : CLK_A);
 	assign smux_clk_b = (preload ? 0 : (FMODE ? (SYNC_FIFO ? CLK_A : CLK_B) : CLK_B));
@@ -144,8 +146,10 @@ module TDP18Kx18_FIFO (
 	assign ram_wen_b = (preload ? 1'b1 : (FMODE ? 1'b0 : WEN_B));
 	assign cen_b = ram_ren_b | ram_wen_b;
 	assign cen_a = ram_ren_a | ram_wen_a;
-	assign ram_addr_b = (preload ? {PL_ADDR[9:0], 4'b0000} : (real_fmode ? {ff_raddr[10:0], 3'b000} : {ADDR_B[13:4], addr_b_d[3:0]}));
-	assign ram_addr_a = (preload ? {PL_ADDR[8:0], 4'b0000} : (real_fmode ? {ff_waddr[10:0], 3'b000} : {ADDR_A[13:4], addr_a_d[3:0]}));
+	assign ram_waddr_b = (preload ? 4'b0000 : (real_fmode ? {ff_raddr[0], 3'b000} : ADDR_B[3:0]));
+	assign ram_waddr_a = (preload ? 4'b0000 : (real_fmode ? {ff_waddr[0], 3'b000} : ADDR_A[3:0]));
+	assign ram_addr_b = (preload ? {PL_ADDR[10:0], 3'h0} : (real_fmode ? {ff_raddr[10:0], 3'h0} : {ADDR_B[13:4], addr_b_d[3:0]}));
+	assign ram_addr_a = (preload ? {PL_ADDR[10:0], 3'h0} : (real_fmode ? {ff_waddr[10:0], 3'b000} : {ADDR_A[13:4], addr_a_d[3:0]}));
 	always @(posedge CLK_A) addr_a_d[3:0] <= ADDR_A[3:0];
 	always @(posedge CLK_B) addr_b_d[3:0] <= ADDR_B[3:0];
 	sram1024x18 uram(
@@ -209,35 +213,36 @@ module TDP18Kx18_FIFO (
 						{wmsk_a[16], wmsk_a[7:0]} = (FMODE ? 9'h000 : (BE_A[0] ? 9'h000 : 9'h1ff));
 					end
 					MODE_9: begin
-						aligned_wdata_a = {{2 {WDATA_A[16]}}, {2 {WDATA_A[7:0]}}};
-						{wmsk_a[17], wmsk_a[15:8]} = (ram_addr_a[3] ? (FMODE ? 9'h000 : (BE_A[0] ? 9'h000 : 9'h1ff)) : 9'h1ff);
-						{wmsk_a[16], wmsk_a[7:0]} = (ram_addr_a[3] ? 9'h1ff : (FMODE ? 9'h000 : (BE_A[0] ? 9'h000 : 9'h1ff)));
+						aligned_wdata_a = {{2 {WDATA_A[8]}}, {2 {WDATA_A[7:0]}}};
+						{wmsk_a[17], wmsk_a[15:8]} = (ram_waddr_a[3] ? 9'h000 : 9'h1ff);
+						{wmsk_a[16], wmsk_a[7:0]} = (ram_waddr_a[3] ? 9'h1ff : 9'h000);
 					end
 					MODE_4: begin
 						aligned_wdata_a = {2'b00, {4 {WDATA_A[3:0]}}};
 						wmsk_a[17:16] = 2'b11;
-						wmsk_a[15:12] = (ram_addr_a[3:2] == 2'b11 ? 4'h0 : 4'hf);
-						wmsk_a[11:8] = (ram_addr_a[3:2] == 2'b10 ? 4'h0 : 4'hf);
-						wmsk_a[7:4] = (ram_addr_a[3:2] == 2'b01 ? 4'h0 : 4'hf);
-						wmsk_a[3:0] = (ram_addr_a[3:2] == 2'b00 ? 4'h0 : 4'hf);
+						wmsk_a[15:12] = (ram_waddr_a[3:2] == 2'b11 ? 4'h0 : 4'hf);
+						wmsk_a[11:8] = (ram_waddr_a[3:2] == 2'b10 ? 4'h0 : 4'hf);
+						wmsk_a[7:4] = (ram_waddr_a[3:2] == 2'b01 ? 4'h0 : 4'hf);
+						wmsk_a[3:0] = (ram_waddr_a[3:2] == 2'b00 ? 4'h0 : 4'hf);
 					end
 					MODE_2: begin
 						aligned_wdata_a = {2'b00, {8 {WDATA_A[1:0]}}};
 						wmsk_a[17:16] = 2'b11;
-						wmsk_a[15:14] = (ram_addr_a[3:1] == 3'b111 ? 2'h0 : 2'h3);
-						wmsk_a[13:12] = (ram_addr_a[3:1] == 3'b110 ? 2'h0 : 2'h3);
-						wmsk_a[11:10] = (ram_addr_a[3:1] == 3'b101 ? 2'h0 : 2'h3);
-						wmsk_a[9:8] = (ram_addr_a[3:1] == 3'b100 ? 2'h0 : 2'h3);
-						wmsk_a[7:6] = (ram_addr_a[3:1] == 3'b011 ? 2'h0 : 2'h3);
-						wmsk_a[5:4] = (ram_addr_a[3:1] == 3'b010 ? 2'h0 : 2'h3);
-						wmsk_a[3:2] = (ram_addr_a[3:1] == 3'b001 ? 2'h0 : 2'h3);
-						wmsk_a[1:0] = (ram_addr_a[3:1] == 3'b000 ? 2'h0 : 2'h3);
+						wmsk_a[15:14] = (ram_waddr_a[3:1] == 3'b111 ? 2'h0 : 2'h3);
+						wmsk_a[13:12] = (ram_waddr_a[3:1] == 3'b110 ? 2'h0 : 2'h3);
+						wmsk_a[11:10] = (ram_waddr_a[3:1] == 3'b101 ? 2'h0 : 2'h3);
+						wmsk_a[9:8] = (ram_waddr_a[3:1] == 3'b100 ? 2'h0 : 2'h3);
+						wmsk_a[7:6] = (ram_waddr_a[3:1] == 3'b011 ? 2'h0 : 2'h3);
+						wmsk_a[5:4] = (ram_waddr_a[3:1] == 3'b010 ? 2'h0 : 2'h3);
+						wmsk_a[3:2] = (ram_waddr_a[3:1] == 3'b001 ? 2'h0 : 2'h3);
+						wmsk_a[1:0] = (ram_waddr_a[3:1] == 3'b000 ? 2'h0 : 2'h3);
 					end
 					MODE_1: begin
 						aligned_wdata_a = {2'b00, {16 {WDATA_A[0]}}};
-						wmsk_a = 18'h3fffe;
-						wmsk_a[ram_addr_a[3:0]] = 0;
+						wmsk_a = 18'h3ffff;
+						wmsk_a[{1'b0, ram_waddr_a[3:0]}] = 0;
 					end
+					default: wmsk_a = 18'h3ffff;
 				endcase
 		end
 		else begin
@@ -252,35 +257,36 @@ module TDP18Kx18_FIFO (
 					{wmsk_b[16], wmsk_b[7:0]} = (BE_B[0] ? 9'h000 : 9'h1ff);
 				end
 				MODE_9: begin
-					aligned_wdata_b = {{2 {WDATA_B[16]}}, {2 {WDATA_B[7:0]}}};
-					{wmsk_b[17], wmsk_b[15:8]} = (ram_addr_b[3] ? (BE_B[0] ? 9'h000 : 9'h1ff) : 9'h1ff);
-					{wmsk_b[16], wmsk_b[7:0]} = (ram_addr_b[3] ? 9'h1ff : (BE_B[0] ? 9'h000 : 9'h1ff));
+					aligned_wdata_b = {{2 {WDATA_B[8]}}, {2 {WDATA_B[7:0]}}};
+					{wmsk_b[17], wmsk_b[15:8]} = (ram_waddr_b[3] ? 9'h000 : 9'h1ff);
+					{wmsk_b[16], wmsk_b[7:0]} = (ram_waddr_b[3] ? 9'h1ff : 9'h000);
 				end
 				MODE_4: begin
 					aligned_wdata_b = {2'b00, {4 {WDATA_B[3:0]}}};
 					wmsk_b[17:16] = 2'b11;
-					wmsk_b[15:12] = (ram_addr_b[3:2] == 2'b11 ? 4'h0 : 4'hf);
-					wmsk_b[11:8] = (ram_addr_b[3:2] == 2'b10 ? 4'h0 : 4'hf);
-					wmsk_b[7:4] = (ram_addr_b[3:2] == 2'b01 ? 4'h0 : 4'hf);
-					wmsk_b[3:0] = (ram_addr_b[3:2] == 2'b00 ? 4'h0 : 4'hf);
+					wmsk_b[15:12] = (ram_waddr_b[3:2] == 2'b11 ? 4'h0 : 4'hf);
+					wmsk_b[11:8] = (ram_waddr_b[3:2] == 2'b10 ? 4'h0 : 4'hf);
+					wmsk_b[7:4] = (ram_waddr_b[3:2] == 2'b01 ? 4'h0 : 4'hf);
+					wmsk_b[3:0] = (ram_waddr_b[3:2] == 2'b00 ? 4'h0 : 4'hf);
 				end
 				MODE_2: begin
 					aligned_wdata_b = {2'b00, {8 {WDATA_B[1:0]}}};
 					wmsk_b[17:16] = 2'b11;
-					wmsk_b[15:14] = (ram_addr_b[3:1] == 3'b111 ? 2'h0 : 2'h3);
-					wmsk_b[13:12] = (ram_addr_b[3:1] == 3'b110 ? 2'h0 : 2'h3);
-					wmsk_b[11:10] = (ram_addr_b[3:1] == 3'b101 ? 2'h0 : 2'h3);
-					wmsk_b[9:8] = (ram_addr_b[3:1] == 3'b100 ? 2'h0 : 2'h3);
-					wmsk_b[7:6] = (ram_addr_b[3:1] == 3'b011 ? 2'h0 : 2'h3);
-					wmsk_b[5:4] = (ram_addr_b[3:1] == 3'b010 ? 2'h0 : 2'h3);
-					wmsk_b[3:2] = (ram_addr_b[3:1] == 3'b001 ? 2'h0 : 2'h3);
-					wmsk_b[1:0] = (ram_addr_b[3:1] == 3'b000 ? 2'h0 : 2'h3);
+					wmsk_b[15:14] = (ram_waddr_b[3:1] == 3'b111 ? 2'h0 : 2'h3);
+					wmsk_b[13:12] = (ram_waddr_b[3:1] == 3'b110 ? 2'h0 : 2'h3);
+					wmsk_b[11:10] = (ram_waddr_b[3:1] == 3'b101 ? 2'h0 : 2'h3);
+					wmsk_b[9:8] = (ram_waddr_b[3:1] == 3'b100 ? 2'h0 : 2'h3);
+					wmsk_b[7:6] = (ram_waddr_b[3:1] == 3'b011 ? 2'h0 : 2'h3);
+					wmsk_b[5:4] = (ram_waddr_b[3:1] == 3'b010 ? 2'h0 : 2'h3);
+					wmsk_b[3:2] = (ram_waddr_b[3:1] == 3'b001 ? 2'h0 : 2'h3);
+					wmsk_b[1:0] = (ram_waddr_b[3:1] == 3'b000 ? 2'h0 : 2'h3);
 				end
 				MODE_1: begin
 					aligned_wdata_b = {2'b00, {16 {WDATA_B[0]}}};
-					wmsk_b = 18'h3fffe;
-					wmsk_b[ram_addr_b[3:0]] = 0;
+					wmsk_b = 18'h3ffff;
+					wmsk_b[{1'b0, ram_waddr_b[3:0]}] = 0;
 				end
+				default: wmsk_b = 18'h3ffff;
 			endcase
 		else begin
 			aligned_wdata_b = 18'b000000000000000000;
@@ -329,8 +335,7 @@ module TDP18Kx18_FIFO (
 			MODE_18: RDATA_B = ram_rdata_b;
 			MODE_9: begin
 				RDATA_B[17:9] = 1'sb1;
-				RDATA_B[8] = (ram_addr_b[3] ? ram_rdata_b[17] : ram_rdata_b[16]);
-				RDATA_B[7:0] = (ram_addr_b[3] ? ram_rdata_b[15:8] : ram_rdata_b[7:0]);
+				RDATA_B[8:0] = (ram_addr_b[3] ? {ram_rdata_b[17], ram_rdata_b[15:8]} : {ram_rdata_b[16], ram_rdata_b[7:0]});
 			end
 			MODE_4:
 				case (ram_addr_b[3:2])
