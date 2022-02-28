@@ -749,7 +749,7 @@ endmodule
 module dsp_t1_10x9x32 (
     input  [ 9:0] a_i,
     input  [ 8:0] b_i,
-    input  [ 3:0] acc_fir_i,
+    input  [ 1:0] acc_fir_i,
     output [18:0] z_o,
     output [ 8:0] dly_b_o,
 
