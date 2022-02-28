@@ -109,7 +109,7 @@ module frac_lut6(
     assign lut4_out[2] = s4[2];
     assign lut4_out[3] = s4[3];
 
-    assign lut5_out[0] = s0[0];
+    assign lut5_out[0] = s5[0];
     assign lut5_out[1] = s5[1];
 
     assign lut6_out = li[5] ? s5[0] : s5[1];
@@ -228,7 +228,7 @@ module dffse(
     (* invertible_pin = "IS_C_INVERTED" *)
     input C,
     input S,
-    input E,
+    input E
 );
     parameter [0:0] INIT = 1'b0;
     parameter [0:0] IS_C_INVERTED = 1'b0;
@@ -749,7 +749,7 @@ endmodule
 module dsp_t1_10x9x32 (
     input  [ 9:0] a_i,
     input  [ 8:0] b_i,
-    input  [ 1:0] acc_fir_i,
+    input  [ 3:0] acc_fir_i,
     output [18:0] z_o,
     output [ 8:0] dly_b_o,
 
