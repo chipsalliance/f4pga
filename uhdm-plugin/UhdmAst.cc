@@ -1086,15 +1086,28 @@ AST::AstNode *UhdmAst::process_value(vpiHandle obj_h)
         // so we are treating here UInt in the same way as if they would be Int
         case vpiUIntVal:
         case vpiIntVal: {
-            auto size = vpi_get(vpiSize, obj_h);
+            int size = -1;
+            bool is_signed = false;
+            // Surelog sometimes report size as part of vpiTypespec (e.g. int_typespec)
+            // if it is the case, we need to set size to the left_range of first packed range
+            visit_one_to_one({vpiTypespec}, obj_h, [&](AST::AstNode *node) {
+                if (node && node->attributes.count(UhdmAst::packed_ranges()) && node->attributes[UhdmAst::packed_ranges()]->children.size() &&
+                    node->attributes[UhdmAst::packed_ranges()]->children[0]->children.size()) {
+                    size = node->attributes[UhdmAst::packed_ranges()]->children[0]->children[0]->integer;
+                }
+            });
+            if (size == -1) {
+                size = vpi_get(vpiSize, obj_h);
+            }
             // Surelog by default returns 64 bit numbers and stardard says that they shall be at least 32bits
             // yosys is assuming that int/uint is 32 bit, so we are setting here correct size
             // NOTE: it *shouldn't* break on explicite 64 bit const values, as they *should* be handled
             // above by vpi*StrVal
             if (size == 64) {
                 size = 32;
+                is_signed = true;
             }
-            auto c = AST::AstNode::mkconst_int(val.value.integer, true, size > 0 ? size : 32);
+            auto c = AST::AstNode::mkconst_int(val.value.integer, is_signed, size > 0 ? size : 32);
             if (size == 0 || size == -1)
                 c->is_unsized = true;
             return c;
@@ -1203,6 +1216,12 @@ static void add_or_replace_child(AST::AstNode *parent, AST::AstNode *child)
                      child->attributes[UhdmAst::unpacked_ranges()]->children.empty())) {
                     child->attributes[UhdmAst::unpacked_ranges()] = (*it)->attributes[UhdmAst::unpacked_ranges()]->clone();
                 }
+            }
+            // Surelog doesn't report correct sign value for param_assign nodes
+            // and only default vpiParameter node have correct sign value, so
+            // if we are overriding parameter, copy sign value from current node to the new node
+            if (((*it)->type == AST::AST_PARAMETER || (*it)->type == AST::AST_LOCALPARAM) && child->children.size() && (*it)->children.size()) {
+                child->children[0]->is_signed = (*it)->children[0]->is_signed;
             }
             delete *it;
             *it = child;
