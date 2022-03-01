@@ -1093,7 +1093,7 @@ AST::AstNode *UhdmAst::process_value(vpiHandle obj_h)
             visit_one_to_one({vpiTypespec}, obj_h, [&](AST::AstNode *node) {
                 if (node && node->attributes.count(UhdmAst::packed_ranges()) && node->attributes[UhdmAst::packed_ranges()]->children.size() &&
                     node->attributes[UhdmAst::packed_ranges()]->children[0]->children.size()) {
-                    size = node->attributes[UhdmAst::packed_ranges()]->children[0]->children[0]->integer;
+                    size = node->attributes[UhdmAst::packed_ranges()]->children[0]->children[0]->integer + 1;
                 }
             });
             if (size == -1) {
