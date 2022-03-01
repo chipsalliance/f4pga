@@ -841,30 +841,43 @@ static void simplify_format_string(AST::AstNode *current_node)
 
 static void simplify(AST::AstNode *current_node, AST::AstNode *parent_node)
 {
+    if (current_node->type == static_cast<int>(AST::AST_DOT))
+        current_node->type = AST::AST_IDENTIFIER;
+
+    auto dot_it =
+      std::find_if(current_node->children.begin(), current_node->children.end(), [](auto c) { return c->type == static_cast<int>(AST::AST_DOT); });
+    AST::AstNode *dot = (dot_it != current_node->children.end()) ? *dot_it : nullptr;
+
     AST::AstNode *expanded = nullptr;
-    AST::AstNode *dot = nullptr;
-    for (auto c : current_node->children) {
-        if (c->type == static_cast<int>(AST::AST_DOT) && expanded == nullptr) {
-            dot = c;
-            break;
-        }
-    }
     if (dot) {
         if (!AST_INTERNAL::current_scope.count(current_node->str)) {
             // for accessing elements currently unsupported with AST_DOT
             // fallback to "." notation
+            AST::AstNode *prefix_node = nullptr;
+            AST::AstNode *parent_node = current_node;
             while (dot && !dot->str.empty()) {
-                current_node->str += "." + dot->str.substr(1);
-                if (!dot->children.empty()) {
-                    dot = dot->children[0];
+                // it is not possible for AST_RANGE to be after AST::DOT (see process_hier_path function)
+                if (parent_node->children[0]->type == AST::AST_RANGE) {
+                    if (parent_node->children[1]->type == AST::AST_RANGE)
+                        log_error("Multirange in AST_DOT is currently unsupported\n");
+
+                    simplify(dot, nullptr);
+                    AST::AstNode *range_const = parent_node->children[0]->children[0];
+                    prefix_node = new AST::AstNode(AST::AST_PREFIX, range_const->clone(), dot->clone());
+                    break;
                 } else {
-                    dot = nullptr;
+                    current_node->str += "." + dot->str.substr(1);
+                    dot_it =
+                      std::find_if(dot->children.begin(), dot->children.end(), [](auto c) { return c->type == static_cast<int>(AST::AST_DOT); });
+                    parent_node = dot;
+                    dot = (dot_it != dot->children.end()) ? *dot_it : nullptr;
                 }
             }
-            for (auto cc : current_node->children) {
-                delete cc;
+            current_node->delete_children();
+            if (prefix_node != nullptr) {
+                current_node->type = AST::AST_PREFIX;
+                current_node->children = prefix_node->children;
             }
-            current_node->children.clear();
         } else {
             auto wire_node = AST_INTERNAL::current_scope[current_node->str];
             // make sure wire_node is already simplified
