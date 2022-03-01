@@ -5,8 +5,8 @@
 # ----------------------------------------------------------------------------- #
 
 import os
-from sf_common import *
-from sf_module import *
+from f4pga.sf_common import *
+from f4pga.sf_module import *
 
 # ----------------------------------------------------------------------------- #
 
@@ -27,33 +27,33 @@ def place_constraints_file(ctx: ModuleContext):
     if not p:
         dummy = True
         p = file_noext(ctx.takes.eblif) + '.place'
-    
+
     return p, dummy
 
 class PlaceModule(Module):
     def map_io(self, ctx: ModuleContext):
         mapping = {}
         p, _ = place_constraints_file(ctx)
-        
+
         mapping['place'] = default_output_name(p)
         return mapping
-    
+
     def execute(self, ctx: ModuleContext):
         place_constraints, dummy = place_constraints_file(ctx)
         place_constraints = os.path.realpath(place_constraints)
         if dummy:
             with open(place_constraints, 'wb') as f:
                 f.write(b'')
-        
+
         build_dir = os.path.dirname(ctx.takes.eblif)
 
         vpr_options = ['--fix_clusters', place_constraints]
-        
+
         yield 'Running VPR...'
         vprargs = VprArgs(ctx.share, ctx.takes.eblif, ctx.values,
                           sdc_file=ctx.takes.sdc, vpr_extra_opts=vpr_options)
         vpr('place', vprargs, cwd=build_dir)
-        
+
         # VPR names output on its own. If user requested another name, the
         # output file should be moved.
         # TODO: This extends the set of names that would cause collisions.

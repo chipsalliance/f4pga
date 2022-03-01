@@ -1,8 +1,8 @@
 import os
 import json
 
-from sf_common import file_noext, ResolutionEnv, deep
-from sf_stage import Stage
+from f4pga.sf_common import file_noext, ResolutionEnv, deep
+from f4pga.sf_stage import Stage
 from copy import copy
 
 _realpath_deep = deep(os.path.realpath)
@@ -37,22 +37,22 @@ def _get_ov_dict(dname: str, flow: dict,
             d = _get_lazy_dict(platform_dict, dname)
     else:
         d = _get_lazy_dict(flow, dname)
-    
+
     return d
 
 def _get_dep_dict(flow: dict,
                   platform: 'str | None' = None, stage: 'str | None' = None):
-    return _get_ov_dict('dependencies', flow, platform, stage) 
+    return _get_ov_dict('dependencies', flow, platform, stage)
 
 def _get_vals_dict(flow: dict,
                    platform: 'str | None' = None, stage: 'str | None' = None):
-    return _get_ov_dict('values', flow, platform, stage) 
+    return _get_ov_dict('values', flow, platform, stage)
 
 def _add_ov(ov_dict_getter, failstr_constr, flow_cfg: dict, name: str,
             values: list, platform: 'str | None' = None,
             stage: 'str | None' = None) -> bool:
         d = ov_dict_getter(flow_cfg, platform, stage)
-        
+
         deps = d.get(name)
         if type(deps) is list:
             deps += values
@@ -61,7 +61,7 @@ def _add_ov(ov_dict_getter, failstr_constr, flow_cfg: dict, name: str,
         else:
             print(failstr_constr(name))
             return False
-        
+
         return True
 
 def _rm_ov_by_values(ov_dict_getter, notset_str_constr, notlist_str_constr,
@@ -70,7 +70,7 @@ def _rm_ov_by_values(ov_dict_getter, notset_str_constr, notlist_str_constr,
                      stage: 'str | None' = None) -> bool:
     values_to_remove = set(vals)
     d = ov_dict_getter(flow, platform, stage)
-    
+
     vallist: list = d.get(name)
     if type(vallist) is list:
         d[name] = [val for val in vallist if val not in values_to_remove]
@@ -80,7 +80,7 @@ def _rm_ov_by_values(ov_dict_getter, notset_str_constr, notlist_str_constr,
     else:
         print(notlist_str_constr(name))
         return False
-    
+
     return True
 
 
@@ -93,14 +93,14 @@ def _rm_ov_by_idx(ov_dict_getter, notset_str_constr, notlist_str_constr,
     if len(idcs) == 0:
         print(f'Index list is emtpy!')
         return False
-    
+
     d = ov_dict_getter(flow, platform, stage)
     vallist: list = d.get(name)
     if type(vallist) is list:
         if idcs[0] >= len(vallist) or idcs[len(idcs) - 1] < 0:
             print(f'Index out of range (max: {len(vallist)}!')
             return False
-        
+
         for idx in idcs:
             vallist.pop(idx)
     elif vallist is None:
@@ -109,7 +109,7 @@ def _rm_ov_by_idx(ov_dict_getter, notset_str_constr, notlist_str_constr,
     else:
         print(notlist_str_constr(name))
         return False
-    
+
     return True
 
 def _get_ovs_raw(dict_name: str, flow_cfg,
@@ -125,7 +125,7 @@ def _get_ovs_raw(dict_name: str, flow_cfg,
             stage_deps = flow_cfg[platform][stage].get(dict_name)
             if stage_deps is not None:
                 vals.update(stage_deps)
-    
+
     return vals
 
 def _remove_dependencies_by_values(flow: dict, name: str, deps: list,
@@ -206,12 +206,12 @@ class FlowDefinition:
         global_vals = flow_def.get('values')
         if global_vals is not None:
             self.r_env.add_values(global_vals)
-        
+
         stages_d = flow_def['stages']
         modopts_d = flow_def.get('stage_options')
         if modopts_d is None:
             modopts_d = {}
-        
+
         for stage_name, modstr in stages_d.items():
             opts = modopts_d.get(stage_name)
             self.stages[stage_name] = Stage(stage_name, modstr, opts)
@@ -241,7 +241,7 @@ class ProjectFlowConfig:
         for platform, _ in self.flow_cfg.items():
             if not _is_kword(platform):
                 yield platform
-    
+
     def add_platform(self, device: str) -> bool:
         d = self.flow_cfg.get(device)
         if d:
@@ -264,7 +264,7 @@ class ProjectFlowConfig:
 
     def get_default_target(self, platform: str) -> 'str | None':
         return self.flow_cfg[platform].get('default_target')
-    
+
     def get_stage_r_env(self, platform: str, stage: str) -> ResolutionEnv:
         r_env = self._cache_platform_r_env(platform)
 
@@ -272,28 +272,28 @@ class ProjectFlowConfig:
         stage_values = stage_cfg.get('values')
         if stage_values:
             r_env.add_values(stage_values)
-        
+
         return r_env
-    
+
     """ Get dependencies without value resolution applied """
     def get_dependencies_raw(self, platform: 'str | None' = None):
         return _get_ovs_raw('dependencies', self.flow_cfg, platform, None)
-    
+
     """ Get values without value resolution applied """
     def get_values_raw(self, platform: 'str | None' = None,
                        stage: 'str | None' = None):
         return _get_ovs_raw('values', self.flow_cfg, platform, stage)
-    
+
     def get_stage_value_overrides(self, platform: str, stage: str):
         stage_cfg = self.flow_cfg[platform].get(stage)
         if stage_cfg is None:
             return {}
-        
+
         stage_vals_ovds = stage_cfg.get('values')
         if stage_vals_ovds is None:
             return {}
         return stage_vals_ovds
-    
+
     def get_dependency_platform_overrides(self, platform: str):
         platform_ovds = self.flow_cfg[platform].get('dependencies')
         if platform_ovds is None:
@@ -314,17 +314,17 @@ class FlowConfig:
         self.r_env.add_values(platform_vals)
         self.stages = platform_def.stages
         self.platform = platform
-        
+
         raw_project_deps = project_config.get_dependencies_raw(platform)
 
         self.dependencies_explicit = \
             _realpath_deep(self.r_env.resolve(raw_project_deps))
-        
+
         for stage_name, stage in platform_def.stages.items():
             project_val_ovds = \
                 project_config.get_stage_value_overrides(platform, stage_name)
             stage.value_overrides.update(project_val_ovds)
-    
+
     def get_dependency_overrides(self):
         return self.dependencies_explicit
 
@@ -332,9 +332,9 @@ class FlowConfig:
         stage = self.stages[stage_name]
         r_env = copy(self.r_env)
         r_env.add_values(stage.value_overrides)
-        
+
         return r_env
-    
+
     def get_stage(self, stage_name: str) -> Stage:
         return self.stages[stage_name]
 
@@ -345,7 +345,7 @@ class FlowConfigException(Exception):
     def __init__(self, path: str, message: str):
         self.path = path
         self.message = message
-    
+
     def __str__(self) -> str:
         return f'Error in config `{self.path}: {self.message}'
 
@@ -356,5 +356,5 @@ def open_project_flow_cfg(path: str) -> ProjectFlowConfig:
     with open(path, 'r') as flow_cfg_file:
         flow_cfg_json = flow_cfg_file.read()
     cfg.flow_cfg = json.loads(flow_cfg_json)
-    
+
     return cfg

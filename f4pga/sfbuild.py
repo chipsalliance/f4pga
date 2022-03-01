@@ -21,30 +21,30 @@ that uses sfbuild. Iontains project-specific definitions needed within the flow,
 such as list of source code files.
 """
 
+from pathlib import Path
 from argparse import Namespace
 import os
 from os import environ
 import json
 from typing import Iterable
 from colorama import Fore, Style
-from sf_common import ResolutionEnv, fatal, scan_modules, set_verbosity_level, \
+from f4pga.sf_common import ResolutionEnv, fatal, scan_modules, set_verbosity_level, \
                       sfprint
-from sf_module import *
-from sf_cache import SymbiCache
-import sf_ugly
-from sf_flow_config import ProjectFlowConfig, FlowConfig, FlowDefinition, \
+from f4pga.sf_module import *
+from f4pga.sf_cache import SymbiCache
+import f4pga.sf_ugly as sf_ugly
+from f4pga.sf_flow_config import ProjectFlowConfig, FlowConfig, FlowDefinition, \
                            open_project_flow_cfg, verify_platform_name, \
                            verify_stage
-from sf_module_runner import *
-from sf_module_inspector import get_module_info
-from sf_stage import Stage
-from sf_argparse import setup_argparser, get_cli_flow_config
+from f4pga.sf_module_runner import *
+from f4pga.sf_module_inspector import get_module_info
+from f4pga.sf_stage import Stage
+from f4pga.sf_argparse import setup_argparser, get_cli_flow_config
 
 SYMBICACHEPATH = '.symbicache'
 
-mypath = os.path.realpath(os.sys.argv[0])
-mypath = os.path.dirname(mypath)
-binpath = os.path.realpath(os.path.join(mypath, '..'))
+binpath = os.path.realpath(os.path.join(os.path.dirname(os.path.realpath(os.sys.argv[0])), '..'))
+mypath = str(Path(__file__).resolve().parent)
 
 share_dir_path = os.path.realpath(f"{environ.get('INSTALL_DIR', '/usr/local')}/xc7/install/share/symbiflow")
 
@@ -624,7 +624,7 @@ def cmd_show_dependencies(args: Namespace):
 
     set_verbosity_level(-1)
 
-if __name__ == '__main__':
+def main():
     parser = setup_argparser()
     args = parser.parse_args()
 
@@ -640,3 +640,6 @@ if __name__ == '__main__':
 
     sfprint(0, 'Please use a command.\nUse `--help` flag to learn more.')
     sfbuild_done()
+
+if __name__ == '__main__':
+    main()

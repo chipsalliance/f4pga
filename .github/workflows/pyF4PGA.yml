@@ -6,7 +6,8 @@ on:
 
 jobs:
 
-  Run-tests:
+
+  Test-pip:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -39,14 +40,20 @@ jobs:
 
       - name: Test py4FPGA build
         run: |
-          cd f4pga-examples
-
           export INSTALL_DIR=/opt/f4pga
           export PATH="$INSTALL_DIR/xc7/install/bin:$PATH";
           source "$INSTALL_DIR/xc7/conda/etc/profile.d/conda.sh"
 
           conda activate xc7
 
-          pip install -r ../f4pga/requirements.txt
+          cd f4pga
+          pip install --use-feature=in-tree-build .
+          cd ..
 
-          PYTHONPATH=$(pwd)/../f4pga python3 ../f4pga/sfbuild.py build --flow ../.github/sftest.json -t bitstream
+          cd f4pga-examples
+          f4pga build --flow ../.github/sftest.json -t bitstream
+
+      - name: Test py4FPGA (PYTHONPATH)
+        run: |
+          PYTHONPATH=$(pwd) python3 f4pga/sfbuild.py
+          PYTHONPATH=$(pwd) python3 f4pga/sfbuild.py -h

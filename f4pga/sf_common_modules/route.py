@@ -6,27 +6,27 @@
 
 import os
 import shutil
-from sf_common import *
-from sf_module import *
+from f4pga.sf_common import *
+from f4pga.sf_module import *
 
 # ----------------------------------------------------------------------------- #
 
 def route_place_file(eblif: str):
-    return file_noext(eblif) + '.route' 
+    return file_noext(eblif) + '.route'
 
 class RouteModule(Module):
     def map_io(self, ctx: ModuleContext):
         return {
             'route': route_place_file(ctx.takes.eblif)
         }
-    
+
     def execute(self, ctx: ModuleContext):
         build_dir = os.path.dirname(ctx.takes.eblif)
 
         vpr_options = []
         if ctx.values.vpr_options:
             vpr_options = options_dict_to_list(ctx.values.vpr_options)
-        
+
 
         vprargs = VprArgs(ctx.share, ctx.takes.eblif, ctx.values,
                           sdc_file=ctx.takes.sdc)
@@ -39,7 +39,7 @@ class RouteModule(Module):
 
         yield 'Saving log...'
         save_vpr_log('route.log', build_dir=build_dir)
-        
+
     def __init__(self, _):
         self.name = 'route'
         self.no_of_phases = 2

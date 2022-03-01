@@ -4,8 +4,8 @@ from contextlib import contextmanager
 import importlib
 import importlib.util
 import os
-from sf_module import Module, ModuleContext, get_mod_metadata
-from sf_common import ResolutionEnv, deep, sfprint
+from f4pga.sf_module import Module, ModuleContext, get_mod_metadata
+from f4pga.sf_common import ResolutionEnv, deep, sfprint
 from colorama import Fore, Style
 
 _realpath_deep = deep(os.path.realpath)

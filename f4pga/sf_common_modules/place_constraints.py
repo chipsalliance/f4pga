@@ -5,8 +5,8 @@
 # ----------------------------------------------------------------------------- #
 
 import os
-from sf_common import *
-from sf_module import *
+from f4pga.sf_common import *
+from f4pga.sf_module import *
 
 # ----------------------------------------------------------------------------- #
 
@@ -19,9 +19,9 @@ class PlaceConstraintsModule(Module):
     def execute(self, ctx: ModuleContext):
         arch_dir = os.path.join(ctx.share, 'arch')
         arch_def = os.path.join(arch_dir, ctx.values.device, 'arch.timing.xml')
-        
+
         database = sub('prjxray-config').decode().replace('\n', '')
-        
+
         yield 'Generating .place...'
 
         extra_opts: 'list[str]'
@@ -38,7 +38,7 @@ class PlaceConstraintsModule(Module):
                       '--db_root', database,
                       '--part', ctx.values.part_name]
                       + extra_opts))
-        
+
         yield 'Saving place constraint data...'
         with open(ctx.outputs.place_constraints, 'wb') as f:
             f.write(data)

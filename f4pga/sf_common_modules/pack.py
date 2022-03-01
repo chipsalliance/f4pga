@@ -6,8 +6,8 @@
 
 import os
 import re
-from sf_common import *
-from sf_module import *
+from f4pga.sf_common import *
+from f4pga.sf_module import *
 
 # ----------------------------------------------------------------------------- #
 
@@ -24,7 +24,7 @@ class PackModule(Module):
             'util_rpt': os.path.join(build_dir, DEFAULT_UTIL_RPT),
             'timing_rpt': os.path.join(build_dir, DEFAULT_TIMING_RPT)
         }
-    
+
     def execute(self, ctx: ModuleContext):
         vpr_args = VprArgs(ctx.share, ctx.takes.eblif, ctx.values,
                            sdc_file=ctx.takes.sdc)
@@ -42,14 +42,14 @@ class PackModule(Module):
             shutil.move(og_log, ctx.outputs.pack_log)
         else:
             os.remove(og_log)
-        
+
         if ctx.outputs.timing_rpt:
             shutil.move(os.path.join(build_dir, DEFAULT_TIMING_RPT),
                         ctx.outputs.timing_rpt)
         if ctx.outputs.util_rpt:
             shutil.move(os.path.join(build_dir, DEFAULT_UTIL_RPT),
                         ctx.outputs.util_rpt)
-    
+
     def __init__(self, _):
         self.name = 'pack'
         self.no_of_phases = 2

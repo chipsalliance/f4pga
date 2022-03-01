@@ -12,8 +12,8 @@ lazily create the directories if they become necessary. """
 # ----------------------------------------------------------------------------- #
 
 import os
-from sf_common import *
-from sf_module import *
+from f4pga.sf_common import *
+from f4pga.sf_module import *
 
 # ----------------------------------------------------------------------------- #
 
@@ -22,13 +22,13 @@ class MkDirsModule(Module):
 
     def map_io(self, ctx: ModuleContext):
         return ctx.r_env.resolve(self.deps_to_produce)
-    
+
     def execute(self, ctx: ModuleContext):
         outputs = vars(ctx.outputs)
         for _, path in outputs.items():
             yield f'Creating directory {path}...'
             os.makedirs(path, exist_ok=True)
-    
+
     def __init__(self, params):
         self.name = 'mkdirs'
         self.no_of_phases = len(params) if params else 0

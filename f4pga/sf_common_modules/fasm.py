@@ -5,8 +5,8 @@
 # ----------------------------------------------------------------------------- #
 
 import os
-from sf_common import *
-from sf_module import *
+from f4pga.sf_common import *
+from f4pga.sf_module import *
 
 # ----------------------------------------------------------------------------- #
 
@@ -31,10 +31,10 @@ class FasmModule(Module):
         return {
             'fasm': fasm_output_path(build_dir, ctx.values.top)
         }
-    
-    def execute(self, ctx: ModuleContext):        
+
+    def execute(self, ctx: ModuleContext):
         build_dir = os.path.dirname(ctx.takes.eblif)
-        
+
         vprargs = VprArgs(ctx.share, ctx.takes.eblif, ctx.values)
 
         optional = []
@@ -48,12 +48,12 @@ class FasmModule(Module):
                '--device', vprargs.device_name,
                '--read_rr_graph', vprargs.rr_graph
         ] + vprargs.optional
-        
+
         if get_verbosity_level() >= 2:
             yield 'Generating FASM...\n           ' + ' '.join(s)
         else:
             yield 'Generating FASM...'
-        
+
         sub(*s, cwd=build_dir)
 
         default_fasm_output_name = fasm_output_path(build_dir, ctx.values.top)
@@ -65,7 +65,7 @@ class FasmModule(Module):
             concat_fasm(ctx.outputs.fasm, ctx.takes.fasm_extra, ctx.outputs.fasm)
         else:
             yield 'No extra FASM to append'
-    
+
     def __init__(self, _):
         self.name = 'fasm'
         self.no_of_phases = 2

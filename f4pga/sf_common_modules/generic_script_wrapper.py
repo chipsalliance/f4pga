@@ -4,7 +4,7 @@
 
 """
 This module is intended for wrapping simple scripts without rewriting them as
-an sfbuild module. This is mostly to maintain compatibility with workflows 
+an sfbuild module. This is mostly to maintain compatibility with workflows
 that do not use sfbuild and instead rely on legacy scripts.
 
 Accepted module parameters:
@@ -24,7 +24,7 @@ Accepted module parameters:
     dependency alsogets two extra values associated with it:
     `:dependency_name[noext]`, which contains the path to the dependency the
     extension with anything after last "." removed and `:dependency_name[dir]` which
-    contains directory paths of the dependency. This is useful for deriving an output 
+    contains directory paths of the dependency. This is useful for deriving an output
     name from the input.
   * `meta` (string, optional): Description of the output dependency.
 * `inputs` (dict[string -> string | bool], mandatory):
@@ -49,8 +49,8 @@ import os
 import shutil
 import re
 
-from sf_common import *
-from sf_module import *
+from f4pga.sf_common import *
+from f4pga.sf_module import *
 
 # ----------------------------------------------------------------------------- #
 
@@ -106,7 +106,7 @@ def _get_input_references(input: str) -> InputReferences:
             refs.dependencies.add(dep_name)
         else:
             refs.values.add(match_str)
-    
+
     return refs
 
 
@@ -146,14 +146,14 @@ class GenericScriptWrapperModule(Module):
         for dep, _, out_path in self.file_outputs:
             out_path_resolved = ctx.r_env.resolve(out_path, final=True)
             outputs[dep] = out_path_resolved
-        
+
         if self.stdout_target:
             out_path_resolved = \
                 ctx.r_env.resolve(self.stdout_target[1], final=True)
             outputs[self.stdout_target[0]] = out_path_resolved
-        
+
         return outputs
-    
+
     def execute(self, ctx: ModuleContext):
         _add_extra_values_to_env(ctx)
 
@@ -163,9 +163,9 @@ class GenericScriptWrapperModule(Module):
             + self.get_args(ctx)
         if self.interpreter:
             sub_args = [ctx.r_env.resolve(self.interpreter, final=True)] + sub_args
-        
+
         sub_env = self.get_env(ctx)
-        
+
         # XXX: This may produce incorrect string if arguments contains whitespace
         #      characters
         cmd = ' '.join(sub_args)
@@ -174,7 +174,7 @@ class GenericScriptWrapperModule(Module):
             yield f'Running script...\n           {cmd}'
         else:
             yield f'Running an externel script...'
-        
+
         data = sub(*sub_args, cwd=cwd, env=sub_env)
 
         yield 'Writing outputs...'
@@ -182,7 +182,7 @@ class GenericScriptWrapperModule(Module):
             target = ctx.r_env.resolve(self.stdout_target[1], final=True)
             with open(target, 'wb') as f:
                 f.write(data)
-        
+
         for _, file, target in self.file_outputs:
             file = ctx.r_env.resolve(file, final=True)
             target = ctx.r_env.resolve(target, final=True)
@@ -199,15 +199,15 @@ class GenericScriptWrapperModule(Module):
             meta = output_def.get('meta')
             if meta is str:
                 self.prod_meta[dname] = meta
-            
+
             mode = output_def.get('mode')
             if type(mode) is not str:
                 raise Exception(f'Output mode for `{dep_name}` is not specified')
-            
+
             target = output_def.get('target')
             if type(target) is not str:
                 raise Exception('`target` field is not specified')
-            
+
             if mode == 'file':
                 file = output_def.get('file')
                 if type(file) is not str:
@@ -217,7 +217,7 @@ class GenericScriptWrapperModule(Module):
                 if self.stdout_target is not None:
                     raise Exception('stdout output is already specified')
                 self.stdout_target = dname, target
-    
+
     # A very functional approach
     def _init_inputs(self, input_defs):
         positional_args = []
@@ -267,7 +267,7 @@ class GenericScriptWrapperModule(Module):
                     if val != '':
                         push_env(val)
                 get_env = _tailcall1(get_env, push_q)
-        
+
         def get_all_args(ctx: ModuleContext):
             nonlocal get_args, positional_args, named_args
 
@@ -277,14 +277,14 @@ class GenericScriptWrapperModule(Module):
             pos =  [ a for _, a in positional_args]
 
             return named_args + pos
-        
+
         def get_all_env(ctx: ModuleContext):
             nonlocal get_env, env_vars
             get_env(ctx)
             if len(env_vars.items()) == 0:
                 return None
             return env_vars
-        
+
         setattr(self, 'get_args', get_all_args)
         setattr(self, 'get_env', get_all_env)
 
@@ -292,7 +292,7 @@ class GenericScriptWrapperModule(Module):
             self.takes.append(dep)
         for val in refs.values:
             self.values.append(val)
-                    
+
     def __init__(self, params):
         self.name = _generate_stage_name(params)
         self.no_of_phases = 2

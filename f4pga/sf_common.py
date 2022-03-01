@@ -27,7 +27,7 @@ def with_qualifier(name: str, q: str) -> str:
 _sfbuild_module_collection_name_to_path = {}
 def scan_modules(mypath: str):
     global _sfbuild_module_collection_name_to_path
-    
+
     sfbuild_home = mypath
     sfbuild_home_dirs = os.listdir(sfbuild_home)
     sfbuild_module_dirs = \
@@ -66,7 +66,7 @@ def deep(fun):
             return [d(p) for p in paths];
         elif type(paths) is dict:
             return dict([(k, d(p)) for k, p in paths.items()])
-    
+
     return d
 
 def file_noext(path: str):
@@ -99,7 +99,7 @@ class VprArgs:
         self.device_name = values.vpr_grid_layout_name
         self.eblif = os.path.realpath(eblif)
         if values.vpr_options is not None:
-            self.optional = options_dict_to_list(values.vpr_options) 
+            self.optional = options_dict_to_list(values.vpr_options)
         else:
             self.optional = []
         if vpr_extra_opts is not None:
@@ -159,7 +159,7 @@ def options_dict_to_list(opt_dict: dict):
     Converts a dictionary of named options for CLI program to a list.
     Example: { "option_name": "value" } -> [ "--option_name", "value" ]
     """
-    
+
     opts = []
     for key, val in opt_dict.items():
         opts.append('--' + key)
@@ -186,7 +186,7 @@ def fatal(code, message):
     with a given return code.
     """
 
-    print(f'[FATAL ERROR]: {message}')
+    raise(Exception(f'[FATAL ERROR]: {message}'))
     exit(code)
 
 class ResolutionEnv:
@@ -202,7 +202,7 @@ class ResolutionEnv:
 
     def __init__(self, values={}):
         self.values = values
-    
+
     def __copy__(self):
         return ResolutionEnv(self.values.copy())
 
@@ -251,7 +251,7 @@ verbosity_level = 0
 
 def sfprint(verbosity: int, *args):
     """ Print with regards to currently set verbosity level """
-    
+
     global verbosity_level
     if verbosity <= verbosity_level:
         print(*args)

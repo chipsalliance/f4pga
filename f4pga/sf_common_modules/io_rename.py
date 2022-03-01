@@ -27,9 +27,9 @@ Accepted module parameters:
 
 # ----------------------------------------------------------------------------- #
 
-from sf_common import *
-from sf_module import *
-from sf_module_runner import get_module
+from f4pga.sf_common import *
+from f4pga.sf_module import *
+from f4pga.sf_module_runner import get_module
 
 # ----------------------------------------------------------------------------- #
 
@@ -64,7 +64,7 @@ def _switch_entries(l: 'list[str]', renames: 'dict[str, str]') -> 'list[str]':
         else:
             newl.append(r if r is not None else e)
     return newl
-    
+
 def _generate_stage_name(name: str):
     return f'{name}-io_renamed'
 
@@ -83,7 +83,7 @@ class IORenameModule(Module):
         newctx.values = _switchback_attrs(ctx.values, self.rename_values)
         r = self.module.map_io(newctx)
         return _switch_keys(r, self.rename_produces)
-    
+
     def execute(self, ctx: ModuleContext):
         newctx = ctx.shallow_copy()
         newctx.takes = _switchback_attrs(ctx.takes, self.rename_takes)
@@ -91,7 +91,7 @@ class IORenameModule(Module):
         newctx.outputs = _switchback_attrs(ctx.produces, self.rename_produces)
         print(newctx.takes)
         return self.module.execute(newctx)
-    
+
     def __init__(self, params):
         mod_path = resolve_modstr(params["module"])
         module_class = get_module(mod_path)

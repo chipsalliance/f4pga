@@ -19,6 +19,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from pathlib import Path
+from typing import List
 
 from setuptools import setup as setuptools_setup
 
@@ -27,6 +28,28 @@ F4PGA_FAM = environ.get('F4PGA_FAM', 'xc7')
 
 
 packagePath = Path(__file__).resolve().parent
+requirementsFile = packagePath / "requirements.txt"
+
+
+# Read requirements file and add them to package dependency list
+def get_requirements(file: Path) -> List[str]:
+    requirements = []
+    with file.open("r") as fh:
+        for line in fh.read().splitlines():
+            if line.startswith("#") or line == "":
+                continue
+            elif line.startswith("-r"):
+                # Remove the first word/argument (-r)
+                filename = " ".join(line.split(" ")[1:])
+                requirements += get_requirements(file.parent / filename)
+            elif line.startswith("https"):
+                # Convert 'URL#NAME' to 'NAME @ URL'
+                splitItems = line.split("#")
+                requirements.append("{} @ {}".format(splitItems[1], splitItems[0]))
+            else:
+                requirements.append(line)
+    return requirements
+
 
 sf = "symbiflow"
 shwrappers = "f4pga.wrappers.sh.__init__"
@@ -54,15 +77,21 @@ setuptools_setup(
     description="F4PGA.",
     url="https://github.com/chipsalliance/f4pga",
     packages=[
+        "f4pga",
+        "f4pga.sf_common_modules",
         "f4pga.wrappers.sh",
     ],
     package_dir={"f4pga": "."},
     package_data={
+        'f4pga': ['platforms/*.json'],
         'f4pga.wrappers.sh': ['xc7/*.f4pga.sh', 'quicklogic/*.f4pga.sh']
     },
     classifiers=[],
     python_requires='>=3.6',
+    install_requires=list(set(get_requirements(requirementsFile))),
     entry_points={
-        "console_scripts": wrapper_entrypoints
+        "console_scripts": [
+            "f4pga = f4pga.sfbuild:main",
+        ] + wrapper_entrypoints
     },
 )
