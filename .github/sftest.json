@@ -5,7 +5,7 @@
     },
     "dependencies": {
         "sources": [
-            "counter.v"
+            "xc7/counter_test/counter.v"
         ],
         "synth_log": "synth.log",
         "pack_log": "pack.log"
