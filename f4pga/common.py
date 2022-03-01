@@ -31,9 +31,9 @@ def scan_modules(mypath: str):
     sfbuild_home = mypath
     sfbuild_home_dirs = os.listdir(sfbuild_home)
     sfbuild_module_dirs = \
-        [dir for dir in sfbuild_home_dirs if re.match('sf_.*_modules$', dir)]
+        [dir for dir in sfbuild_home_dirs if re.match('.*_modules$', dir)]
     _sfbuild_module_collection_name_to_path = \
-        dict([(re.match('sf_(.*)_modules$', moddir).groups()[0],
+        dict([(re.match('(.*)_modules$', moddir).groups()[0],
             os.path.join(sfbuild_home, moddir))
             for moddir in sfbuild_module_dirs])
 

@@ -6,8 +6,8 @@
 
 import os
 import shutil
-from f4pga.sf_common import *
-from f4pga.sf_module import *
+from f4pga.common import *
+from f4pga.module import *
 
 # ----------------------------------------------------------------------------- #
 

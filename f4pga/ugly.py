@@ -1,7 +1,7 @@
 """ The "ugly" module is dedicated for some *ugly* workarounds """
 
 import os
-from f4pga.sf_common import sub as common_sub
+from f4pga.common import sub as common_sub
 
 def noisy_warnings():
     """ Emit some noisy warnings """

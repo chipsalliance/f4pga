@@ -12,8 +12,8 @@ lazily create the directories if they become necessary. """
 # ----------------------------------------------------------------------------- #
 
 import os
-from f4pga.sf_common import *
-from f4pga.sf_module import *
+from f4pga.common import *
+from f4pga.module import *
 
 # ----------------------------------------------------------------------------- #
 

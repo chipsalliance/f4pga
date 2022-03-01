@@ -78,7 +78,7 @@ setuptools_setup(
     url="https://github.com/chipsalliance/f4pga",
     packages=[
         "f4pga",
-        "f4pga.sf_common_modules",
+        "f4pga.common_modules",
         "f4pga.wrappers.sh",
     ],
     package_dir={"f4pga": "."},

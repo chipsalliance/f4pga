@@ -1,8 +1,8 @@
 import os
 import json
 
-from f4pga.sf_common import file_noext, ResolutionEnv, deep
-from f4pga.sf_stage import Stage
+from f4pga.common import file_noext, ResolutionEnv, deep
+from f4pga.stage import Stage
 from copy import copy
 
 _realpath_deep = deep(os.path.realpath)

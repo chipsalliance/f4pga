@@ -2,7 +2,7 @@
 
 import abc
 from types import SimpleNamespace
-from f4pga.sf_common import *
+from f4pga.common import *
 from colorama import Fore, Style
 
 class Module:

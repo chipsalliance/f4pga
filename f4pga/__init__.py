@@ -28,18 +28,29 @@ from os import environ
 import json
 from typing import Iterable
 from colorama import Fore, Style
-from f4pga.sf_common import ResolutionEnv, fatal, scan_modules, set_verbosity_level, \
-                      sfprint
-from f4pga.sf_module import *
-from f4pga.sf_cache import SymbiCache
-import f4pga.sf_ugly as sf_ugly
-from f4pga.sf_flow_config import ProjectFlowConfig, FlowConfig, FlowDefinition, \
-                           open_project_flow_cfg, verify_platform_name, \
-                           verify_stage
-from f4pga.sf_module_runner import *
-from f4pga.sf_module_inspector import get_module_info
-from f4pga.sf_stage import Stage
-from f4pga.sf_argparse import setup_argparser, get_cli_flow_config
+
+from f4pga.common import (
+    ResolutionEnv,
+    fatal,
+    scan_modules,
+    set_verbosity_level,
+    sfprint
+)
+from f4pga.module import *
+from f4pga.cache import SymbiCache
+import f4pga.ugly as ugly
+from f4pga.flow_config import (
+    ProjectFlowConfig,
+    FlowConfig,
+    FlowDefinition,
+    open_project_flow_cfg,
+    verify_platform_name,
+    verify_stage
+)
+from f4pga.module_runner import *
+from f4pga.module_inspector import get_module_info
+from f4pga.stage import Stage
+from f4pga.argparser import setup_argparser, get_cli_flow_config
 
 SYMBICACHEPATH = '.symbicache'
 
@@ -462,7 +473,7 @@ def setup_resolution_env():
         'shareDir': share_dir_path,
         'binDir': os.path.realpath(os.path.join(share_dir_path, '../../bin'))
     })
-    r_env.add_values(sf_ugly.generate_values())
+    r_env.add_values(ugly.generate_values())
     return r_env
 
 def open_project_flow_config(path: str) -> ProjectFlowConfig:
