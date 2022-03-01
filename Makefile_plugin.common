@@ -56,14 +56,18 @@ DATA_DIR ?= $(shell $(YOSYS_CONFIG) --datdir)
 EXTRA_FLAGS ?=
 
 OBJS := $(patsubst %.cc,%.o,$(SOURCES))
+DEPS ?=
 
 all: $(NAME).so
 
-$(OBJS): %.o: %.cc
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(EXTRA_FLAGS) -c -o $@ $^
+$(OBJS): %.o: %.cc $(DEPS)
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(EXTRA_FLAGS) -c -o $@ $(filter %.cc, $^)
 
 $(NAME).so: $(OBJS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared -o $@ $^ $(LDLIBS)
+
+../pmgen.py:
+	@$(MAKE) -C .. pmgen.py
 
 install_plugin: $(NAME).so
 	install -D $< $(PLUGINS_DIR)/$<

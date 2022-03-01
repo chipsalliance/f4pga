@@ -269,6 +269,7 @@ struct SynthQuickLogicPass : public ScriptPass {
 
                 if (help_mode) {
                     run("wreduce t:$mul", "                (for qlf_k6n10f if not -no_dsp)");
+                    run("ql_dsp_macc", "                   (for qlf_k6n10f if not -no_dsp)");
                     run("techmap -map +/mul2dsp.v [...]", "(for qlf_k6n10f if not -no_dsp)");
                     run("chtype -set $mul t:$__soft_mul", "(for qlf_k6n10f if not -no_dsp)");
                     run("techmap -map +/quicklogic/" + family + "/dsp_map.v", "(for qlf_k6n10f if not -no_dsp)");
@@ -277,6 +278,8 @@ struct SynthQuickLogicPass : public ScriptPass {
                 } else if (!nodsp) {
 
                     run("wreduce t:$mul");
+                    run("ql_dsp_macc");
+
                     for (const auto &rule : dsp_rules) {
                         run(stringf("techmap -map +/mul2dsp.v "
                                     "-D DSP_A_MAXWIDTH=%zu -D DSP_B_MAXWIDTH=%zu "

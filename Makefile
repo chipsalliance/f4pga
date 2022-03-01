@@ -36,6 +36,9 @@ endef
 
 $(foreach plugin,$(PLUGIN_LIST),$(eval $(call install_plugin,$(plugin))))
 
+pmgen.py:
+	wget -nc -O $@ https://raw.githubusercontent.com/YosysHQ/yosys/master/passes/pmgen/pmgen.py
+
 plugins: $(PLUGINS)
 
 install: $(PLUGINS_INSTALL)
@@ -45,6 +48,7 @@ test: $(PLUGINS_TEST)
 plugins_clean: $(PLUGINS_CLEAN)
 
 clean:: plugins_clean
+	rm -rf pmgen.py
 
 CLANG_FORMAT ?= clang-format-8
 format:
