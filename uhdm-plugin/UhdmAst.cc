@@ -2589,6 +2589,14 @@ void UhdmAst::process_operation()
             current_node = nullptr;
             break;
         }
+        case vpiMinTypMaxOp: {
+            // ignore min and max and set only typ
+            log_assert(current_node->children.size() == 3);
+            auto tmp = current_node->children[1]->clone();
+            delete current_node;
+            current_node = tmp;
+            break;
+        }
         default: {
             delete current_node;
             current_node = nullptr;
