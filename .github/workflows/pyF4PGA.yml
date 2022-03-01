@@ -55,5 +55,5 @@ jobs:
 
       - name: Test py4FPGA (PYTHONPATH)
         run: |
-          PYTHONPATH=$(pwd) python3 f4pga/sfbuild.py
-          PYTHONPATH=$(pwd) python3 f4pga/sfbuild.py -h
+          PYTHONPATH=$(pwd) python3 f4pga/__init__.py
+          PYTHONPATH=$(pwd) python3 f4pga/__init__.py -h
