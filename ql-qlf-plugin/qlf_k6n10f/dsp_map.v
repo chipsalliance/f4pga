@@ -41,11 +41,7 @@ module \$__QL_MUL20X18 (input [19:0] A, input [17:0] B, output [37:0] Y);
         .shift_right_i      (6'd0),
         .round_i            (1'b0),
         .subtract_i         (1'b0),
-        .register_inputs_i  (1'b0),
-        .coeff_0_i          (20'd0),
-        .coeff_1_i          (20'd0),
-        .coeff_2_i          (20'd0),
-        .coeff_3_i          (20'd0)
+        .register_inputs_i  (1'b0)
     );
 
     assign Y = z;
@@ -87,11 +83,7 @@ module \$__QL_MUL10X9 (input [9:0] A, input [8:0] B, output [18:0] Y);
         .shift_right_i      (6'd0),
         .round_i            (1'b0),
         .subtract_i         (1'b0),
-        .register_inputs_i  (1'b0),
-        .coeff_0_i          (10'd0),
-        .coeff_1_i          (10'd0),
-        .coeff_2_i          (10'd0),
-        .coeff_3_i          (10'd0)
+        .register_inputs_i  (1'b0)
     );
 
     assign Y = z;
