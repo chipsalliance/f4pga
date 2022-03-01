@@ -841,9 +841,6 @@ static void simplify_format_string(AST::AstNode *current_node)
 
 static void simplify(AST::AstNode *current_node, AST::AstNode *parent_node)
 {
-    if (current_node->type == static_cast<int>(AST::AST_DOT))
-        current_node->type = AST::AST_IDENTIFIER;
-
     auto dot_it =
       std::find_if(current_node->children.begin(), current_node->children.end(), [](auto c) { return c->type == static_cast<int>(AST::AST_DOT); });
     AST::AstNode *dot = (dot_it != current_node->children.end()) ? *dot_it : nullptr;
@@ -861,6 +858,7 @@ static void simplify(AST::AstNode *current_node, AST::AstNode *parent_node)
                     if (parent_node->children[1]->type == AST::AST_RANGE)
                         log_error("Multirange in AST_DOT is currently unsupported\n");
 
+                    dot->type = AST::AST_IDENTIFIER;
                     simplify(dot, nullptr);
                     AST::AstNode *range_const = parent_node->children[0]->children[0];
                     prefix_node = new AST::AstNode(AST::AST_PREFIX, range_const->clone(), dot->clone());
