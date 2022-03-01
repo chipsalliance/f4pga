@@ -26,14 +26,20 @@ module dsp_t1_20x18x64 (
     input  [5:0]  shift_right_i,
     input         round_i,
     input         subtract_i,
-    input         register_inputs_i,
-    input  [19:0] coeff_0_i,
-    input  [19:0] coeff_1_i,
-    input  [19:0] coeff_2_i,
-    input  [19:0] coeff_3_i
+    input         register_inputs_i
 );
 
-    QL_DSP2 _TECHMAP_REPLACE_ (
+    parameter [19:0] COEFF_0 = 20'd0;
+    parameter [19:0] COEFF_1 = 20'd0;
+    parameter [19:0] COEFF_2 = 20'd0;
+    parameter [19:0] COEFF_3 = 20'd0;
+
+    QL_DSP2 # (
+        .COEFF_0            (COEFF_0),
+        .COEFF_1            (COEFF_1),
+        .COEFF_2            (COEFF_2),
+        .COEFF_3            (COEFF_3)
+    ) _TECHMAP_REPLACE_ (
         .a                  (a_i),
         .b                  (b_i),
         .acc_fir            (acc_fir_i),
@@ -54,11 +60,7 @@ module dsp_t1_20x18x64 (
         .shift_right        (shift_right_i),
         .round              (round_i),
         .subtract           (subtract_i),
-        .register_inputs    (register_inputs_i),
-        .coeff_0            (coeff_0_i),
-        .coeff_1            (coeff_1_i),
-        .coeff_2            (coeff_2_i),
-        .coeff_3            (coeff_3_i)
+        .register_inputs    (register_inputs_i)
     );
 
 endmodule
@@ -91,10 +93,20 @@ module dsp_t1_10x9x32 (
     input  [ 9:0] coeff_3_i
 );
 
+    parameter [9:0] COEFF_0 = 10'd0;
+    parameter [9:0] COEFF_1 = 10'd0;
+    parameter [9:0] COEFF_2 = 10'd0;
+    parameter [9:0] COEFF_3 = 10'd0;
+
     wire [37:0] z;
     wire [17:0] dly_b;
 
-    QL_DSP2 _TECHMAP_REPLACE_ (
+    QL_DSP2 # (
+        .COEFF_0            ({10'd0, COEFF_0}),
+        .COEFF_1            ({10'd0, COEFF_1}),
+        .COEFF_2            ({10'd0, COEFF_2}),
+        .COEFF_3            ({10'd0, COEFF_3})
+    ) _TECHMAP_REPLACE_ (
         .a                  ({10'd0, a_i}),
         .b                  ({ 9'd0, b_i}),
         .acc_fir            (acc_fir_i),
@@ -115,11 +127,7 @@ module dsp_t1_10x9x32 (
         .shift_right        (shift_right_i),
         .round              (round_i),
         .subtract           (subtract_i),
-        .register_inputs    (register_inputs_i),
-        .coeff_0            ({10'd0, coeff_0_i}),
-        .coeff_1            ({10'd0, coeff_1_i}),
-        .coeff_2            ({10'd0, coeff_2_i}),
-        .coeff_3            ({10'd0, coeff_3_i})
+        .register_inputs    (register_inputs_i)
     );
 
     assign z_o = z[18:0];

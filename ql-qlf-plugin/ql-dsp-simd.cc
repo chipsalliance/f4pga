@@ -76,6 +76,9 @@ struct QlDspSimdPass : public Pass {
       std::make_pair("z_o", "z"), std::make_pair("dly_b_o", "dly_b"),
     };
 
+    // DSP parameters
+    const std::vector<std::string> m_DspParams = {"COEFF_0", "COEFF_1", "COEFF_2", "COEFF_3"};
+
     // Source DSP cell type (SISD)
     const RTLIL::IdString m_SisdDspType = RTLIL::escape_id("dsp_t1_10x9x32");
     // Target DSP cell type for the SIMD mode
@@ -191,6 +194,17 @@ struct QlDspSimdPass : public Pass {
                         sigspec.append(getConnection(dsp_a));
                         sigspec.append(getConnection(dsp_b));
                         simd->setPort(dport, sigspec);
+                    }
+
+                    // Set parameters
+                    for (const auto &it : m_DspParams) {
+                        auto val_a = dsp_a->getParam(RTLIL::escape_id(it));
+                        auto val_b = dsp_b->getParam(RTLIL::escape_id(it));
+
+                        std::vector<RTLIL::State> bits;
+                        bits.insert(bits.end(), val_a.begin(), val_a.end());
+                        bits.insert(bits.end(), val_b.begin(), val_b.end());
+                        simd->setParam(RTLIL::escape_id(it), RTLIL::Const(bits));
                     }
 
                     // Enable the fractured mode by connecting the control
