@@ -24,3 +24,8 @@ jobs:
           PYTHONPATH=$(pwd)/f4pga python3 f4pga/sfbuild.py
 
           PYTHONPATH=$(pwd)/f4pga python3 f4pga/sfbuild.py -h
+
+      - name: Test py4FPGA build
+        run: |
+          make env
+          PYTHONPATH=$(pwd)/f4pga python3 f4pga/sfbuild.py build --platform xc7a50t -t bitstream
