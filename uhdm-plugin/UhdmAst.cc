@@ -1490,7 +1490,7 @@ void UhdmAst::process_module()
                 }
             });
             visit_one_to_many({vpiModule, vpiInterface, vpiTaskFunc, vpiParameter, vpiParamAssign, vpiPort, vpiNet, vpiArrayNet, vpiGenScopeArray,
-                               vpiContAssign, vpiProcess, vpiClockingBlock},
+                               vpiContAssign, vpiProcess, vpiClockingBlock, vpiAssertion},
                               obj_h, [&](AST::AstNode *node) {
                                   if (node) {
                                       if (node->type == AST::AST_ASSIGN && node->children.size() < 2)
@@ -3897,6 +3897,10 @@ AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
         if (!shared.no_assert)
             process_immediate_assert();
         break;
+    case vpiAssert:
+        if (!shared.no_assert)
+            process_unsupported_stmt(object);
+        break;
     case vpiHierPath:
         process_hier_path();
         break;
@@ -3934,6 +3938,9 @@ AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
         break;
     case vpiImmediateAssume:
         process_immediate_assume();
+        break;
+    case vpiAssume:
+        process_unsupported_stmt(object);
         break;
     case vpiWhile:
         process_while();
