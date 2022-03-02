@@ -948,7 +948,7 @@ module dsp_t1_sim # (
 
     // Shift right control
     wire [5:0] shift_d1 = register_inputs_i ? r_shift_d1 : shift_right_i;
-    wire [5:0] shift_d2 = output_select_i[1] ? r_shift_d2 : shift_right_i;
+    wire [5:0] shift_d2 = output_select_i[1] ? shift_d1 : r_shift_d2;
     //localparam SHIFT_SEL = {register_inputs_i, output_select_i[1]};
     //wire [5:0] shift_right = (SHIFT_SEL == 2'b00) ?   shift_right_i :
                              //(SHIFT_SEL == 2'b01) ?   r_shift_d1 :
