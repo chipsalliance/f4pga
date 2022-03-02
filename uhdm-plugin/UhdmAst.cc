@@ -1466,6 +1466,10 @@ void UhdmAst::process_module()
         if (shared.top_nodes.find(type) != shared.top_nodes.end()) {
             current_node = shared.top_nodes[type];
             shared.current_top_node = current_node;
+            auto process_it = std::find_if(current_node->children.begin(), current_node->children.end(),
+                                           [](auto node) { return node->type == AST::AST_INITIAL || node->type == AST::AST_ALWAYS; });
+            auto children_after_process = std::vector<AST::AstNode *>(process_it, current_node->children.end());
+            current_node->children.erase(process_it, current_node->children.end());
             visit_one_to_many({vpiModule, vpiInterface, vpiParameter, vpiParamAssign, vpiPort, vpiNet, vpiArrayNet, vpiTaskFunc, vpiGenScopeArray,
                                vpiContAssign, vpiVariables},
                               obj_h, [&](AST::AstNode *node) {
@@ -1473,6 +1477,8 @@ void UhdmAst::process_module()
                                       add_or_replace_child(current_node, node);
                                   }
                               });
+            current_node->children.insert(current_node->children.end(), children_after_process.begin(), children_after_process.end());
+
             auto it = current_node->attributes.find(UhdmAst::partial());
             if (it != current_node->attributes.end()) {
                 delete it->second;
