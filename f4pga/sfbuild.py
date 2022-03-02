@@ -23,6 +23,7 @@ such as list of source code files.
 
 from argparse import Namespace
 import os
+from os import environ
 import json
 from typing import Iterable
 from colorama import Fore, Style
@@ -45,7 +46,7 @@ mypath = os.path.realpath(os.sys.argv[0])
 mypath = os.path.dirname(mypath)
 binpath = os.path.realpath(os.path.join(mypath, '..'))
 
-share_dir_path = os.path.realpath(os.path.join(mypath, '../../share/symbiflow'))
+share_dir_path = os.path.realpath(f"{environ.get('INSTALL_DIR', '/usr/local')}/xc7/install/share/symbiflow")
 
 class DependencyNotProducedException(Exception):
     dep_name: str
@@ -54,7 +55,7 @@ class DependencyNotProducedException(Exception):
     def __init__(self, dep_name: str, provider: str):
         self.dep_name = dep_name
         self.provider = provider
-    
+
     def __str__(self) -> str:
         return f'Stage `{self.provider}` did not produce promised ' \
                f'dependency `{self.dep_name}`'
@@ -69,10 +70,10 @@ def platform_stages(platform_flow, r_env):
     for stage_name, modulestr in platform_flow['stages'].items():
         mod_opts = stage_options.get(stage_name) if stage_options else None
         yield Stage(stage_name, modulestr, mod_opts, r_env)
-        
+
 def req_exists(r):
     """ Checks whether a dependency exists on a drive. """
-    
+
     if type(r) is str:
         if not os.path.isfile(r) and not os.path.islink(r) \
                 and not os.path.isdir(r):
@@ -121,21 +122,21 @@ def prepare_stage_input(stage: Stage, platform_name: str, values: dict,
         paths = dep_paths.get(take.name)
         if paths: # Some takes may be not required
             takes[take.name] = paths
-    
+
     produces = {}
     for prod in stage.produces:
         if dep_paths.get(prod.name):
             produces[prod.name] = dep_paths[prod.name]
         elif config_paths.get(prod.name):
             produces[prod.name] = config_paths[prod.name]
-    
+
     stage_mod_cfg = {
         'takes': takes,
         'produces': produces,
         'values': values,
         'platform': platform_name,
     }
-    
+
     return stage_mod_cfg
 
 def update_dep_statuses(paths, consumer: str, symbicache: SymbiCache):
@@ -154,7 +155,7 @@ def dep_differ(paths, consumer: str, symbicache: SymbiCache):
     Check if a dependency differs from its last version, lack of dependency is
     treated as "differs"
     """
-    
+
     if type(paths) is str:
         s = symbicache.get_status(paths, consumer)
         if s == 'untracked':
@@ -198,7 +199,7 @@ class Flow:
 
     # Dependendecy to build
     target: str
-    # Values in global scope 
+    # Values in global scope
     cfg: FlowConfig
     # dependency-producer map
     os_map: 'dict[str, Stage]'
@@ -228,14 +229,14 @@ class Flow:
         self.deps_rebuilds = {}
 
         self._resolve_dependencies(self.target, set())
-    
+
     def _dep_will_differ(self, dep: str, paths, consumer: str):
         if not self.symbicache: # Handle --nocache mode
             return True
         return dep_will_differ(dep, paths, consumer,
                                self.os_map, self.run_stages,
                                self.symbicache)
-    
+
     def _resolve_dependencies(self, dep: str, stages_checked: 'set[str]'):
         # Initialize the dependency status if necessary
         if self.deps_rebuilds.get(dep) is None:
@@ -251,7 +252,7 @@ class Flow:
 
         # TODO: Check if the dependency is "on-demand" and force it in provider's
         # config if it is.
-        
+
         for take in provider.takes:
             self._resolve_dependencies(take.name, stages_checked)
             # If any of the required dependencies is unavailable, then the
@@ -263,17 +264,17 @@ class Flow:
             if not take_paths and take.spec == 'req':
                 _print_unreachable_stage_message(provider, take)
                 return
-            
+
             if self._dep_will_differ(take.name, take_paths, provider.name):
                 sfprint(2, f'{take.name} is causing rebuild for {provider.name}')
                 self.run_stages.add(provider.name)
                 self.deps_rebuilds[take.name] += 1
-        
+
         stage_values = self.cfg.get_r_env(provider.name).values
         modrunctx = config_mod_runctx(provider, self.cfg.platform,
                                       stage_values, self.dep_paths,
                                       self.cfg.get_dependency_overrides())
-        
+
         outputs = module_map(provider.module, modrunctx)
 
         stages_checked.add(provider.name)
@@ -282,7 +283,7 @@ class Flow:
         for _, out_paths in outputs.items():
             if (out_paths is not None) and not (req_exists(out_paths)):
                 self.run_stages.add(provider.name)
-        
+
         # Verify module's outputs and add paths as values.
         outs = outputs.keys()
         # print(outs)
@@ -303,7 +304,7 @@ class Flow:
                 provider.value_overrides[dep_value_str(o.name)] = \
                     outputs.get(o.name)
 
-    
+
     def print_resolved_dependencies(self, verbosity: int):
         deps = list(self.deps_rebuilds.keys())
         deps.sort()
@@ -333,7 +334,7 @@ class Flow:
                 status = Fore.RED + '[U]' + Fore.RESET
                 source = \
                     f'{Fore.BLUE + self.os_map[dep].name + Fore.RESET} -> ???'
-        
+
             sfprint(verbosity, f'    {Style.BRIGHT + status} '
                                f'{dep + Style.RESET_ALL}:  {source}')
 
@@ -344,12 +345,12 @@ class Flow:
         if not paths:
             sfprint(2, f'Dependency {dep} is unresolved.')
             return False
-        
+
         if req_exists(paths) and not run:
             return True
         else:
             assert(provider)
-            
+
             any_dep_differ = False if self.symbicache else True
             for p_dep in provider.takes:
                 if not self._build_dep(p_dep.name):
@@ -360,7 +361,7 @@ class Flow:
                     any_dep_differ |= \
                         update_dep_statuses(self.dep_paths[p_dep.name],
                                             provider.name, self.symbicache)
-            
+
             # If dependencies remained the same, consider the dep as up-to date
             # For example, when changing a comment in Verilog source code,
             # the initial dependency resolution will report a need for complete
@@ -372,7 +373,7 @@ class Flow:
                            f'{Style.BRIGHT + dep + Style.RESET_ALL}` because all '
                            f'of it\'s dependencies remained unchanged')
                 return True
-            
+
             stage_values = self.cfg.get_r_env(provider.name).values
             modrunctx = config_mod_runctx(provider, self.cfg.platform,
                                           stage_values, self.dep_paths,
@@ -380,12 +381,12 @@ class Flow:
             module_exec(provider.module, modrunctx)
 
             self.run_stages.discard(provider.name)
-            
+
             if not req_exists(paths):
                 raise DependencyNotProducedException(dep, provider.name)
-        
+
         return True
-    
+
     def execute(self):
         self._build_dep(self.target)
         if self.symbicache:
@@ -402,7 +403,7 @@ def display_dep_info(stages: 'Iterable[Stage]'):
             l = len(out.name)
             if l > longest_out_name_len:
                 longest_out_name_len = l
-    
+
     desc_indent = longest_out_name_len + 7
     nl_indentstr = '\n'
     for _ in range(0, desc_indent):
@@ -418,9 +419,9 @@ def display_dep_info(stages: 'Iterable[Stage]'):
             if out.spec == 'req':
                 specstr = f'{Fore.BLUE}guaranteed{Fore.RESET}'
             elif out.spec == 'maybe':
-                specstr = f'{Fore.YELLOW}not guaranteed{Fore.RESET}' 
+                specstr = f'{Fore.YELLOW}not guaranteed{Fore.RESET}'
             elif out.spec == 'demand':
-                specstr = f'{Fore.RED}on-demand{Fore.RESET}' 
+                specstr = f'{Fore.RED}on-demand{Fore.RESET}'
             pgen = f'{Style.DIM}stage: `{stage.name}`, '\
                    f'spec: {specstr}{Style.RESET_ALL}'
             pdesc = stage.meta[out.name].replace('\n', nl_indentstr)
@@ -432,7 +433,7 @@ def display_stage_info(stage: Stage):
         sfprint(0, f'Stage  does not exist')
         sfbuild_fail()
         return
-    
+
     sfprint(0, f'Stage `{Style.BRIGHT}{stage.name}{Style.RESET_ALL}`:')
     sfprint(0, f'  Module: `{Style.BRIGHT}{stage.module.name}{Style.RESET_ALL}`')
     sfprint(0, f'  Module info:')
@@ -481,13 +482,13 @@ def verify_platform_stage_params(flow_cfg: FlowConfig,
         if args.platform not in flow_cfg.platforms():
             sfprint(0, f'Platform `{platform}`` is not in project.')
             return False
-    
+
     if stage:
         if not verify_stage(platform, stage, mypath):
             sfprint(0, f'Stage `{stage}` is invalid.')
             sfbuild_fail()
             return False
-    
+
     return True
 
 def get_platform_name_for_part(part_name: str):
@@ -506,7 +507,7 @@ def cmd_build(args: Namespace):
     """ sfbuild's `build` command implementation """
 
     project_flow_cfg: ProjectFlowConfig = None
-    
+
 
     platform = args.platform
     if platform is None:
@@ -596,7 +597,7 @@ def cmd_show_dependencies(args: Namespace):
     if not verify_platform_stage_params(flow_cfg, args.platform):
         sfbuild_fail()
         return
-    
+
     platform_overrides: 'set | None' = None
     if args.platform is not None:
         platform_overrides = \
@@ -613,14 +614,14 @@ def cmd_show_dependencies(args: Namespace):
                     f'{Style.BRIGHT + dep_name + Style.RESET_ALL}: {dep_paths}'
         else:
             prstr = f'{Style.BRIGHT + dep_name + Style.RESET_ALL}: {dep_paths}'
-        
+
         display_list.append((dep_name, prstr))
-    
+
     display_list.sort(key = lambda p: p[0])
 
     for _, prstr in display_list:
         sfprint(0, prstr)
-    
+
     set_verbosity_level(-1)
 
 if __name__ == '__main__':
