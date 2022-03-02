@@ -685,17 +685,17 @@ endmodule  /* QL_DSP1 */
 
 (* blackbox *)
 module QL_DSP2 ( // TODO: Name subject to change
-    input  [19:0] a,
-    input  [17:0] b,
-    input  [ 3:0] acc_fir,
-    output [37:0] z,
-    output [17:0] dly_b,
+    input  [NBITS_A-1:0] a,
+    input  [NBITS_B-1:0] b,
+    input  [NBITS_AF-1:0] acc_fir,
+    output [NBITS_Z-1:0] z,
+    output [NBITS_B-1:0] dly_b,
 
     (* clkbuf_sink *)
     input         clk,
     input         reset,
 
-    input  [1:0]  feedback,
+    input  [2:0]  feedback,
     input         load_acc,
     input         unsigned_a,
     input         unsigned_b,
@@ -709,11 +709,136 @@ module QL_DSP2 ( // TODO: Name subject to change
     input         register_inputs
 );
 
-    parameter [19:0] COEFF_0 = 20'd0;
-    parameter [19:0] COEFF_1 = 20'd0;
-    parameter [19:0] COEFF_2 = 20'd0;
-    parameter [19:0] COEFF_3 = 20'd0;
+    parameter [NBITS_COEF-1:0] COEFF_0 = 20'd0;
+    parameter [NBITS_COEF-1:0] COEFF_1 = 20'd0;
+    parameter [NBITS_COEF-1:0] COEFF_2 = 20'd0;
+    parameter [NBITS_COEF-1:0] COEFF_3 = 20'd0;
 
+      localparam NBITS_ACC = 64;
+      localparam NBITS_A = 20;
+      localparam NBITS_B = 18;
+      localparam NBITS_Z = 38;
+      localparam NBITS_COEF = 20;
+      localparam NBITS_AF = 4;
+
+      wire [NBITS_Z-1:0] dsp_full_z;
+      wire [(NBITS_Z/2)-1:0] dsp_frac0_z;
+      wire [(NBITS_Z/2)-1:0] dsp_frac1_z;
+
+      wire [NBITS_B-1:0] dsp_full_dly_b;
+      wire [(NBITS_B/2)-1:0] dsp_frac0_dly_b;
+      wire [(NBITS_B/2)-1:0] dsp_frac1_dly_b;
+
+      assign z = f_mode ? {dsp_frac1_z, dsp_frac0_z} : dsp_full_z;
+      assign dly_b = f_mode ? {dsp_frac1_dly_b, dsp_frac0_dly_b} : dsp_full_dly_b;
+
+	// Output used when fmode == 1
+        dsp_t1_sim #(
+	    .NBITS_A(NBITS_A/2),
+            .NBITS_B(NBITS_B/2),
+            .NBITS_ACC(NBITS_ACC/2),
+            .NBITS_Z(NBITS_Z/2),
+            .NBITS_COEF(NBITS_COEF/2),
+            .NBITS_AF(NBITS_AF/2)
+        ) dsp_frac0 (
+            .a_i(a[(NBITS_A/2)-1:0]),
+            .b_i(b[(NBITS_B/2)-1:0]),
+            .z_o(dsp_frac0_z),
+            .dly_b_o(dsp_frac0_dly_b),
+
+            .acc_fir_i(acc_fir[(NBITS_AF/2)-1:0]),
+            .feedback_i(feedback),
+            .load_acc_i(load_acc),
+
+            .unsigned_a_i(unsigned_a),
+            .unsigned_b_i(unsigned_b),
+
+            .clock_i(clk),
+            .reset_n_i(~reset),
+
+            .saturate_enable_i(saturate_enable),
+            .output_select_i(output_select),
+            .round_i(round),
+            .shift_right_i(shift_right),
+            .subtract_i(subtract),
+            .register_inputs_i(register_inputs),
+            .coef_0_i(COEFF_0[(NBITS_COEF/2)-1:0]),
+            .coef_1_i(COEFF_1[(NBITS_COEF/2)-1:0]),
+            .coef_2_i(COEFF_2[(NBITS_COEF/2)-1:0]),
+            .coef_3_i(COEFF_3[(NBITS_COEF/2)-1:0])
+        );
+
+	// Output used when fmode == 1
+        dsp_t1_sim #(
+	    .NBITS_A(NBITS_A/2),
+            .NBITS_B(NBITS_B/2),
+            .NBITS_ACC(NBITS_ACC/2),
+            .NBITS_Z(NBITS_Z/2),
+            .NBITS_COEF(NBITS_COEF/2),
+            .NBITS_AF(NBITS_AF/2)
+        ) dsp_frac1 (
+            .a_i(a[NBITS_A-1:NBITS_A/2]),
+            .b_i(b[NBITS_B-1:NBITS_B/2]),
+            .z_o(dsp_frac1_z),
+            .dly_b_o(dsp_frac1_dly_b),
+
+            .acc_fir_i(acc_fir[NBITS_AF-1:NBITS_AF/2]),
+            .feedback_i(feedback),
+            .load_acc_i(load_acc),
+
+            .unsigned_a_i(unsigned_a),
+            .unsigned_b_i(unsigned_b),
+
+            .clock_i(clk),
+            .reset_n_i(~reset),
+
+            .saturate_enable_i(saturate_enable),
+            .output_select_i(output_select),
+            .round_i(round),
+            .shift_right_i(shift_right),
+            .subtract_i(subtract),
+            .register_inputs_i(register_inputs),
+            .coef_0_i(COEFF_0[NBITS_COEF-1:NBITS_COEF/2]),
+            .coef_1_i(COEFF_1[NBITS_COEF-1:NBITS_COEF/2]),
+            .coef_2_i(COEFF_2[NBITS_COEF-1:NBITS_COEF/2]),
+            .coef_3_i(COEFF_3[NBITS_COEF-1:NBITS_COEF/2])
+        );
+
+	// Output used when fmode == 0
+        dsp_t1_sim #(
+             .NBITS_A(NBITS_A),
+             .NBITS_B(NBITS_B),
+             .NBITS_ACC(NBITS_ACC),
+             .NBITS_Z(NBITS_Z),
+             .NBITS_COEF(NBITS_COEF),
+             .NBITS_AF(NBITS_AF)
+        ) dsp_full (
+            .a_i(a),
+            .b_i(b),
+            .z_o(dsp_full_z),
+            .dly_b_o(dsp_full_dly_b),
+
+            .acc_fir_i(acc_fir),
+            .feedback_i(feedback),
+            .load_acc_i(load_acc),
+
+            .unsigned_a_i(unsigned_a),
+            .unsigned_b_i(unsigned_b),
+
+            .clock_i(clk),
+            .reset_n_i(~reset),
+
+            .saturate_enable_i(saturate_enable),
+            .output_select_i(output_select),
+            .round_i(round),
+            .shift_right_i(shift_right),
+            .subtract_i(subtract),
+            .register_inputs_i(register_inputs),
+            .coef_0_i(COEFF_0),
+            .coef_1_i(COEFF_1),
+            .coef_2_i(COEFF_2),
+            .coef_3_i(COEFF_3)
+        );
 endmodule
 
 module dsp_t1_sim # (
@@ -966,39 +1091,35 @@ module dsp_t1_20x18x64 (
     parameter [19:0] COEFF_2 = 20'd0;
     parameter [19:0] COEFF_3 = 20'd0;
 
-    dsp_t1_sim #(
-	.NBITS_ACC(64),
-	.NBITS_A(20),
-	.NBITS_B(18),
-	.NBITS_Z(38),
-	.NBITS_COEF(20),
-	.NBITS_AF(4)
-    ) dsp (
-	.a_i(a_i),
-	.b_i(b_i),
-	.z_o(z_o),
-	.dly_b_o(dly_b_o),
+   QL_DSP2 #(
+        .COEFF_0(COEFF_0),
+        .COEFF_1(COEFF_1),
+        .COEFF_2(COEFF_2),
+        .COEFF_3(COEFF_3)
+   ) dsp (
+	.a(a_i),
+	.b(b_i),
+	.z(z_o),
+	.dly_b(dly_b_o),
 
-	.acc_fir_i(acc_fir_i),
-	.feedback_i(feedback_i),
-	.load_acc_i(load_acc_i),
+	.f_mode(1'b0),	// 20x18x64 DSP
 
-	.unsigned_a_i(unsigned_a_i),
-	.unsigned_b_i(unsigned_b_i),
+	.acc_fir(acc_fir_i),
+	.feedback(feedback_i),
+	.load_acc(load_acc_i),
 
-	.clock_i(clock_i),
-	.reset_n_i(~reset_i),
+	.unsigned_a(unsigned_a_i),
+	.unsigned_b(unsigned_b_i),
 
-	.saturate_enable_i(saturate_enable_i),
-	.output_select_i(output_select_i),
-	.round_i(round_i),
-	.shift_right_i(shift_right_i),
-	.subtract_i(subtract_i),
-	.register_inputs_i(register_inputs_i),
-	.coef_0_i(coeff_0_i),
-	.coef_1_i(coeff_1_i),
-	.coef_2_i(coeff_2_i),
-	.coef_3_i(coeff_3_i)
+	.clk(clock_i),
+	.reset(reset_i),
+
+	.saturate_enable(saturate_enable_i),
+	.output_select(output_select_i),
+	.round(round_i),
+	.shift_right(shift_right_i),
+	.subtract(subtract_i),
+	.register_inputs(register_inputs_i)
     );
 endmodule
 
@@ -1031,38 +1152,37 @@ module dsp_t1_10x9x32 (
     parameter [9:0] COEFF_2 = 10'd0;
     parameter [9:0] COEFF_3 = 10'd0;
 
-    dsp_t1_sim #(
-	.NBITS_ACC(32),
-	.NBITS_A(10),
-	.NBITS_B(9),
-	.NBITS_Z(19),
-	.NBITS_COEF(10),
-	.NBITS_AF(2)
-    ) dsp (
-	.a_i(a_i),
-	.b_i(b_i),
-	.z_o(z_o),
-	.dly_b_o(dly_b_o),
+    wire [18:0] z_rem;
+    wire [8:0] dly_b_rem;
 
-	.acc_fir_i(acc_fir_i),
-	.feedback_i(feedback_i),
-	.load_acc_i(load_acc_i),
+    QL_DSP2 #(
+        .COEFF_0({10'd0, COEFF_0}),
+        .COEFF_1({10'd0, COEFF_1}),
+        .COEFF_2({10'd0, COEFF_2}),
+        .COEFF_3({10'd0, COEFF_3})
+   ) dsp (
+	.a({10'd0, a_i}),
+	.b({9'd0, b_i}),
+	.z({z_rem, z_o}),
+	.dly_b({dly_b_rem, dly_b_o}),
 
-	.unsigned_a_i(unsigned_a_i),
-	.unsigned_b_i(unsigned_b_i),
+	.f_mode(1'b1),	// 10x9x32 DSP
 
-	.clock_i(clock_i),
-	.reset_n_i(~reset_i),
+	.acc_fir({2'd0, acc_fir_i}),
+	.feedback(feedback_i),
+	.load_acc(load_acc_i),
 
-	.saturate_enable_i(saturate_enable_i),
-	.output_select_i(output_select_i),
-	.round_i(round_i),
-	.shift_right_i(shift_right_i),
-	.subtract_i(subtract_i),
-	.register_inputs_i(register_inputs_i),
-	.coef_0_i(coeff_0_i),
-	.coef_1_i(coeff_1_i),
-	.coef_2_i(coeff_2_i),
-	.coef_3_i(coeff_3_i)
+	.unsigned_a(unsigned_a_i),
+	.unsigned_b(unsigned_b_i),
+
+	.clk(clock_i),
+	.reset(reset_i),
+
+	.saturate_enable(saturate_enable_i),
+	.output_select(output_select_i),
+	.round(round_i),
+	.shift_right(shift_right_i),
+	.subtract(subtract_i),
+	.register_inputs(register_inputs_i)
     );
 endmodule
