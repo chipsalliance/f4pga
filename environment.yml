@@ -13,3 +13,4 @@ channels:
 dependencies:
   - litex-hub::yosys
   - litex-hub::surelog
+  - litex-hub::iverilog
