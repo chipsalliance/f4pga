@@ -70,12 +70,14 @@ $(1)/ok: $(1)/$$(notdir $(1).v)
 
 endef
 
+DEV = $(shell echo $(1) | cut -d "/" -f 1)
+SIM_LIBS = $(shell find ../$(DEV) -name "*.v" -not -name "*map.v" -not -name "cells_sim.v")
 define test_sim_tpl =
 $(1): $(1)/ok
 	@printf "Test %-18s \e[32mPASSED\e[0m @ %s\n" $(1) $(CURDIR);
 
 $(1)/$$(notdir $(1).vvp): $(1)/$$(notdir $(1).v)
-	@iverilog -vvvv -g2005 -o $$@ $$< -I../ -DVCD_FILE=\"$(1)/$$(notdir $(1).vcd)\" >$(1)/$$(notdir $(1).vvp.log) 2>&1; \
+	@iverilog -vvvv -g2005 -o $$@ $$< $(SIM_LIBS) -I../ -DVCD_FILE=\"$(1)/$$(notdir $(1).vcd)\" >$(1)/$$(notdir $(1).vvp.log) 2>&1; \
 	if [ $$$$? -ne 0 ]; then \
 		printf "Test %-18s \e[31;1mFAILED\e[0m @ %s\n" $(1) $(CURDIR); \
 		false; \
