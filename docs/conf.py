@@ -54,8 +54,8 @@ html_show_sourcelink = True
 html_theme = 'sphinx_symbiflow_theme'
 
 html_theme_options = {
-    'repo_name': 'chipsalliance/f4pga-docs',
-    'github_url' : 'https://github.com/chipsalliance/f4pga-docs',
+    'repo_name': 'chipsalliance/f4pga',
+    'github_url' : 'https://github.com/chipsalliance/f4pga',
     'globaltoc_collapse': True,
     'color_primary': 'indigo',
     'color_accent': 'blue',
