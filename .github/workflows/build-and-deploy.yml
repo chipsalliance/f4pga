@@ -19,8 +19,9 @@ jobs:
         with:
           node-version: '10'
 
-      - name: Clone and Build
+      - name: Build
         run: |
+          cd site
           npm install
           npm install -g gulp-cli
           gulp build
@@ -28,8 +29,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: website-build
-          path: |
-              build
+          path: site/build
 
 
   deploy:
