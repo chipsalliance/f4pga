@@ -132,7 +132,7 @@ jobs:
 
   pyF4PGA:
     runs-on: ubuntu-latest
-    name: '🐍 Example'
+    name: '🐍 Example | xc7'
     env:
       F4PGA_INSTALL_DIR: /opt/f4pga
       F4PGA_FAM: xc7
@@ -155,7 +155,7 @@ jobs:
           pip install --use-feature=in-tree-build .
           cd ..
 
-      - name: 🚧 Test py4FPGA build
+      - name: 🚧 Test f4pga build
         run: |
           . ./.github/scripts/activate.sh
 
@@ -168,7 +168,54 @@ jobs:
           name: arty_35-Bitstream-pyF4PGA
           path: f4pga-examples/build/arty_35/top.bit
 
-      - name: Test py4FPGA (PYTHONPATH)
+
+  PYTHONPATH:
+    runs-on: ubuntu-latest
+    name: '🐍 PYTHONPATH'
+    env:
+      F4PGA_INSTALL_DIR: /opt/f4pga
+      F4PGA_FAM: xc7
+
+    steps:
+
+      - name: 🧰 Checkout
+        uses: actions/checkout@v3
+
+      - name: 🚧 Test pyF4PGA (PYTHONPATH)
         run: |
           PYTHONPATH=$(pwd) python3 f4pga/__init__.py
           PYTHONPATH=$(pwd) python3 f4pga/__init__.py -h
+
+
+  pyWrappers:
+    runs-on: ubuntu-latest
+    name: '🐍 Python wrappers'
+    env:
+      F4PGA_INSTALL_DIR: /opt/f4pga
+      F4PGA_FAM: xc7
+
+    steps:
+
+      - name: 🧰 Checkout
+        uses: actions/checkout@v3
+
+      - name: 🔧 Prepare environment
+        run: ./.github/scripts/prepare_environment.sh
+
+      - name: 🐍 Install f4pga (pip)
+        run: |
+          . ./.github/scripts/activate.sh
+
+          cd f4pga
+          pip install --use-feature=in-tree-build .
+          cd ..
+
+      - name: 🚦 Test Python wrappers
+        run: |
+          . ./.github/scripts/activate.sh
+
+          for tool in place route synth write-fasm; do
+            echo "::group::Test f4pga-$tool"
+            "f4pga-$tool" || echo "Failing?"
+            echo "::endgroup::"
+          done;

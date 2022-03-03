@@ -1,7 +1,9 @@
+from pathlib import Path
 import subprocess
 import argparse
 import os
 import shutil
+from sys import argv as sys_argv
 
 class VprArgs:
     arch_dir: str
@@ -17,7 +19,7 @@ class VprArgs:
 
     def __init__(self, mypath, args):
         self.arch_dir = \
-            os.path.join(mypath, '../share/symbiflow/arch/', args.device)
+            str(Path(mypath) / '../share/symbiflow/arch' / args.device)
         self.arch_dir = os.path.realpath(self.arch_dir)
         self.arch_def = os.path.join(self.arch_dir, 'arch.timing.xml')
         self.lookahead = \
@@ -38,7 +40,7 @@ class VprArgs:
         self.optional = []
         if args.sdc:
             self.optional += ['--sdc_file', args.sdc]
-    
+
     def export(self):
         os.environ['ARCH_DIR'] = self.arch_dir
         os.environ['ARCH_DEF'] = self.arch_def
@@ -51,7 +53,7 @@ class VprArgs:
 def setup_vpr_arg_parser():
     parser = argparse.ArgumentParser(description="Parse flags")
     parser.add_argument('-d', '--device', nargs=1, metavar='<device>',
-                        type=str, help='Device type (e.g. artix7)')
+                        type=str, help='Device type (e.g. artix7)', default='artix7')
     parser.add_argument('-e', '--eblif', nargs=1, metavar='<eblif file>',
                         type=str, help='EBLIF filename')
     parser.add_argument('-p', '--pcf', nargs=1, metavar='<pcf file>',
@@ -60,7 +62,7 @@ def setup_vpr_arg_parser():
                         type=str, help='Part name')
     parser.add_argument('-s', '--sdc', nargs=1, metavar='<sdc file>',
                         type=str, help='SDC file')
-    parser.add_argument('-a', '--additional_vpr_options', metavar='<opts>',
+    parser.add_argument('-a', '--vpr_options', metavar='<opts>',
                         type=str, help='Additional VPR options')
     parser.add_argument('additional_vpr_args', nargs='*', metavar='<args>',
                         type=str, help='Additional arguments for vpr command')
@@ -91,7 +93,7 @@ def noisy_warnings(device):
 
 # Get current PWD
 def my_path():
-    mypath = os.path.realpath(sys.argv[0])
+    mypath = os.path.realpath(sys_argv[0])
     return os.path.dirname(mypath)
 
 # Save VPR log
