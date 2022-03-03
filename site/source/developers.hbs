@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>F4PGA - For Developers</title>
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="assets/css/developers.css">
+</head>
+
+<body>
+
+<!--
+  <div class="gsoc-banner">
+    <span class="gsoc-banner__caption">F4PGA is participating in </span>
+    <a href="https://summerofcode.withgoogle.com/organizations/6224851964002304/"><img class="gsoc-banner__logo" src="assets/img/gsoc-logo.svg" alt="Google's Summer of Code website"></a>
+  </div>
+-->
+
+  <nav class="nav">
+    <div class="nav__wrapper">
+      <a href="index.html">
+        <img class="nav__logo" src="assets/img/f4pga.svg" alt="F4PGA">
+      </a>
+
+      <div class="nav__toggle">
+        <button class="hamburger hamburger--squeeze" type="button">
+          <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+          </span>
+        </button>
+      </div>
+      <ul class="nav__links">
+        <li><a href="index.html#hero">Home</a></li>
+        <li><a href="getting-started.html">Start using</a></li>
+        <li><a href="developers.html" class="current-page">Contribute now</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="row help" id="help">
+    <h2 class="row__header help__header">
+      <span class="underline">Help wanted!</span>
+    </h2>
+    <div class="help__content">
+      <p>
+        Are you interested in helping this project move forward? There are
+        multiple areas and technologies we need help with - reach out to us,
+        we’re sure we will find something for you.
+      </p>
+      <ul class="help__list">
+        <li>Do you know <span class="tech">Python</span>? Almost all scripts are written in Python!</li>
+        <li>Do you know <span class="tech">C++</span>? VPR & nextpnr & libraries written in C++!</li>
+        <li>Do you know <span class="tech">TCL</span>? All the EDA tools use TCL!</li>
+        <li>
+          Do you know <span class="tech">(System) Verilog</span>, <span class="tech">VHDL</span>, <span class="tech">Chisel</span>, <span class="tech">Migen</span> and/or <span class="tech">Amaranth</span>?
+          Simulation and models are written in Hardware Description Languages (HDLs)!</li>
+        <li>Do you know <span class="tech">XML</span>? Most file formats are XML!</li>
+        <li>Do you know English? Documentation is written in English!</li>
+        <li>Do you know <span class="tech">Docker</span> and/or <span class="tech">Podman</span>? Help make it easier to set up F4PGA!</li>
+        <li>Do you have time? We will find you a task!</li>
+      </ul>
+    </div>
+    <div class="downloads__links help__links">
+      <a class="downloads__anchor" href="https://kiwiirc.com/nextclient/#irc://irc.libera.chat/#f4pga">
+        <div class="btn btn--inverted">
+          IRC
+        </div>
+      </a>
+      <a class="downloads__anchor" href="https://lists.chipsalliance.org/g/f4pga">
+        <div class="btn btn--inverted">
+          Mailing list
+        </div>
+      </a>
+      <a class="downloads__anchor" href="https://chipsalliance.slack.com">
+        <div class="btn btn--inverted">
+          Slack
+        </div>
+      </a>
+    </div>
+    <div class="help__register">
+      To register to CHIPS Alliance Slack workspace, use the following
+      <a class="inline-link" href="https://slack-invite.chipsalliance.org/">
+        Slack Invite
+      </a>.
+    </div>
+  </section>
+
+  <section class="row tools" id="tools">
+    <h2 class="row__header tools__header">
+      <span class="underline">About F4PGA</span>
+    </h2>
+    <div class="tools__content">
+      <p class="tools__paragraph">
+        The F4PGA toolchain consists of logic synthesis and implementation
+        tools, as well as chip documentation projects for chips of various
+        vendors. To prepare a working bitstream for a particular FPGA chip,
+        the toolchain goes through the following stages.
+      </p>
+      <p class="tools__paragraph">
+        First, a description of the FPGA chip is created with the information
+        from the relevant bitstream documentation project.
+        This part is done within the
+        <a href="https://github.com/chipsalliance/f4pga-arch-defs" class="tools__link">
+        F4PGA Architecture Definitions</a>. The project prepares
+        information about the timings and resources available in the chip
+        needed at the implementation stage, as well as techmaps for
+        the synthesis tools.
+      </p>
+      <p class="tools__paragraph">
+        The second step is logic synthesis. It is carried out in the
+        <a href="https://github.com/YosysHQ/yosys" class="tools__link">Yosys</a>
+        framework, which expresses the input Verilog file by means of the block
+        and connection types available in the chosen chip.
+      </p>
+      <p class="tools__paragraph">
+        The next step is implementation. Placement and routing tools put
+        individual blocks from the synthesis description in the specific chip
+        locations and create paths between them. To do that, F4PGA uses
+        either <a href="https://github.com/YosysHQ/nextpnr" class="tools__link">
+        nextpnr</a> or <a href="https://github.com/verilog-to-routing/vtr-verilog-to-routing"
+        class="tools__link">Verilog to Routing</a>.
+      </p>
+      <p class="tools__paragraph">
+        Finally, the design properties are translated into a set of features
+        available in the given FPGA chip. These features are saved in the
+        <a href="https://github.com/chipsalliance/fasm" class="tools__link">fasm
+        format</a>, which is developed as part of F4PGA. The fasm file is
+        then translated to bitstream using the information from the
+        bitstream documentation projects.
+      </p>
+      </div>
+    </div>
+    <h2 class="row__header tools__subprojects_header" id="bitstream">
+      <span class="underline">Bitstream Documentation</span>
+    </h2>
+    <div class="subprojects__tiles">
+      <div class="subproject__tile">
+        <div class="subproject__details">
+          <h4 class="subproject__header">
+            Project X-Ray
+          </h4>
+          <p class="subproject__description">
+            Project X-Ray aims to provide information to develop a free and
+            open Verilog to bitstream toolchain for the Xilinx 7-Series
+            FPGA architecture.
+          </p>
+          <a class="subproject__more inline-link" href="https://github.com/f4pga/prjxray">learn more</a>
+        </div>
+      </div>
+      <div class="subproject__tile">
+        <div class="subproject__details">
+          <h4 class="subproject__header">
+            Project Trellis
+          </h4>
+          <p class="subproject__description">
+            Project Trellis enables a fully open-source flow for ECP5 FPGAs
+            using Yosys for Verilog synthesis and nextpnr for place and route,
+            providing the device database and tools for bitstream creation.
+          </p>
+          <a class="subproject__more inline-link" href="https://github.com/f4pga/prjtrellis">learn more</a>
+        </div>
+      </div>
+      <div class="subproject__tile">
+        <div class="subproject__details">
+          <h4 class="subproject__header">
+            Project IceStorm
+          </h4>
+          <p class="subproject__description">
+            Project IceStorm was the first bitstream documentation project that
+            started the idea of a fully Open-Source flow for FPGA chips.
+            It documents the whole iCE40 chip.
+          </p>
+          <a class="subproject__more inline-link" href="https://github.com/f4pga/icestorm">learn more</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer__wrapper">
+        <span class="footer__copy">
+          © 2022 F4PGA
+        </span>
+
+      <div class="chips__alliance">
+        <a  href="https://chipsalliance.com">
+        <img src="assets/img/chips-alliance.svg" />
+        </a>
+      </div>
+
+      <span class="footer__social">
+        <a href="https://github.com/f4pga/" target="_blank">
+          <img class="social__icon" src="assets/img/github.svg" alt="GitHub">
+        </a>
+      </span>
+    </div>
+  </footer>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/cferdinandi/smooth-scroll/dist/smooth-scroll.polyfills.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@glidejs/glide"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/mustache.js/0.7.2/mustache.min.js"></script>
+  <script src="assets/js/github-activity.js"></script>
+  <script src="assets/js/script.js"></script>
+</body>
+
+</html>

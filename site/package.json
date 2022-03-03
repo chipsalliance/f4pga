@@ -1,0 +1,31 @@
+{
+  "name": "f4pga-website",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "private": true,
+  "devDependencies": {
+    "@babel/core": "^7.2.0",
+    "@babel/preset-env": "^7.2.0",
+    "browser-sync": "^2.26.3",
+    "gulp": "^4.0.0",
+    "gulp-autoprefixer": "^6.0.0",
+    "gulp-babel": "^8.0.0",
+    "gulp-handlebars-all": "^0.1.1",
+    "gulp-imagemin": "^5.0.3",
+    "gulp-inject-string": "^1.1.2",
+    "gulp-markdown": "^3.0.0",
+    "gulp-newer": "^1.4.0",
+    "gulp-purgecss": "^1.1.1",
+    "gulp-rename": "^1.4.0",
+    "gulp-sass": "^4.0.2",
+    "gulp-uglify": "^3.0.1"
+  },
+  "dependencies": {
+    "handlebars-helpers": "^0.10.0"
+  }
+}

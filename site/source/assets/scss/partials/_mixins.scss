@@ -1,0 +1,36 @@
+@mixin tilted-bg($sub: 150px) {
+  &::before {
+    z-index: 0;
+    display: block;
+    position: absolute;
+    content: '';
+    width: 200vw;
+    height: calc(100% - #{$sub});
+    background-color: $bg-secondary;
+    @if $sub == 320px {
+      top: 38%;
+    } @else {
+      top: 50%;
+    }
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  &::after {
+    z-index: -1;
+    display: block;
+    position: absolute;
+    content: '';
+    width: 200vw;
+    background-color: $bg-secondary;
+    @if $sub == 320px {
+      height: calc((100% - #{$sub}) / 2);
+      top: 39%;
+      transform: translate(-50%, -100%);
+    } @else {
+      height: calc(100% - #{$sub});
+      top: 51%;
+      transform: translate(-50%, -50%);
+    }
+    left: 50%;
+  }
+}

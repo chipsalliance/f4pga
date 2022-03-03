@@ -1,0 +1,60 @@
+name: build-and-deploy
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '10'
+
+      - name: Build
+        run: |
+          cd site
+          npm install
+          npm install -g gulp-cli
+          gulp build
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: website-build
+          path: site/build
+
+
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: [ build ]
+    steps:
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: website-build
+          path: /tmp/website-build
+
+      - uses: actions/checkout@v2
+
+      - name: Deploy website
+        run: |
+          export ROOT=$(pwd)
+          cd /tmp/website-build/
+          touch .nojekyll
+          echo 'f4pga.org' > CNAME
+          git init
+          cp $ROOT/.git/config ./.git/config
+          git add .
+          git config --local user.email "push@gha"
+          git config --local user.name "GHA"
+          git commit -am "update ${{ github.sha }}"
+          git push -u origin +HEAD:gh-pages
