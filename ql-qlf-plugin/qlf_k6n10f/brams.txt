@@ -52,13 +52,5 @@ match $__QLF_FACTOR_BRAM36_TDP
   min efficiency 2
   shuffle_enable B
   make_transp
-  or_next_if_better
-endmatch
-
-match $__QLF_FACTOR_BRAM18_TDP
-  min bits 128
-  min efficiency 2
-  shuffle_enable B
-  make_transp
 endmatch
 
