@@ -24,13 +24,16 @@ TESTS = consts \
     qlf_k6n10f/dsp_mult \
     qlf_k6n10f/dsp_simd \
     qlf_k6n10f/dsp_macc \
-    qlf_k6n10f/bram_tdp
 #	qlf_k6n10_bram \
 
 SIM_TESTS = \
     qlf_k6n10f/sim_dsp_mult \
     qlf_k6n10f/sim_dsp_mult_r \
     qlf_k6n10f/sim_dsp_fir
+
+# Those tests perform synthesis and simulation of synthesis results
+POST_SYNTH_SIM_TESTS = \
+    qlf_k6n10f/bram_tdp
 
 include $(shell pwd)/../../Makefile_test.common
 
@@ -50,5 +53,4 @@ pp3_bram_verify = true
 qlf_k6n10f-dsp_mult_verify = true
 qlf_k6n10f-dsp_simd_verify = true
 qlf_k6n10f-dsp_macc_verify = true
-qlf_k6n10f-bram_tdp_verify = true
 #qlf_k6n10_bram_verify = true
