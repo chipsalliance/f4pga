@@ -508,17 +508,13 @@ def get_platform_name_for_part(part_name: str):
     The reason for such distinction is that plenty of chips with different names
     differ only in a type of package they use.
     """
-
-    d: dict
-    with open(os.path.join(mypath, 'part_db/parts.json')) as f:
-        d = json.loads(f.read())
-    return d.get(part_name.upper())
+    with (Path(mypath) / 'part_db.json').open('r') as rfptr:
+        return json.load(rfptr).get(part_name.upper())
 
 def cmd_build(args: Namespace):
     """ sfbuild's `build` command implementation """
 
     project_flow_cfg: ProjectFlowConfig = None
-
 
     platform = args.platform
     if platform is None:
