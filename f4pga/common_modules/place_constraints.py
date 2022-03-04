@@ -1,24 +1,17 @@
-#!/usr/bin/python3
-
-# Symbiflow Stage Module
-
-# ----------------------------------------------------------------------------- #
-
-import os
+from pathlib import Path
 from f4pga.common import *
-from f4pga.module import *
+from f4pga.module import Module, ModuleContext
 
-# ----------------------------------------------------------------------------- #
 
 class PlaceConstraintsModule(Module):
     def map_io(self, ctx: ModuleContext):
         return {
-            'place_constraints': file_noext(ctx.takes.net) + '.preplace'
+            'place_constraints': f'{Path(ctx.takes.net).stem!s}.preplace'
         }
 
     def execute(self, ctx: ModuleContext):
-        arch_dir = os.path.join(ctx.share, 'arch')
-        arch_def = os.path.join(arch_dir, ctx.values.device, 'arch.timing.xml')
+        arch_dir = str(Path(ctx.share) / 'arch')
+        arch_def = str(Path(arch_dir) / ctx.values.device / 'arch.timing.xml')
 
         database = sub('prjxray-config').decode().replace('\n', '')
 

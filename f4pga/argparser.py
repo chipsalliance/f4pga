@@ -1,68 +1,157 @@
 from argparse import ArgumentParser, Namespace
-import re
+from re import finditer as re_finditer
+
 
 def _add_flow_arg(parser: ArgumentParser):
-    parser.add_argument('-f', '--flow', metavar='flow_path', type=str,
-                        help='Path to flow definition file')
+    parser.add_argument(
+        '-f',
+        '--flow',
+        metavar='flow_path',
+        type=str,
+        help='Path to flow definition file'
+    )
+
 
 def _setup_build_parser(parser: ArgumentParser):
     _add_flow_arg(parser)
-    parser.add_argument('-t', '--target', metavar='target_name', type=str,
-                        help='Perform stages necessary to acquire target')
-    parser.add_argument('--platform', metavar='platform_name',
-                        help='Target platform_name')
-    parser.add_argument('-P', '--pretend', action='store_true',
-                        help='Show dependency resolution without executing flow')
-    parser.add_argument('-i', '--info', action='store_true',
-                        help='Display info about available targets')
-    parser.add_argument('-c', '--nocache', action='store_true',
-                        help='Ignore caching and rebuild everything up to the '
-                             'target.')
-    parser.add_argument('-S', '--stageinfo', nargs=1, metavar='stage_name',
-                        help='Display info about stage')
-    parser.add_argument('-r', '--requirements', action='store_true',
-                        help='Display info about project\'s requirements.')
-    parser.add_argument('-p', '--part', metavar='part_name',
-                        help='Name of the target chip')
-    parser.add_argument('--dep', '-D', action='append', default=[])
-    parser.add_argument('--val', '-V', action='append', default=[])
+
+    parser.add_argument(
+        '-t',
+        '--target',
+        metavar='target_name',
+        type=str,
+        help='Perform stages necessary to acquire target'
+    )
+
+    parser.add_argument(
+        '--platform',
+        metavar='platform_name',
+        help='Target platform_name'
+    )
+
+    parser.add_argument(
+        '-P',
+        '--pretend',
+        action='store_true',
+        help='Show dependency resolution without executing flow'
+    )
+
+    parser.add_argument(
+        '-i',
+        '--info',
+        action='store_true',
+        help='Display info about available targets'
+    )
+
+    parser.add_argument(
+        '-c',
+        '--nocache',
+        action='store_true',
+        help='Ignore caching and rebuild everything up to the target.'
+    )
+
+    parser.add_argument(
+        '-S',
+        '--stageinfo',
+        nargs=1,
+        metavar='stage_name',
+        help='Display info about stage'
+    )
+
+    parser.add_argument(
+        '-r',
+        '--requirements',
+        action='store_true',
+        help='Display info about project\'s requirements.'
+    )
+
+    parser.add_argument(
+        '-p',
+        '--part',
+        metavar='part_name',
+        help='Name of the target chip'
+    )
+
+    parser.add_argument(
+        '--dep',
+        '-D',
+        action='append',
+        default=[]
+    )
+
+    parser.add_argument(
+        '--val',
+        '-V',
+        action='append',
+        default=[]
+    )
+
     # Currently unsupported
-    parser.add_argument('-M', '--moduleinfo', nargs=1,
-                        metavar='module_name_or_path',
-                        help='Display info about module. Requires `-p` option '
-                             'in case of module name')
-    parser.add_argument('-T', '--take_explicit_paths', nargs='+',
-                        metavar='<name=path, ...>', type=str,
-                        help='Specify stage inputs explicitely. This might be '
-                             'required if some files got renamed or deleted and '
-                             'symbiflow is unable to deduce the flow that lead '
-                             'to dependencies required by the requested stage')
+    parser.add_argument(
+        '-M',
+        '--moduleinfo',
+        nargs=1,
+        metavar='module_name_or_path',
+        help='Display info about module. Requires `-p` option in case of module name'
+    )
+
+    parser.add_argument(
+        '-T',
+        '--take_explicit_paths',
+        nargs='+',
+        metavar='<name=path, ...>',
+        type=str,
+        help='Specify stage inputs explicitely. This might be required if some files got renamed or deleted and '
+             'symbiflow is unable to deduce the flow that lead to dependencies required by the requested stage'
+    )
+
 
 def _setup_show_dep_parser(parser: ArgumentParser):
-    parser.add_argument('-p', '--platform', metavar='platform_name', type=str,
-                        help='Name of the platform (use to display '
-                             'platform-specific values.')
-    parser.add_argument('-s', '--stage', metavar='stage_name', type=str,
-                        help='Name of the stage (use if you want to set the '
-                             'value only for that stage). Requires `-p`.')
+    parser.add_argument(
+        '-p',
+        '--platform',
+        metavar='platform_name',
+        type=str,
+        help='Name of the platform (use to display platform-specific values.'
+    )
+
+    parser.add_argument(
+        '-s',
+        '--stage',
+        metavar='stage_name',
+        type=str,
+        help='Name of the stage (use if you want to set the value only for that stage). Requires `-p`.'
+    )
+
     _add_flow_arg(parser)
 
-# Set up argument parser for the program. Pretty self-explanatory.
+
 def setup_argparser():
+    """
+    Set up argument parser for the program.
+    """
     parser = ArgumentParser(description='SymbiFlow Build System')
 
-    parser.add_argument('-v', '--verbose', action='count', default=0)
-    parser.add_argument('-s', '--silent', action='store_true')
+    parser.add_argument(
+        '-v',
+        '--verbose',
+        action='count',
+        default=0
+    )
+
+    parser.add_argument(
+        '-s',
+        '--silent',
+        action='store_true'
+    )
 
     subparsers = parser.add_subparsers(dest='command')
-    build = subparsers.add_parser('build')
-    _setup_build_parser(build)
-    show_dep = subparsers.add_parser('showd',
-                                     description='Show the value(s) assigned to a '
-                                                 'dependency')
+    _setup_build_parser(subparsers.add_parser('build'))
+    show_dep = subparsers.add_parser('showd', description='Show the value(s) assigned to a dependency')
     _setup_show_dep_parser(show_dep)
 
     return parser
+
 
 def _parse_depval(depvalstr: str):
     """
@@ -94,6 +183,7 @@ def _parse_depval(depvalstr: str):
 
     return d
 
+
 def _unescaped_matches(regexp: str, s: str, escape_chr='\\'):
     """
     Find all occurences of a pattern in a string that contains escape sequences.
@@ -109,8 +199,7 @@ def _unescaped_matches(regexp: str, s: str, escape_chr='\\'):
     offsets = []
     offset = 0
     for sl in s.split(escape_chr):
-        l = len(sl)
-        if l <= 1:
+        if len(sl) <= 1:
             continue
         noescape = sl[(1 if offset != 0 else 0):]
         for _ in noescape:
@@ -118,7 +207,7 @@ def _unescaped_matches(regexp: str, s: str, escape_chr='\\'):
         offset += 2
         noescapes += noescape
 
-    iter =  re.finditer(regexp, noescapes)
+    iter = re_finditer(regexp, noescapes)
 
     for m in iter:
         start = m.start()
@@ -127,10 +216,13 @@ def _unescaped_matches(regexp: str, s: str, escape_chr='\\'):
         off2 = end + offsets[end]
         yield off1, off2
 
-def _unescaped_separated(regexp: str, s: str, escape_chr='\\'):
-    """ Yields substrings of a string that contains escape sequences. """
 
-    last_end = 0;
+def _unescaped_separated(regexp: str, s: str, escape_chr='\\'):
+    """
+    Yields substrings of a string that contains escape sequences.
+    """
+
+    last_end = 0
     for start, end in _unescaped_matches(regexp, s, escape_chr=escape_chr):
         yield s[last_end:start]
         last_end = end
@@ -138,6 +230,7 @@ def _unescaped_separated(regexp: str, s: str, escape_chr='\\'):
         yield s[last_end:]
     else:
         yield ''
+
 
 def _parse_cli_value(s: str):
     """
@@ -206,6 +299,7 @@ def _parse_cli_value(s: str):
 
     # String
     return s.replace('\\', '')
+
 
 def get_cli_flow_config(args: Namespace, platform: str):
     def create_defdict():

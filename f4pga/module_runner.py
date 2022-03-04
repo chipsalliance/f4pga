@@ -1,14 +1,16 @@
-""" Dynamically import and run sfbuild modules """
+"""
+Dynamically import and run F4PGA modules.
+"""
 
 from contextlib import contextmanager
-import importlib
-import importlib.util
-import os
+import importlib.util as importlib_util
+from pathlib import Path
+
+from colorama import Style
+
 from f4pga.module import Module, ModuleContext, get_mod_metadata
 from f4pga.common import ResolutionEnv, deep, sfprint
-from colorama import Fore, Style
 
-_realpath_deep = deep(os.path.realpath)
 
 @contextmanager
 def _add_to_sys_path(path: str):
@@ -20,16 +22,19 @@ def _add_to_sys_path(path: str):
     finally:
         sys.path = old_syspath
 
+
 def import_module_from_path(path: str):
-    absolute_path = os.path.realpath(path)
+    absolute_path = str(Path(path).resolve())
     with _add_to_sys_path(path):
-        spec = importlib.util.spec_from_file_location(absolute_path, absolute_path)
-        module = importlib.util.module_from_spec(spec)
+        spec = importlib_util.spec_from_file_location(absolute_path, absolute_path)
+        module = importlib_util.module_from_spec(spec)
         spec.loader.exec_module(module)
         return module
 
+
 # Once imported a module will be added to that dict to avaid re-importing it
 preloaded_modules = {}
+
 
 def get_module(path: str):
     global preloaded_modules
@@ -41,9 +46,9 @@ def get_module(path: str):
     mod = import_module_from_path(path)
     preloaded_modules[path] = mod
 
-    # All sfbuild modules should expose a `ModuleClass` type/alias which is a
-    # class implementing a Module interface
+    # All F4PGA modules should expose a `ModuleClass` type/alias which is a class implementing a Module interface
     return mod.ModuleClass
+
 
 class ModRunCtx:
     share: str
@@ -58,6 +63,7 @@ class ModRunCtx:
     def make_r_env(self):
         return ResolutionEnv(self.config['values'])
 
+
 class ModuleFailException(Exception):
     module: str
     mode: str
@@ -69,8 +75,11 @@ class ModuleFailException(Exception):
         self.e = e
 
     def __str__(self) -> str:
-        return f'ModuleFailException:\n  Module `{self.module}` failed ' \
-               f'MODE: \'{self.mode}\'\n\nException `{type(self.e)}`: {self.e}'
+        return f"""ModuleFailException:
+  Module `{self.module}` failed MODE: \'{self.mode}\'
+  Exception `{type(self.e)}`: {self.e}
+"""
+
 
 def module_io(module: Module):
     return {
@@ -80,32 +89,41 @@ def module_io(module: Module):
         'meta': get_mod_metadata(module)
     }
 
+
 def module_map(module: Module, ctx: ModRunCtx):
     try:
-        mod_ctx = ModuleContext(module, ctx.config, ctx.make_r_env(), ctx.share,
-                                ctx.bin)
+        mod_ctx = ModuleContext(
+            module,
+            ctx.config,
+            ctx.make_r_env(),
+            ctx.share,
+            ctx.bin
+        )
     except Exception as e:
         raise ModuleFailException(module.name, 'map', e)
 
-    return _realpath_deep(vars(mod_ctx.outputs))
+    return deep(lambda p: str(Path(p).resolve()))(vars(mod_ctx.outputs))
+
 
 def module_exec(module: Module, ctx: ModRunCtx):
     try:
-        mod_ctx = ModuleContext(module, ctx.config, ctx.make_r_env(), ctx.share,
-                                ctx.bin)
+        mod_ctx = ModuleContext(
+            module,
+            ctx.config,
+            ctx.make_r_env(),
+            ctx.share,
+            ctx.bin
+        )
     except Exception as e:
         raise ModuleFailException(module.name, 'exec', e)
 
-    sfprint(1, 'Executing module '
-              f'`{Style.BRIGHT + module.name + Style.RESET_ALL}`:')
+    sfprint(1, f'Executing module `{Style.BRIGHT + module.name + Style.RESET_ALL}`:')
     current_phase = 1
     try:
         for phase_msg in module.execute(mod_ctx):
-            sfprint(1, f'    {Style.BRIGHT}[{current_phase}/{module.no_of_phases}]'
-                       f'{Style.RESET_ALL}: {phase_msg}')
+            sfprint(1, f'    {Style.BRIGHT}[{current_phase}/{module.no_of_phases}] {Style.RESET_ALL}: {phase_msg}')
             current_phase += 1
     except Exception as e:
         raise ModuleFailException(module.name, 'exec', e)
 
-    sfprint(1, f'Module `{Style.BRIGHT + module.name + Style.RESET_ALL}` '
-                'has finished its work!')
+    sfprint(1, f'Module `{Style.BRIGHT + module.name + Style.RESET_ALL}` has finished its work!')

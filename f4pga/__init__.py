@@ -1,31 +1,28 @@
-#!/usr/bin/env python3
-
 """
-sfbuild - Symbiflow Build System
+F4PGA Build System
 
-This tool allows for building FPGA targets (such as bitstreams) for any supported
-platform with just one simple command and a project file.
+This tool allows for building FPGA targets (such as bitstreams) for any supported platform with just one simple command
+and a project file.
 
-The idea is that sfbuild wraps all the tools needed by different platforms in
-"modules", which define inputs/outputs and various parameters. This allows
-sfbuild to resolve dependencies for any target provided that a "flow definition"
-file exists for such target. The flow defeinition file list modules available for
-that platform and may tweak some settings of those modules.
+The idea is that F4PGA wraps all the tools needed by different platforms in "modules", which define inputs/outputs and
+various parameters.
+This allows F4PGA to resolve dependencies for any target provided that a "flow definition" file exists for such target.
+The flow defeinition file list modules available for that platform and may tweak some settings of those modules.
 
-A basic example of using sfbuild:
-$ sfbuild build --platform arty_35 -t bitstream
+A basic example of using F4PGA:
 
-This will make sfbuild  attempt to create a bitstream for arty_35 platform.
-flow.json is a flow configuration file, which should be created for a project
-that uses sfbuild. Iontains project-specific definitions needed within the flow,
-such as list of source code files.
+$ f4pga build --platform arty_35 -t bitstream
+
+This will make F4PGA attempt to create a bitstream for arty_35 platform.
+``flow.json`` is a flow configuration file, which should be created for a project that uses F4PGA.
+Contains project-specific definitions needed within the flow, such as list of source code files.
 """
 
 from pathlib import Path
 from argparse import Namespace
-import os
+from sys import argv as sys_argv
 from os import environ
-import json
+from json import load as json_load, loads as json_loads
 from typing import Iterable
 from colorama import Fore, Style
 
@@ -34,11 +31,11 @@ from f4pga.common import (
     fatal,
     scan_modules,
     set_verbosity_level,
-    sfprint
+    sfprint,
+    sub as common_sub
 )
 from f4pga.module import *
 from f4pga.cache import SymbiCache
-import f4pga.ugly as ugly
 from f4pga.flow_config import (
     ProjectFlowConfig,
     FlowConfig,
@@ -54,10 +51,10 @@ from f4pga.argparser import setup_argparser, get_cli_flow_config
 
 SYMBICACHEPATH = '.symbicache'
 
-binpath = os.path.realpath(os.path.join(os.path.dirname(os.path.realpath(os.sys.argv[0])), '..'))
+binpath = str(Path(sys_argv[0]).resolve().parent.parent)
 mypath = str(Path(__file__).resolve().parent)
 
-share_dir_path = os.path.realpath(f"{environ.get('F4PGA_INSTALL_DIR', '/usr/local')}/xc7/install/share/symbiflow")
+share_dir_path = str(Path(f"{environ.get('F4PGA_INSTALL_DIR', '/usr/local')}/xc7/install/share/symbiflow").resolve())
 
 class DependencyNotProducedException(Exception):
     dep_name: str
@@ -86,8 +83,7 @@ def req_exists(r):
     """ Checks whether a dependency exists on a drive. """
 
     if type(r) is str:
-        if not os.path.isfile(r) and not os.path.islink(r) \
-                and not os.path.isdir(r):
+        if not Path(r).is_file() and not Path(r).is_symlink() and not Path(r).is_dir():
             return False
     elif type(r) is list:
         return not (False in map(req_exists, r))
@@ -471,9 +467,27 @@ def setup_resolution_env():
 
     r_env = ResolutionEnv({
         'shareDir': share_dir_path,
-        'binDir': os.path.realpath(os.path.join(share_dir_path, '../../bin'))
+        'binDir': str((Path(share_dir_path) / '../../bin').resolve())
     })
-    r_env.add_values(ugly.generate_values())
+
+    def _noisy_warnings():
+        """
+        Emit some noisy warnings.
+        """
+        environ['OUR_NOISY_WARNINGS'] = 'noisy_warnings.log'
+        return 'noisy_warnings.log'
+
+    def _generate_values():
+        """
+        Generate initial values, available in configs.
+        """
+        return {
+            'prjxray_db': common_sub('prjxray-config').decode().replace('\n', ''),
+            'python3': common_sub('which', 'python3').decode().replace('\n', ''),
+            'noisyWarnings': _noisy_warnings()
+        }
+
+    r_env.add_values(_generate_values())
     return r_env
 
 def open_project_flow_config(path: str) -> ProjectFlowConfig:
@@ -509,7 +523,7 @@ def get_platform_name_for_part(part_name: str):
     differ only in a type of package they use.
     """
     with (Path(mypath) / 'part_db.json').open('r') as rfptr:
-        return json.load(rfptr).get(part_name.upper())
+        return json_load(rfptr).get(part_name.upper())
 
 def cmd_build(args: Namespace):
     """ sfbuild's `build` command implementation """
@@ -535,7 +549,7 @@ def cmd_build(args: Namespace):
         fatal(-1, 'No configuration was provided. Use `--flow`, `--platform` or '
                   '`--part` to configure flow..')
 
-    platform_path = os.path.join(mypath, 'platforms', platform + '.json')
+    platform_path = str(Path(mypath) / f'platforms/{platform}.json')
     platform_def = None
     try:
         with open(platform_path) as platform_file:
@@ -550,7 +564,7 @@ def cmd_build(args: Namespace):
     sfprint(2, 'Scanning modules...')
     scan_modules(mypath)
 
-    flow_definition_dict = json.loads(platform_def)
+    flow_definition_dict = json_loads(platform_def)
     flow_def = FlowDefinition(flow_definition_dict, r_env)
     flow_cfg = FlowConfig(project_flow_cfg, flow_def, platform)
 

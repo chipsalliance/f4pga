@@ -1,34 +1,28 @@
-#!/usr/bin/python3
-
-# Symbiflow Stage Module
-
-# ----------------------------------------------------------------------------- #
-
+from pathlib import Path
 import os
+from shutil import move as sh_mv
+from re import match as re_match
 from f4pga.common import *
-from f4pga.module import *
+from f4pga.module import Module, ModuleContext
 
-# ----------------------------------------------------------------------------- #
 
 def default_output_name(place_constraints):
     p = place_constraints
-    m = re.match('(.*)\\.[^.]*$', place_constraints)
+    m = re_match('(.*)\\.[^.]*$', place_constraints)
     if m:
-        p = m.groups()[0] + '.place'
-    else:
-        p += '.place'
-    return p
+        return m.groups()[0] + '.place'
+    return f'{p}.place'
+
 
 def place_constraints_file(ctx: ModuleContext):
-    dummy =- False
     p = ctx.takes.place_constraints
-    if not p:
-        p = ctx.takes.io_place
-    if not p:
-        dummy = True
-        p = file_noext(ctx.takes.eblif) + '.place'
+    if p:
+        return p, False
+    p = ctx.takes.io_place
+    if p:
+        return p, False
+    return f'{Path(ctx.takes.eblif).stem}.place', True
 
-    return p, dummy
 
 class PlaceModule(Module):
     def map_io(self, ctx: ModuleContext):
@@ -45,7 +39,7 @@ class PlaceModule(Module):
             with open(place_constraints, 'wb') as f:
                 f.write(b'')
 
-        build_dir = os.path.dirname(ctx.takes.eblif)
+        build_dir = str(Path(ctx.takes.eblif).parent)
 
         vpr_options = ['--fix_clusters', place_constraints]
 
@@ -63,7 +57,7 @@ class PlaceModule(Module):
         # the ones in flow configuration.
         if ctx.is_output_explicit('place'):
             output_file = default_output_name(place_constraints)
-            shutil.move(output_file, ctx.outputs.place)
+            sh_mv(output_file, ctx.outputs.place)
 
         yield 'Saving log...'
         save_vpr_log('place.log', build_dir=build_dir)

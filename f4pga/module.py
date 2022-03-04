@@ -1,17 +1,22 @@
-# Here are the things necessary to write a symbiflow Module
+"""
+Here are the things necessary to write an F4PGA Module.
+"""
 
-import abc
 from types import SimpleNamespace
-from f4pga.common import *
-from colorama import Fore, Style
+from abc import abstractmethod
+
+from f4pga.common import (
+    decompose_depname,
+    ResolutionEnv
+)
+
 
 class Module:
     """
     A `Module` is a wrapper for whatever tool is used in a flow.
-    Modules can request dependencies, values and are guranteed to have all the
-    required ones present when entering `exec` mode.
-    They also have to specify what dependencies they produce and create the files
-    for these dependencies.
+    Modules can request dependencies, values and are guranteed to have all the required ones present when entering
+    `exec` mode.
+    They also have to specify what dependencies they produce and create the files for these dependencies.
     """
 
     no_of_phases: int
@@ -21,16 +26,16 @@ class Module:
     values: 'list[str]'
     prod_meta: 'dict[str, str]'
 
-    @abc.abstractmethod
+    @abstractmethod
     def execute(self, ctx):
         """
-        Executes module. Use yield to print a message informing about current
-        execution phase.
+        Executes module.
+        Use yield to print a message informing about current execution phase.
         `ctx` is `ModuleContext`.
         """
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def map_io(self, ctx) -> 'dict[str, ]':
         """
         Returns paths for outputs derived from given inputs.
@@ -44,48 +49,50 @@ class Module:
         self.name = '<BASE STAGE>'
         self.prod_meta = {}
 
+
 class ModuleContext:
     """
-    A class for object holding mappings for dependencies and values as well as
-    other information needed during modules execution.
+    A class for object holding mappings for dependencies and values as well as other information needed during modules
+    execution.
     """
 
-    share: str                 #   Absolute path to Symbiflow's share directory
-    bin: str                   #   Absolute path to Symbiflow's bin directory
-    takes: SimpleNamespace     #   Maps symbolic dependency names to relative
-                               # paths.
-    produces: SimpleNamespace  #   Contains mappings for explicitely specified
-                               # dependencies. Useful mostly for checking for
-                               # on-demand optional outputs (such as logs)
-                               # with `is_output_explicit` method.
-    outputs: SimpleNamespace   #   Contains mappings for all available outputs.
-    values: SimpleNamespace    #   Contains all available requested values.
-    r_env: ResolutionEnv       # `ResolutionEnvironmet` object holding mappings
-                               # for current scope.
+    share: str                 #  Absolute path to Symbiflow's share directory
+    bin: str                   #  Absolute path to Symbiflow's bin directory
+    takes: SimpleNamespace     #  Maps symbolic dependency names to relative paths.
+    produces: SimpleNamespace  #  Contains mappings for explicitely specified dependencies.
+                               #  Useful mostly for checking for on-demand optional outputs (such as logs) with
+                               #    `is_output_explicit` method.
+    outputs: SimpleNamespace   #  Contains mappings for all available outputs.
+    values: SimpleNamespace    #  Contains all available requested values.
+    r_env: ResolutionEnv       # `ResolutionEnvironmet` object holding mappings for current scope.
     module_name: str           # Name of the module.
 
     def is_output_explicit(self, name: str):
-        """ True if user has explicitely specified output's path. """
-        o = getattr(self.produces, name)
-        return o is not None
+        """
+        True if user has explicitely specified output's path.
+        """
+        return getattr(self.produces, name) is not None
 
     def _getreqmaybe(self, obj, deps: 'list[str]', deps_cfg: 'dict[str, ]'):
         """
-        Add attribute for a dependency or panic if a required dependency has not
-        been given to the module on its input.
+        Add attribute for a dependency or panic if a required dependency has not been given to the module on its input.
         """
-
         for name in deps:
             name, spec = decompose_depname(name)
             value = deps_cfg.get(name)
             if value is None and spec == 'req':
-                fatal(-1, f'Dependency `{name}` is required by module '
-                          f'`{self.module_name}` but wasn\'t provided')
+                fatal(-1, f'Dependency `{name}` is required by module `{self.module_name}` but wasn\'t provided')
             setattr(obj, name, self.r_env.resolve(value))
 
     # `config` should be a dictionary given as modules input.
-    def __init__(self, module: Module, config: 'dict[str, ]',
-                 r_env: ResolutionEnv, share: str, bin: str):
+    def __init__(
+        self,
+        module: Module,
+        config: 'dict[str, ]',
+        r_env: ResolutionEnv,
+        share: str,
+        bin: str
+    ):
         self.module_name = module.name
         self.takes = SimpleNamespace()
         self.produces = SimpleNamespace()
@@ -122,6 +129,7 @@ class ModuleContext:
 
         return mycopy
 
+
 class ModuleRuntimeException(Exception):
     info: str
 
@@ -131,14 +139,15 @@ class ModuleRuntimeException(Exception):
     def __str___(self):
         return self.info
 
-def get_mod_metadata(module: Module):
-    """ Get descriptions for produced dependencies. """
 
+def get_mod_metadata(module: Module):
+    """
+    Get descriptions for produced dependencies.
+    """
     meta = {}
     has_meta = hasattr(module, 'prod_meta')
     for prod in module.produces:
-        prod = prod.replace('?', '')
-        prod = prod.replace('!', '')
+        prod = prod.replace('?', '').replace('!', '')
         if not has_meta:
             meta[prod] = '<no descritption>'
             continue

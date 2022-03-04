@@ -1,17 +1,12 @@
-#!/usr/bin/python3
-
-# Symbiflow Stage Module
-
-# ----------------------------------------------------------------------------- #
-
 import os
 from f4pga.common import *
-from f4pga.module import *
+from f4pga.module import Module, ModuleContext
 
-# ----------------------------------------------------------------------------- #
 
-# Setup environmental variables for YOSYS TCL scripts
 def yosys_setup_tcl_env(tcl_env_def):
+    """
+    Setup environmental variables for YOSYS TCL scripts.
+    """
     env = {}
     for key, value in tcl_env_def.items():
         if value is None:
@@ -21,6 +16,7 @@ def yosys_setup_tcl_env(tcl_env_def):
             v = ' '.join(value)
         env[key] = v
     return env
+
 
 def yosys_synth(tcl, tcl_env, verilog_files=[], read_verilog_args=None, log=None):
     # Set up environment for TCL weirdness
@@ -41,19 +37,15 @@ def yosys_synth(tcl, tcl_env, verilog_files=[], read_verilog_args=None, log=None
         verilog_files = []
 
     # Execute YOSYS command
-    return sub(*(['yosys', '-p', tcl] + optional + verilog_files),
-               env=env)
+    return sub(*(['yosys', '-p', tcl] + optional + verilog_files), env=env)
+
 
 def yosys_conv(tcl, tcl_env, synth_json):
     # Set up environment for TCL weirdness
     env = os.environ.copy()
     env.update(tcl_env)
+    return sub('yosys', '-p', f'read_json {synth_json}; tcl {tcl}', env=env)
 
-    # Execute YOSYS command
-    return sub('yosys', '-p', 'read_json ' + synth_json + '; tcl ' + tcl,
-               env=env)
-
-# ----------------------------------------------------------------------------- #
 
 class SynthModule(Module):
     extra_products: 'list[str]'

@@ -1,22 +1,21 @@
-import os
-import json
-
-from f4pga.common import file_noext, ResolutionEnv, deep
-from f4pga.stage import Stage
+from pathlib import Path
 from copy import copy
+from os import listdir as os_listdir
+from json import dump as json_dump, load as json_load
 
-_realpath_deep = deep(os.path.realpath)
+from f4pga.common import ResolutionEnv, deep
+from f4pga.stage import Stage
+
 
 def open_flow_cfg(path: str) -> dict:
-    flow_cfg_json: str
-    with open(path, 'r') as flow_cfg_file:
-        flow_cfg_json = flow_cfg_file.read()
-    return json.loads(flow_cfg_json)
+    with Path(path).open('r') as rfptr:
+        return json_load(rfptr)
+
 
 def save_flow_cfg(flow: dict, path: str):
-    flow_cfg_json = json.dumps(flow, indent=4)
-    with open(path, 'w') as flow_cfg_file:
-        flow_cfg_file.write(flow_cfg_json)
+    with Path(path).open('w') as wfptr:
+        json_dump(flow, wfptr, indent=4)
+
 
 def _get_lazy_dict(parent: dict, name: str):
     d = parent.get(name)
@@ -25,69 +24,96 @@ def _get_lazy_dict(parent: dict, name: str):
         parent[name] = d
     return d
 
-def _get_ov_dict(dname: str, flow: dict,
-                 platform: 'str | None' = None, stage: 'str | None' = None):
-    d: dict
-    if platform:
-        platform_dict: dict = flow[platform]
-        if stage:
-            stage_dict: dict = _get_lazy_dict(platform_dict, stage)
-            d = _get_lazy_dict(stage_dict, dname)
-        else:
-            d = _get_lazy_dict(platform_dict, dname)
-    else:
-        d = _get_lazy_dict(flow, dname)
 
-    return d
+def _get_ov_dict(
+    dname: str,
+    flow: dict,
+    platform: 'str | None' = None,
+    stage: 'str | None' = None
+):
+    if not platform:
+        return _get_lazy_dict(flow, dname)
+    platform_dict: dict = flow[platform]
+    if stage:
+        stage_dict: dict = _get_lazy_dict(platform_dict, stage)
+        return _get_lazy_dict(stage_dict, dname)
+    return _get_lazy_dict(platform_dict, dname)
 
-def _get_dep_dict(flow: dict,
-                  platform: 'str | None' = None, stage: 'str | None' = None):
+
+def _get_dep_dict(
+    flow: dict,
+    platform: 'str | None' = None,
+    stage: 'str | None' = None
+):
     return _get_ov_dict('dependencies', flow, platform, stage)
 
-def _get_vals_dict(flow: dict,
-                   platform: 'str | None' = None, stage: 'str | None' = None):
+
+def _get_vals_dict(
+    flow: dict,
+    platform: 'str | None' = None,
+    stage: 'str | None' = None
+):
     return _get_ov_dict('values', flow, platform, stage)
 
-def _add_ov(ov_dict_getter, failstr_constr, flow_cfg: dict, name: str,
-            values: list, platform: 'str | None' = None,
-            stage: 'str | None' = None) -> bool:
-        d = ov_dict_getter(flow_cfg, platform, stage)
 
-        deps = d.get(name)
-        if type(deps) is list:
-            deps += values
-        elif deps is None:
-            d[name] = values
-        else:
-            print(failstr_constr(name))
-            return False
-
+def _add_ov(
+    ov_dict_getter,
+    failstr_constr,
+    flow_cfg: dict,
+    name: str,
+    values: list,
+    platform: 'str | None' = None,
+    stage: 'str | None' = None
+) -> bool:
+    d = ov_dict_getter(flow_cfg, platform, stage)
+    deps = d.get(name)
+    if type(deps) is list:
+        deps += values
         return True
 
-def _rm_ov_by_values(ov_dict_getter, notset_str_constr, notlist_str_constr,
-                     flow: dict, name: str, vals: list,
-                     platform: 'str | None' = None,
-                     stage: 'str | None' = None) -> bool:
-    values_to_remove = set(vals)
+    if deps is None:
+        d[name] = values
+        return True
+
+    print(failstr_constr(name))
+    return False
+
+
+def _rm_ov_by_values(
+    ov_dict_getter,
+    notset_str_constr,
+    notlist_str_constr,
+    flow: dict,
+    name: str,
+    vals: list,
+    platform: 'str | None' = None,
+    stage: 'str | None' = None
+) -> bool:
     d = ov_dict_getter(flow, platform, stage)
 
     vallist: list = d.get(name)
     if type(vallist) is list:
-        d[name] = [val for val in vallist if val not in values_to_remove]
-    elif type(vallist) is None:
+        d[name] = [val for val in vallist if val not in set(vals)]
+        return True
+
+    if type(vallist) is None:
         print(notset_str_constr(name))
         return False
-    else:
-        print(notlist_str_constr(name))
-        return False
 
-    return True
+    print(notlist_str_constr(name))
+    return False
 
 
-def _rm_ov_by_idx(ov_dict_getter, notset_str_constr, notlist_str_constr,
-                  flow: dict, name: str, idcs: list,
-                  platform: 'str | None' = None,
-                  stage: 'str | None' = None) -> bool:
+def _rm_ov_by_idx(
+    ov_dict_getter,
+    notset_str_constr,
+    notlist_str_constr,
+    flow: dict,
+    name: str,
+    idcs: list,
+    platform: 'str | None' = None,
+    stage: 'str | None' = None
+) -> bool:
     idcs.sort(reverse=True)
 
     if len(idcs) == 0:
@@ -103,17 +129,22 @@ def _rm_ov_by_idx(ov_dict_getter, notset_str_constr, notlist_str_constr,
 
         for idx in idcs:
             vallist.pop(idx)
-    elif vallist is None:
+        return True
+
+    if vallist is None:
         print(notset_str_constr(name))
         return False
-    else:
-        print(notlist_str_constr(name))
-        return False
 
-    return True
+    print(notlist_str_constr(name))
+    return False
 
-def _get_ovs_raw(dict_name: str, flow_cfg,
-                 platform: 'str | None', stage: 'str | None'):
+
+def _get_ovs_raw(
+    dict_name: str,
+    flow_cfg,
+    platform: 'str | None',
+    stage: 'str | None'
+):
     vals = flow_cfg.get(dict_name)
     if vals is None:
         vals = {}
@@ -128,48 +159,105 @@ def _get_ovs_raw(dict_name: str, flow_cfg,
 
     return vals
 
-def _remove_dependencies_by_values(flow: dict, name: str, deps: list,
-                                   platform: 'str | None' = None,
-                                   stage: 'str | None' = None) -> bool:
+
+def _remove_dependencies_by_values(
+    flow: dict,
+    name: str,
+    deps: list,
+    platform: 'str | None' = None,
+    stage: 'str | None' = None
+) -> bool:
     def notset_str_constr(dname):
         return f'Dependency `{dname}` is not set. Nothing to remove.'
     def notlist_str_constr(dname):
         return f'Dependency `{dname}` is not a list! Use unsetd instead.'
-    return _rm_ov_by_values(_get_dep_dict, notset_str_constr, notlist_str_constr,
-                            flow, name, deps, platform, stage)
+    return _rm_ov_by_values(
+        _get_dep_dict,
+        notset_str_constr,
+        notlist_str_constr,
+        flow,
+        name,
+        deps,
+        platform,
+        stage
+    )
 
-def _remove_dependencies_by_idx(flow: dict, name: str, idcs: list,
-                                platform: 'str | None' = None,
-                                stage: 'str | None' = None) -> bool:
+
+def _remove_dependencies_by_idx(
+    flow: dict,
+    name: str,
+    idcs: list,
+    platform: 'str | None' = None,
+    stage: 'str | None' = None
+) -> bool:
     def notset_str_constr(dname):
         return f'Dependency `{dname}` is not set. Nothing to remove.'
     def notlist_str_constr(dname):
         return f'Dependency `{dname}` is not a list! Use unsetd instead.'
-    return _rm_ov_by_idx(_get_dep_dict, notset_str_constr, notlist_str_constr,
-                         flow, name, idcs, platform, stage)
+    return _rm_ov_by_idx(
+        _get_dep_dict,
+        notset_str_constr,
+        notlist_str_constr,
+        flow,
+        name,
+        idcs,
+        platform,
+        stage
+    )
 
-def _remove_values_by_values(flow: dict, name: str, deps: list,
-                             platform: 'str | None' = None,
-                             stage: 'str | None' = None) -> bool:
+
+def _remove_values_by_values(
+    flow: dict,
+    name: str,
+    deps: list,
+    platform: 'str | None' = None,
+    stage: 'str | None' = None
+) -> bool:
     def notset_str_constr(vname):
         return f'Value `{vname}` is not set. Nothing to remove.'
     def notlist_str_constr(vname):
         return f'Value `{vname}` is not a list! Use unsetv instead.'
-    return _rm_ov_by_values(_get_vals_dict, notset_str_constr, notlist_str_constr,
-                            flow, name, deps, platform, stage)
+    return _rm_ov_by_values(
+        _get_vals_dict,
+        notset_str_constr,
+        notlist_str_constr,
+        flow,
+        name,
+        deps,
+        platform,
+        stage
+    )
 
-def _remove_values_by_idx(flow: dict, name: str, idcs: list,
-                          platform: 'str | None' = None,
-                          stage: 'str | None' = None) -> bool:
+
+def _remove_values_by_idx(
+    flow: dict,
+    name: str,
+    idcs: list,
+    platform: 'str | None' = None,
+    stage: 'str | None' = None
+) -> bool:
     def notset_str_constr(dname):
         return f'Dependency `{dname}` is not set. Nothing to remove.'
     def notlist_str_constr(dname):
         return f'Dependency `{dname}` is not a list! Use unsetv instead.'
-    return _rm_ov_by_idx(_get_vals_dict, notset_str_constr, notlist_str_constr,
-                         flow, name, idcs, platform, stage)
+    return _rm_ov_by_idx(
+        _get_vals_dict,
+        notset_str_constr,
+        notlist_str_constr,
+        flow,
+        name,
+        idcs,
+        platform,
+        stage
+    )
 
-def unset_dependency(flow: dict, name: str,
-                   platform: 'str | None', stage: 'str | None'):
+
+def unset_dependency(
+    flow: dict,
+    name: str,
+    platform: 'str | None',
+    stage: 'str | None'
+):
     d = _get_dep_dict(flow, platform, stage)
     if d.get(name) is None:
         print(f'Dependency `{name}` is not set!')
@@ -177,21 +265,25 @@ def unset_dependency(flow: dict, name: str,
     d.pop(name)
     return True
 
+
 def verify_platform_name(platform: str, mypath: str):
-    for plat_def_filename in os.listdir(os.path.join(mypath, 'platforms')):
-        platform_name = file_noext(plat_def_filename)
+    for plat_def_filename in os_listdir(str(Path(mypath) / 'platforms')):
+        platform_name = str(Path(plat_def_filename).stem)
         if platform == platform_name:
             return True
     return False
+
 
 def verify_stage(platform: str, stage: str, mypath: str):
     # TODO: Verify stage
     return True
 
+
 def _is_kword(w: str):
     return \
         (w == 'dependencies') | (w == 'values') | \
         (w == 'default_platform') | (w == 'default_target')
+
 
 class FlowDefinition:
     # stage name -> module path mapping
@@ -224,6 +316,7 @@ class FlowDefinition:
         r_env = copy(self.r_env)
         r_env.add_values(stage.value_overrides)
         return r_env
+
 
 class ProjectFlowConfig:
     flow_cfg: dict
@@ -275,20 +368,26 @@ class ProjectFlowConfig:
 
         return r_env
 
-    """ Get dependencies without value resolution applied """
     def get_dependencies_raw(self, platform: 'str | None' = None):
+        """
+        Get dependencies without value resolution applied.
+        """
         return _get_ovs_raw('dependencies', self.flow_cfg, platform, None)
 
-    """ Get values without value resolution applied """
-    def get_values_raw(self, platform: 'str | None' = None,
-                       stage: 'str | None' = None):
+    def get_values_raw(
+        self,
+        platform: 'str | None' = None,
+        stage: 'str | None' = None
+    ):
+        """
+        Get values without value resolution applied.
+        """
         return _get_ovs_raw('values', self.flow_cfg, platform, stage)
 
     def get_stage_value_overrides(self, platform: str, stage: str):
         stage_cfg = self.flow_cfg[platform].get(stage)
         if stage_cfg is None:
             return {}
-
         stage_vals_ovds = stage_cfg.get('values')
         if stage_vals_ovds is None:
             return {}
@@ -317,8 +416,7 @@ class FlowConfig:
 
         raw_project_deps = project_config.get_dependencies_raw(platform)
 
-        self.dependencies_explicit = \
-            _realpath_deep(self.r_env.resolve(raw_project_deps))
+        self.dependencies_explicit = deep(lambda p: str(Path(p).resolve()))(self.r_env.resolve(raw_project_deps))
 
         for stage_name, stage in platform_def.stages.items():
             project_val_ovds = \
@@ -349,12 +447,9 @@ class FlowConfigException(Exception):
     def __str__(self) -> str:
         return f'Error in config `{self.path}: {self.message}'
 
+
 def open_project_flow_cfg(path: str) -> ProjectFlowConfig:
     cfg = ProjectFlowConfig(path)
-
-    flow_cfg_json: str
-    with open(path, 'r') as flow_cfg_file:
-        flow_cfg_json = flow_cfg_file.read()
-    cfg.flow_cfg = json.loads(flow_cfg_json)
-
+    with Path(path).open('r') as rfptr:
+        cfg.flow_cfg = json_load(rfptr)
     return cfg
