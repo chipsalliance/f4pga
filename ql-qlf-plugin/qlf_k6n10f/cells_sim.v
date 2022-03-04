@@ -685,11 +685,11 @@ endmodule  /* QL_DSP1 */
 
 (* blackbox *)
 module QL_DSP2 ( // TODO: Name subject to change
-    input  [NBITS_A-1:0] a,
-    input  [NBITS_B-1:0] b,
-    input  [NBITS_AF-1:0] acc_fir,
-    output [NBITS_Z-1:0] z,
-    output [NBITS_B-1:0] dly_b,
+      input  [19:0] a,
+      input  [17:0] b,
+      input  [3:0] acc_fir,
+      output [37:0] z,
+      output [17:0] dly_b,
 
     (* clkbuf_sink *)
     input         clk,
@@ -709,10 +709,10 @@ module QL_DSP2 ( // TODO: Name subject to change
     input         register_inputs
 );
 
-    parameter [NBITS_COEF-1:0] COEFF_0 = 20'd0;
-    parameter [NBITS_COEF-1:0] COEFF_1 = 20'd0;
-    parameter [NBITS_COEF-1:0] COEFF_2 = 20'd0;
-    parameter [NBITS_COEF-1:0] COEFF_3 = 20'd0;
+    parameter [19:0] COEFF_0 = 20'd0;
+    parameter [19:0] COEFF_1 = 20'd0;
+    parameter [19:0] COEFF_2 = 20'd0;
+    parameter [19:0] COEFF_3 = 20'd0;
 
       localparam NBITS_ACC = 64;
       localparam NBITS_A = 20;
@@ -852,7 +852,7 @@ module dsp_t1_sim # (
     input [NBITS_A-1:0] a_i,
     input [NBITS_B-1:0] b_i,
     output [NBITS_Z-1:0] z_o,
-    output [NBITS_B-1:0] dly_b_o,
+    output reg [NBITS_B-1:0] dly_b_o,
 
     input [NBITS_AF-1:0] acc_fir_i,
     input [2:0] feedback_i,
@@ -896,6 +896,7 @@ module dsp_t1_sim # (
     reg			r_subtract;
     reg			r_sat;
     reg			r_rnd;
+    reg [NBITS_ACC-1:0] acc;
 
     always @(posedge clock_i or negedge reset_n_i) begin
         if (~reset_n_i) begin
@@ -949,11 +950,6 @@ module dsp_t1_sim # (
     // Shift right control
     wire [5:0] shift_d1 = register_inputs_i ? r_shift_d1 : shift_right_i;
     wire [5:0] shift_d2 = output_select_i[1] ? shift_d1 : r_shift_d2;
-    //localparam SHIFT_SEL = {register_inputs_i, output_select_i[1]};
-    //wire [5:0] shift_right = (SHIFT_SEL == 2'b00) ?   shift_right_i :
-                             //(SHIFT_SEL == 2'b01) ?   r_shift_d1 :
-                             //(SHIFT_SEL == 2'b10) ?   r_shift_d1 :
-                           //[>(SHIFT_SEL == 2'b11) ?<] r_shift_d2;
 
     // Multiplier
     wire unsigned_mode = unsigned_a & unsigned_b;
@@ -996,8 +992,7 @@ module dsp_t1_sim # (
 
     wire [NBITS_ACC-1:0] add_o = add_a + add_b;
 
-    // Accumulator
-    reg [NBITS_ACC-1:0] acc;
+    // Accumulator    
     always @(posedge clock_i or negedge reset_n_i)
         if (~reset_n_i) acc <= 'h0;
         else begin
@@ -1052,8 +1047,6 @@ module dsp_t1_sim # (
 					       z1;	// if output_select_i == 3'h7
 
     // B input delayed passthrough
-    reg [NBITS_B-1:0] dly_b_o;
-
     always @(posedge clock_i or negedge reset_n_i)
         if (!reset_n_i)
             dly_b_o <= 0;
