@@ -6,6 +6,13 @@
 //
 // SPDX-License-Identifier:ISC
 
+`define MODE_36 3'b111	// 36 or 32-bit
+`define MODE_18 3'b110	// 18 or 16-bit
+`define MODE_9  3'b101	// 9 or 8-bit
+`define MODE_4  3'b100	// 4-bit
+`define MODE_2  3'b010	// 32-bit
+`define MODE_1  3'b001	// 32-bit
+
 module \$__QLF_FACTOR_BRAM36_TDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1ADDR, C1DATA, C1EN, CLK1, CLK2, D1ADDR, D1DATA, D1EN);
 	parameter CFG_ABITS = 10;
 	parameter CFG_DBITS = 36;
@@ -15,13 +22,6 @@ module \$__QLF_FACTOR_BRAM36_TDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1
 	parameter CLKPOL2 = 1;
 	parameter CLKPOL3 = 1;
 	parameter [36863:0] INIT = 36864'bx;
-
-	localparam MODE_36  = 3'b111;	// 36 or 32-bit
-	localparam MODE_18  = 3'b110;	// 18 or 16-bit
-	localparam MODE_9   = 3'b101;	// 9 or 8-bit
-	localparam MODE_4   = 3'b100;	// 4-bit
-	localparam MODE_2   = 3'b010;	// 32-bit
-	localparam MODE_1   = 3'b001;	// 32-bit
 
 	input CLK1;
 	input CLK2;
@@ -45,21 +45,6 @@ module \$__QLF_FACTOR_BRAM36_TDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1
 	wire FLUSH1;
 	wire FLUSH2;
 	wire SPLIT;
-	wire [10:0] UPAE1;
-	wire [10:0] UPAF1;
-	wire [10:0] UPAE2;
-	wire [10:0] UPAF2;
-	wire SYNC_FIFO1;
-	wire SYNC_FIFO2;
-	wire FMODE1;
-	wire FMODE2;
-	wire POWERDN1;
-	wire POWERDN2;
-	wire SLEEP1;
-	wire SLEEP2;
-	wire PROTECT1;
-	wire PROTECT2;
-	wire [8:0] RAM_ID_i;
 
 	wire PL_INIT_i;
 	wire PL_ENA_i;
@@ -102,69 +87,85 @@ module \$__QLF_FACTOR_BRAM36_TDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1
 		1: begin
 			assign PORT_A_ADDR = A1EN ? A1ADDR_TOTAL : (B1EN ? B1ADDR_TOTAL : 15'd0);
 			assign PORT_B_ADDR = C1EN ? C1ADDR_TOTAL : (D1EN ? D1ADDR_TOTAL : 15'd0);
-			assign WMODE = MODE_1;
-			assign RMODE = MODE_1;
+			defparam _TECHMAP_REPLACE_.WMODE_A1_i = `MODE_1;
+			defparam _TECHMAP_REPLACE_.WMODE_A2_i = `MODE_1;
+			defparam _TECHMAP_REPLACE_.RMODE_A1_i = `MODE_1;
+			defparam _TECHMAP_REPLACE_.RMODE_A2_i = `MODE_1;
+			defparam _TECHMAP_REPLACE_.WMODE_B1_i = `MODE_1;
+			defparam _TECHMAP_REPLACE_.WMODE_B2_i = `MODE_1;
+			defparam _TECHMAP_REPLACE_.RMODE_B1_i = `MODE_1;
+			defparam _TECHMAP_REPLACE_.RMODE_B2_i = `MODE_1;
 		end
 
 		2: begin
 			assign PORT_A_ADDR = A1EN ? (A1ADDR_TOTAL << 1) : (B1EN ? (B1ADDR_TOTAL << 1) : 15'd0);
 			assign PORT_B_ADDR = C1EN ? (C1ADDR_TOTAL << 1) : (D1EN ? (D1ADDR_TOTAL << 1) : 15'd0);
-			assign WMODE = MODE_2;
-			assign RMODE = MODE_2;
+			defparam _TECHMAP_REPLACE_.WMODE_A1_i = `MODE_2;
+			defparam _TECHMAP_REPLACE_.WMODE_A2_i = `MODE_2;
+			defparam _TECHMAP_REPLACE_.RMODE_A1_i = `MODE_2;
+			defparam _TECHMAP_REPLACE_.RMODE_A2_i = `MODE_2;
+			defparam _TECHMAP_REPLACE_.WMODE_B1_i = `MODE_2;
+			defparam _TECHMAP_REPLACE_.WMODE_B2_i = `MODE_2;
+			defparam _TECHMAP_REPLACE_.RMODE_B1_i = `MODE_2;
+			defparam _TECHMAP_REPLACE_.RMODE_B2_i = `MODE_2;
 		end
 
 		4: begin
 			assign PORT_A_ADDR = A1EN ? (A1ADDR_TOTAL << 5) : (B1EN ? (B1ADDR_TOTAL << 5) : 15'd0);
 			assign PORT_B_ADDR = C1EN ? (C1ADDR_TOTAL << 5) : (D1EN ? (D1ADDR_TOTAL << 5) : 15'd0);
-			assign WMODE = MODE_4;
-			assign RMODE = MODE_4;
+			defparam _TECHMAP_REPLACE_.WMODE_A1_i = `MODE_4;
+			defparam _TECHMAP_REPLACE_.WMODE_A2_i = `MODE_4;
+			defparam _TECHMAP_REPLACE_.RMODE_A1_i = `MODE_4;
+			defparam _TECHMAP_REPLACE_.RMODE_A2_i = `MODE_4;
+			defparam _TECHMAP_REPLACE_.WMODE_B1_i = `MODE_4;
+			defparam _TECHMAP_REPLACE_.WMODE_B2_i = `MODE_4;
+			defparam _TECHMAP_REPLACE_.RMODE_B1_i = `MODE_4;
+			defparam _TECHMAP_REPLACE_.RMODE_B2_i = `MODE_4;
 		end
 
-		8: begin
+		8, 9: begin
 			assign PORT_A_ADDR = A1EN ? (A1ADDR_TOTAL << 3) : (B1EN ? (B1ADDR_TOTAL << 3) : 15'd0);
 			assign PORT_B_ADDR = C1EN ? (C1ADDR_TOTAL << 3) : (D1EN ? (D1ADDR_TOTAL << 3) : 15'd0);
-			assign WMODE = MODE_9;
-			assign RMODE = MODE_9;
+			defparam _TECHMAP_REPLACE_.WMODE_A1_i = `MODE_9;
+			defparam _TECHMAP_REPLACE_.WMODE_A2_i = `MODE_9;
+			defparam _TECHMAP_REPLACE_.RMODE_A1_i = `MODE_9;
+			defparam _TECHMAP_REPLACE_.RMODE_A2_i = `MODE_9;
+			defparam _TECHMAP_REPLACE_.WMODE_B1_i = `MODE_9;
+			defparam _TECHMAP_REPLACE_.WMODE_B2_i = `MODE_9;
+			defparam _TECHMAP_REPLACE_.RMODE_B1_i = `MODE_9;
+			defparam _TECHMAP_REPLACE_.RMODE_B2_i = `MODE_9;
 		end
 
-		9: begin
-			assign PORT_A_ADDR = A1EN ? (A1ADDR_TOTAL << 3) : (B1EN ? (B1ADDR_TOTAL << 3) : 15'd0);
-			assign PORT_B_ADDR = C1EN ? (C1ADDR_TOTAL << 3) : (D1EN ? (D1ADDR_TOTAL << 3) : 15'd0);
-			assign WMODE = MODE_9;
-			assign RMODE = MODE_9;
-		end
-
-		16: begin
+		16, 18: begin
 			assign PORT_A_ADDR = A1EN ? (A1ADDR_TOTAL << 4) : (B1EN ? (B1ADDR_TOTAL << 4) : 15'd0);
 			assign PORT_B_ADDR = C1EN ? (C1ADDR_TOTAL << 4) : (D1EN ? (D1ADDR_TOTAL << 4) : 15'd0);
-			assign WMODE = MODE_18;
-			assign RMODE = MODE_18;
+			defparam _TECHMAP_REPLACE_.WMODE_A1_i = `MODE_18;
+			defparam _TECHMAP_REPLACE_.WMODE_A2_i = `MODE_18;
+			defparam _TECHMAP_REPLACE_.RMODE_A1_i = `MODE_18;
+			defparam _TECHMAP_REPLACE_.RMODE_A2_i = `MODE_18;
+			defparam _TECHMAP_REPLACE_.WMODE_B1_i = `MODE_18;
+			defparam _TECHMAP_REPLACE_.WMODE_B2_i = `MODE_18;
+			defparam _TECHMAP_REPLACE_.RMODE_B1_i = `MODE_18;
+			defparam _TECHMAP_REPLACE_.RMODE_B2_i = `MODE_18;
 		end
 
-		18: begin
-			assign PORT_A_ADDR = A1EN ? (A1ADDR_TOTAL << 4) : (B1EN ? (B1ADDR_TOTAL << 4) : 15'd0);
-			assign PORT_B_ADDR = C1EN ? (C1ADDR_TOTAL << 4) : (D1EN ? (D1ADDR_TOTAL << 4) : 15'd0);
-			assign WMODE = MODE_18;
-			assign RMODE = MODE_18;
-		end
-
-		32: begin
+		32, 36: begin
 			assign PORT_A_ADDR = A1EN ? (A1ADDR_TOTAL << 5) : (B1EN ? (B1ADDR_TOTAL << 5) : 15'd0);
 			assign PORT_B_ADDR = C1EN ? (C1ADDR_TOTAL << 5) : (D1EN ? (D1ADDR_TOTAL << 5) : 15'd0);
-			assign WMODE = MODE_36;
-			assign RMODE = MODE_36;
-		end
-		36: begin
-			assign PORT_A_ADDR = A1EN ? (A1ADDR_TOTAL << 5) : (B1EN ? (B1ADDR_TOTAL << 5) : 15'd0);
-			assign PORT_B_ADDR = C1EN ? (C1ADDR_TOTAL << 5) : (D1EN ? (D1ADDR_TOTAL << 5) : 15'd0);
-			assign WMODE = MODE_36;
-			assign RMODE = MODE_36;
+			defparam _TECHMAP_REPLACE_.WMODE_A1_i = `MODE_36;
+			defparam _TECHMAP_REPLACE_.WMODE_A2_i = `MODE_36;
+			defparam _TECHMAP_REPLACE_.RMODE_A1_i = `MODE_36;
+			defparam _TECHMAP_REPLACE_.RMODE_A2_i = `MODE_36;
+			defparam _TECHMAP_REPLACE_.WMODE_B1_i = `MODE_36;
+			defparam _TECHMAP_REPLACE_.WMODE_B2_i = `MODE_36;
+			defparam _TECHMAP_REPLACE_.RMODE_B1_i = `MODE_36;
+			defparam _TECHMAP_REPLACE_.RMODE_B2_i = `MODE_36;
 		end
 		default: begin
 			assign PORT_A_ADDR = A1EN ? A1ADDR_TOTAL : (B1EN ? B1ADDR_TOTAL : 15'd0);
 			assign PORT_B_ADDR = C1EN ? C1ADDR_TOTAL : (D1EN ? D1ADDR_TOTAL : 15'd0);
-			assign WMODE = MODE_36;
-			assign RMODE = MODE_36;
+			assign WMODE = `MODE_36;
+			assign RMODE = `MODE_36;
 		end
 	endcase
 
@@ -172,21 +173,6 @@ module \$__QLF_FACTOR_BRAM36_TDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1
 	assign SPLIT = 1'b0;
 	assign FLUSH1 = 1'b0;
 	assign FLUSH2 = 1'b0;
-	assign UPAE1 = 11'd10;
-	assign UPAF1 = 11'd10;
-	assign UPAE2 = 11'd10;
-	assign UPAF2 = 11'd10;
-	assign SYNC_FIFO1 = 1'b0;
-	assign SYNC_FIFO2 = 1'b0;
-	assign FMODE1 = 1'b0;
-	assign FMODE2 = 1'b0;
-	assign POWERDN1 = 1'b0;
-	assign POWERDN2 = 1'b0;
-	assign SLEEP1 = 1'b0;
-	assign SLEEP2 = 1'b0;
-	assign PROTECT1 = 1'b0;
-	assign PROTECT2 = 1'b0;
-	assign RAM_ID_i = 9'b0;
 
 	assign PL_INIT_i = 1'b0;
 	assign PL_ENA_i = 1'b0;
@@ -196,12 +182,24 @@ module \$__QLF_FACTOR_BRAM36_TDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1
 	assign PL_ADDR_i = 24'b0;
 	assign PL_DATA_i = 36'b0;
 
-	TDP_BRAM36 #() _TECHMAP_REPLACE_ (
-		.WMODE_A1_i(WMODE),
-		.WMODE_A2_i(WMODE),
-		.RMODE_A1_i(RMODE),
-		.RMODE_A2_i(RMODE),
-
+	TDP_BRAM36 #(
+		.UPAE1_i(12'd10),
+		.UPAF1_i(12'd10),
+		.UPAE2_i(12'd10),
+		.UPAF2_i(12'd10),
+		.SYNC_FIFO1_i(1'b0),
+		.SYNC_FIFO2_i(1'b0),
+		.FMODE1_i(1'b0),
+		.FMODE2_i(1'b0),
+		.POWERDN1_i(1'b0),
+		.POWERDN2_i(1'b0),
+		.SLEEP1_i(1'b0),
+		.SLEEP2_i(1'b0),
+		.PROTECT1_i(1'b0),
+		.PROTECT2_i(1'b0),
+		.RAM_ID_i(9'b0),
+		.SPLIT_i(1'b0)
+	) _TECHMAP_REPLACE_ (
 		.WDATA_A1_i(B1DATA[17:0]),
 		.WDATA_A2_i(B1DATA[35:18]),
 		.RDATA_A1_o(A1DATA_TOTAL[17:0]),
@@ -216,12 +214,6 @@ module \$__QLF_FACTOR_BRAM36_TDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1
 		.WEN_A2_i(B1EN[0]),
 		.BE_A1_i({B1EN[1],B1EN[0]}),
 		.BE_A2_i({B1EN[3],B1EN[2]}),
-
-
-		.WMODE_B1_i(WMODE),
-		.WMODE_B2_i(WMODE),
-		.RMODE_B1_i(RMODE),
-		.RMODE_B2_i(RMODE),
 
 		.WDATA_B1_i(D1DATA[17:0]),
 		.WDATA_B2_i(D1DATA[35:18]),
@@ -238,25 +230,8 @@ module \$__QLF_FACTOR_BRAM36_TDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1
 		.BE_B1_i({D1EN[1],D1EN[0]}),
 		.BE_B2_i({D1EN[3],D1EN[2]}),
 
-
-		.SPLIT_i(SPLIT),
 		.FLUSH1_i(FLUSH1),
 		.FLUSH2_i(FLUSH2),
-		.UPAE1_i(UPAE1),
-		.UPAF1_i(UPAF1),
-		.UPAE2_i(UPAE2),
-		.UPAF2_i(UPAF2),
-		.SYNC_FIFO1_i(SYNC_FIFO1),
-		.SYNC_FIFO2_i(SYNC_FIFO2),
-		.FMODE1_i(FMODE1),
-		.FMODE2_i(FMODE2),
-		.POWERDN1_i(POWERDN1),
-		.POWERDN2_i(POWERDN2),
-		.SLEEP1_i(SLEEP1),
-		.SLEEP2_i(SLEEP2),
-		.PROTECT1_i(PROTECT1),
-		.PROTECT2_i(PROTECT2),
-		.RAM_ID_i(RAM_ID_i),
 
 		.PL_INIT_i(PL_INIT_i),
 		.PL_ENA_i(PL_ENA_i),
