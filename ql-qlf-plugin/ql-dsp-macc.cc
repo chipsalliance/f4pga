@@ -55,6 +55,11 @@ void create_ql_macc_dsp(ql_dsp_macc_pm &pm)
         }
     }
 
+    // Accept only posedge clocked FFs
+    if (st.ff->getParam(ID(CLK_POLARITY)) != RTLIL::S1) {
+        return;
+    }
+
     // Get port widths
     size_t a_width = GetSize(st.mul->getPort(ID(A)));
     size_t b_width = GetSize(st.mul->getPort(ID(B)));
@@ -146,13 +151,21 @@ void create_ql_macc_dsp(ql_dsp_macc_pm &pm)
     RTLIL::SigSpec ena;
 
     if (st.ff->hasPort(ID(ARST))) {
-        rst = st.ff->getPort(ID(ARST));
+        if (st.ff->getParam(ID(ARST_POLARITY)) != RTLIL::S0) {
+            rst = pm.module->Not(NEW_ID, st.ff->getPort(ID(ARST)));
+        } else {
+            rst = st.ff->getPort(ID(ARST));
+        }
     } else {
-        rst = RTLIL::SigSpec(RTLIL::S0);
+        rst = RTLIL::SigSpec(RTLIL::S1);
     }
 
     if (st.ff->hasPort(ID(EN))) {
-        ena = st.ff->getPort(ID(EN));
+        if (st.ff->getParam(ID(EN_POLARITY)) != RTLIL::S1) {
+            ena = pm.module->Not(NEW_ID, st.ff->getPort(ID(EN)));
+        } else {
+            ena = st.ff->getPort(ID(EN));
+        }
     } else {
         ena = RTLIL::SigSpec(RTLIL::S1);
     }
@@ -166,19 +179,20 @@ void create_ql_macc_dsp(ql_dsp_macc_pm &pm)
 
         // Depending on the mux port ordering insert inverter if needed
         log_assert(st.mux_ab == ID(A) || st.mux_ab == ID(B));
-        if (st.mux_ab == ID(B)) {
+        if (st.mux_ab == ID(A)) {
             sig_s = pm.module->Not(NEW_ID, sig_s);
         }
 
         // Assemble the full control signal for the feedback_i port
         RTLIL::SigSpec sig_f;
-        sig_f.append(RTLIL::S0);
         sig_f.append(sig_s);
+        sig_f.append(RTLIL::S0);
+        sig_f.append(RTLIL::S0);
         cell->setPort(RTLIL::escape_id("feedback_i"), sig_f);
     }
     // No acc clear/load
     else {
-        cell->setPort(RTLIL::escape_id("feedback_i"), RTLIL::SigSpec(RTLIL::S0, 2));
+        cell->setPort(RTLIL::escape_id("feedback_i"), RTLIL::SigSpec(RTLIL::S0, 3));
     }
 
     // Connect control ports
@@ -196,7 +210,7 @@ void create_ql_macc_dsp(ql_dsp_macc_pm &pm)
 
     // 3 - output post acc
     // 1 - output pre acc
-    cell->setPort(RTLIL::escape_id("output_select_i"), out_ff ? RTLIL::Const(3, 3) : RTLIL::Const(1, 3));
+    cell->setPort(RTLIL::escape_id("output_select_i"), out_ff ? RTLIL::Const(1, 3) : RTLIL::Const(3, 3));
 
     // Mark the cells for removal
     pm.autoremove(st.mul);
