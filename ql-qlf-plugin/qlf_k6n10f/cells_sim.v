@@ -503,17 +503,6 @@ module TDP_BRAM36 (
 	RDATA_A1_o,
 	RDATA_B1_o,
 	FLUSH1_i,
-	SYNC_FIFO1_i,
-	RMODE_A1_i,
-	RMODE_B1_i,
-	WMODE_A1_i,
-	WMODE_B1_i,
-	FMODE1_i,
-	POWERDN1_i,
-	SLEEP1_i,
-	PROTECT1_i,
-	UPAE1_i,
-	UPAF1_i,
 	WEN_A2_i,
 	WEN_B2_i,
 	REN_A2_i,
@@ -529,18 +518,6 @@ module TDP_BRAM36 (
 	RDATA_A2_o,
 	RDATA_B2_o,
 	FLUSH2_i,
-	SYNC_FIFO2_i,
-	RMODE_A2_i,
-	RMODE_B2_i,
-	WMODE_A2_i,
-	WMODE_B2_i,
-	FMODE2_i,
-	POWERDN2_i,
-	SLEEP2_i,
-	PROTECT2_i,
-	UPAE2_i,
-	UPAF2_i,
-	SPLIT_i,
 	RAM_ID_i,
 	PL_INIT_i,
 	PL_ENA_i,
@@ -557,6 +534,32 @@ module TDP_BRAM36 (
 	PL_ADDR_o,
 	PL_DATA_o
 );
+	parameter SYNC_FIFO1_i = 1'b0;
+	parameter RMODE_A1_i = 3'b0;
+	parameter RMODE_B1_i = 3'b0;
+	parameter WMODE_A1_i = 3'b0;
+	parameter WMODE_B1_i = 3'b0;
+	parameter FMODE1_i = 1'b0;
+	parameter POWERDN1_i = 1'b0;
+	parameter SLEEP1_i = 1'b0;
+	parameter PROTECT1_i = 1'b0;
+	parameter UPAE1_i = 12'b0;
+	parameter UPAF1_i = 12'b0;
+
+	parameter SYNC_FIFO2_i = 1'b0;
+	parameter RMODE_A2_i = 3'b0;
+	parameter RMODE_B2_i = 3'b0;
+	parameter WMODE_A2_i = 3'b0;
+	parameter WMODE_B2_i = 3'b0;
+	parameter FMODE2_i = 1'b0;
+	parameter POWERDN2_i = 1'b0;
+	parameter SLEEP2_i = 1'b0;
+	parameter PROTECT2_i = 1'b0;
+	parameter UPAE2_i = 12'b0;
+	parameter UPAF2_i = 12'b0;
+
+	parameter SPLIT_i = 1'b0;
+
 	parameter INITP_00 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
 	parameter INITP_01 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
 	parameter INITP_02 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
@@ -719,17 +722,6 @@ module TDP_BRAM36 (
 	output reg [17:0] RDATA_A1_o;
 	output reg [17:0] RDATA_B1_o;
 	input wire FLUSH1_i;
-	input wire SYNC_FIFO1_i;
-	input wire [2:0] RMODE_A1_i;
-	input wire [2:0] RMODE_B1_i;
-	input wire [2:0] WMODE_A1_i;
-	input wire [2:0] WMODE_B1_i;
-	input wire FMODE1_i;
-	input wire POWERDN1_i;
-	input wire SLEEP1_i;
-	input wire PROTECT1_i;
-	input wire [11:0] UPAE1_i;
-	input wire [11:0] UPAF1_i;
 	input wire WEN_A2_i;
 	input wire WEN_B2_i;
 	input wire REN_A2_i;
@@ -747,19 +739,7 @@ module TDP_BRAM36 (
 	output reg [17:0] RDATA_A2_o;
 	output reg [17:0] RDATA_B2_o;
 	input wire FLUSH2_i;
-	input wire SYNC_FIFO2_i;
-	input wire [2:0] RMODE_A2_i;
-	input wire [2:0] RMODE_B2_i;
-	input wire [2:0] WMODE_A2_i;
-	input wire [2:0] WMODE_B2_i;
-	input wire FMODE2_i;
-	input wire POWERDN2_i;
-	input wire SLEEP2_i;
-	input wire PROTECT2_i;
-	input wire [10:0] UPAE2_i;
-	input wire [10:0] UPAF2_i;
-	input SPLIT_i;
-	input [15:0] RAM_ID_i;
+	input wire [15:0] RAM_ID_i;
 	input wire PL_INIT_i;
 	input wire PL_ENA_i;
 	input wire PL_REN_i;
@@ -990,29 +970,27 @@ module TDP_BRAM36 (
 			end
 		endcase
 	end
-	always @(*)
-		case (SPLIT_i)
-			0: begin
-				ram_rmode_a1 = (RMODE_A1_i == MODE_36 ? MODE_18 : RMODE_A1_i);
-				ram_rmode_a2 = (RMODE_A1_i == MODE_36 ? MODE_18 : RMODE_A1_i);
-				ram_wmode_a1 = (WMODE_A1_i == MODE_36 ? MODE_18 : (FMODE1_i ? MODE_18 : WMODE_A1_i));
-				ram_wmode_a2 = (WMODE_A1_i == MODE_36 ? MODE_18 : (FMODE1_i ? MODE_18 : WMODE_A1_i));
-				ram_rmode_b1 = (RMODE_B1_i == MODE_36 ? MODE_18 : (FMODE1_i ? MODE_18 : RMODE_B1_i));
-				ram_rmode_b2 = (RMODE_B1_i == MODE_36 ? MODE_18 : (FMODE1_i ? MODE_18 : RMODE_B1_i));
-				ram_wmode_b1 = (WMODE_B1_i == MODE_36 ? MODE_18 : WMODE_B1_i);
-				ram_wmode_b2 = (WMODE_B1_i == MODE_36 ? MODE_18 : WMODE_B1_i);
-			end
-			1: begin
-				ram_rmode_a1 = (RMODE_A1_i == MODE_36 ? MODE_18 : RMODE_A1_i);
-				ram_rmode_a2 = (RMODE_A2_i == MODE_36 ? MODE_18 : RMODE_A2_i);
-				ram_wmode_a1 = (WMODE_A1_i == MODE_36 ? MODE_18 : WMODE_A1_i);
-				ram_wmode_a2 = (WMODE_A2_i == MODE_36 ? MODE_18 : WMODE_A2_i);
-				ram_rmode_b1 = (RMODE_B1_i == MODE_36 ? MODE_18 : RMODE_B1_i);
-				ram_rmode_b2 = (RMODE_B2_i == MODE_36 ? MODE_18 : RMODE_B2_i);
-				ram_wmode_b1 = (WMODE_B1_i == MODE_36 ? MODE_18 : WMODE_B1_i);
-				ram_wmode_b2 = (WMODE_B2_i == MODE_36 ? MODE_18 : WMODE_B2_i);
-			end
-		endcase
+	always @(posedge CLK_A1_i or posedge CLK_B1_i or posedge CLK_A2_i or posedge CLK_B2_i) begin
+		if (!SPLIT_i) begin
+				ram_rmode_a1 <= (RMODE_A1_i == MODE_36 ? MODE_18 : RMODE_A1_i);
+				ram_rmode_a2 <= (RMODE_A1_i == MODE_36 ? MODE_18 : RMODE_A1_i);
+				ram_wmode_a1 <= (WMODE_A1_i == MODE_36 ? MODE_18 : (FMODE1_i ? MODE_18 : WMODE_A1_i));
+				ram_wmode_a2 <= (WMODE_A1_i == MODE_36 ? MODE_18 : (FMODE1_i ? MODE_18 : WMODE_A1_i));
+				ram_rmode_b1 <= (RMODE_B1_i == MODE_36 ? MODE_18 : (FMODE1_i ? MODE_18 : RMODE_B1_i));
+				ram_rmode_b2 <= (RMODE_B1_i == MODE_36 ? MODE_18 : (FMODE1_i ? MODE_18 : RMODE_B1_i));
+				ram_wmode_b1 <= (WMODE_B1_i == MODE_36 ? MODE_18 : WMODE_B1_i);
+				ram_wmode_b2 <= (WMODE_B1_i == MODE_36 ? MODE_18 : WMODE_B1_i);
+		end else begin
+				ram_rmode_a1 <= (RMODE_A1_i == MODE_36 ? MODE_18 : RMODE_A1_i);
+				ram_rmode_a2 <= (RMODE_A2_i == MODE_36 ? MODE_18 : RMODE_A2_i);
+				ram_wmode_a1 <= (WMODE_A1_i == MODE_36 ? MODE_18 : WMODE_A1_i);
+				ram_wmode_a2 <= (WMODE_A2_i == MODE_36 ? MODE_18 : WMODE_A2_i);
+				ram_rmode_b1 <= (RMODE_B1_i == MODE_36 ? MODE_18 : RMODE_B1_i);
+				ram_rmode_b2 <= (RMODE_B2_i == MODE_36 ? MODE_18 : RMODE_B2_i);
+				ram_wmode_b1 <= (WMODE_B1_i == MODE_36 ? MODE_18 : WMODE_B1_i);
+				ram_wmode_b2 <= (WMODE_B2_i == MODE_36 ? MODE_18 : WMODE_B2_i);
+		end
+	end
 	always @(*) begin : FIFO_READ_SEL
 		case (RMODE_B1_i)
 			MODE_36: fifo_rdata = {ram_rdata_b2[17:16], ram_rdata_b1[17:16], ram_rdata_b2[15:0], ram_rdata_b1[15:0]};
@@ -1115,19 +1093,24 @@ module TDP_BRAM36 (
 	end
 	always @(posedge CLK_A1_i) laddr_a1 <= ADDR_A1_i;
 	always @(posedge CLK_B1_i) laddr_b1 <= ADDR_B1_i;
-	always @(*) begin
-		case (WMODE_A1_i)
-			default: fifo_wmode = 2'b00;
-			MODE_36: fifo_wmode = 2'b00;
-			MODE_18: fifo_wmode = 2'b01;
-			MODE_9: fifo_wmode = 2'b10;
-		endcase
-		case (RMODE_B1_i)
-			default: fifo_rmode = 2'b00;
-			MODE_36: fifo_rmode = 2'b00;
-			MODE_18: fifo_rmode = 2'b01;
-			MODE_9: fifo_rmode = 2'b10;
-		endcase
+	always @(posedge CLK_A1_i or posedge CLK_B1_i or posedge CLK_A2_i or posedge CLK_B2_i) begin
+		if (WMODE_A1_i == MODE_36)
+			fifo_wmode = 2'b00;
+		else if (WMODE_A1_i == MODE_18)
+			fifo_wmode = 2'b01;
+		else if (WMODE_A1_i == MODE_9)
+			fifo_wmode = 2'b10;
+		else
+			fifo_wmode = 2'b00;
+
+		if (RMODE_B1_i == MODE_36)
+			fifo_rmode = 2'b00;
+		else if (RMODE_B1_i == MODE_18)
+			fifo_rmode = 2'b01;
+		else if (RMODE_B1_i == MODE_9)
+			fifo_rmode = 2'b10;
+		else
+			fifo_rmode = 2'b00;
 	end
 	fifo_ctl #(
 		.ADDR_WIDTH(12),
@@ -1150,7 +1133,14 @@ module TDP_BRAM36 (
 		.upaf(UPAF1_i),
 		.upae(UPAE1_i)
 	);
-	TDP18K_FIFO u1(
+	TDP18K_FIFO #(
+		.UPAF(UPAF1_i[10:0]),
+		.UPAE(UPAE1_i[10:0]),
+		.SYNC_FIFO(SYNC_FIFO1_i),
+		.POWERDN(POWERDN1_i),
+		.SLEEP(SLEEP1_i),
+		.PROTECT(PROTECT1_i)
+	)u1(
 		.RMODE_A(ram_rmode_a1),
 		.RMODE_B(ram_rmode_b1),
 		.WMODE_A(ram_wmode_a1),
@@ -1178,13 +1168,8 @@ module TDP_BRAM36 (
 		.FWM(FWM1),
 		.OVERRUN(OVERRUN1),
 		.FLUSH(FLUSH1_i),
+		.RAM_ID({RAM_ID_i}),
 		.FMODE(ram_fmode1),
-		.UPAF(UPAF1_i[10:0]),
-		.UPAE(UPAE1_i[10:0]),
-		.SYNC_FIFO(SYNC_FIFO1_i),
-		.POWERDN(POWERDN1_i),
-		.SLEEP(SLEEP1_i),
-		.PROTECT(PROTECT1_i),
 		.PL_INIT(PL_INIT_i),
 		.PL_ENA(PL_ENA_i),
 		.PL_WEN(PL_WEN_i[0]),
@@ -1192,10 +1177,16 @@ module TDP_BRAM36 (
 		.PL_CLK(PL_CLK_i),
 		.PL_ADDR(PL_ADDR_i),
 		.PL_DATA_IN({PL_DATA_i[33:32], PL_DATA_i[15:0]}),
-		.PL_DATA_OUT(pl_dout0),
-		.RAM_ID({RAM_ID_i})
+		.PL_DATA_OUT(pl_dout0)
 	);
-	TDP18K_FIFO u2(
+	TDP18K_FIFO #(
+		.UPAF(UPAF2_i[10:0]),
+		.UPAE(UPAE2_i[10:0]),
+		.SYNC_FIFO(SYNC_FIFO2_i),
+		.POWERDN(POWERDN2_i),
+		.SLEEP(SLEEP2_i),
+		.PROTECT(PROTECT2_i)
+	)u2(
 		.RMODE_A(ram_rmode_a2),
 		.RMODE_B(ram_rmode_b2),
 		.WMODE_A(ram_wmode_a2),
@@ -1223,13 +1214,8 @@ module TDP_BRAM36 (
 		.FWM(FWM2),
 		.OVERRUN(OVERRUN2),
 		.FLUSH(FLUSH2_i),
+		.RAM_ID({RAM_ID_i}),
 		.FMODE(ram_fmode2),
-		.UPAF(UPAF2_i),
-		.UPAE(UPAE2_i),
-		.SYNC_FIFO(SYNC_FIFO2_i),
-		.POWERDN(POWERDN2_i),
-		.SLEEP(SLEEP2_i),
-		.PROTECT(PROTECT2_i),
 		.PL_INIT(PL_INIT_i),
 		.PL_ENA(PL_ENA_i),
 		.PL_WEN(PL_WEN_i[1]),
@@ -1237,8 +1223,7 @@ module TDP_BRAM36 (
 		.PL_CLK(PL_CLK_i),
 		.PL_ADDR(PL_ADDR_i),
 		.PL_DATA_IN({PL_DATA_i[35:34], PL_DATA_i[31:16]}),
-		.PL_DATA_OUT(pl_dout1),
-		.RAM_ID(RAM_ID_i)
+		.PL_DATA_OUT(pl_dout1)
 	);
 	always @(*) begin
 		if (RAM_ID_i == PL_ADDR_i[31:16])

@@ -34,13 +34,8 @@ module TDP18K_FIFO (
 	FWM,
 	OVERRUN,
 	FLUSH,
+	RAM_ID,
 	FMODE,
-	SYNC_FIFO,
-	POWERDN,
-	SLEEP,
-	PROTECT,
-	UPAF,
-	UPAE,
 	PL_INIT,
 	PL_ENA,
 	PL_WEN,
@@ -48,9 +43,15 @@ module TDP18K_FIFO (
 	PL_CLK,
 	PL_ADDR,
 	PL_DATA_IN,
-	PL_DATA_OUT,
-	RAM_ID
+	PL_DATA_OUT
 );
+	parameter SYNC_FIFO = 1'b0;
+	parameter POWERDN = 1'b0;
+	parameter SLEEP = 1'b0;
+	parameter PROTECT = 1'b0;
+	parameter UPAF = 11'b0;
+	parameter UPAE = 11'b0;
+
 	input wire [2:0] RMODE_A;
 	input wire [2:0] RMODE_B;
 	input wire [2:0] WMODE_A;
@@ -80,13 +81,8 @@ module TDP18K_FIFO (
 	output wire FWM;
 	output wire OVERRUN;
 	input wire FLUSH;
+	input wire [15:0] RAM_ID;
 	input wire FMODE;
-	input wire SYNC_FIFO;
-	input wire POWERDN;
-	input wire SLEEP;
-	input wire PROTECT;
-	input wire [10:0] UPAF;
-	input wire [10:0] UPAE;
 	input PL_INIT;
 	input PL_ENA;
 	input PL_WEN;
@@ -95,7 +91,6 @@ module TDP18K_FIFO (
 	input [31:0] PL_ADDR;
 	input [17:0] PL_DATA_IN;
 	output reg [17:0] PL_DATA_OUT;
-	input [15:0] RAM_ID;
 	reg [17:0] wmsk_a;
 	reg [17:0] wmsk_b;
 	wire [8:0] addr_a;
