@@ -109,7 +109,7 @@ module dsp_t1_10x9x32 (
     ) _TECHMAP_REPLACE_ (
         .a                  ({10'd0, a_i}),
         .b                  ({ 9'd0, b_i}),
-        .acc_fir            (acc_fir_i),
+        .acc_fir            ({ 2'd0, acc_fir_i}),
         .z                  (z),
         .dly_b              (dly_b),
 
