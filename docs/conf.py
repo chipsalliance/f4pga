@@ -47,7 +47,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx_verilog_domain',
     'sphinxcontrib.bibtex',
-    'recommonmark'
+    'myst_parser'
 ]
 
 bibtex_default_style = 'plain'
