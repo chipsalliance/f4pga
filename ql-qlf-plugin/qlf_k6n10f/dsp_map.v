@@ -36,7 +36,7 @@ module \$__QL_MUL20X18 (input [19:0] A, input [17:0] B, output [37:0] Y);
         .unsigned_a_i       (!A_SIGNED),
         .unsigned_b_i       (!B_SIGNED),
 
-        .output_select_i    (2'd0),
+        .output_select_i    (3'd0),
         .saturate_enable_i  (1'b0),
         .shift_right_i      (6'd0),
         .round_i            (1'b0),
@@ -78,7 +78,7 @@ module \$__QL_MUL10X9 (input [9:0] A, input [8:0] B, output [18:0] Y);
         .unsigned_a_i       (!A_SIGNED),
         .unsigned_b_i       (!B_SIGNED),
 
-        .output_select_i    (2'd0),
+        .output_select_i    (3'd0),
         .saturate_enable_i  (1'b0),
         .shift_right_i      (6'd0),
         .round_i            (1'b0),
