@@ -45,6 +45,7 @@ module \$__QLF_FACTOR_BRAM36_TDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1
 	wire FLUSH1;
 	wire FLUSH2;
 	wire SPLIT;
+	wire [15:0] RAM_ID;
 
 	wire PL_INIT_i;
 	wire PL_ENA_i;
@@ -176,6 +177,7 @@ module \$__QLF_FACTOR_BRAM36_TDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1
 	assign SPLIT = 1'b0;
 	assign FLUSH1 = 1'b0;
 	assign FLUSH2 = 1'b0;
+	assign RAM_ID = 16'b0;
 
 	assign PL_INIT_i = 1'b0;
 	assign PL_ENA_i = 1'b0;
@@ -200,7 +202,6 @@ module \$__QLF_FACTOR_BRAM36_TDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1
 		.SLEEP2_i(1'b0),
 		.PROTECT1_i(1'b0),
 		.PROTECT2_i(1'b0),
-		.RAM_ID_i(9'b0),
 		.SPLIT_i(1'b0)
 	) _TECHMAP_REPLACE_ (
 		.WDATA_A1_i(B1DATA[17:0]),
@@ -235,6 +236,7 @@ module \$__QLF_FACTOR_BRAM36_TDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1
 
 		.FLUSH1_i(FLUSH1),
 		.FLUSH2_i(FLUSH2),
+		.RAM_ID_i(RAM_ID),
 
 		.PL_INIT_i(PL_INIT_i),
 		.PL_ENA_i(PL_ENA_i),
