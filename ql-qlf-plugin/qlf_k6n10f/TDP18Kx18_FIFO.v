@@ -34,6 +34,7 @@ module TDP18K_FIFO (
 	FWM,
 	OVERRUN,
 	FLUSH,
+	RAM_ID,
 	FMODE,
 	PL_INIT,
 	PL_ENA,
@@ -50,7 +51,6 @@ module TDP18K_FIFO (
 	parameter PROTECT = 1'b0;
 	parameter UPAF = 11'b0;
 	parameter UPAE = 11'b0;
-	parameter RAM_ID = 16'b0;
 
 	input wire [2:0] RMODE_A;
 	input wire [2:0] RMODE_B;
@@ -81,6 +81,7 @@ module TDP18K_FIFO (
 	output wire FWM;
 	output wire OVERRUN;
 	input wire FLUSH;
+	input wire [15:0] RAM_ID;
 	input wire FMODE;
 	input PL_INIT;
 	input PL_ENA;

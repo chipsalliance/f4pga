@@ -518,6 +518,7 @@ module TDP_BRAM36 (
 	RDATA_A2_o,
 	RDATA_B2_o,
 	FLUSH2_i,
+	RAM_ID_i,
 	PL_INIT_i,
 	PL_ENA_i,
 	PL_REN_i,
@@ -558,7 +559,6 @@ module TDP_BRAM36 (
 	parameter UPAF2_i = 12'b0;
 
 	parameter SPLIT_i = 1'b0;
-	parameter RAM_ID_i = 16'b0;
 
 	parameter INITP_00 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
 	parameter INITP_01 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
@@ -739,6 +739,7 @@ module TDP_BRAM36 (
 	output reg [17:0] RDATA_A2_o;
 	output reg [17:0] RDATA_B2_o;
 	input wire FLUSH2_i;
+	input wire [15:0] RAM_ID_i;
 	input wire PL_INIT_i;
 	input wire PL_ENA_i;
 	input wire PL_REN_i;
@@ -1138,8 +1139,7 @@ module TDP_BRAM36 (
 		.SYNC_FIFO(SYNC_FIFO1_i),
 		.POWERDN(POWERDN1_i),
 		.SLEEP(SLEEP1_i),
-		.PROTECT(PROTECT1_i),
-		.RAM_ID({RAM_ID_i})
+		.PROTECT(PROTECT1_i)
 	)u1(
 		.RMODE_A(ram_rmode_a1),
 		.RMODE_B(ram_rmode_b1),
@@ -1168,6 +1168,7 @@ module TDP_BRAM36 (
 		.FWM(FWM1),
 		.OVERRUN(OVERRUN1),
 		.FLUSH(FLUSH1_i),
+		.RAM_ID({RAM_ID_i}),
 		.FMODE(ram_fmode1),
 		.PL_INIT(PL_INIT_i),
 		.PL_ENA(PL_ENA_i),
@@ -1184,8 +1185,7 @@ module TDP_BRAM36 (
 		.SYNC_FIFO(SYNC_FIFO2_i),
 		.POWERDN(POWERDN2_i),
 		.SLEEP(SLEEP2_i),
-		.PROTECT(PROTECT2_i),
-		.RAM_ID({RAM_ID_i})
+		.PROTECT(PROTECT2_i)
 	)u2(
 		.RMODE_A(ram_rmode_a2),
 		.RMODE_B(ram_rmode_b2),
@@ -1214,6 +1214,7 @@ module TDP_BRAM36 (
 		.FWM(FWM2),
 		.OVERRUN(OVERRUN2),
 		.FLUSH(FLUSH2_i),
+		.RAM_ID({RAM_ID_i}),
 		.FMODE(ram_fmode2),
 		.PL_INIT(PL_INIT_i),
 		.PL_ENA(PL_ENA_i),
