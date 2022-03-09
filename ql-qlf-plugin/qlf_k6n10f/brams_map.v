@@ -61,9 +61,6 @@ module \$__QLF_FACTOR_BRAM36_TDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1
 	reg [23:0] PL_ADDR_o;
 	wire [35:0] PL_DATA_o;
 
-	wire [2:0] WMODE;
-	wire [2:0] RMODE;
-
 	wire [14:CFG_ABITS] A1ADDR_CMPL = {15-CFG_ABITS{1'b0}};
 	wire [14:CFG_ABITS] B1ADDR_CMPL = {15-CFG_ABITS{1'b0}};
 	wire [14:CFG_ABITS] C1ADDR_CMPL = {15-CFG_ABITS{1'b0}};
@@ -164,8 +161,14 @@ module \$__QLF_FACTOR_BRAM36_TDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1
 		default: begin
 			assign PORT_A_ADDR = A1EN ? A1ADDR_TOTAL : (B1EN ? B1ADDR_TOTAL : 15'd0);
 			assign PORT_B_ADDR = C1EN ? C1ADDR_TOTAL : (D1EN ? D1ADDR_TOTAL : 15'd0);
-			assign WMODE = `MODE_36;
-			assign RMODE = `MODE_36;
+			defparam _TECHMAP_REPLACE_.WMODE_A1_i = `MODE_36;
+			defparam _TECHMAP_REPLACE_.WMODE_A2_i = `MODE_36;
+			defparam _TECHMAP_REPLACE_.RMODE_A1_i = `MODE_36;
+			defparam _TECHMAP_REPLACE_.RMODE_A2_i = `MODE_36;
+			defparam _TECHMAP_REPLACE_.WMODE_B1_i = `MODE_36;
+			defparam _TECHMAP_REPLACE_.WMODE_B2_i = `MODE_36;
+			defparam _TECHMAP_REPLACE_.RMODE_B1_i = `MODE_36;
+			defparam _TECHMAP_REPLACE_.RMODE_B2_i = `MODE_36;
 		end
 	endcase
 
