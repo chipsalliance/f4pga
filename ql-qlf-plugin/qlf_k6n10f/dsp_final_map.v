@@ -46,7 +46,7 @@ module dsp_t1_20x18x64 (
         .z                  (z_o),
         .dly_b              (dly_b_o),
 
-        .clk                (clk_i),
+        .clk                (clock_i),
         .reset              (reset_i),
 
         .feedback           (feedback_i),
@@ -113,7 +113,7 @@ module dsp_t1_10x9x32 (
         .z                  (z),
         .dly_b              (dly_b),
 
-        .clk                (clk_i),
+        .clk                (clock_i),
         .reset              (reset_i),
 
         .feedback           (feedback_i),

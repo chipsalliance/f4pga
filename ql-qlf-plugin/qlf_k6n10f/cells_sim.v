@@ -1258,7 +1258,6 @@ module QL_DSP1 (
     parameter MODE_BITS = 27'b00000000000000000000000000;
 endmodule  /* QL_DSP1 */
 
-(* blackbox *)
 module QL_DSP2 ( // TODO: Name subject to change
       input  [19:0] a,
       input  [17:0] b,
@@ -1329,7 +1328,7 @@ module QL_DSP2 ( // TODO: Name subject to change
             .unsigned_b_i(unsigned_b),
 
             .clock_i(clk),
-            .reset_n_i(~reset),
+            .reset_n_i(reset),
 
             .saturate_enable_i(saturate_enable),
             .output_select_i(output_select),
@@ -1365,7 +1364,7 @@ module QL_DSP2 ( // TODO: Name subject to change
             .unsigned_b_i(unsigned_b),
 
             .clock_i(clk),
-            .reset_n_i(~reset),
+            .reset_n_i(reset),
 
             .saturate_enable_i(saturate_enable),
             .output_select_i(output_select),
@@ -1401,7 +1400,7 @@ module QL_DSP2 ( // TODO: Name subject to change
             .unsigned_b_i(unsigned_b),
 
             .clock_i(clk),
-            .reset_n_i(~reset),
+            .reset_n_i(reset),
 
             .saturate_enable_i(saturate_enable),
             .output_select_i(output_select),
