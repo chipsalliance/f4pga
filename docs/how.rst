@@ -1,14 +1,8 @@
-Introduction
-============
-
-F4PGA is a Open Source Verilog-to-Bitstream FPGA synthesis flow,
-currently targeting Xilinx 7-Series, Lattice iCE40 and Lattice ECP5 FPGAs.
-Think of it as the GCC of FPGAs.
-
-The project aim is to design tools that are highly extendable and multiplatform.
+How it works
+############
 
 EDA Tooling Ecosystem
----------------------
+=====================
 
 For both ASIC- and FPGA-oriented EDA tooling, there are three major areas that
 the workflow needs to cover: hardware description, frontend and backend.
@@ -28,7 +22,7 @@ on the latter (some parts of F4PGA will also be useful in the former).
 .. figure:: _static/images/EDA.svg
 
 Project structure
------------------
+=================
 
 To achieve F4PGA's goal of a complete FOSS FPGA toolchain, a number of tools and projects are necessary to provide all
 the needed components of an end-to-end flow.
@@ -47,35 +41,3 @@ collaborating projects targeting different FPGAs - :doc:`Project X-Ray
 
 .. figure:: _static/images/parts.svg
 
-Current status of bitstream documentation
------------------------------------------
-
-.. table::
-    :align: center
-    :widths: 40 20 20 20
-
-    +-----------------+----------+----------+---------+
-    | Projects        | IceStorm | X-Ray    | Trellis |
-    +=================+==========+==========+=========+
-    | **Basic Tiles**                                 |
-    +-----------------+----------+----------+---------+
-    | Logic           | Yes      | Yes      | Yes     |
-    +-----------------+----------+----------+---------+
-    | Block RAM       | Yes      | Partial  | N/A     |
-    +-----------------+----------+----------+---------+
-    | **Advanced Tiles**                              |
-    +-----------------+----------+----------+---------+
-    | DSP             | Yes      | No       | Yes     |
-    +-----------------+----------+----------+---------+
-    | Hard Blocks     | Yes      | No       | Yes     |
-    +-----------------+----------+----------+---------+
-    | Clock Tiles     | Yes      | Partial  | Yes     |
-    +-----------------+----------+----------+---------+
-    | IO Tiles        | Yes      | Partial  | Yes     |
-    +-----------------+----------+----------+---------+
-    | **Routing**                                     |
-    +-----------------+----------+----------+---------+
-    | Logic           | Yes      | Yes      | Yes     |
-    +-----------------+----------+----------+---------+
-    | Clock           | Yes      | Partial  | Yes     |
-    +-----------------+----------+----------+---------+

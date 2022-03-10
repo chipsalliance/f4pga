@@ -1,17 +1,45 @@
-F4PGA documentation
+FOSS Flows For FPGA
 ###################
 
-.. toctree::
+F4PGA is an Open Source HDL-to-Bitstream FPGA synthesis solution, currently targeting Xilinx 7-Series, Lattice iCE40 and
+Lattice ECP5 FPGAs.
+Think of it as the GCC of FPGAs.
 
-   introduction
-   toolchain-desc/index
-   Architecture Definitions ➚ <https://f4pga.readthedocs.io/projects/arch-defs/en/latest/>
-   Project X-Ray ➚ <https://f4pga.readthedocs.io/projects/prjxray/en/latest/>
-   Project Trellis ➚ <https://prjtrellis.readthedocs.io/en/latest/>
-   FPGA Assembly (FASM) ➚ <https://fasm.readthedocs.io/en/latest/>
+The project aim is to design tools that are highly extendable and multiplatform.
 
 .. toctree::
-   :caption: Contributing
+  :caption: About F4PGA
 
-   contributing/building-docs
-   contributing/venv
+  community
+  how
+  status
+  getting-started
+
+.. toctree::
+  :caption: Design Flows
+
+  flows/index
+  flows/synthesis
+  flows/pnr
+  flows/bitstream
+  flows/f4pga
+
+.. toctree::
+  :caption: Specifications
+
+  FPGA Assembly (FASM) ➚ <https://fasm.readthedocs.io/en/latest/>
+
+.. toctree::
+  :caption: Other
+
+  yosys
+  VPR ➚ <https://docs.verilogtorouting.org/en/latest/vpr/>
+  Architecture Definitions ➚ <https://f4pga.readthedocs.io/projects/arch-defs/en/latest/>
+  Project X-Ray ➚ <https://f4pga.readthedocs.io/projects/prjxray/en/latest/>
+  Project Trellis ➚ <https://prjtrellis.readthedocs.io/en/latest/>
+
+.. toctree::
+  :caption: Contributing
+
+  contributing/building-docs
+  contributing/venv
