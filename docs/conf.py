@@ -53,6 +53,10 @@ extensions = [
 bibtex_default_style = 'plain'
 bibtex_bibfiles = ['refs.bib']
 
+myst_enable_extensions = [
+    "colon_fence",
+]
+
 numfig = True
 
 templates_path = ['_templates']
