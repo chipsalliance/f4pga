@@ -1,6 +1,30 @@
 How it works
 ############
 
+The F4PGA toolchain consists of logic synthesis and implementation tools, as well as chip documentation projects for
+chips of various vendors.
+To prepare a working bitstream for a particular FPGA chip, the toolchain goes through the following stages:
+
+* First, a description of the FPGA chip is created with the information from the relevant bitstream documentation
+  project.
+  This part is done within the `F4PGA Architecture Definitions <https://github.com/chipsalliance/f4pga-arch-defs>`__.
+  The project prepares information about the timings and resources available in the chip needed at the implementation
+  stage, as well as techmaps for the synthesis tools.
+
+* The second step is logic synthesis.
+  It is carried out in the Yosys framework, which expresses the input Verilog file by means of the block and connection
+  types available in the chosen chip.
+
+* The next step is implementation.
+  Placement and routing tools put individual blocks from the synthesis description in the specific chip locations and
+  create paths between them.
+  To do that, F4PGA uses either `nextpnr <https://github.com/YosysHQ/nextpnr>`__ or `Verilog to Routing <https://github.com/verilog-to-routing/vtr-verilog-to-routing>`__.
+
+* Finally, the design properties are translated into a set of features available in the given FPGA chip.
+  These features are saved in the `fasm format <https://github.com/chipsalliance/fasm>`__, which is developed as part of
+  F4PGA.
+  The fasm file is then translated to bitstream using the information from the bitstream documentation projects.
+
 EDA Tooling Ecosystem
 =====================
 
