@@ -1,38 +1,29 @@
 Supported Architectures
 #######################
 
+
+* `Xilinx 7-Series <https://www.xilinx.com/video/fpga/7-series-fpga-overview.html>`__:
+  the most popular Xilinx FPGA family.
+
+* `Lattice ice40 <http://www.latticesemi.com/iCE40>`__:
+  world's smallest FPGAs for mobile devices.
+
+* `Lattice ecp5 <https://www.latticesemi.com/Products/FPGAandCPLD/ECP5>`__:
+  low cost FPGAs with high performance features.
+
+* `QuickLogic EOS S3 <https://www.quicklogic.com/products/eos-s3/>`__:
+  FPGA + CPU sensor processing platform.
+
+* `QuickLogic QLF K4N8 <https://www.quicklogic.com/products/efpga/efpga-ip-software/>`__:
+  a 24x24 eFPGA with 6144 flip-flops, 4608 LUT4s, adder and shift-register support.
+
+* Do you want to add more? :ref:`Help us! <Contributing>`
+
+
 Bitstream documentation
 =======================
 
-.. table::
-    :align: center
-    :widths: 40 20 20 20
-
-    +-----------------+----------+----------+---------+
-    | Projects        | IceStorm | X-Ray    | Trellis |
-    +=================+==========+==========+=========+
-    | **Basic Tiles**                                 |
-    +-----------------+----------+----------+---------+
-    | Logic           | Yes      | Yes      | Yes     |
-    +-----------------+----------+----------+---------+
-    | Block RAM       | Yes      | Partial  | N/A     |
-    +-----------------+----------+----------+---------+
-    | **Advanced Tiles**                              |
-    +-----------------+----------+----------+---------+
-    | DSP             | Yes      | No       | Yes     |
-    +-----------------+----------+----------+---------+
-    | Hard Blocks     | Yes      | No       | Yes     |
-    +-----------------+----------+----------+---------+
-    | Clock Tiles     | Yes      | Partial  | Yes     |
-    +-----------------+----------+----------+---------+
-    | IO Tiles        | Yes      | Partial  | Yes     |
-    +-----------------+----------+----------+---------+
-    | **Routing**                                     |
-    +-----------------+----------+----------+---------+
-    | Logic           | Yes      | Yes      | Yes     |
-    +-----------------+----------+----------+---------+
-    | Clock           | Yes      | Partial  | Yes     |
-    +-----------------+----------+----------+---------+
+.. include:: status.inc
 
 Boards
 ======
