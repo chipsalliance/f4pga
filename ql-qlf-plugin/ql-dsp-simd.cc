@@ -80,9 +80,9 @@ struct QlDspSimdPass : public Pass {
     const std::vector<std::string> m_DspParams = {"COEFF_0", "COEFF_1", "COEFF_2", "COEFF_3"};
 
     // Source DSP cell type (SISD)
-    const RTLIL::IdString m_SisdDspType = RTLIL::escape_id("dsp_t1_10x9x32");
+    const std::string m_SisdDspType = "dsp_t1_10x9x32";
     // Target DSP cell type for the SIMD mode
-    const RTLIL::IdString m_SimdDspType = RTLIL::escape_id("QL_DSP2");
+    const std::string m_SimdDspType = "QL_DSP2";
 
     /// Temporary SigBit to SigBit helper map.
     SigMap m_SigMap;
@@ -108,7 +108,7 @@ struct QlDspSimdPass : public Pass {
             for (auto cell : module->selected_cells()) {
 
                 // Check if this is a DSP cell
-                if (cell->type != m_SisdDspType) {
+                if (cell->type != RTLIL::escape_id(m_SisdDspType)) {
                     continue;
                 }
 
@@ -143,15 +143,15 @@ struct QlDspSimdPass : public Pass {
 
                     log(" SIMD: %s (%s) + %s (%s) => %s (%s)\n", RTLIL::unescape_id(dsp_a->name).c_str(), RTLIL::unescape_id(dsp_a->type).c_str(),
                         RTLIL::unescape_id(dsp_b->name).c_str(), RTLIL::unescape_id(dsp_b->type).c_str(), RTLIL::unescape_id(name).c_str(),
-                        RTLIL::unescape_id(m_SimdDspType).c_str());
+                        m_SimdDspType.c_str());
 
                     // Create the new cell
-                    RTLIL::Cell *simd = module->addCell(RTLIL::escape_id(name), m_SimdDspType);
+                    RTLIL::Cell *simd = module->addCell(RTLIL::escape_id(name), RTLIL::escape_id(m_SimdDspType));
 
                     // Check if the target cell is known (important to know
                     // its port widths)
                     if (!simd->known()) {
-                        log_error(" The target cell type '%s' is not known!", RTLIL::unescape_id(m_SimdDspType).c_str());
+                        log_error(" The target cell type '%s' is not known!", m_SimdDspType.c_str());
                     }
 
                     // Connect common ports
