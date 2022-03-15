@@ -17,4 +17,4 @@ your FPGA.
 
   * `Project Trellis ➚ <https://prjtrellis.readthedocs.io/en/latest/>`__
 
-  * `Project Icestorm ➚ <https://github.com/f4pga/icestorm>`__
+  * :gh:`Project Icestorm ➚ <f4pga/icestorm>`

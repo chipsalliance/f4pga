@@ -57,15 +57,13 @@ An example configuration script can be found below:
     write_blif -attr -cname -param $::env(OUT_EBLIF)
     write_verilog $::env(OUT_SYNTH_V)
 
-It can be seen that this script performs a platform-specific process of
-synthesis, some optimization steps (``opt_`` commands), and writes the final file in
-``.eblif`` and Verilog formats. Yosys synthesis configuration scripts are platform-specific
-and can by found in ``<platform-dir>/yosys/synth.tcl``
-in the `F4PGA Architecture Definitions <https://github.com/SymbiFlow/f4pga-arch-defs>`_
-repository.
+It can be seen that this script performs a platform-specific process of synthesis, some optimization steps (``opt_``
+commands), and writes the final file in ``.eblif`` and Verilog formats.
+Yosys synthesis configuration scripts are platform-specific and can by found in ``<platform-dir>/yosys/synth.tcl`` in
+the :gh:`F4PGA Architecture Definitions <SymbiFlow/f4pga-arch-defs>` repository.
 
-To understand performed operations, view the log file. It is usually generated
-in the project build directory. It should be named ``top.eblif.log``.
+To understand performed operations, view the log file.
+It is usually generated in the project build directory. It should be named ``top.eblif.log``.
 
 Output analysis
 ---------------
