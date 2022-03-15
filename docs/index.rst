@@ -46,3 +46,4 @@ The project aims to design tools that are highly extendable and multiplatform.
   :caption: Appendix
 
   glossary
+  references

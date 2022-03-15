@@ -1,4 +1,5 @@
-Sphinx==3.0.4
+sphinx
+sphinxcontrib-bibtex
 http://github.com/SymbiFlow/sphinx_symbiflow_theme/archive/chips.zip#sphinx-symbiflow-theme
 http://github.com/SymbiFlow/sphinx-verilog-domain/archive/master.zip#sphinx-verilog-domain
 tabulate

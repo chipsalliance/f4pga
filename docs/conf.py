@@ -45,8 +45,12 @@ release = '' # The full version, including alpha/beta/rc tags.
 extensions = [
     'sphinx.ext.extlinks',
     'sphinx.ext.intersphinx',
-    'sphinx_verilog_domain'
+    'sphinx_verilog_domain',
+    'sphinxcontrib.bibtex',
 ]
+
+bibtex_default_style = 'plain'
+bibtex_bibfiles = ['refs.bib']
 
 numfig = True
 
