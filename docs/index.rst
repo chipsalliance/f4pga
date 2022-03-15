@@ -1,11 +1,13 @@
 FOSS Flows For FPGA
 ###################
 
-F4PGA is an Open Source HDL-to-Bitstream FPGA synthesis solution, currently targeting Xilinx 7-Series, Lattice iCE40 and
-Lattice ECP5 FPGAs.
+F4PGA is an Open Source solution for Hardware Description Language (HDL) to Bitstream FPGA synthesis, currently
+targeting Xilinx 7-Series, Lattice iCE40 and Lattice ECP5 FPGAs.
 Think of it as the GCC of FPGAs.
+The project aims to design tools that are highly extendable and multiplatform.
 
-The project aim is to design tools that are highly extendable and multiplatform.
+.. image:: _static/images/hero.svg
+  :align: center
 
 
 .. toctree::
