@@ -30,12 +30,6 @@ The project aim is to design tools that are highly extendable and multiplatform.
   FPGA Assembly (FASM) ➚ <https://fasm.readthedocs.io/en/latest/>
 
 .. toctree::
-  :caption: Other
-
-  yosys
-  VPR ➚ <https://docs.verilogtorouting.org/en/latest/vpr/>
-
-.. toctree::
   :caption: Contributing
 
   contributing/building-docs
