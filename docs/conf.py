@@ -6,9 +6,33 @@
 import sys, os
 from pathlib import Path
 
+from tabulate import tabulate
+
+ROOT = Path(__file__).resolve().parent
+
 #sys.path.insert(0, os.path.abspath('.'))
 
-# -- General configuration -----------------------------------------------------
+# -- Generate status.inc -----------------------------------------------------------------------------------------------
+
+with (ROOT / "status.inc").open("w", encoding="utf-8") as wfptr:
+    wfptr.write(
+        tabulate(
+            [
+                ["[Basic Tiles] Logic", "Yes", "Yes", "Yes", "Yes"],
+                ["[Basic Tiles] Block RAM", "Yes", "Yes", "Partial", "Yes"],
+                ["[Advanced Tiles] DSP", "Yes", "Yes", "Partial", "Yes"],
+                ["[Advanced Tiles] Hard Blocks", "Yes", "Yes", "Partial", "Yes"],
+                ["[Advanced Tiles] Clock Tiles", "Yes", "Yes", "Yes", "Yes"],
+                ["[Advanced Tiles] IO Tiles", "Yes", "Yes", "Yes", "Yes"],
+                ["[Routing] Logic", "Yes", "Yes", "Yes", "Yes"],
+                ["[Routing] Clock", "Yes", "Yes", "Yes", "Yes"],
+            ],
+            headers=["", "Project Icestorm", "Project Trellis ", "Project X-Ray", "QuickLogic Database"],
+            tablefmt="rst",
+        )
+    )
+
+# -- General configuration ---------------------------------------------------------------------------------------------
 
 project = 'F4PGA'
 basic_filename = 'f4pga-docs'
@@ -47,7 +71,7 @@ rst_prolog = """
    :format: html
 """
 
-# -- Options for HTML output ---------------------------------------------------
+# -- Options for HTML output -------------------------------------------------------------------------------------------
 
 html_show_sourcelink = True
 
@@ -66,7 +90,7 @@ html_static_path = ['_static']
 html_logo = str(Path(html_static_path[0]) / 'logo.svg')
 html_favicon = str(Path(html_static_path[0]) / 'favicon.svg')
 
-# -- Options for LaTeX output --------------------------------------------------
+# -- Options for LaTeX output ------------------------------------------------------------------------------------------
 
 latex_documents = [
   ('index', basic_filename+'.tex', project,
@@ -99,7 +123,7 @@ latex_elements = {
     '''
 }
 
-# -- Options for manual page output --------------------------------------------
+# -- Options for manual page output ------------------------------------------------------------------------------------
 
 man_pages = [
     ('index', basic_filename, project,

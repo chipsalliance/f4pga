@@ -1,14 +1,11 @@
-Introduction
-============
+How it works
+############
 
-F4PGA is a Open Source Verilog-to-Bitstream FPGA synthesis flow,
-currently targeting Xilinx 7-Series, Lattice iCE40 and Lattice ECP5 FPGAs.
-Think of it as the GCC of FPGAs.
-
-The project aim is to design tools that are highly extendable and multiplatform.
+To understand how F4PGA works, it is best to start with an overview of the general EDA tooling ecosystem and then
+proceed to see what the F4PGA project consists of.
 
 EDA Tooling Ecosystem
----------------------
+=====================
 
 For both ASIC- and FPGA-oriented EDA tooling, there are three major areas that
 the workflow needs to cover: hardware description, frontend and backend.
@@ -28,7 +25,7 @@ on the latter (some parts of F4PGA will also be useful in the former).
 .. figure:: _static/images/EDA.svg
 
 Project structure
------------------
+=================
 
 To achieve F4PGA's goal of a complete FOSS FPGA toolchain, a number of tools and projects are necessary to provide all
 the needed components of an end-to-end flow.
@@ -47,35 +44,26 @@ collaborating projects targeting different FPGAs - :doc:`Project X-Ray
 
 .. figure:: _static/images/parts.svg
 
-Current status of bitstream documentation
------------------------------------------
+The F4PGA toolchain consists of logic synthesis and implementation tools, as well as chip documentation projects for
+chips of various vendors.
+To prepare a working bitstream for a particular FPGA chip, the toolchain goes through the following stages:
 
-.. table::
-    :align: center
-    :widths: 40 20 20 20
+* First, a description of the FPGA chip is created with the information from the relevant bitstream documentation
+  project.
+  This part is done within the `F4PGA Architecture Definitions <https://github.com/chipsalliance/f4pga-arch-defs>`__.
+  The project prepares information about the timings and resources available in the chip needed at the implementation
+  stage, as well as techmaps for the synthesis tools.
 
-    +-----------------+----------+----------+---------+
-    | Projects        | IceStorm | X-Ray    | Trellis |
-    +=================+==========+==========+=========+
-    | **Basic Tiles**                                 |
-    +-----------------+----------+----------+---------+
-    | Logic           | Yes      | Yes      | Yes     |
-    +-----------------+----------+----------+---------+
-    | Block RAM       | Yes      | Partial  | N/A     |
-    +-----------------+----------+----------+---------+
-    | **Advanced Tiles**                              |
-    +-----------------+----------+----------+---------+
-    | DSP             | Yes      | No       | Yes     |
-    +-----------------+----------+----------+---------+
-    | Hard Blocks     | Yes      | No       | Yes     |
-    +-----------------+----------+----------+---------+
-    | Clock Tiles     | Yes      | Partial  | Yes     |
-    +-----------------+----------+----------+---------+
-    | IO Tiles        | Yes      | Partial  | Yes     |
-    +-----------------+----------+----------+---------+
-    | **Routing**                                     |
-    +-----------------+----------+----------+---------+
-    | Logic           | Yes      | Yes      | Yes     |
-    +-----------------+----------+----------+---------+
-    | Clock           | Yes      | Partial  | Yes     |
-    +-----------------+----------+----------+---------+
+* The second step is logic synthesis.
+  It is carried out in the Yosys framework, which expresses the input Verilog file by means of the block and connection
+  types available in the chosen chip.
+
+* The next step is implementation.
+  Placement and routing tools put individual blocks from the synthesis description in the specific chip locations and
+  create paths between them.
+  To do that, F4PGA uses either `nextpnr <https://github.com/YosysHQ/nextpnr>`__ or `Verilog to Routing <https://github.com/verilog-to-routing/vtr-verilog-to-routing>`__.
+
+* Finally, the design properties are translated into a set of features available in the given FPGA chip.
+  These features are saved in the `fasm format <https://github.com/chipsalliance/fasm>`__, which is developed as part of
+  F4PGA.
+  The fasm file is then translated to bitstream using the information from the bitstream documentation projects.
