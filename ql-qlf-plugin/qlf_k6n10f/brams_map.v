@@ -14,12 +14,12 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-`define MODE_36 3'b111	// 36 or 32-bit
-`define MODE_18 3'b110	// 18 or 16-bit
-`define MODE_9  3'b101	// 9 or 8-bit
+`define MODE_36 3'b011	// 36 or 32-bit
+`define MODE_18 3'b010	// 18 or 16-bit
+`define MODE_9  3'b001	// 9 or 8-bit
 `define MODE_4  3'b100	// 4-bit
-`define MODE_2  3'b010	// 32-bit
-`define MODE_1  3'b001	// 32-bit
+`define MODE_2  3'b110	// 32-bit
+`define MODE_1  3'b101	// 32-bit
 
 module \$__QLF_FACTOR_BRAM36_TDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1ADDR, C1DATA, C1EN, CLK1, CLK2, D1ADDR, D1DATA, D1EN);
 	parameter CFG_ABITS = 10;
@@ -53,22 +53,6 @@ module \$__QLF_FACTOR_BRAM36_TDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1
 	wire FLUSH1;
 	wire FLUSH2;
 	wire SPLIT;
-	wire [15:0] RAM_ID;
-
-	wire PL_INIT_i;
-	wire PL_ENA_i;
-	wire PL_REN_i;
-	wire PL_CLK_i;
-	wire [1:0] PL_WEN_i;
-	wire [23:0] PL_ADDR_i;
-	wire [35:0] PL_DATA_i;
-	reg PL_INIT_o;
-	reg PL_ENA_o;
-	reg PL_REN_o;
-	reg PL_CLK_o;
-	reg [1:0] PL_WEN_o;
-	reg [23:0] PL_ADDR_o;
-	wire [35:0] PL_DATA_o;
 
 	wire [14:CFG_ABITS] A1ADDR_CMPL = {15-CFG_ABITS{1'b0}};
 	wire [14:CFG_ABITS] B1ADDR_CMPL = {15-CFG_ABITS{1'b0}};
@@ -157,17 +141,9 @@ module \$__QLF_FACTOR_BRAM36_TDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1
 	assign SPLIT = 1'b0;
 	assign FLUSH1 = 1'b0;
 	assign FLUSH2 = 1'b0;
-	assign RAM_ID = 16'b0;
 
-	assign PL_INIT_i = 1'b0;
-	assign PL_ENA_i = 1'b0;
-	assign PL_REN_i = 1'b0;
-	assign PL_CLK_i = 1'b0;
-	assign PL_WEN_i = 2'b0;
-	assign PL_ADDR_i = 24'b0;
-	assign PL_DATA_i = 36'b0;
-
-	TDP_BRAM36 _TECHMAP_REPLACE_ (
+	TDP36K _TECHMAP_REPLACE_ (
+		.RESET_ni(1'b1),
 		.WDATA_A1_i(B1DATA[17:0]),
 		.WDATA_A2_i(B1DATA[35:18]),
 		.RDATA_A1_o(A1DATA_TOTAL[17:0]),
@@ -199,24 +175,7 @@ module \$__QLF_FACTOR_BRAM36_TDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1
 		.BE_B2_i({D1EN[3],D1EN[2]}),
 
 		.FLUSH1_i(FLUSH1),
-		.FLUSH2_i(FLUSH2),
-		.RAM_ID_i(RAM_ID),
-
-		.PL_INIT_i(PL_INIT_i),
-		.PL_ENA_i(PL_ENA_i),
-		.PL_WEN_i(PL_WEN_i),
-		.PL_REN_i(PL_REN_i),
-		.PL_CLK_i(PL_CLK_i),
-		.PL_ADDR_i(PL_ADDR_i),
-		.PL_DATA_i(PL_DATA_i),
-		.PL_INIT_o(PL_INIT_o),
-		.PL_ENA_o(PL_ENA_o),
-		.PL_WEN_o(PL_WEN_o),
-		.PL_REN_o(PL_REN_o),
-		.PL_CLK_o(PL_CLK_o),
-		.PL_ADDR_o(),
-		.PL_DATA_o(PL_DATA_o)
-
+		.FLUSH2_i(FLUSH2)
 	);
 endmodule
 
@@ -383,22 +342,6 @@ module \$__QLF_FACTOR_BRAM36_SDP (CLK2, CLK3, A1ADDR, A1DATA, A1EN, B1ADDR, B1DA
 
 	wire FLUSH1;
 	wire FLUSH2;
-	wire [15:0] RAM_ID;
-
-	wire PL_INIT_i;
-	wire PL_ENA_i;
-	wire PL_REN_i;
-	wire PL_CLK_i;
-	wire [1:0] PL_WEN_i;
-	wire [23:0] PL_ADDR_i;
-	wire [35:0] PL_DATA_i;
-	reg PL_INIT_o;
-	reg PL_ENA_o;
-	reg PL_REN_o;
-	reg PL_CLK_o;
-	reg [1:0] PL_WEN_o;
-	reg [23:0] PL_ADDR_o;
-	wire [35:0] PL_DATA_o;
 
 	assign A1ADDR_CMPL = {15-CFG_ABITS{1'b0}};
 	assign B1ADDR_CMPL = {15-CFG_ABITS{1'b0}};
@@ -474,16 +417,9 @@ module \$__QLF_FACTOR_BRAM36_SDP (CLK2, CLK3, A1ADDR, A1DATA, A1EN, B1ADDR, B1DA
 
 	assign FLUSH1 = 1'b0;
 	assign FLUSH2 = 1'b0;
-	assign RAM_ID = 16'b0;
-	assign PL_INIT_i = 1'b0;
-	assign PL_ENA_i = 1'b0;
-	assign PL_REN_i = 1'b0;
-	assign PL_CLK_i = 1'b0;
-	assign PL_WEN_i = 2'b0;
-	assign PL_ADDR_i = 24'b0;
-	assign PL_DATA_i = 36'b0;
 
-	TDP_BRAM36 _TECHMAP_REPLACE_ (
+	TDP36K _TECHMAP_REPLACE_ (
+		.RESET_ni(1'b1),
 		.WDATA_A1_i(18'h3FFFF),
 		.WDATA_A2_i(18'h3FFFF),
 		.RDATA_A1_o(A1DATA_TOTAL[17:0]),
@@ -515,24 +451,7 @@ module \$__QLF_FACTOR_BRAM36_SDP (CLK2, CLK3, A1ADDR, A1DATA, A1EN, B1ADDR, B1DA
 		.BE_B2_i(B1EN[3:2]),
 
 		.FLUSH1_i(FLUSH1),
-		.FLUSH2_i(FLUSH2),
-		.RAM_ID_i(RAM_ID),
-
-		.PL_INIT_i(PL_INIT_i),
-		.PL_ENA_i(PL_ENA_i),
-		.PL_WEN_i(PL_WEN_i),
-		.PL_REN_i(PL_REN_i),
-		.PL_CLK_i(PL_CLK_i),
-		.PL_ADDR_i(PL_ADDR_i),
-		.PL_DATA_i(PL_DATA_i),
-		.PL_INIT_o(PL_INIT_o),
-		.PL_ENA_o(PL_ENA_o),
-		.PL_WEN_o(PL_WEN_o),
-		.PL_REN_o(PL_REN_o),
-		.PL_CLK_o(PL_CLK_o),
-		.PL_ADDR_o(),
-		.PL_DATA_o(PL_DATA_o)
-
+		.FLUSH2_i(FLUSH2)
 	);
 endmodule
 
