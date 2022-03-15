@@ -9,9 +9,9 @@
 module _80_quicklogic_alu (A, B, CI, BI, X, Y, CO);
 	parameter A_SIGNED = 0;
 	parameter B_SIGNED = 0;
-	parameter A_WIDTH = 1;
-	parameter B_WIDTH = 1;
-	parameter Y_WIDTH = 1;
+	parameter A_WIDTH = 2;
+	parameter B_WIDTH = 2;
+	parameter Y_WIDTH = 2;
 	parameter _TECHMAP_CONSTVAL_CI_ = 0;
 	parameter _TECHMAP_CONSTMSK_CI_ = 0;
 
@@ -40,14 +40,15 @@ module _80_quicklogic_alu (A, B, CI, BI, X, Y, CO);
 	wire [Y_WIDTH-1:0] BB = BI ? ~B_buf : B_buf;
 
 	genvar i;
+	wire co;
 
 	(* force_downto *)
 	//wire [Y_WIDTH-1:0] C = {CO, CI};
 	wire [Y_WIDTH:0] C;
 	(* force_downto *)
 	wire [Y_WIDTH-1:0] S  = {AA ^ BB};
-	
 	assign CO[Y_WIDTH-1:0] = C[Y_WIDTH:1];
+        //assign CO[Y_WIDTH-1] = co;
 
 	generate
 	     adder_carry intermediate_adder (
@@ -59,7 +60,7 @@ module _80_quicklogic_alu (A, B, CI, BI, X, Y, CO);
 	     );
 	endgenerate
 	genvar i;
-	generate for (i = 0; i < Y_WIDTH; i = i + 1) begin:slice
+	generate for (i = 0; i < Y_WIDTH-2; i = i + 1) begin:slice
 		adder_carry  my_adder (
 			.cin(C[i]),
 			.g(AA[i]),
@@ -68,6 +69,21 @@ module _80_quicklogic_alu (A, B, CI, BI, X, Y, CO);
 		        .sumout(Y[i])
 		);
 	end endgenerate
+	generate
+	     adder_carry final_adder (
+	       .cin     (C[Y_WIDTH-2]),
+	       .cout    (),
+	       .p       (1'b0),
+	       .g       (1'b0),
+	       .sumout    (co)
+	     );
+	endgenerate
+
+	assign Y[Y_WIDTH-2] = S[Y_WIDTH-2] ^ co;
+        assign C[Y_WIDTH-1] = S[Y_WIDTH-2] ? co : AA[Y_WIDTH-2];
+	assign Y[Y_WIDTH-1] = S[Y_WIDTH-1] ^ C[Y_WIDTH-1];
+        assign C[Y_WIDTH] = S[Y_WIDTH-1] ? C[Y_WIDTH-1] : AA[Y_WIDTH-1];
+
 	assign X = S;
 endmodule
 

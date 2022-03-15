@@ -68,7 +68,7 @@ equiv_opt -assert  -map +/quicklogic/qlf_k6n10f/cells_sim.v synth_quicklogic -fa
 design -load postopt
 yosys cd full_adder
 stat
-select -assert-count 6 t:adder_carry
+select -assert-count 5 t:adder_carry
 
 design -reset
 
@@ -80,7 +80,7 @@ equiv_opt -assert  -map +/quicklogic/qlf_k6n10f/cells_sim.v synth_quicklogic -fa
 design -load postopt
 yosys cd subtractor
 stat
-select -assert-count 6 t:adder_carry
+select -assert-count 5 t:adder_carry
 
 design -reset
 
@@ -92,7 +92,7 @@ equiv_opt -assert  -map +/quicklogic/qlf_k6n10f/cells_sim.v synth_quicklogic -fa
 design -load postopt
 yosys cd comparator
 stat
-select -assert-count 5 t:adder_carry
+select -assert-count 4 t:adder_carry
 
 design -reset
 
