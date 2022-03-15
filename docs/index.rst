@@ -34,9 +34,6 @@ The project aim is to design tools that are highly extendable and multiplatform.
 
   yosys
   VPR ➚ <https://docs.verilogtorouting.org/en/latest/vpr/>
-  Architecture Definitions ➚ <https://f4pga.readthedocs.io/projects/arch-defs/en/latest/>
-  Project X-Ray ➚ <https://f4pga.readthedocs.io/projects/prjxray/en/latest/>
-  Project Trellis ➚ <https://prjtrellis.readthedocs.io/en/latest/>
 
 .. toctree::
   :caption: Contributing
