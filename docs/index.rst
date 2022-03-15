@@ -36,10 +36,10 @@ The project aims to design tools that are highly extendable and multiplatform.
 
 
 .. toctree::
-  :caption: Contributing
+  :caption: Development
 
-  contributing/building-docs
-  contributing/venv
+  development/building-docs
+  development/venv
 
 
 .. toctree::
