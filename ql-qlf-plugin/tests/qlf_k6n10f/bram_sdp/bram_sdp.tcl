@@ -13,7 +13,7 @@ opt_expr -undriven
 opt_clean
 stat
 write_verilog sim/bram_sdp_32x512_post_synth.v
-select -assert-count 1 t:TDP_BRAM36
+select -assert-count 1 t:TDP36K
 
 select -clear
 design -load bram_sdp
@@ -24,7 +24,7 @@ opt_expr -undriven
 opt_clean
 stat
 write_verilog sim/bram_sdp_16x1024_post_synth.v
-select -assert-count 1 t:TDP_BRAM36
+select -assert-count 1 t:TDP36K
 
 select -clear
 design -load bram_sdp
@@ -35,7 +35,7 @@ opt_expr -undriven
 opt_clean
 stat
 write_verilog sim/bram_sdp_8x2048_post_synth.v
-select -assert-count 1 t:TDP_BRAM36
+select -assert-count 1 t:TDP36K
 
 select -clear
 design -load bram_sdp
@@ -46,5 +46,5 @@ opt_expr -undriven
 opt_clean
 stat
 write_verilog sim/bram_sdp_4x4096_post_synth.v
-select -assert-count 1 t:TDP_BRAM36
+select -assert-count 1 t:TDP36K
 
