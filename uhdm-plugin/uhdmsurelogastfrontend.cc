@@ -110,6 +110,12 @@ struct UhdmSurelogAstFrontend : public UhdmCommonFrontend {
         if (!success) {
             log_error("Error parsing Surelog arguments!\n");
         }
+        // Force -parse flag settings even if it wasn't specified
+        clp->setwritePpOutput(true);
+        clp->setParse(true);
+        clp->setCompile(true);
+        clp->setElaborate(true);
+
         SURELOG::scompiler *compiler = nullptr;
         const std::vector<vpiHandle> uhdm_design = executeCompilation(symbolTable, errors, clp, compiler);
 
