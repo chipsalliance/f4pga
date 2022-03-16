@@ -140,6 +140,7 @@ man_pages = [
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
     "arch-defs": ("https://f4pga.readthedocs.io/projects/arch-defs/en/latest/", None),
+    "interchange": ("https://fpga-interchange-schema.readthedocs.io/", None),
     "fasm": ("https://fasm.readthedocs.io/en/latest/", None),
     "prjtrellis": ("https://prjtrellis.readthedocs.io/en/latest/", None),
     "prjxray": ("https://f4pga.readthedocs.io/projects/prjxray/en/latest/", None),
