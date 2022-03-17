@@ -33,7 +33,8 @@ SIM_TESTS = \
 
 # Those tests perform synthesis and simulation of synthesis results
 POST_SYNTH_SIM_TESTS = \
-    qlf_k6n10f/bram_tdp
+    qlf_k6n10f/bram_tdp \
+    qlf_k6n10f/bram_sdp
 
 include $(shell pwd)/../../Makefile_test.common
 
