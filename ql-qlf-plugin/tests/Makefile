@@ -37,7 +37,8 @@ TESTS = consts \
 SIM_TESTS = \
     qlf_k6n10f/sim_dsp_mult \
     qlf_k6n10f/sim_dsp_mult_r \
-    qlf_k6n10f/sim_dsp_fir
+    qlf_k6n10f/sim_dsp_fir \
+    qlf_k6n10f/sim_tc36fifo
 
 # Those tests perform synthesis and simulation of synthesis results
 POST_SYNTH_SIM_TESTS = \
