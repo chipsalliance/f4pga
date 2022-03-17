@@ -6,7 +6,7 @@
 #
 # SPDX-License-Identifier:ISC
 
-NAME = uhdm
+NAME = systemverilog
 SOURCES = UhdmAst.cc \
 	  uhdmastfrontend.cc \
 	  uhdmcommonfrontend.cc \
