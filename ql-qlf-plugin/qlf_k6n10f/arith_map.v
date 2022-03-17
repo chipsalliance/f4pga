@@ -60,7 +60,8 @@ module _80_quicklogic_alu (A, B, CI, BI, X, Y, CO);
 	     );
 	endgenerate
 	genvar i;
-	generate for (i = 0; i < Y_WIDTH-2; i = i + 1) begin:slice
+	generate if (Y_WIDTH > 2) begin
+	  for (i = 0; i < Y_WIDTH-2; i = i + 1) begin:slice
 		adder_carry  my_adder (
 			.cin(C[i]),
 			.g(AA[i]),
@@ -68,6 +69,7 @@ module _80_quicklogic_alu (A, B, CI, BI, X, Y, CO);
 			.cout(C[i+1]),
 		        .sumout(Y[i])
 		);
+	      end
 	end endgenerate
 	generate
 	     adder_carry final_adder (
