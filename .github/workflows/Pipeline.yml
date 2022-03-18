@@ -214,8 +214,5 @@ jobs:
         run: |
           . ./.github/scripts/activate.sh
 
-          for tool in place route synth write-fasm; do
-            echo "::group::Test f4pga-$tool"
-            "f4pga-$tool" || echo "Failing?"
-            echo "::endgroup::"
-          done;
+          pip3 install -r ./test/requirements.txt
+          pytest -vsrA --color=yes test/wrappers.py
