@@ -406,6 +406,7 @@ static void convert_packed_unpacked_range(AST::AstNode *wire_node)
     if (packed_ranges.empty() && unpacked_ranges.empty()) {
         wire_node->attributes.erase(UhdmAst::packed_ranges());
         wire_node->attributes.erase(UhdmAst::unpacked_ranges());
+        wire_node->range_valid = true;
         return;
     }
     size_t size = 1;
