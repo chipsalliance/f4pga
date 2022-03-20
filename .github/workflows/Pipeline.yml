@@ -67,6 +67,14 @@ jobs:
       - name: '🔧 Prepare environment'
         run: ./.github/scripts/prepare_environment.sh
 
+      - name: '🐍 Install f4pga (pip)'
+        run: |
+          . ./.github/scripts/activate.sh
+
+          cd f4pga
+          pip install --use-feature=in-tree-build .
+          cd ..
+
       - name: '🚧 Test f4pga-env'
         run: |
           . ./.github/scripts/activate.sh
