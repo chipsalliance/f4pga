@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+set -e
+
+case "$1" in
+  bin)
+    (
+        cd $(dirname "$0")
+        pwd
+    )
+  ;;
+  share)
+    (
+        case "$F4PGA_FAM" in
+          xc7) cd $(dirname "$0")/../share/symbiflow;;
+          eos-s3) cd $(dirname "$0")/../share;;
+        esac
+        pwd
+    )
+  ;;
+esac

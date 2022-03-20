@@ -67,6 +67,13 @@ jobs:
       - name: '🔧 Prepare environment'
         run: ./.github/scripts/prepare_environment.sh
 
+      - name: '🚧 Test f4pga-env'
+        run: |
+          . ./.github/scripts/activate.sh
+
+          f4pga-env bin
+          f4pga-env share
+
       - name: '🚧 Test make example'
         run: |
           . ./.github/scripts/activate.sh
