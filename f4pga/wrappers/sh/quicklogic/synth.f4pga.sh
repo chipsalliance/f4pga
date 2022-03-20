@@ -1,11 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 set -e
 
-MYPATH=`realpath $0`
-MYPATH=`dirname ${MYPATH}`
-
-SPLIT_INOUTS=`realpath ${MYPATH}/python/split_inouts.py`
-CONVERT_OPTS=`realpath ${MYPATH}/python/convert_compile_opts.py`
+export SHARE_DIR_PATH=${SHARE_DIR_PATH:=$(f4pga-env share)}
+VPRPATH=${VPRPATH:=$(f4pga-env bin)}
+SPLIT_INOUTS=`realpath ${VPRPATH}/python/split_inouts.py`
+CONVERT_OPTS=`realpath ${VPRPATH}/python/convert_compile_opts.py`
 
 print_usage () {
     echo "Usage: symbiflow_synth  -v|--verilog <Verilog file list>"
@@ -101,16 +101,16 @@ if [ -z ${FAMILY} ]; then
 fi
 
 if [ ${#VERILOG_FILES[@]} -eq 0 ]; then
-	echo "Please provide at least one Verilog file"
-	exit 1
+  echo "Please provide at least one Verilog file"
+  exit 1
 fi
 
 PINMAPCSV="pinmap_${PART}.csv"
 
-export TECHMAP_PATH=`realpath ${MYPATH}/../share/symbiflow/techmaps/${FAMILY}`
+export TECHMAP_PATH="${SHARE_DIR_PATH}/techmaps/${FAMILY}"
 
-SYNTH_TCL_PATH=`realpath ${MYPATH}/../share/symbiflow/scripts/${FAMILY}/synth.tcl`
-CONV_TCL_PATH=`realpath ${MYPATH}/../share/symbiflow/scripts/${FAMILY}/conv.tcl`
+SYNTH_TCL_PATH="${SHARE_DIR_PATH}/scripts/${FAMILY}/synth.tcl"
+CONV_TCL_PATH="${SHARE_DIR_PATH}/scripts/${FAMILY}/conv.tcl"
 
 export USE_ROI="FALSE"
 export OUT_JSON=$TOP.json
@@ -123,24 +123,24 @@ if [ -s $PCF ]; then
     export PCF_FILE=$PCF
 fi
 
-DEVICE_PATH=`realpath ${MYPATH}/../share/symbiflow/arch/${DEVICE}_${DEVICE}`
+DEVICE_PATH="${SHARE_DIR_PATH}/arch/${DEVICE}_${DEVICE}"
 export PINMAP_FILE=${DEVICE_PATH}/${PINMAPCSV}
 if [ -d "${DEVICE_PATH}/cells" ]; then
-	export DEVICE_CELLS_SIM=`find ${DEVICE_PATH}/cells -name "*_sim.v"`
-	export DEVICE_CELLS_MAP=`find ${DEVICE_PATH}/cells -name "*_map.v"`
+  export DEVICE_CELLS_SIM=`find ${DEVICE_PATH}/cells -name "*_sim.v"`
+  export DEVICE_CELLS_MAP=`find ${DEVICE_PATH}/cells -name "*_map.v"`
 else
-	# pp3 family has different directory naming scheme
-	# the are named as ${DEVICE}_${PACKAGE}
-	# ${PACKAGE} is not known because it is not passed down in add_binary_toolchain_test
-	DEVICE_PATH=$(find $(realpath ${MYPATH}/../share/symbiflow/arch/) -type d -name "${DEVICE}*")
-	export PINMAP_FILE=${DEVICE_PATH}/${PINMAPCSV}
-	if [ -d "${DEVICE_PATH}/cells" ]; then
-		export DEVICE_CELLS_SIM=`find ${DEVICE_PATH}/cells -name "*_sim.v"`
-		export DEVICE_CELLS_MAP=`find ${DEVICE_PATH}/cells -name "*_map.v"`
-	else
-		export DEVICE_CELLS_SIM=
-		export DEVICE_CELLS_MAP=
-	fi
+  # pp3 family has different directory naming scheme
+  # the are named as ${DEVICE}_${PACKAGE}
+  # ${PACKAGE} is not known because it is not passed down in add_binary_toolchain_test
+  DEVICE_PATH=$(find $(realpath ${SHARE_DIR_PATH}/arch/) -type d -name "${DEVICE}*")
+  export PINMAP_FILE=${DEVICE_PATH}/${PINMAPCSV}
+  if [ -d "${DEVICE_PATH}/cells" ]; then
+    export DEVICE_CELLS_SIM=`find ${DEVICE_PATH}/cells -name "*_sim.v"`
+    export DEVICE_CELLS_MAP=`find ${DEVICE_PATH}/cells -name "*_map.v"`
+  else
+    export DEVICE_CELLS_SIM=
+    export DEVICE_CELLS_MAP=
+  fi
 fi
 
 YOSYS_COMMANDS=`echo ${EXTRA_ARGS[*]} | python3 ${CONVERT_OPTS}`
@@ -151,11 +151,11 @@ LOG=${TOP}_synth.log
 YOSYS_SCRIPT="tcl ${SYNTH_TCL_PATH}"
 
 for f in ${VERILOG_FILES[*]}; do
-    YOSYS_SCRIPT="read_verilog ${f}; $YOSYS_SCRIPT"
+  YOSYS_SCRIPT="read_verilog ${f}; $YOSYS_SCRIPT"
 done
 
 if [ ! -z "${YOSYS_COMMANDS}" ]; then
-    YOSYS_SCRIPT="$YOSYS_COMMANDS; $YOSYS_SCRIPT"
+  YOSYS_SCRIPT="$YOSYS_COMMANDS; $YOSYS_SCRIPT"
 fi
 
 yosys -p "${YOSYS_SCRIPT}" -l $LOG

@@ -1,32 +1,23 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 set -e
 
-MYPATH=`realpath $0`
-MYPATH=`dirname ${MYPATH}`
+if [ -z $VPRPATH ]; then
+  export VPRPATH=$(f4pga-env bin)
+  export PYTHONPATH=${VPRPATH}/python:${VPRPATH}/python/prjxray:${PYTHONPATH}
+fi
 
-source ${MYPATH}/env
 source ${VPRPATH}/vpr_common
-
 parse_args $@
 
-REPACK=`realpath ${MYPATH}/python/repacker/repack.py`
-
 DESIGN=${EBLIF/.eblif/}
-RULES=${ARCH_DIR}/${DEVICE_1}.repacking_rules.json
 
-JSON_ARGS=
-if [ ! -z "${JSON}" ]; then
-  JSON_ARGS="--json-constraints ${JSON}"
-fi
+[ ! -z "${JSON}" ] && JSON_ARGS="--json-constraints ${JSON}" || JSON_ARGS=
+[ ! -z "${PCF_PATH}" ] && PCF_ARGS="--pcf-constraints ${PCF_PATH}" || PCF_ARGS=
 
-PCF_ARGS=
-if [ ! -z "${PCF_PATH}" ]; then
-  PCF_ARGS="--pcf-constraints ${PCF_PATH}"
-fi
-
-python3 ${REPACK} \
+python3 $(f4pga-env bin)/python/repacker/repack.py \
   --vpr-arch ${ARCH_DEF} \
-  --repacking-rules ${RULES} \
+  --repacking-rules ${ARCH_DIR}/${DEVICE_1}.repacking_rules.json \
   $JSON_ARGS \
   $PCF_ARGS \
   --eblif-in ${DESIGN}.eblif \

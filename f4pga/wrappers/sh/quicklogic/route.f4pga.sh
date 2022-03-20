@@ -1,15 +1,16 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 set -e
 
-MYPATH=`realpath $0`
-MYPATH=`dirname ${MYPATH}`
+if [ -z $VPRPATH ]; then
+  export VPRPATH=$(f4pga-env bin)
+  export PYTHONPATH=${VPRPATH}/python:${VPRPATH}/python/prjxray:${PYTHONPATH}
+fi
 
-source ${MYPATH}/env
 source ${VPRPATH}/vpr_common
-
 parse_args $@
 
-export OUR_NOISY_WARNINGS=noisy_warnings-${DEVICE}_pack.log
+export OUT_NOISY_WARNINGS=noisy_warnings-${DEVICE}_pack.log
 
 run_vpr --route
 

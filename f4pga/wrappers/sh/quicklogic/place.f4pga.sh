@@ -1,48 +1,42 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 set -e
 
-MYPATH=`realpath $0`
-MYPATH=`dirname ${MYPATH}`
+if [ -z $VPRPATH ]; then
+  export VPRPATH=$(f4pga-env bin)
+  export PYTHONPATH=${VPRPATH}/python:${VPRPATH}/python/prjxray:${PYTHONPATH}
+fi
 
-source ${MYPATH}/env
-source ${MYPATH}/vpr_common
-
+source ${VPRPATH}/vpr_common
 parse_args $@
 
 if [ -z $PCF ]; then
-     echo "Please provide pcf file name"
-     exit 1
+  echo "Please provide pcf file name"
+  exit 1
 fi
 
 if [ -z $NET ]; then
-     echo "Please provide net file name"
-     exit 1
+  echo "Please provide net file name"
+  exit 1
 fi
 
 OUT_NOISY_WARNINGS=noisy_warnings-${DEVICE}_place.log
 PROJECT=$(basename -- "$EBLIF")
+PLACE_FILE="${PROJECT%.*}_constraints.place"
 
-# Generate IO constraints
 if [ -s $PCF ]; then
-    echo "Generating constraints ..."
-    symbiflow_generate_constraints $PCF $EBLIF $NET $PART $DEVICE $ARCH_DEF $CORNER
-
-    IOPLACE_FILE="${PROJECT%.*}_io.place"
-    PLACE_FILE="${PROJECT%.*}_constraints.place"
-
-    if [ -f ${PLACE_FILE} ]; then
-        VPR_PLACE_FILE=${PLACE_FILE}
-    else
-        VPR_PLACE_FILE=${IOPLACE_FILE}
-    fi
-
-# Make a dummy empty constraint file
-else
-
-    PLACE_FILE="${PROJECT%.*}_constraints.place"
-    touch ${PLACE_FILE}
+  # Generate IO constraints
+  echo "Generating constraints ..."
+  symbiflow_generate_constraints $PCF $EBLIF $NET $PART $DEVICE $ARCH_DEF $CORNER
+  if [ -f ${PLACE_FILE} ]; then
     VPR_PLACE_FILE=${PLACE_FILE}
-
+  else
+    VPR_PLACE_FILE="${PROJECT%.*}_io.place"
+  fi
+else
+  # Make a dummy empty constraint file
+  touch ${PLACE_FILE}
+  VPR_PLACE_FILE=${PLACE_FILE}
 fi
 
 run_vpr --fix_clusters ${VPR_PLACE_FILE} --place
