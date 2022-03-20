@@ -1,12 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 set -e
 
-MYPATH=`realpath $0`
-MYPATH=`dirname ${MYPATH}`
-
-source ${MYPATH}/env
-source ${VPRPATH}/vpr_common
-
+source $(dirname "$0")/vpr_common.f4pga.sh
 parse_args "$@"
 
 TOP="${EBLIF%.*}"
@@ -18,9 +14,9 @@ run_genfasm
 
 echo "FASM extra: $FASM_EXTRA"
 if [ -f $FASM_EXTRA ]; then
-	echo "writing final fasm"
-	cat ${TOP}.fasm $FASM_EXTRA > tmp.fasm
-	mv tmp.fasm ${TOP}.fasm
+  echo "writing final fasm"
+  cat ${TOP}.fasm $FASM_EXTRA > tmp.fasm
+  mv tmp.fasm ${TOP}.fasm
 fi
 
 mv vpr_stdout.log fasm.log

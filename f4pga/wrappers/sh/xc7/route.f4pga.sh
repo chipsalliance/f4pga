@@ -1,15 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 set -e
 
-MYPATH=`realpath $0`
-MYPATH=`dirname ${MYPATH}`
-
-source ${MYPATH}/env
-source ${VPRPATH}/vpr_common
-
+source $(dirname "$0")/vpr_common.f4pga.sh
 parse_args "$@"
 
-export OUR_NOISY_WARNINGS=noisy_warnings-${DEVICE}_pack.log
+export OUT_NOISY_WARNINGS=noisy_warnings-${DEVICE}_pack.log
 
 run_vpr --route
 

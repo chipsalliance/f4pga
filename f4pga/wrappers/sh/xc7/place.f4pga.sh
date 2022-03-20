@@ -1,24 +1,18 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 set -e
 
-MYPATH=`realpath $0`
-MYPATH=`dirname ${MYPATH}`
-
-source ${MYPATH}/env
-source ${MYPATH}/vpr_common
-
+source $(dirname "$0")/vpr_common.f4pga.sh
 parse_args "$@"
 
-if [ -z $PCF ]; then
-    PCF=""
-fi
+PCF=${PCF:=}
 
 if [ -z $NET ]; then
-     echo "Please provide net file name"
-     exit 1
+   echo "Please provide net file name"
+   exit 1
 fi
 
-OUT_NOISY_WARNINGS=noisy_warnings-${DEVICE}_place.log
+export OUT_NOISY_WARNINGS=noisy_warnings-${DEVICE}_place.log
 
 echo "Generating coinstrains ..."
 symbiflow_generate_constraints $EBLIF $NET $PART $DEVICE $ARCH_DEF $PCF
