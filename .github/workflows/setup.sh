@@ -39,16 +39,23 @@ end_section
 #Install yosys
 start_section Install-Yosys
 (
-    echo '=========================='
-    echo 'Making env with yosys and Surelog'
-    echo '=========================='
+    echo '================================='
+    echo 'Making env with Yosys and Surelog'
+    echo '================================='
     make env
-    make enter
-    echo $(which yosys)
-    echo $(which yosys-config)
-    echo $(yosys-config --datdir)
+    source env/conda/bin/activate yosys-plugins
+    conda list
 )
 end_section
 
 ##########################################################################
 
+start_section Yosys-Version
+(
+    source env/conda/bin/activate yosys-plugins
+    echo $(which yosys)
+    echo $(which yosys-config)
+    echo $(yosys --version)
+    echo $(yosys-config --datdir)
+)
+end_section
