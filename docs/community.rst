@@ -31,9 +31,9 @@ Communication
 Souces
 ======
 
-* `github.com/chipsalliance <https://github.com/chipsalliance/?q=f4pga>`__
+* :gh:`github.com/chipsalliance <chipsalliance/?q=f4pga>`
 
-* `github.com/F4PGA <https://github.com/F4PGA>`__
+* :gh:`github.com/F4PGA <F4PGA>`
 
 .. _Contributing:
 

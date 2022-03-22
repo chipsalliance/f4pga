@@ -43,9 +43,14 @@ version = ''
 release = '' # The full version, including alpha/beta/rc tags.
 
 extensions = [
+    'sphinx.ext.extlinks',
     'sphinx.ext.intersphinx',
-    'sphinx_verilog_domain'
+    'sphinx_verilog_domain',
+    'sphinxcontrib.bibtex',
 ]
+
+bibtex_default_style = 'plain'
+bibtex_bibfiles = ['refs.bib']
 
 numfig = True
 
@@ -139,4 +144,15 @@ intersphinx_mapping = {
     "prjtrellis": ("https://prjtrellis.readthedocs.io/en/latest/", None),
     "prjxray": ("https://f4pga.readthedocs.io/projects/prjxray/en/latest/", None),
     "vtr": ("https://docs.verilogtorouting.org/en/latest/", None),
+}
+
+# -- Sphinx.Ext.ExtLinks -----------------------------------------------------------------------------------------------
+
+extlinks = {
+   'wikipedia': ('https://en.wikipedia.org/wiki/%s', 'wikipedia:'),
+   'gh':        ('https://github.com/%s', 'gh:'),
+   'ghsharp':   ('https://github.com/chipsalliance/f4pga/issues/%s', '#'),
+   'ghissue':   ('https://github.com/chipsalliance/f4pga/issues/%s', 'issue #'),
+   'ghpull':    ('https://github.com/chipsalliance/f4pga/pull/%s', 'pull request #'),
+   'ghsrc':     ('https://github.com/chipsalliance/f4pga/blob/master/%s', '')
 }
