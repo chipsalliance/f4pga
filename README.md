@@ -13,7 +13,7 @@ This repository contains plugins for
 6. [QuickLogic QLF FPGAs](#quicklogic-qlf-plugin)
 7. [SDC](#sdc-plugin)
 8. [XDC](#xdc-plugin)
-9. [UHDM](#uhdm-plugin)
+9. [SystemVerilog](#systemverilog-plugin)
 
 ## Summary
 
@@ -99,12 +99,12 @@ The plugin adds the following commands:
 * set_property
 * get_bank_tiles
 
-### UHDM plugin
+### SystemVerilog plugin
 
-Reads UHDM files and processes it into yosys AST.
+Reads SystemVerilog and UHDM files and processes them into yosys AST.
 
 The plugin adds the following commands:
+* read_systemverilog
 * read_uhdm
-* read_verilog_with_uhdm
 
 Detailed help on the supported command(s) can be obtained by running `help <command_name>` in Yosys.
