@@ -1,6 +1,11 @@
 Glossary
 ########
 
+.. Warning::
+  This is work-in-progress, since the utilities and wrappers developed in F4PGA are being redesigned (from shell to Python).
+  Therefore, the terms and definitions shown below are subject to change.
+  It is strongly suggested not to rely on the content below until this note is updated/removed.
+
 .. glossary::
   :sorted:
 
