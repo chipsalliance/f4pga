@@ -406,6 +406,7 @@ static void convert_packed_unpacked_range(AST::AstNode *wire_node)
     if (packed_ranges.empty() && unpacked_ranges.empty()) {
         wire_node->attributes.erase(UhdmAst::packed_ranges());
         wire_node->attributes.erase(UhdmAst::unpacked_ranges());
+        wire_node->range_valid = true;
         return;
     }
     size_t size = 1;
@@ -1114,7 +1115,8 @@ AST::AstNode *UhdmAst::process_value(vpiHandle obj_h)
             // yosys is assuming that int/uint is 32 bit, so we are setting here correct size
             // NOTE: it *shouldn't* break on explicite 64 bit const values, as they *should* be handled
             // above by vpi*StrVal
-            if (size == 64) {
+            // FIXME: Minimal int size should be resolved in UHDM, here we make sure it is at least 32
+            if (size == 64 || size < 32) {
                 size = 32;
                 is_signed = true;
             }
@@ -1385,11 +1387,12 @@ AST::AstNode *UhdmAst::find_ancestor(const std::unordered_set<AST::AstNodeType> 
 void UhdmAst::process_design()
 {
     current_node = make_ast_node(AST::AST_DESIGN);
-    visit_one_to_many({UHDM::uhdmallInterfaces, UHDM::uhdmallPackages, UHDM::uhdmallModules, UHDM::uhdmtopModules}, obj_h, [&](AST::AstNode *node) {
-        if (node) {
-            shared.top_nodes[node->str] = node;
-        }
-    });
+    visit_one_to_many({UHDM::uhdmallInterfaces, UHDM::uhdmallPackages, UHDM::uhdmtopPackages, UHDM::uhdmallModules, UHDM::uhdmtopModules}, obj_h,
+                      [&](AST::AstNode *node) {
+                          if (node) {
+                              shared.top_nodes[node->str] = node;
+                          }
+                      });
     visit_one_to_many({vpiParameter, vpiParamAssign}, obj_h, [&](AST::AstNode *node) {});
     visit_one_to_many({vpiTypedef}, obj_h, [&](AST::AstNode *node) {
         if (node)
