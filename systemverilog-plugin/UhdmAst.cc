@@ -1879,7 +1879,7 @@ void UhdmAst::process_custom_var()
         delete node;
     });
     auto type = vpi_get(vpiType, obj_h);
-    if (type == vpiEnumVar || type == vpiStructVar) {
+    if (type == vpiEnumVar || type == vpiStructVar || type == vpiUnionVar) {
         visit_default_expr(obj_h);
     }
     current_node->is_custom_type = true;
@@ -3510,6 +3510,7 @@ void UhdmAst::process_port()
         case vpiStructNet:
         case vpiArrayNet:
         case vpiStructVar:
+        case vpiUnionVar:
         case vpiEnumVar:
         case vpiShortIntVar:
         case vpiIntVar:
@@ -3770,6 +3771,7 @@ AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
     case vpiEnumNet:
     case vpiStructVar:
     case vpiStructNet:
+    case vpiUnionVar:
         process_custom_var();
         break;
     case vpiShortIntVar:
