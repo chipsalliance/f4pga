@@ -1,10 +1,9 @@
-# Yosys SymbiFlow Plugins
+# Yosys F4PGA Plugins
 
-This repository contains plugins for
-[Yosys](https://github.com/YosysHQ/yosys.git) developed as
-[part of the SymbiFlow project](https://symbiflow.github.io).
+This repository contains plugins for [Yosys](https://github.com/YosysHQ/yosys.git) developed as [part of the F4PGA project](https://f4pga.org).
 
 ## List of plugins
+
 1. [Design introspection](#design-introspection-plugin)
 2. [FASM](#fasm-plugin)
 3. [Integrate inverters](#integrate-inverters-plugin)
@@ -32,7 +31,8 @@ Following commands are added with the plugin:
 
 ### FASM plugin
 
-Writes out the design's [fasm features](https://symbiflow.readthedocs.io/en/latest/fasm/docs/specification.html) based on the parameter annotations on a design cell.
+Writes out the design's [fasm features](https://fasm.readthedocs.io/en/latest/) based on the parameter annotations on a
+design cell.
 
 The plugin adds the following command:
 * write_fasm
@@ -91,7 +91,7 @@ Reads Xilinx Design Constraints (XDC) files and annotates the specified cells pa
 * DRIVE
 * IN_TERM
 * LOC
-* PACKAGE_PIN 
+* PACKAGE_PIN
 
 The plugin adds the following commands:
 * read_xdc

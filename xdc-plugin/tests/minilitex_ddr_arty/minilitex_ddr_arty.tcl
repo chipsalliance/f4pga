@@ -6,7 +6,7 @@ yosys -import  ;# ingest plugin commands
 read_verilog $::env(DESIGN_TOP).v
 read_verilog [file dirname [info script]]/VexRiscv_Lite.v
 # -flatten is used to ensure that the output eblif has only one module.
-# Some of symbiflow expects eblifs with only one module.
+# Some of F4PGA expects eblifs with only one module.
 synth_xilinx -flatten -abc9 -nosrl -noclkbuf -nodsp
 
 #Read the design constraints

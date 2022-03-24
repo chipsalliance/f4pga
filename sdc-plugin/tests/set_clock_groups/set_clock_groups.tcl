@@ -3,7 +3,7 @@ if { [info procs read_sdc] == {} } { plugin -i sdc }
 yosys -import  ;# ingest plugin commands
 
 read_verilog $::env(DESIGN_TOP).v
-# Some of symbiflow expects eblifs with only one module.
+# Some of F4PGA expects eblifs with only one module.
 synth_xilinx -flatten -abc9 -nosrl -noclkbuf -nodsp
 
 set_clock_groups -group clk1 clk2

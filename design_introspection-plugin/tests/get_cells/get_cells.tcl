@@ -3,7 +3,7 @@ if { [info procs get_cells] == {} } { plugin -i design_introspection }
 yosys -import  ;# ingest plugin commands
 
 read_verilog $::env(DESIGN_TOP).v
-# Some of symbiflow expects eblifs with only one module.
+# Some of F4PGA expects eblifs with only one module.
 synth_xilinx -flatten -abc9 -nosrl -noclkbuf -nodsp
 
 

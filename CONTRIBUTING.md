@@ -1,18 +1,16 @@
-# Contributing to Yosys SymbiFlow Plugins
+# Contributing to Yosys F4PGA Plugins
 
-There are a couple of guidelines when contributing to Yosys SymbiFlow Plugins
-which are listed here.
+There are a couple of guidelines when contributing to Yosys F4PGA Plugins which are listed here.
 
 ### Sending
 
-All contributions should be sent as
-[GitHub Pull requests](https://help.github.com/articles/creating-a-pull-request-from-a-fork/).
+All contributions should be sent as [GitHub Pull requests](https://help.github.com/articles/creating-a-pull-request-from-a-fork/).
 
 ### License
 
-All software (code, associated documentation, support files, etc) in the
-Yosys SymbiFlow Plugins repository are licensed under the very permissive
-[ISC Licence](COPYING). A copy can be found in the [`COPYING`](COPYING) file.
+All software (code, associated documentation, support files, etc) in the Yosys F4PGA Plugins repository are licensed
+under the very permissive [ISC Licence](COPYING).
+A copy can be found in the [`COPYING`](COPYING) file.
 
 All new contributions must also be released under this license.
 
