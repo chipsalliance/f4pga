@@ -1,4 +1,4 @@
-sphinx
+sphinx>=4.5.0
 sphinxcontrib-bibtex
 http://github.com/SymbiFlow/sphinx_symbiflow_theme/archive/chips.zip#sphinx-symbiflow-theme
 http://github.com/SymbiFlow/sphinx-verilog-domain/archive/master.zip#sphinx-verilog-domain
