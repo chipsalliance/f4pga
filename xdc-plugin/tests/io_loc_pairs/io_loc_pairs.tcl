@@ -12,7 +12,7 @@ read_verilog -lib [file dirname $::env(DESIGN_TOP)]/cells_xtra.v
 hierarchy -check -top top
 
 # -flatten is used to ensure that the output eblif has only one module.
-# Some of symbiflow expects eblifs with only one module.
+# Some of F4PGA expects eblifs with only one module.
 synth_xilinx -flatten -abc9 -nosrl -noclkbuf -nodsp -run prepare:check
 
 #Read the design constraints
