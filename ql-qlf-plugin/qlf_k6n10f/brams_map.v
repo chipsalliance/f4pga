@@ -1,10 +1,10 @@
-// Copyright (C) 2020-2021  The SymbiFlow Authors.
+// Copyright (C) 2019-2022 The SymbiFlow Authors
 //
 // Use of this source code is governed by a ISC-style
 // license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/ISC
 //
-// SPDX-License-Identifier:ISC
+// SPDX-License-Identifier: ISC
 
 `define MODE_36 3'b111	// 36 or 32-bit
 `define MODE_18 3'b110	// 18 or 16-bit
