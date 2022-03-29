@@ -1,10 +1,10 @@
-# Copyright (C) 2022  The SymbiFlow Authors.
+# Copyright (C) 2019-2022 The SymbiFlow Authors
 #
 # Use of this source code is governed by a ISC-style
 # license that can be found in the LICENSE file or at
 # https://opensource.org/licenses/ISC
 #
-# SPDX-License-Identifier:ISC
+# SPDX-License-Identifier: ISC
 
 TESTBENCH = bram_tdp_tb.v
 POST_SYNTH = bram_tdp_32x512_post_synth bram_tdp_16x1024_post_synth bram_tdp_8x2048_post_synth bram_tdp_4x4096_post_synth
