@@ -9,7 +9,7 @@ The elements of the project include (but are not limited to):
   * F4PGA documentation: [f4pga.readthedocs.io](https://f4pga.readthedocs.io) (knowledge base)
   * F4PGA Architecture Definitions: [f4pga.readthedocs.io/projects/arch-defs](https://f4pga.readthedocs.io/projects/arch-defs)
   * F4PGA examples: [f4pga-examples.readthedocs.io](https://f4pga-examples.readthedocs.io)
-  * [F4PGA Yosys plugins](https://github.com/f4pga/yosys-f4pga-plugins)
+  * [F4PGA Yosys plugins](https://github.com/chipsalliance/yosys-f4pga-plugins)
 
 * The FPGA interchange format (an interchange format defined by CHIPS Alliance to enable interoperability between
   different FPGA tools) adopted by the F4PGA toolchain:
