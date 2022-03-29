@@ -1472,6 +1472,22 @@ module dsp_t1_sim # (
     reg			r_rnd;
     reg [NBITS_ACC-1:0] acc;
 
+    initial begin
+        r_a          <= 'h0;
+        r_b          <= 'h0;
+
+	    r_acc_fir	 <= 0;
+        r_unsigned_a <= 0;
+        r_unsigned_b <= 0;
+        r_feedback   <= 0;
+        r_shift_d1   <= 0;
+        r_shift_d2   <= 0;
+	    r_subtract   <= 0;
+        r_load_acc   <= 0;
+        r_sat	     <= 0;
+        r_rnd	     <= 0;
+    end
+
     always @(posedge clock_i or negedge reset_n_i) begin
         if (~reset_n_i) begin
 
@@ -1566,7 +1582,9 @@ module dsp_t1_sim # (
 
     wire [NBITS_ACC-1:0] add_o = add_a + add_b;
 
-    // Accumulator    
+    // Accumulator
+    initial acc <= 0;
+
     always @(posedge clock_i or negedge reset_n_i)
         if (~reset_n_i) acc <= 'h0;
         else begin
@@ -1603,6 +1621,8 @@ module dsp_t1_sim # (
     assign z0 = mult_xtnd[NBITS_Z-1:0];
     assign z2 = acc_sat[NBITS_Z-1:0];
 
+    initial z1 <= 0;
+
     always @(posedge clock_i or negedge reset_n_i)
         if (!reset_n_i)
             z1 <= 0;
@@ -1621,6 +1641,8 @@ module dsp_t1_sim # (
 					       z1;	// if output_select_i == 3'h7
 
     // B input delayed passthrough
+    initial dly_b_o <= 0;
+
     always @(posedge clock_i or negedge reset_n_i)
         if (!reset_n_i)
             dly_b_o <= 0;

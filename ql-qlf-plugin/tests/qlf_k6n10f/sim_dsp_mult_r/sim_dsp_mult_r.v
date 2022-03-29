@@ -58,6 +58,7 @@ module tb();
 
     // Error detection
     reg [37:0] r_C;
+    initial r_C <= 0;
     always @(posedge clk)
         r_C <= C;
 
