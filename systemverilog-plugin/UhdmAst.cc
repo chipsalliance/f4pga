@@ -3607,6 +3607,7 @@ void UhdmAst::process_parameter()
         }
         case vpiEnumTypespec:
         case vpiRealTypespec:
+        case vpiStringTypespec: {
             shared.report.mark_handled(typespec_h);
             break;
         }
