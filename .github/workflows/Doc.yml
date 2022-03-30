@@ -10,6 +10,7 @@ on:
 jobs:
 
   Docs:
+    if: ${{ !(github.event_name != 'pull_request' && github.actor == 'dependabot[bot]') }}
     runs-on: ubuntu-latest
     name: '📓 Docs'
     steps:
