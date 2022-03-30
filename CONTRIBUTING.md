@@ -9,8 +9,8 @@ All contributions should be sent as [GitHub Pull requests](https://help.github.c
 ### License
 
 All software (code, associated documentation, support files, etc) in the Yosys F4PGA Plugins repository are licensed
-under the very permissive [ISC Licence](COPYING).
-A copy can be found in the [`COPYING`](COPYING) file.
+under the very permissive [Apache-2.0 Licence](LICENSE).
+A copy can be found in the [`LICENSE`](LICENSE) file.
 
 All new contributions must also be released under this license.
 
