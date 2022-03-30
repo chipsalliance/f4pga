@@ -309,7 +309,11 @@ struct SynthQuickLogicPass : public ScriptPass {
             if (family == "pp3") {
                 run("pp3_braminit");
             }
+            run("ql_bram_split                   ", "(for qlf_k6n10f if not -no_bram)");
             run("techmap -map +/quicklogic/" + family + "/brams_map.v");
+            if (family == "qlf_k6n10f") {
+                run("techmap -map +/quicklogic/" + family + "/brams_final_map.v");
+            }
         }
 
         if (check_label("map_ffram")) {
