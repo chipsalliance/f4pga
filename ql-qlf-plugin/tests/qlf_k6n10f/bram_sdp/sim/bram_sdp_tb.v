@@ -100,8 +100,8 @@ module TB;
 	end
 
 	case (`STRINGIFY(`TOP))
-		"BRAM_SDP_32x512": begin
-			BRAM_SDP_32x512 #() bram (
+		"BRAM_SDP_36x1024": begin
+			BRAM_SDP_36x1024 #() bram (
 				.clk(clk),
 				.rce(rce),
 				.ra(ra),
@@ -111,8 +111,8 @@ module TB;
 				.wd(wd)
 			);
 		end
-		"BRAM_SDP_16x1024": begin
-			BRAM_SDP_16x1024 #() bram (
+		"BRAM_SDP_32x1024": begin
+			BRAM_SDP_32x1024 #() bram (
 				.clk(clk),
 				.rce(rce),
 				.ra(ra),
@@ -122,8 +122,8 @@ module TB;
 				.wd(wd)
 			);
 		end
-		"BRAM_SDP_8x2048": begin
-			BRAM_SDP_8x2048 #() bram (
+		"BRAM_SDP_18x2048": begin
+			BRAM_SDP_18x2048 #() bram (
 				.clk(clk),
 				.rce(rce),
 				.ra(ra),
@@ -133,8 +133,63 @@ module TB;
 				.wd(wd)
 			);
 		end
-		"BRAM_SDP_4x4096": begin
-			BRAM_SDP_4x4096 #() bram (
+		"BRAM_SDP_16x2048": begin
+			BRAM_SDP_16x2048 #() bram (
+				.clk(clk),
+				.rce(rce),
+				.ra(ra),
+				.rq(rq),
+				.wce(wce),
+				.wa(wa),
+				.wd(wd)
+			);
+		end
+		"BRAM_SDP_9x4096": begin
+			BRAM_SDP_9x4096 #() bram (
+				.clk(clk),
+				.rce(rce),
+				.ra(ra),
+				.rq(rq),
+				.wce(wce),
+				.wa(wa),
+				.wd(wd)
+			);
+		end
+		"BRAM_SDP_8x4096": begin
+			BRAM_SDP_8x4096 #() bram (
+				.clk(clk),
+				.rce(rce),
+				.ra(ra),
+				.rq(rq),
+				.wce(wce),
+				.wa(wa),
+				.wd(wd)
+			);
+		end
+		"BRAM_SDP_4x8192": begin
+			BRAM_SDP_4x8192 #() bram (
+				.clk(clk),
+				.rce(rce),
+				.ra(ra),
+				.rq(rq),
+				.wce(wce),
+				.wa(wa),
+				.wd(wd)
+			);
+		end
+		"BRAM_SDP_2x16384": begin
+			BRAM_SDP_2x16384 #() bram (
+				.clk(clk),
+				.rce(rce),
+				.ra(ra),
+				.rq(rq),
+				.wce(wce),
+				.wa(wa),
+				.wd(wd)
+			);
+		end
+		"BRAM_SDP_1x32768": begin
+			BRAM_SDP_1x32768 #() bram (
 				.clk(clk),
 				.rce(rce),
 				.ra(ra),
