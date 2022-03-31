@@ -41,6 +41,7 @@ sim:
 	$(call simulate_post_synth,2)
 	$(call simulate_post_synth,3)
 	$(call simulate_post_synth,4)
+	$(call simulate_post_synth,5)
 	$(call simulate_post_synth,6)
 	$(call simulate_post_synth,7)
 	$(call simulate_post_synth,8)

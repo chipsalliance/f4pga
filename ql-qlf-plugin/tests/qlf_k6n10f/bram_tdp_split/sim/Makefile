@@ -31,6 +31,7 @@ endef
 sim:
 	$(call simulate_post_synth,1)
 	$(call simulate_post_synth,2)
+	$(call simulate_post_synth,3)
 	$(call simulate_post_synth,4)
 	$(call simulate_post_synth,5)
 	$(call simulate_post_synth,6)
