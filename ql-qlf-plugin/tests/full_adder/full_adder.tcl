@@ -153,4 +153,3 @@ stat
 #select -assert-count 8 t:inpad
 #select -assert-count 1 t:outpad
 #select -assert-none t:LUT2 t:LUT4 t:inpad t:outpad %% t:* %D
-

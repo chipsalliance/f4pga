@@ -444,9 +444,6 @@ module logic_cell_macro (
   wire TAP1, TAP2, TBP1, TBP2, BAP1, BAP2, BBP1, BBP2, QCKP, TAI, TBI, BAI, BBI, TZI, BZI, CZI, QZI;
   reg QZ_r;
 
-  initial begin
-    QZ_r = 1'b0;
-  end
   assign QZ   = QZ_r;
   assign TAP1 = TAS1 ? ~TA1 : TA1;
   assign TAP2 = TAS2 ? ~TA2 : TA2;
@@ -470,11 +467,16 @@ module logic_cell_macro (
   assign CZ   = CZI;
   assign QCKP = QCKS ? QCK : ~QCK;
 
+  initial QZ_r <= 1'b0;
 
-  always @(posedge QCKP) if (~QRT && ~QST) if (QEN) QZ_r = QZI;
-  always @(QRT or QST)
-    if (QRT) QZ_r = 1'b0;
-    else if (QST) QZ_r = 1'b1;
+  always @(posedge QCKP or posedge QRT or posedge QST) begin
+    if (QRT)
+        QZ_r <= 1'b0;
+    else if (QST)
+        QZ_r <= 1'b1;
+    else if (QEN)
+        QZ_r <= QZI;
+  end
 
 endmodule
 
