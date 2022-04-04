@@ -1711,7 +1711,8 @@ void UhdmAst::process_typespec_member()
         shared.report.mark_handled(typespec_h);
         break;
     }
-    case vpiIntTypespec: {
+    case vpiIntTypespec:
+    case vpiIntegerTypespec: {
         current_node->is_signed = true;
         packed_ranges.push_back(make_range(31, 0));
         shared.report.mark_handled(typespec_h);
@@ -1819,7 +1820,8 @@ void UhdmAst::process_enum_typespec()
             shared.report.mark_handled(typespec_h);
             break;
         }
-        case vpiIntTypespec: {
+        case vpiIntTypespec:
+        case vpiIntegerTypespec: {
             current_node->is_signed = true;
             shared.report.mark_handled(typespec_h);
             break;
@@ -3514,6 +3516,7 @@ void UhdmAst::process_port()
         case vpiEnumVar:
         case vpiShortIntVar:
         case vpiIntVar:
+        case vpiIntegerVar:
             break;
         default: {
             const uhdm_handle *const handle = (const uhdm_handle *)actual_h;
@@ -3603,11 +3606,13 @@ void UhdmAst::process_parameter()
             break;
         }
         case vpiEnumTypespec:
-        case vpiRealTypespec: {
+        case vpiRealTypespec:
+        case vpiStringTypespec: {
             shared.report.mark_handled(typespec_h);
             break;
         }
-        case vpiIntTypespec: {
+        case vpiIntTypespec:
+        case vpiIntegerTypespec: {
             packed_ranges.push_back(make_range(31, 0));
             shared.report.mark_handled(typespec_h);
             break;
@@ -3776,6 +3781,7 @@ AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
         break;
     case vpiShortIntVar:
     case vpiIntVar:
+    case vpiIntegerVar:
         process_int_var();
         break;
     case vpiShortRealVar:
@@ -3924,6 +3930,7 @@ AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
         process_logic_typespec();
         break;
     case vpiIntTypespec:
+    case vpiIntegerTypespec:
         process_int_typespec();
         break;
     case vpiBitTypespec:
