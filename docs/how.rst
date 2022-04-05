@@ -33,12 +33,12 @@ Thus, F4PGA serves as an umbrella project for several activities.
 The central resources are the so-called FPGA "architecture definitions" (i.e. documentation of how specific FPGAs work
 internally) and the "interchange schema" (for logical and physical netlists).
 Those definitions serve as input to frontend and backend tools, such as
-`Yosys ➚ <http://www.clifford.at/yosys/>`__,
+`Yosys ➚ <http://yosyshq.net/yosys/>`__,
 :gh:`nextpnr ➚ <YosysHQ/nextpnr>` and `Verilog to Routing ➚ <https://verilogtorouting.org/>`_.
 They are created within separate collaborating projects targeting different FPGAs:
 
 * :doc:`Project X-Ray ➚ <prjxray:index>` for Xilinx 7-Series
-* `Project IceStorm ➚ <http://www.clifford.at/icestorm/>`__ for Lattice iCE40
+* `Project IceStorm ➚ <http://bygone.clairexen.net/icestorm/>`__ for Lattice iCE40
 * :doc:`Project Trellis ➚ <prjtrellis:index>` for Lattice ECP5 FPGAs
 
 More information can be found at :doc:`F4PGA Architecture Definitions ➚ <arch-defs:index>` and :doc:`FPGA Interchange ➚ <interchange:index>`.
@@ -55,7 +55,7 @@ To prepare a working bitstream for a particular FPGA chip, the toolchain goes th
     This stage is typically pre-built and installed as assets.
     However, developers contributing to the bitstream documentation might build it.
 
-* Then, logic synthesis is carried out in the `Yosys ➚ <http://www.clifford.at/yosys/>`__ framework, which expresses the
+* Then, logic synthesis is carried out in the `Yosys ➚ <http://yosyshq.net/yosys/>`__ framework, which expresses the
   user-provided hardware description by means of the block and connection types available in the chosen chip.
 
 * The next step is implementation.
