@@ -5,7 +5,7 @@ Supported Architectures
 * `Xilinx 7-Series <https://www.xilinx.com/video/fpga/7-series-fpga-overview.html>`__:
   the most popular Xilinx FPGA family.
 
-* `Lattice ice40 <http://www.latticesemi.com/iCE40>`__:
+* `Lattice ice40 <https://www.latticesemi.com/iCE40>`__:
   world's smallest FPGAs for mobile devices.
 
 * `Lattice ecp5 <https://www.latticesemi.com/Products/FPGAandCPLD/ECP5>`__:
