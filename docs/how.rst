@@ -33,7 +33,7 @@ Thus, F4PGA serves as an umbrella project for several activities.
 The central resources are the so-called FPGA "architecture definitions" (i.e. documentation of how specific FPGAs work
 internally) and the "interchange schema" (for logical and physical netlists).
 Those definitions serve as input to frontend and backend tools, such as
-`Yosys ➚ <http://yosyshq.net/yosys/>`__,
+`Yosys ➚ <https://yosyshq.net/yosys/>`__,
 :gh:`nextpnr ➚ <YosysHQ/nextpnr>` and `Verilog to Routing ➚ <https://verilogtorouting.org/>`_.
 They are created within separate collaborating projects targeting different FPGAs:
 
@@ -55,7 +55,7 @@ To prepare a working bitstream for a particular FPGA chip, the toolchain goes th
     This stage is typically pre-built and installed as assets.
     However, developers contributing to the bitstream documentation might build it.
 
-* Then, logic synthesis is carried out in the `Yosys ➚ <http://yosyshq.net/yosys/>`__ framework, which expresses the
+* Then, logic synthesis is carried out in the `Yosys ➚ <https://yosyshq.net/yosys/>`__ framework, which expresses the
   user-provided hardware description by means of the block and connection types available in the chosen chip.
 
 * The next step is implementation.

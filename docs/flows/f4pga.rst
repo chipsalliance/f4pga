@@ -134,7 +134,7 @@ Technology mapping in F4PGA toolchain
 
 .. _Xilinx 7 Series FPGAs Clocking Resources User Guide: https://www.xilinx.com/support/documentation/user_guides/ug472_7Series_Clocking.pdf#page=38
 .. _VTR FPGA Architecture Description: https://docs.verilogtorouting.org/en/latest/arch/
-.. _techmap section in the Yosys Manual: http://yosyshq.net/yosys/files/yosys_manual.pdf#page=153
+.. _techmap section in the Yosys Manual: https://yosyshq.net/yosys/files/yosys_manual.pdf#page=153
 
 It is important to understand the connection between the synthesis and
 implementation tools used in the F4PGA toolchain. As mentioned before,
@@ -190,7 +190,7 @@ Below you can see the pb_type XML for ``BUFGCTRL_VPR`` primitive:
 .. code-block:: xml
 
    <!-- Model of BUFG group in BUFG_CLK_TOP/BOT -->
-   <pb_type name="BLK-TL-BUFGCTRL" xmlns:xi="http://www.w3.org/2001/XInclude">
+   <pb_type name="BLK-TL-BUFGCTRL" xmlns:xi="https://www.w3.org/2001/XInclude">
      <output name="O" num_pins="1"/>
      <input name="CE0" num_pins="1"/>
      <input name="CE1" num_pins="1"/>
@@ -406,7 +406,7 @@ More information
 
 Additional information about Yosys can be found on the `Yosys Project Website
 <https://yosyshq.net/yosys/>`_ , or in `Yosys Manual
-<http://yosyshq.net/yosys/files/yosys_manual.pdf>`_. You can also compile
+<https://yosyshq.net/yosys/files/yosys_manual.pdf>`_. You can also compile
 one of the tests described in Getting Started section and watch the log file
 to understand which operations are performed by Yosys.
 
