@@ -78,8 +78,9 @@ void UhdmCommonFrontend::execute(std::istream *&f, std::string filename, std::ve
     bool dump_vlog2 = false;
     bool no_dump_ptr = false;
     bool dump_rtlil = false;
+    std::vector<std::string> unhandled_args;
 
-    for (size_t i = 1; i < args.size(); i++) {
+    for (size_t i = 0; i < args.size(); i++) {
         if (args[i] == "-debug") {
             dump_ast1 = true;
             dump_ast2 = true;
@@ -107,9 +108,15 @@ void UhdmCommonFrontend::execute(std::istream *&f, std::string filename, std::ve
             dump_rtlil = true;
         } else if (args[i] == "-yydebug") {
             this->shared.debug_flag = true;
+        } else {
+            unhandled_args.push_back(args[i]);
         }
     }
-    extra_args(f, filename, args, args.size() - 1);
+    // pass only unhandled args to Surelog
+    // unhandled args starts with command name,
+    // but Surelog expects args[0] to be program name
+    // and skips it
+    this->args = unhandled_args;
 
     AST::current_filename = filename;
     AST::set_line_num = &set_line_num;
