@@ -74,6 +74,9 @@ rst_prolog = """
 
 .. role:: raw-html(raw)
    :format: html
+
+.. IMPORTANT::
+  SymbiFlow is now F4PGA. See `f4pga.org <https://f4pga.org/>`__ and `f4pga.readthedocs.io <https://f4pga.readthedocs.io>`__.
 """
 
 # -- Options for HTML output -------------------------------------------------------------------------------------------
