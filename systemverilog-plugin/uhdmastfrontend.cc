@@ -44,9 +44,11 @@ struct UhdmAstFrontend : public UhdmCommonFrontend {
         UHDM::Serializer serializer;
 
         std::vector<vpiHandle> restoredDesigns = serializer.Restore(filename);
-        for (auto design : restoredDesigns) {
-            std::stringstream strstr;
-            UHDM::visit_object(design, 1, "", &this->shared.report.unhandled, this->shared.debug_flag ? std::cout : strstr);
+        if (this->shared.debug_flag || !this->report_directory.empty()) {
+            for (auto design : restoredDesigns) {
+                std::stringstream strstr;
+                UHDM::visit_object(design, 1, "", &this->shared.report.unhandled, this->shared.debug_flag ? std::cout : strstr);
+            }
         }
         UhdmAst uhdm_ast(this->shared);
         AST::AstNode *current_ast = uhdm_ast.visit_designs(restoredDesigns);
