@@ -72,26 +72,22 @@ std::vector<vpiHandle> executeCompilation(SURELOG::SymbolTable *symbolTable, SUR
     }
     if ((!noFatalErrors) || (!success))
         codedReturn |= 1;
+    if (codedReturn) {
+        log_error("Encoraged fatal error when executing Surelog. Aborting!\n");
+    }
     return the_design;
 }
 
 struct UhdmSurelogAstFrontend : public UhdmCommonFrontend {
     UhdmSurelogAstFrontend(std::string name, std::string short_help) : UhdmCommonFrontend(name, short_help) {}
     UhdmSurelogAstFrontend() : UhdmCommonFrontend("verilog_with_uhdm", "generate/read UHDM file") {}
-    void print_read_options() override
-    {
-        log("    -process\n");
-        log("        loads design from given UHDM file\n");
-        log("\n");
-        UhdmCommonFrontend::print_read_options();
-    }
     void help() override
     {
         //   |---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|
         log("\n");
         log("    read_verilog_with_uhdm [options] [filenames]\n");
         log("\n");
-        log("Generate or load design from a UHDM file into the current design\n");
+        log("Read SystemVerilog files using Surelog into the current design\n");
         log("\n");
         this->print_read_options();
     }
@@ -117,6 +113,12 @@ struct UhdmSurelogAstFrontend : public UhdmCommonFrontend {
 
         SURELOG::scompiler *compiler = nullptr;
         const std::vector<vpiHandle> uhdm_design = executeCompilation(symbolTable, errors, clp, compiler);
+        if (this->shared.debug_flag || !this->report_directory.empty()) {
+            for (auto design : uhdm_design) {
+                std::stringstream strstr;
+                UHDM::visit_object(design, 1, "", &this->shared.report.unhandled, this->shared.debug_flag ? std::cout : strstr);
+            }
+        }
 
         SURELOG::shutdown_compiler(compiler);
         delete clp;
@@ -125,8 +127,8 @@ struct UhdmSurelogAstFrontend : public UhdmCommonFrontend {
 
         UhdmAst uhdm_ast(this->shared);
         AST::AstNode *current_ast = uhdm_ast.visit_designs(uhdm_design);
-        if (report_directory != "") {
-            shared.report.write(report_directory);
+        if (!this->report_directory.empty()) {
+            this->shared.report.write(this->report_directory);
         }
 
         return current_ast;
@@ -136,6 +138,16 @@ struct UhdmSurelogAstFrontend : public UhdmCommonFrontend {
 
 struct UhdmSystemVerilogFrontend : public UhdmSurelogAstFrontend {
     UhdmSystemVerilogFrontend() : UhdmSurelogAstFrontend("systemverilog", "read SystemVerilog files") {}
+    void help() override
+    {
+        //   |---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|---v---|
+        log("\n");
+        log("    read_systemverilog [options] [filenames]\n");
+        log("\n");
+        log("Read SystemVerilog files using Surelog into the current design\n");
+        log("\n");
+        this->print_read_options();
+    }
 } UhdmSystemVerilogFrontend;
 
 YOSYS_NAMESPACE_END
