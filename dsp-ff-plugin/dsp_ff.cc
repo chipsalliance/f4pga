@@ -289,7 +289,7 @@ struct DspFF : public Pass {
 
         log("Loading rules from '%s'...\n", a_FileName.c_str());
         if (!file) {
-            log_error(" Error opening file!\n");
+            log_error(" Error opening file '%s'!\n", a_FileName.c_str());
         }
 
         // Parse each port as if it was associated with its own DSP register.
