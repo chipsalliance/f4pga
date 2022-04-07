@@ -1,17 +1,11 @@
 name: Docs
 
 on:
-  pull_request:
-  push:
-  schedule:
-    - cron: '0 0 * * *'
-  workflow_dispatch:
+  workflow_call:
 
 jobs:
 
-
   Docs:
-    if: ${{ !(github.event_name != 'pull_request' && github.actor == 'dependabot[bot]') }}
     runs-on: ubuntu-latest
     name: '📓 Docs'
     steps:
@@ -50,17 +44,3 @@ jobs:
           git config --local user.name "GitHub Actions"
           git commit -a -m "update ${{ github.sha }}"
           git push -u origin +HEAD:gh-pages
-
-
-  Automerge:
-    needs: Docs
-    if: github.event_name == 'pull_request' && github.actor == 'dependabot[bot]'
-    runs-on: ubuntu-latest
-    name: Automerge dependabot PRs
-    permissions:
-      contents: write
-
-    steps:
-
-      - name: Auto-merge Dependabot PR
-        run: GITHUB_TOKEN='${{ github.token }}' gh pr merge '${{ github.event.pull_request.html_url }}' --squash
