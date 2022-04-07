@@ -112,6 +112,7 @@ void UhdmCommonFrontend::execute(std::istream *&f, std::string filename, std::ve
             unhandled_args.push_back(args[i]);
         }
     }
+    extra_args(f, filename, args, args.size() - 1);
     // pass only unhandled args to Surelog
     // unhandled args starts with command name,
     // but Surelog expects args[0] to be program name
