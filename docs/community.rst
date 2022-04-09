@@ -30,8 +30,8 @@ Communication
 
 * `Mailing list [lists.chipsalliance.org/g/f4pga-wg] <https://lists.chipsalliance.org/g/f4pga-wg>`__
 
-Souces
-======
+Sources
+=======
 
 * :gh:`github.com/chipsalliance <chipsalliance/?q=f4pga>`
 
