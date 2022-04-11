@@ -151,13 +151,13 @@ void create_ql_macc_dsp(ql_dsp_macc_pm &pm)
     RTLIL::SigSpec ena;
 
     if (st.ff->hasPort(ID(ARST))) {
-        if (st.ff->getParam(ID(ARST_POLARITY)) != RTLIL::S0) {
+        if (st.ff->getParam(ID(ARST_POLARITY)) != RTLIL::S1) {
             rst = pm.module->Not(NEW_ID, st.ff->getPort(ID(ARST)));
         } else {
             rst = st.ff->getPort(ID(ARST));
         }
     } else {
-        rst = RTLIL::SigSpec(RTLIL::S1);
+        rst = RTLIL::SigSpec(RTLIL::S0);
     }
 
     if (st.ff->hasPort(ID(EN))) {

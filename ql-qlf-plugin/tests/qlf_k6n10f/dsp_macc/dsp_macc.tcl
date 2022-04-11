@@ -56,7 +56,7 @@ check_equiv $TOP
 design -load postopt
 yosys cd $TOP
 select -assert-count 1 t:QL_DSP2
-select -assert-count 2 t:*
+select -assert-count 1 t:*
 
 #FIXME: DSP not inferred (got $mux instead of $dffe)
 #set TOP "macc_simple_ena"
