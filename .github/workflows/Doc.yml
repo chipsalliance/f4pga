@@ -27,7 +27,7 @@ jobs:
           make html
 
       - name: '📤 Upload artifact: Sphinx HTML'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: Documentation-HTML
           path: _build/html
