@@ -1291,10 +1291,12 @@ module QL_DSP2 ( // TODO: Name subject to change
     input         register_inputs
 );
 
-    parameter [19:0] COEFF_0 = 20'd0;
-    parameter [19:0] COEFF_1 = 20'd0;
-    parameter [19:0] COEFF_2 = 20'd0;
-    parameter [19:0] COEFF_3 = 20'd0;
+    parameter [79:0] MODE_BITS = 80'd0;
+
+    localparam [19:0] COEFF_0 = MODE_BITS[19:0];
+    localparam [19:0] COEFF_1 = MODE_BITS[39:20];
+    localparam [19:0] COEFF_2 = MODE_BITS[59:40];
+    localparam [19:0] COEFF_3 = MODE_BITS[79:60];
 
       localparam NBITS_ACC = 64;
       localparam NBITS_A = 20;
@@ -1689,10 +1691,7 @@ module dsp_t1_20x18x64 (
     parameter [19:0] COEFF_3 = 20'd0;
 
    QL_DSP2 #(
-        .COEFF_0(COEFF_0),
-        .COEFF_1(COEFF_1),
-        .COEFF_2(COEFF_2),
-        .COEFF_3(COEFF_3)
+    .MODE_BITS({COEFF_3, COEFF_2, COEFF_1, COEFF_0})
    ) dsp (
     .a(a_i),
     .b(b_i),
@@ -1753,10 +1752,10 @@ module dsp_t1_10x9x32 (
     wire [8:0] dly_b_rem;
 
     QL_DSP2 #(
-        .COEFF_0({10'd0, COEFF_0}),
-        .COEFF_1({10'd0, COEFF_1}),
-        .COEFF_2({10'd0, COEFF_2}),
-        .COEFF_3({10'd0, COEFF_3})
+    .MODE_BITS({10'd0, COEFF_3,
+                10'd0, COEFF_2,
+                10'd0, COEFF_1,
+                10'd0, COEFF_0})
    ) dsp (
     .a({10'd0, a_i}),
     .b({9'd0, b_i}),

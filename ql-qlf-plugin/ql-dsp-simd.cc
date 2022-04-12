@@ -87,7 +87,7 @@ struct QlDspSimdPass : public Pass {
     };
 
     // DSP parameters
-    const std::vector<std::string> m_DspParams = {"COEFF_0", "COEFF_1", "COEFF_2", "COEFF_3"};
+    const std::vector<std::string> m_DspParams = {"COEFF_3", "COEFF_2", "COEFF_1", "COEFF_0"};
 
     // Source DSP cell type (SISD)
     const std::string m_SisdDspType = "dsp_t1_10x9x32";
@@ -206,16 +206,18 @@ struct QlDspSimdPass : public Pass {
                         simd->setPort(dport, sigspec);
                     }
 
-                    // Set parameters
+                    // Concatenate FIR coefficient parameters into the single
+                    // MODE_BITS parameter
+                    std::vector<RTLIL::State> mode_bits;
                     for (const auto &it : m_DspParams) {
                         auto val_a = dsp_a->getParam(RTLIL::escape_id(it));
                         auto val_b = dsp_b->getParam(RTLIL::escape_id(it));
 
-                        std::vector<RTLIL::State> bits;
-                        bits.insert(bits.end(), val_a.begin(), val_a.end());
-                        bits.insert(bits.end(), val_b.begin(), val_b.end());
-                        simd->setParam(RTLIL::escape_id(it), RTLIL::Const(bits));
+                        mode_bits.insert(mode_bits.end(), val_a.begin(), val_a.end());
+                        mode_bits.insert(mode_bits.end(), val_b.begin(), val_b.end());
                     }
+                    simd->setParam(RTLIL::escape_id("MODE_BITS"), RTLIL::Const(mode_bits));
+                    log_assert(mode_bits.size() == 80);
 
                     // Enable the fractured mode by connecting the control
                     // port.
