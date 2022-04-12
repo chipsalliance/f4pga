@@ -93,91 +93,63 @@ module \$__QLF_FACTOR_BRAM36_TDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1
 		1: begin
 			assign PORT_A_ADDR = A1EN ? A1ADDR_TOTAL : (B1EN ? B1ADDR_TOTAL : 15'd0);
 			assign PORT_B_ADDR = C1EN ? C1ADDR_TOTAL : (D1EN ? D1ADDR_TOTAL : 15'd0);
-			defparam _TECHMAP_REPLACE_.WMODE_A1_i = `MODE_1;
-			defparam _TECHMAP_REPLACE_.WMODE_A2_i = `MODE_1;
-			defparam _TECHMAP_REPLACE_.RMODE_A1_i = `MODE_1;
-			defparam _TECHMAP_REPLACE_.RMODE_A2_i = `MODE_1;
-			defparam _TECHMAP_REPLACE_.WMODE_B1_i = `MODE_1;
-			defparam _TECHMAP_REPLACE_.WMODE_B2_i = `MODE_1;
-			defparam _TECHMAP_REPLACE_.RMODE_B1_i = `MODE_1;
-			defparam _TECHMAP_REPLACE_.RMODE_B2_i = `MODE_1;
+            defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+                11'd10, 11'd10, 4'd0, `MODE_1, `MODE_1, `MODE_1, `MODE_1, 1'd0,
+                12'd10, 12'd10, 4'd0, `MODE_1, `MODE_1, `MODE_1, `MODE_1, 1'd0
+            };
 		end
 
 		2: begin
 			assign PORT_A_ADDR = A1EN ? (A1ADDR_TOTAL << 1) : (B1EN ? (B1ADDR_TOTAL << 1) : 15'd0);
 			assign PORT_B_ADDR = C1EN ? (C1ADDR_TOTAL << 1) : (D1EN ? (D1ADDR_TOTAL << 1) : 15'd0);
-			defparam _TECHMAP_REPLACE_.WMODE_A1_i = `MODE_2;
-			defparam _TECHMAP_REPLACE_.WMODE_A2_i = `MODE_2;
-			defparam _TECHMAP_REPLACE_.RMODE_A1_i = `MODE_2;
-			defparam _TECHMAP_REPLACE_.RMODE_A2_i = `MODE_2;
-			defparam _TECHMAP_REPLACE_.WMODE_B1_i = `MODE_2;
-			defparam _TECHMAP_REPLACE_.WMODE_B2_i = `MODE_2;
-			defparam _TECHMAP_REPLACE_.RMODE_B1_i = `MODE_2;
-			defparam _TECHMAP_REPLACE_.RMODE_B2_i = `MODE_2;
+            defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+                11'd10, 11'd10, 4'd0, `MODE_2, `MODE_2, `MODE_2, `MODE_2, 1'd0,
+                12'd10, 12'd10, 4'd0, `MODE_2, `MODE_2, `MODE_2, `MODE_2, 1'd0
+            };
 		end
 
 		4: begin
 			assign PORT_A_ADDR = A1EN ? (A1ADDR_TOTAL << 2) : (B1EN ? (B1ADDR_TOTAL << 2) : 15'd0);
 			assign PORT_B_ADDR = C1EN ? (C1ADDR_TOTAL << 2) : (D1EN ? (D1ADDR_TOTAL << 2) : 15'd0);
-			defparam _TECHMAP_REPLACE_.WMODE_A1_i = `MODE_4;
-			defparam _TECHMAP_REPLACE_.WMODE_A2_i = `MODE_4;
-			defparam _TECHMAP_REPLACE_.RMODE_A1_i = `MODE_4;
-			defparam _TECHMAP_REPLACE_.RMODE_A2_i = `MODE_4;
-			defparam _TECHMAP_REPLACE_.WMODE_B1_i = `MODE_4;
-			defparam _TECHMAP_REPLACE_.WMODE_B2_i = `MODE_4;
-			defparam _TECHMAP_REPLACE_.RMODE_B1_i = `MODE_4;
-			defparam _TECHMAP_REPLACE_.RMODE_B2_i = `MODE_4;
+            defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+                11'd10, 11'd10, 4'd0, `MODE_4, `MODE_4, `MODE_4, `MODE_4, 1'd0,
+                12'd10, 12'd10, 4'd0, `MODE_4, `MODE_4, `MODE_4, `MODE_4, 1'd0
+            };
 		end
 
 		8, 9: begin
 			assign PORT_A_ADDR = A1EN ? (A1ADDR_TOTAL << 3) : (B1EN ? (B1ADDR_TOTAL << 3) : 15'd0);
 			assign PORT_B_ADDR = C1EN ? (C1ADDR_TOTAL << 3) : (D1EN ? (D1ADDR_TOTAL << 3) : 15'd0);
-			defparam _TECHMAP_REPLACE_.WMODE_A1_i = `MODE_9;
-			defparam _TECHMAP_REPLACE_.WMODE_A2_i = `MODE_9;
-			defparam _TECHMAP_REPLACE_.RMODE_A1_i = `MODE_9;
-			defparam _TECHMAP_REPLACE_.RMODE_A2_i = `MODE_9;
-			defparam _TECHMAP_REPLACE_.WMODE_B1_i = `MODE_9;
-			defparam _TECHMAP_REPLACE_.WMODE_B2_i = `MODE_9;
-			defparam _TECHMAP_REPLACE_.RMODE_B1_i = `MODE_9;
-			defparam _TECHMAP_REPLACE_.RMODE_B2_i = `MODE_9;
+            defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+                11'd10, 11'd10, 4'd0, `MODE_9, `MODE_9, `MODE_9, `MODE_9, 1'd0,
+                12'd10, 12'd10, 4'd0, `MODE_9, `MODE_9, `MODE_9, `MODE_9, 1'd0
+            };
 		end
 
 		16, 18: begin
 			assign PORT_A_ADDR = A1EN ? (A1ADDR_TOTAL << 4) : (B1EN ? (B1ADDR_TOTAL << 4) : 15'd0);
 			assign PORT_B_ADDR = C1EN ? (C1ADDR_TOTAL << 4) : (D1EN ? (D1ADDR_TOTAL << 4) : 15'd0);
-			defparam _TECHMAP_REPLACE_.WMODE_A1_i = `MODE_18;
-			defparam _TECHMAP_REPLACE_.WMODE_A2_i = `MODE_18;
-			defparam _TECHMAP_REPLACE_.RMODE_A1_i = `MODE_18;
-			defparam _TECHMAP_REPLACE_.RMODE_A2_i = `MODE_18;
-			defparam _TECHMAP_REPLACE_.WMODE_B1_i = `MODE_18;
-			defparam _TECHMAP_REPLACE_.WMODE_B2_i = `MODE_18;
-			defparam _TECHMAP_REPLACE_.RMODE_B1_i = `MODE_18;
-			defparam _TECHMAP_REPLACE_.RMODE_B2_i = `MODE_18;
+            defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+                11'd10, 11'd10, 4'd0, `MODE_18, `MODE_18, `MODE_18, `MODE_18, 1'd0,
+                12'd10, 12'd10, 4'd0, `MODE_18, `MODE_18, `MODE_18, `MODE_18, 1'd0
+            };
 		end
 
 		32, 36: begin
 			assign PORT_A_ADDR = A1EN ? (A1ADDR_TOTAL << 5) : (B1EN ? (B1ADDR_TOTAL << 5) : 15'd0);
 			assign PORT_B_ADDR = C1EN ? (C1ADDR_TOTAL << 5) : (D1EN ? (D1ADDR_TOTAL << 5) : 15'd0);
-			defparam _TECHMAP_REPLACE_.WMODE_A1_i = `MODE_36;
-			defparam _TECHMAP_REPLACE_.WMODE_A2_i = `MODE_36;
-			defparam _TECHMAP_REPLACE_.RMODE_A1_i = `MODE_36;
-			defparam _TECHMAP_REPLACE_.RMODE_A2_i = `MODE_36;
-			defparam _TECHMAP_REPLACE_.WMODE_B1_i = `MODE_36;
-			defparam _TECHMAP_REPLACE_.WMODE_B2_i = `MODE_36;
-			defparam _TECHMAP_REPLACE_.RMODE_B1_i = `MODE_36;
-			defparam _TECHMAP_REPLACE_.RMODE_B2_i = `MODE_36;
+            defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+                11'd10, 11'd10, 4'd0, `MODE_36, `MODE_36, `MODE_36, `MODE_36, 1'd0,
+                12'd10, 12'd10, 4'd0, `MODE_36, `MODE_36, `MODE_36, `MODE_36, 1'd0
+            };
 		end
 		default: begin
 			assign PORT_A_ADDR = A1EN ? A1ADDR_TOTAL : (B1EN ? B1ADDR_TOTAL : 15'd0);
 			assign PORT_B_ADDR = C1EN ? C1ADDR_TOTAL : (D1EN ? D1ADDR_TOTAL : 15'd0);
-			defparam _TECHMAP_REPLACE_.WMODE_A1_i = `MODE_36;
-			defparam _TECHMAP_REPLACE_.WMODE_A2_i = `MODE_36;
-			defparam _TECHMAP_REPLACE_.RMODE_A1_i = `MODE_36;
-			defparam _TECHMAP_REPLACE_.RMODE_A2_i = `MODE_36;
-			defparam _TECHMAP_REPLACE_.WMODE_B1_i = `MODE_36;
-			defparam _TECHMAP_REPLACE_.WMODE_B2_i = `MODE_36;
-			defparam _TECHMAP_REPLACE_.RMODE_B1_i = `MODE_36;
-			defparam _TECHMAP_REPLACE_.RMODE_B2_i = `MODE_36;
+            defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+                11'd10, 11'd10, 4'd0, `MODE_36, `MODE_36, `MODE_36, `MODE_36, 1'd0,
+                12'd10, 12'd10, 4'd0, `MODE_36, `MODE_36, `MODE_36, `MODE_36, 1'd0
+            };
 		end
 	endcase
 
@@ -195,23 +167,7 @@ module \$__QLF_FACTOR_BRAM36_TDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1
 	assign PL_ADDR_i = 24'b0;
 	assign PL_DATA_i = 36'b0;
 
-	TDP_BRAM36 #(
-		.UPAE1_i(12'd10),
-		.UPAF1_i(12'd10),
-		.UPAE2_i(12'd10),
-		.UPAF2_i(12'd10),
-		.SYNC_FIFO1_i(1'b0),
-		.SYNC_FIFO2_i(1'b0),
-		.FMODE1_i(1'b0),
-		.FMODE2_i(1'b0),
-		.POWERDN1_i(1'b0),
-		.POWERDN2_i(1'b0),
-		.SLEEP1_i(1'b0),
-		.SLEEP2_i(1'b0),
-		.PROTECT1_i(1'b0),
-		.PROTECT2_i(1'b0),
-		.SPLIT_i(1'b0)
-	) _TECHMAP_REPLACE_ (
+	TDP_BRAM36 _TECHMAP_REPLACE_ (
 		.WDATA_A1_i(B1DATA[17:0]),
 		.WDATA_A2_i(B1DATA[35:18]),
 		.RDATA_A1_o(A1DATA_TOTAL[17:0]),
@@ -444,9 +400,6 @@ module \$__QLF_FACTOR_BRAM36_SDP (CLK2, CLK3, A1ADDR, A1DATA, A1EN, B1ADDR, B1DA
 	reg [23:0] PL_ADDR_o;
 	wire [35:0] PL_DATA_o;
 
-	wire [2:0] WMODE;
-	wire [2:0] RMODE;
-
 	assign A1ADDR_CMPL = {15-CFG_ABITS{1'b0}};
 	assign B1ADDR_CMPL = {15-CFG_ABITS{1'b0}};
 
@@ -460,89 +413,61 @@ module \$__QLF_FACTOR_BRAM36_SDP (CLK2, CLK3, A1ADDR, A1DATA, A1EN, B1ADDR, B1DA
 		1: begin
 			assign A1ADDR_15 = A1ADDR_TOTAL;
 			assign B1ADDR_15 = B1ADDR_TOTAL;
-			defparam _TECHMAP_REPLACE_.WMODE_A1_i = `MODE_1;
-			defparam _TECHMAP_REPLACE_.WMODE_A2_i = `MODE_1;
-			defparam _TECHMAP_REPLACE_.RMODE_A1_i = `MODE_1;
-			defparam _TECHMAP_REPLACE_.RMODE_A2_i = `MODE_1;
-			defparam _TECHMAP_REPLACE_.WMODE_B1_i = `MODE_1;
-			defparam _TECHMAP_REPLACE_.WMODE_B2_i = `MODE_1;
-			defparam _TECHMAP_REPLACE_.RMODE_B1_i = `MODE_1;
-			defparam _TECHMAP_REPLACE_.RMODE_B2_i = `MODE_1;
+            defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+                11'd10, 11'd10, 4'd0, `MODE_1, `MODE_1, `MODE_1, `MODE_1, 1'd0,
+                12'd10, 12'd10, 4'd0, `MODE_1, `MODE_1, `MODE_1, `MODE_1, 1'd0
+            };
 		end
 
 		2: begin
 			assign A1ADDR_15 = A1ADDR_TOTAL << 1;
 			assign B1ADDR_15 = B1ADDR_TOTAL << 1;
-			defparam _TECHMAP_REPLACE_.WMODE_A1_i = `MODE_2;
-			defparam _TECHMAP_REPLACE_.WMODE_A2_i = `MODE_2;
-			defparam _TECHMAP_REPLACE_.RMODE_A1_i = `MODE_2;
-			defparam _TECHMAP_REPLACE_.RMODE_A2_i = `MODE_2;
-			defparam _TECHMAP_REPLACE_.WMODE_B1_i = `MODE_2;
-			defparam _TECHMAP_REPLACE_.WMODE_B2_i = `MODE_2;
-			defparam _TECHMAP_REPLACE_.RMODE_B1_i = `MODE_2;
-			defparam _TECHMAP_REPLACE_.RMODE_B2_i = `MODE_2;
+            defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+                11'd10, 11'd10, 4'd0, `MODE_2, `MODE_2, `MODE_2, `MODE_2, 1'd0,
+                12'd10, 12'd10, 4'd0, `MODE_2, `MODE_2, `MODE_2, `MODE_2, 1'd0
+            };
 		end
 
 		4: begin
 			assign A1ADDR_15 = A1ADDR_TOTAL << 2;
 			assign B1ADDR_15 = B1ADDR_TOTAL << 2;
-			defparam _TECHMAP_REPLACE_.WMODE_A1_i = `MODE_4;
-			defparam _TECHMAP_REPLACE_.WMODE_A2_i = `MODE_4;
-			defparam _TECHMAP_REPLACE_.RMODE_A1_i = `MODE_4;
-			defparam _TECHMAP_REPLACE_.RMODE_A2_i = `MODE_4;
-			defparam _TECHMAP_REPLACE_.WMODE_B1_i = `MODE_4;
-			defparam _TECHMAP_REPLACE_.WMODE_B2_i = `MODE_4;
-			defparam _TECHMAP_REPLACE_.RMODE_B1_i = `MODE_4;
-			defparam _TECHMAP_REPLACE_.RMODE_B2_i = `MODE_4;
+            defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+                11'd10, 11'd10, 4'd0, `MODE_4, `MODE_4, `MODE_4, `MODE_4, 1'd0,
+                12'd10, 12'd10, 4'd0, `MODE_4, `MODE_4, `MODE_4, `MODE_4, 1'd0
+            };
 		end
 		8, 9: begin
 			assign A1ADDR_15 = A1ADDR_TOTAL << 3;
 			assign B1ADDR_15 = B1ADDR_TOTAL << 3;
-			defparam _TECHMAP_REPLACE_.WMODE_A1_i = `MODE_9;
-			defparam _TECHMAP_REPLACE_.WMODE_A2_i = `MODE_9;
-			defparam _TECHMAP_REPLACE_.RMODE_A1_i = `MODE_9;
-			defparam _TECHMAP_REPLACE_.RMODE_A2_i = `MODE_9;
-			defparam _TECHMAP_REPLACE_.WMODE_B1_i = `MODE_9;
-			defparam _TECHMAP_REPLACE_.WMODE_B2_i = `MODE_9;
-			defparam _TECHMAP_REPLACE_.RMODE_B1_i = `MODE_9;
-			defparam _TECHMAP_REPLACE_.RMODE_B2_i = `MODE_9;
+            defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+                11'd10, 11'd10, 4'd0, `MODE_9, `MODE_9, `MODE_9, `MODE_9, 1'd0,
+                12'd10, 12'd10, 4'd0, `MODE_9, `MODE_9, `MODE_9, `MODE_9, 1'd0
+            };
 		end
 
 		16, 18: begin
 			assign A1ADDR_15 = A1ADDR_TOTAL << 4;
 			assign B1ADDR_15 = B1ADDR_TOTAL << 4;
-			defparam _TECHMAP_REPLACE_.WMODE_A1_i = `MODE_18;
-			defparam _TECHMAP_REPLACE_.WMODE_A2_i = `MODE_18;
-			defparam _TECHMAP_REPLACE_.RMODE_A1_i = `MODE_18;
-			defparam _TECHMAP_REPLACE_.RMODE_A2_i = `MODE_18;
-			defparam _TECHMAP_REPLACE_.WMODE_B1_i = `MODE_18;
-			defparam _TECHMAP_REPLACE_.WMODE_B2_i = `MODE_18;
-			defparam _TECHMAP_REPLACE_.RMODE_B1_i = `MODE_18;
-			defparam _TECHMAP_REPLACE_.RMODE_B2_i = `MODE_18;
+            defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+                11'd10, 11'd10, 4'd0, `MODE_18, `MODE_18, `MODE_18, `MODE_18, 1'd0,
+                12'd10, 12'd10, 4'd0, `MODE_18, `MODE_18, `MODE_18, `MODE_18, 1'd0
+            };
 		end
 		32, 36: begin
 			assign A1ADDR_15 = A1ADDR_TOTAL << 5;
 			assign B1ADDR_15 = B1ADDR_TOTAL << 5;
-			defparam _TECHMAP_REPLACE_.WMODE_A1_i = `MODE_36;
-			defparam _TECHMAP_REPLACE_.WMODE_A2_i = `MODE_36;
-			defparam _TECHMAP_REPLACE_.RMODE_A1_i = `MODE_36;
-			defparam _TECHMAP_REPLACE_.RMODE_A2_i = `MODE_36;
-			defparam _TECHMAP_REPLACE_.WMODE_B1_i = `MODE_36;
-			defparam _TECHMAP_REPLACE_.WMODE_B2_i = `MODE_36;
-			defparam _TECHMAP_REPLACE_.RMODE_B1_i = `MODE_36;
-			defparam _TECHMAP_REPLACE_.RMODE_B2_i = `MODE_36;
+            defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+                11'd10, 11'd10, 4'd0, `MODE_36, `MODE_36, `MODE_36, `MODE_36, 1'd0,
+                12'd10, 12'd10, 4'd0, `MODE_36, `MODE_36, `MODE_36, `MODE_36, 1'd0
+            };
 		end
 		default: begin
 			assign A1ADDR_15 = A1ADDR_TOTAL;
 			assign B1ADDR_15 = B1ADDR_TOTAL;
-			defparam _TECHMAP_REPLACE_.WMODE_A1_i = `MODE_36;
-			defparam _TECHMAP_REPLACE_.WMODE_A2_i = `MODE_36;
-			defparam _TECHMAP_REPLACE_.RMODE_A1_i = `MODE_36;
-			defparam _TECHMAP_REPLACE_.RMODE_A2_i = `MODE_36;
-			defparam _TECHMAP_REPLACE_.WMODE_B1_i = `MODE_36;
-			defparam _TECHMAP_REPLACE_.WMODE_B2_i = `MODE_36;
-			defparam _TECHMAP_REPLACE_.RMODE_B1_i = `MODE_36;
-			defparam _TECHMAP_REPLACE_.RMODE_B2_i = `MODE_36;
+            defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+                11'd10, 11'd10, 4'd0, `MODE_36, `MODE_36, `MODE_36, `MODE_36, 1'd0,
+                12'd10, 12'd10, 4'd0, `MODE_36, `MODE_36, `MODE_36, `MODE_36, 1'd0
+            };
 		end
 	endcase
 
@@ -558,23 +483,7 @@ module \$__QLF_FACTOR_BRAM36_SDP (CLK2, CLK3, A1ADDR, A1DATA, A1EN, B1ADDR, B1DA
 	assign PL_ADDR_i = 24'b0;
 	assign PL_DATA_i = 36'b0;
 
-	TDP_BRAM36 #(
-		.UPAE1_i(12'd10),
-		.UPAF1_i(12'd10),
-		.UPAE2_i(12'd10),
-		.UPAF2_i(12'd10),
-		.SYNC_FIFO1_i(1'b0),
-		.SYNC_FIFO2_i(1'b0),
-		.FMODE1_i(1'b0),
-		.FMODE2_i(1'b0),
-		.POWERDN1_i(1'b0),
-		.POWERDN2_i(1'b0),
-		.SLEEP1_i(1'b0),
-		.SLEEP2_i(1'b0),
-		.PROTECT1_i(1'b0),
-		.PROTECT2_i(1'b0),
-		.SPLIT_i(1'b0)
-	) _TECHMAP_REPLACE_ (
+	TDP_BRAM36 _TECHMAP_REPLACE_ (
 		.WDATA_A1_i(18'h3FFFF),
 		.WDATA_A2_i(18'h3FFFF),
 		.RDATA_A1_o(A1DATA_TOTAL[17:0]),
