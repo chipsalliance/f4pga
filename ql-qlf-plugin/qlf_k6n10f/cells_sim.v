@@ -1554,12 +1554,12 @@ module dsp_t1_sim # (
     wire [NBITS_B-1:0] mult_b = (feedback == 2'h2) ? {NBITS_B{1'b0}}  : b;
 
     wire [NBITS_A-1:0] mult_sgn_a = mult_a[NBITS_A-1];
-    wire [NBITS_A-1:0] mult_mag_a = (mult_sgn_a) ? (~mult_a + 1) : mult_a;
+    wire [NBITS_A-1:0] mult_mag_a = (mult_sgn_a && !unsigned_a) ? (~mult_a + 1) : mult_a;
     wire [NBITS_B-1:0] mult_sgn_b = mult_b[NBITS_B-1];
-    wire [NBITS_B-1:0] mult_mag_b = (mult_sgn_b) ? (~mult_b + 1) : mult_b;
+    wire [NBITS_B-1:0] mult_mag_b = (mult_sgn_b && !unsigned_b) ? (~mult_b + 1) : mult_b;
 
     wire [NBITS_A+NBITS_B-1:0] mult_mag = mult_mag_a * mult_mag_b;
-    wire mult_sgn = mult_sgn_a ^ mult_sgn_b;
+    wire mult_sgn = (mult_sgn_a && !unsigned_a) ^ (mult_sgn_b && !unsigned_b);
 
     wire [NBITS_A+NBITS_B-1:0] mult = (unsigned_a && unsigned_b) ?
         (mult_a * mult_b) : (mult_sgn ? (~mult_mag + 1) : mult_mag);
