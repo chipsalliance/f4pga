@@ -1150,10 +1150,10 @@ module BRAM2x18_TDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1ADDR, C1DATA,
             assign PORT_B1_ADDR = C1EN ? C1ADDR_TOTAL : (D1EN ? D1ADDR_TOTAL : 14'd0);
             assign PORT_A2_ADDR = E1EN ? E1ADDR_TOTAL : (F1EN ? F1ADDR_TOTAL : 14'd0);
             assign PORT_B2_ADDR = G1EN ? G1ADDR_TOTAL : (H1EN ? H1ADDR_TOTAL : 14'd0);
-        defparam bram_2x18k.MODE_BITS = { 1'b1,
-        11'd10, 11'd10, 4'd0, MODE_1, MODE_1, MODE_1, MODE_1, 1'd0,
-        12'd10, 12'd10, 4'd0, MODE_1, MODE_1, MODE_1, MODE_1, 1'd0
-        };
+            defparam bram_2x18k.MODE_BITS = { 1'b1,
+                11'd10, 11'd10, 4'd0, MODE_1, MODE_1, MODE_1, MODE_1, 1'd0,
+                12'd10, 12'd10, 4'd0, MODE_1, MODE_1, MODE_1, MODE_1, 1'd0
+            };
         end
 
         2: begin
@@ -1161,10 +1161,10 @@ module BRAM2x18_TDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1ADDR, C1DATA,
             assign PORT_B1_ADDR = C1EN ? (C1ADDR_TOTAL << 1) : (D1EN ? (D1ADDR_TOTAL << 1) : 14'd0);
             assign PORT_A2_ADDR = E1EN ? (E1ADDR_TOTAL << 1) : (F1EN ? (F1ADDR_TOTAL << 1) : 14'd0);
             assign PORT_B2_ADDR = G1EN ? (G1ADDR_TOTAL << 1) : (H1EN ? (H1ADDR_TOTAL << 1) : 14'd0);
-        defparam bram_2x18k.MODE_BITS = { 1'b1,
-        11'd10, 11'd10, 4'd0, MODE_2, MODE_2, MODE_2, MODE_2, 1'd0,
-        12'd10, 12'd10, 4'd0, MODE_2, MODE_2, MODE_2, MODE_2, 1'd0
-        };
+            defparam bram_2x18k.MODE_BITS = { 1'b1,
+                11'd10, 11'd10, 4'd0, MODE_2, MODE_2, MODE_2, MODE_2, 1'd0,
+                12'd10, 12'd10, 4'd0, MODE_2, MODE_2, MODE_2, MODE_2, 1'd0
+            };
         end
 
         4: begin
@@ -1172,10 +1172,10 @@ module BRAM2x18_TDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1ADDR, C1DATA,
             assign PORT_B1_ADDR = C1EN ? (C1ADDR_TOTAL << 2) : (D1EN ? (D1ADDR_TOTAL << 2) : 14'd0);
             assign PORT_A2_ADDR = E1EN ? (E1ADDR_TOTAL << 2) : (F1EN ? (F1ADDR_TOTAL << 2) : 14'd0);
             assign PORT_B2_ADDR = G1EN ? (G1ADDR_TOTAL << 2) : (H1EN ? (H1ADDR_TOTAL << 2) : 14'd0);
-        defparam bram_2x18k.MODE_BITS = { 1'b1,
-        11'd10, 11'd10, 4'd0, MODE_4, MODE_4, MODE_4, MODE_4, 1'd0,
-        12'd10, 12'd10, 4'd0, MODE_4, MODE_4, MODE_4, MODE_4, 1'd0
-        };
+            defparam bram_2x18k.MODE_BITS = { 1'b1,
+                11'd10, 11'd10, 4'd0, MODE_4, MODE_4, MODE_4, MODE_4, 1'd0,
+                12'd10, 12'd10, 4'd0, MODE_4, MODE_4, MODE_4, MODE_4, 1'd0
+            };
         end
 
         8, 9: begin
@@ -1183,10 +1183,10 @@ module BRAM2x18_TDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1ADDR, C1DATA,
             assign PORT_B1_ADDR = C1EN ? (C1ADDR_TOTAL << 3) : (D1EN ? (D1ADDR_TOTAL << 3) : 14'd0);
             assign PORT_A2_ADDR = E1EN ? (E1ADDR_TOTAL << 3) : (F1EN ? (F1ADDR_TOTAL << 3) : 14'd0);
             assign PORT_B2_ADDR = G1EN ? (G1ADDR_TOTAL << 3) : (H1EN ? (H1ADDR_TOTAL << 3) : 14'd0);
-        defparam bram_2x18k.MODE_BITS = { 1'b1,
-        11'd10, 11'd10, 4'd0, MODE_9, MODE_9, MODE_9, MODE_9, 1'd0,
-        12'd10, 12'd10, 4'd0, MODE_9, MODE_9, MODE_9, MODE_9, 1'd0
-        };
+            defparam bram_2x18k.MODE_BITS = { 1'b1,
+                11'd10, 11'd10, 4'd0, MODE_9, MODE_9, MODE_9, MODE_9, 1'd0,
+                12'd10, 12'd10, 4'd0, MODE_9, MODE_9, MODE_9, MODE_9, 1'd0
+            };
         end
 
         16, 18: begin
@@ -1194,10 +1194,10 @@ module BRAM2x18_TDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1ADDR, C1DATA,
             assign PORT_B1_ADDR = C1EN ? (C1ADDR_TOTAL << 4) : (D1EN ? (D1ADDR_TOTAL << 4) : 14'd0);
             assign PORT_A2_ADDR = E1EN ? (E1ADDR_TOTAL << 4) : (F1EN ? (F1ADDR_TOTAL << 4) : 14'd0);
             assign PORT_B2_ADDR = G1EN ? (G1ADDR_TOTAL << 4) : (H1EN ? (H1ADDR_TOTAL << 4) : 14'd0);
-        defparam bram_2x18k.MODE_BITS = { 1'b1,
-        11'd10, 11'd10, 4'd0, MODE_18, MODE_18, MODE_18, MODE_18, 1'd0,
-        12'd10, 12'd10, 4'd0, MODE_18, MODE_18, MODE_18, MODE_18, 1'd0
-        };
+            defparam bram_2x18k.MODE_BITS = { 1'b1,
+                11'd10, 11'd10, 4'd0, MODE_18, MODE_18, MODE_18, MODE_18, 1'd0,
+                12'd10, 12'd10, 4'd0, MODE_18, MODE_18, MODE_18, MODE_18, 1'd0
+            };
         end
 
         default: begin
@@ -1205,10 +1205,10 @@ module BRAM2x18_TDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1ADDR, C1DATA,
             assign PORT_B1_ADDR = C1EN ? C1ADDR_TOTAL : (D1EN ? D1ADDR_TOTAL : 14'd0);
             assign PORT_A2_ADDR = E1EN ? E1ADDR_TOTAL : (F1EN ? F1ADDR_TOTAL : 14'd0);
             assign PORT_B2_ADDR = G1EN ? G1ADDR_TOTAL : (H1EN ? H1ADDR_TOTAL : 14'd0);
-        defparam bram_2x18k.MODE_BITS = { 1'b1,
-            11'd10, 11'd10, 4'd0, MODE_36, MODE_36, MODE_36, MODE_36, 1'd0,
-            12'd10, 12'd10, 4'd0, MODE_36, MODE_36, MODE_36, MODE_36, 1'd0
-        };
+            defparam bram_2x18k.MODE_BITS = { 1'b1,
+                11'd10, 11'd10, 4'd0, MODE_36, MODE_36, MODE_36, MODE_36, 1'd0,
+                12'd10, 12'd10, 4'd0, MODE_36, MODE_36, MODE_36, MODE_36, 1'd0
+            };
         end
     endcase
 
@@ -1295,12 +1295,12 @@ module BRAM2x18_SDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1ADDR, C1DATA,
     parameter [18431:0] INIT0 = 18432'bx;
     parameter [18431:0] INIT1 = 18432'bx;
 
-        localparam MODE_36 = 3'b011; // 36- or 32-bit
-        localparam MODE_18 = 3'b010; // 18- or 16-bit
-        localparam MODE_9 = 3'b001; // 9- or 8-bit
-        localparam MODE_4 = 3'b100; // 4-bit
-        localparam MODE_2 = 3'b110; // 2-bit
-        localparam MODE_1 = 3'b101; // 1-bit
+    localparam MODE_36 = 3'b011; // 36- or 32-bit
+    localparam MODE_18 = 3'b010; // 18- or 16-bit
+    localparam MODE_9 = 3'b001; // 9- or 8-bit
+    localparam MODE_4 = 3'b100; // 4-bit
+    localparam MODE_2 = 3'b110; // 2-bit
+    localparam MODE_1 = 3'b101; // 1-bit
 
     input CLK1;
     input CLK2;
@@ -1501,6 +1501,189 @@ module BRAM2x18_SDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1ADDR, C1DATA,
         .REN_B2_i(PORT_B2_REN),
         .WEN_B2_i(PORT_B2_WEN),
         .BE_B2_i(PORT_B2_BE),
+
+        .FLUSH1_i(FLUSH1),
+        .FLUSH2_i(FLUSH2)
+    );
+endmodule
+
+module \$mem_v2_asymmetric (RD_ADDR, RD_ARST, RD_CLK, RD_DATA, RD_EN, RD_SRST, WR_ADDR, WR_CLK, WR_DATA, WR_EN);
+    localparam CFG_ABITS = 10;
+    localparam CFG_DBITS = 36;
+    localparam CFG_ENABLE_B = 4;
+
+    localparam CLKPOL2 = 1;
+    localparam CLKPOL3 = 1;
+
+    parameter READ_ADDR_WIDTH = 11;
+    parameter READ_DATA_WIDTH = 16;
+    parameter WRITE_ADDR_WIDTH = 10;
+    parameter WRITE_DATA_WIDTH = 32;
+    parameter ABITS = 0;
+    parameter MEMID = 0;
+    parameter [36863:0] INIT = 36864'bx;
+    parameter OFFSET = 0;
+    parameter RD_ARST_VALUE = 0;
+    parameter RD_CE_OVER_SRST = 0;
+    parameter RD_CLK_ENABLE = 0;
+    parameter RD_CLK_POLARITY = 0;
+    parameter RD_COLLISION_X_MASK = 0;
+    parameter RD_INIT_VALUE = 0;
+    parameter RD_PORTS = 0;
+    parameter RD_SRST_VALUE = 0;
+    parameter RD_TRANSPARENCY_MASK = 0;
+    parameter RD_WIDE_CONTINUATION = 0;
+    parameter SIZE = 0;
+    parameter WIDTH = 0;
+    parameter WR_CLK_ENABLE = 0;
+    parameter WR_CLK_POLARITY = 0;
+    parameter WR_PORTS = 0;
+    parameter WR_PRIORITY_MASK = 0;
+    parameter WR_WIDE_CONTINUATION = 0;
+
+    localparam MODE_36  = 3'b111;   // 36 or 32-bit
+    localparam MODE_18  = 3'b110;   // 18 or 16-bit
+    localparam MODE_9   = 3'b101;   // 9 or 8-bit
+    localparam MODE_4   = 3'b100;   // 4-bit
+    localparam MODE_2   = 3'b010;   // 32-bit
+    localparam MODE_1   = 3'b001;   // 32-bit
+
+    input RD_CLK;
+    input WR_CLK;
+    input RD_ARST;
+    input RD_SRST;
+
+    input [CFG_ABITS-1:0] RD_ADDR;
+    output [CFG_DBITS-1:0] RD_DATA;
+    input RD_EN;
+
+    input [CFG_ABITS-1:0] WR_ADDR;
+    input [CFG_DBITS-1:0] WR_DATA;
+    input [CFG_ENABLE_B-1:0] WR_EN;
+
+    wire [14:0] RD_ADDR_15;
+    wire [14:0] WR_ADDR_15;
+
+    wire [35:0] DOBDO;
+
+    wire [14:CFG_ABITS] RD_ADDR_CMPL;
+    wire [14:CFG_ABITS] WR_ADDR_CMPL;
+    wire [35:CFG_DBITS] RD_DATA_CMPL;
+    wire [35:CFG_DBITS] WR_DATA_CMPL;
+
+    wire [14:0] RD_ADDR_TOTAL;
+    wire [14:0] WR_ADDR_TOTAL;
+    wire [35:0] RD_DATA_TOTAL;
+    wire [35:0] WR_DATA_TOTAL;
+
+    wire FLUSH1;
+    wire FLUSH2;
+
+    assign RD_ADDR_CMPL = {15-CFG_ABITS{1'b0}};
+    assign WR_ADDR_CMPL = {15-CFG_ABITS{1'b0}};
+
+    assign RD_ADDR_TOTAL = {RD_ADDR_CMPL, RD_ADDR};
+    assign WR_ADDR_TOTAL = {WR_ADDR_CMPL, WR_ADDR};
+
+    assign RD_DATA_TOTAL = {RD_DATA_CMPL, RD_DATA};
+    assign WR_DATA_TOTAL = {WR_DATA_CMPL, WR_DATA};
+
+    case (CFG_DBITS)
+        1: begin
+            assign RD_ADDR_15 = RD_ADDR_TOTAL;
+            assign WR_ADDR_15 = WR_ADDR_TOTAL;
+            defparam bram_asymmetric.MODE_BITS = { 1'b0,
+                11'd10, 11'd10, 4'd0, MODE_1, MODE_1, MODE_1, MODE_1, 1'd0,
+                12'd10, 12'd10, 4'd0, MODE_1, MODE_1, MODE_1, MODE_1, 1'd0
+            };
+        end
+
+        2: begin
+            assign RD_ADDR_15 = RD_ADDR_TOTAL << 1;
+            assign WR_ADDR_15 = WR_ADDR_TOTAL << 1;
+            defparam bram_asymmetric.MODE_BITS = { 1'b0,
+                11'd10, 11'd10, 4'd0, MODE_2, MODE_2, MODE_2, MODE_2, 1'd0,
+                12'd10, 12'd10, 4'd0, MODE_2, MODE_2, MODE_2, MODE_2, 1'd0
+            };
+        end
+
+        4: begin
+            assign RD_ADDR_15 = RD_ADDR_TOTAL << 2;
+            assign WR_ADDR_15 = WR_ADDR_TOTAL << 2;
+            defparam bram_asymmetric.MODE_BITS = { 1'b0,
+                11'd10, 11'd10, 4'd0, MODE_4, MODE_4, MODE_4, MODE_4, 1'd0,
+                12'd10, 12'd10, 4'd0, MODE_4, MODE_4, MODE_4, MODE_4, 1'd0
+            };
+        end
+        8, 9: begin
+            assign RD_ADDR_15 = RD_ADDR_TOTAL << 3;
+            assign WR_ADDR_15 = WR_ADDR_TOTAL << 3;
+            defparam bram_asymmetric.MODE_BITS = { 1'b0,
+                11'd10, 11'd10, 4'd0, MODE_9, MODE_9, MODE_9, MODE_9, 1'd0,
+                12'd10, 12'd10, 4'd0, MODE_9, MODE_9, MODE_9, MODE_9, 1'd0
+            };
+        end
+
+        16, 18: begin
+            assign RD_ADDR_15 = RD_ADDR_TOTAL << 4;
+            assign WR_ADDR_15 = WR_ADDR_TOTAL << 4;
+            defparam bram_asymmetric.MODE_BITS = { 1'b0,
+                11'd10, 11'd10, 4'd0, MODE_18, MODE_18, MODE_18, MODE_18, 1'd0,
+                12'd10, 12'd10, 4'd0, MODE_18, MODE_18, MODE_18, MODE_18, 1'd0
+            };
+        end
+        32, 36: begin
+            assign RD_ADDR_15 = RD_ADDR_TOTAL << 5;
+            assign WR_ADDR_15 = WR_ADDR_TOTAL << 5;
+            defparam bram_asymmetric.MODE_BITS = { 1'b0,
+                11'd10, 11'd10, 4'd0, MODE_36, MODE_36, MODE_36, MODE_36, 1'd0,
+                12'd10, 12'd10, 4'd0, MODE_36, MODE_36, MODE_36, MODE_36, 1'd0
+            };
+        end
+        default: begin
+            assign RD_ADDR_15 = RD_ADDR_TOTAL;
+            assign WR_ADDR_15 = WR_ADDR_TOTAL;
+            defparam bram_asymmetric.MODE_BITS = { 1'b0,
+                11'd10, 11'd10, 4'd0, MODE_36, MODE_36, MODE_36, MODE_36, 1'd0,
+                12'd10, 12'd10, 4'd0, MODE_36, MODE_36, MODE_36, MODE_36, 1'd0
+            };
+        end
+    endcase
+
+    assign FLUSH1 = 1'b0;
+    assign FLUSH2 = 1'b0;
+
+    TDP36K bram_asymmetric (
+        .RESET_ni(1'b1),
+        .WDATA_A1_i(18'h3FFFF),
+        .WDATA_A2_i(18'h3FFFF),
+        .RDATA_A1_o(RD_DATA_TOTAL[17:0]),
+        .RDATA_A2_o(RD_DATA_TOTAL[35:18]),
+        .ADDR_A1_i(RD_ADDR_15),
+        .ADDR_A2_i(RD_ADDR_15),
+        .CLK_A1_i(RD_CLK),
+        .CLK_A2_i(RD_CLK),
+        .REN_A1_i(RD_EN),
+        .REN_A2_i(RD_EN),
+        .WEN_A1_i(1'b0),
+        .WEN_A2_i(1'b0),
+        .BE_A1_i({RD_EN, RD_EN}),
+        .BE_A2_i({RD_EN, RD_EN}),
+
+        .WDATA_B1_i(WR_DATA[17:0]),
+        .WDATA_B2_i(WR_DATA[35:18]),
+        .RDATA_B1_o(DOBDO[17:0]),
+        .RDATA_B2_o(DOBDO[35:18]),
+        .ADDR_B1_i(WR_ADDR_15),
+        .ADDR_B2_i(WR_ADDR_15),
+        .CLK_B1_i(WR_CLK),
+        .CLK_B2_i(WR_CLK),
+        .REN_B1_i(1'b0),
+        .REN_B2_i(1'b0),
+        .WEN_B1_i(WR_EN[0]),
+        .WEN_B2_i(WR_EN[0]),
+        .BE_B1_i(WR_EN[1:0]),
+        .BE_B2_i(WR_EN[3:2]),
 
         .FLUSH1_i(FLUSH1),
         .FLUSH2_i(FLUSH2)

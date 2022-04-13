@@ -23,10 +23,13 @@ SOURCES = synth_quicklogic.cc \
           ql-dsp-simd.cc \
           ql-dsp-macc.cc \
           ql-bram-split.cc \
-          ql-dsp-io-regs.cc
+          ql-dsp-io-regs.cc \
+          ql-bram-asymmetric.cc
 
 DEPS = pmgen/ql-dsp-pm.h \
-       pmgen/ql-dsp-macc.h
+       pmgen/ql-dsp-macc.h \
+       pmgen/ql-bram-asymmetric-wider-write.h \
+       pmgen/ql-bram-asymmetric-wider-read.h
 
 include ../Makefile_plugin.common
 
@@ -84,6 +87,12 @@ pmgen/ql-dsp-pm.h: ../pmgen.py ql_dsp.pmg | pmgen
 
 pmgen/ql-dsp-macc.h: ../pmgen.py ql-dsp-macc.pmg | pmgen
 	python3 ../pmgen.py -o $@ -p ql_dsp_macc ql-dsp-macc.pmg
+
+pmgen/ql-bram-asymmetric-wider-write.h: ../pmgen.py ql-bram-asymmetric-wider-write.pmg | pmgen
+	python3 ../pmgen.py -o $@ -p ql_bram_asymmetric_wider_write ql-bram-asymmetric-wider-write.pmg
+
+pmgen/ql-bram-asymmetric-wider-read.h: ../pmgen.py ql-bram-asymmetric-wider-read.pmg | pmgen
+	python3 ../pmgen.py -o $@ -p ql_bram_asymmetric_wider_read ql-bram-asymmetric-wider-read.pmg
 
 install_modules: $(VERILOG_MODULES)
 	$(foreach f,$^,install -D $(f) $(DATA_DIR)/quicklogic/$(f);)

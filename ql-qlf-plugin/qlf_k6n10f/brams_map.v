@@ -483,3 +483,515 @@ module \$__QLF_FACTOR_BRAM36_SDP (CLK2, CLK3, A1ADDR, A1DATA, A1EN, B1ADDR, B1DA
 	);
 endmodule
 
+(* techmap_celltype = "$mem_v2_asymmetric" *)
+module \$__QLF_FACTOR_BRAM36_SDP_ASYMMETRIC (RD_ADDR, RD_ARST, RD_CLK, RD_DATA, RD_EN, RD_SRST, WR_ADDR, WR_CLK, WR_DATA, WR_EN);
+	parameter CFG_ABITS = 10;
+	parameter CFG_DBITS = 36;
+	parameter CFG_ENABLE_B = 4;
+
+	parameter CLKPOL2 = 1;
+	parameter CLKPOL3 = 1;
+
+	parameter RD_ADDR_WIDTH = 11;
+	parameter RD_DATA_WIDTH = 16;
+	parameter WR_ADDR_WIDTH = 10;
+	parameter WR_DATA_WIDTH = 32;
+
+	parameter ABITS = 0;
+	parameter MEMID = 0;
+	parameter [36863:0] INIT = 36864'bx;
+	parameter OFFSET = 0;
+	parameter RD_ARST_VALUE = 0;
+	parameter RD_CE_OVER_SRST = 0;
+	parameter RD_CLK_ENABLE = 0;
+	parameter RD_CLK_POLARITY = 0;
+	parameter RD_COLLISION_X_MASK = 0;
+	parameter RD_INIT_VALUE = 0;
+	parameter RD_PORTS = 0;
+	parameter RD_SRST_VALUE = 0;
+	parameter RD_TRANSPARENCY_MASK = 0;
+	parameter RD_WIDE_CONTINUATION = 0;
+	parameter SIZE = 0;
+	parameter WIDTH = 0;
+	parameter WR_CLK_ENABLE = 0;
+	parameter WR_CLK_POLARITY = 0;
+	parameter WR_PORTS = 0;
+	parameter WR_PRIORITY_MASK = 0;
+	parameter WR_WIDE_CONTINUATION = 0;
+
+	localparam MODE_36  = 3'b111;	// 36 or 32-bit
+	localparam MODE_18  = 3'b110;	// 18 or 16-bit
+	localparam MODE_9   = 3'b101;	// 9 or 8-bit
+	localparam MODE_4   = 3'b100;	// 4-bit
+	localparam MODE_2   = 3'b010;	// 32-bit
+	localparam MODE_1   = 3'b001;	// 32-bit
+
+	localparam READ_DATA_BITS_TO_SKIP = 36 - RD_DATA_WIDTH;
+
+	input RD_CLK;
+	input WR_CLK;
+	input RD_ARST;
+	input RD_SRST;
+
+	input [RD_ADDR_WIDTH-1:0] RD_ADDR;
+	output [RD_DATA_WIDTH-1:0] RD_DATA;
+	input RD_EN;
+
+	input [WR_ADDR_WIDTH-1:0] WR_ADDR;
+	input [WR_DATA_WIDTH-1:0] WR_DATA;
+	input [CFG_ENABLE_B-1:0] WR_EN;
+
+	wire [14:RD_ADDR_WIDTH] RD_ADDR_CMPL;
+	wire [14:WR_ADDR_WIDTH] WR_ADDR_CMPL;
+	wire [35:RD_DATA_WIDTH] RD_DATA_CMPL;
+	wire [35:WR_DATA_WIDTH] WR_DATA_CMPL;
+
+	wire [14:0] RD_ADDR_TOTAL;
+	wire [14:0] WR_ADDR_TOTAL;
+	wire [35:0] RD_DATA_TOTAL;
+	wire [35:0] WR_DATA_TOTAL;
+
+	wire [14:0] RD_ADDR_SHIFTED;
+	wire [14:0] WR_ADDR_SHIFTED;
+
+	wire FLUSH1;
+	wire FLUSH2;
+
+	assign RD_ADDR_CMPL = {15-RD_ADDR_WIDTH{1'b0}};
+	assign WR_ADDR_CMPL = {15-WR_ADDR_WIDTH{1'b0}};
+
+	assign RD_ADDR_TOTAL = {RD_ADDR_CMPL, RD_ADDR};
+	assign WR_ADDR_TOTAL = {WR_ADDR_CMPL, WR_ADDR};
+
+	assign WR_DATA_TOTAL = {WR_DATA_CMPL, WR_DATA};
+
+	// Assign parameters
+	case (RD_DATA_WIDTH)
+		1: begin
+			case (WR_DATA_WIDTH)
+				1: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_1, `MODE_1, `MODE_1, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_1, `MODE_1, `MODE_1, 1'd0
+					};
+				end
+				2: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_2, `MODE_2, `MODE_1, `MODE_1, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_2, `MODE_2, `MODE_1, `MODE_1, 1'd0
+					};
+				end
+				4: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_4, `MODE_4, `MODE_1, `MODE_1, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_4, `MODE_4, `MODE_1, `MODE_1, 1'd0
+					};
+				end
+				8, 9: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_9, `MODE_9, `MODE_1, `MODE_1, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_9, `MODE_9, `MODE_1, `MODE_1, 1'd0
+					};
+				end
+				16, 18: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_18, `MODE_18, `MODE_1, `MODE_1, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_18, `MODE_18, `MODE_1, `MODE_1, 1'd0
+					};
+				end
+				32, 36: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_36, `MODE_36, `MODE_1, `MODE_1, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_36, `MODE_36, `MODE_1, `MODE_1, 1'd0
+					};
+				end
+				default: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_1, `MODE_1, `MODE_1, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_1, `MODE_1, `MODE_1, 1'd0
+					};
+				end
+			endcase
+		end
+		2: begin
+			case (WR_DATA_WIDTH)
+				1: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_1, `MODE_2, `MODE_2, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_1, `MODE_2, `MODE_2, 1'd0
+					};
+				end
+				2: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_2, `MODE_2, `MODE_2, `MODE_2, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_2, `MODE_2, `MODE_2, `MODE_2, 1'd0
+					};
+				end
+				4: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_4, `MODE_4, `MODE_2, `MODE_2, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_4, `MODE_4, `MODE_2, `MODE_2, 1'd0
+					};
+				end
+				8, 9: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_9, `MODE_9, `MODE_2, `MODE_2, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_9, `MODE_9, `MODE_2, `MODE_2, 1'd0
+					};
+				end
+				16, 18: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_18, `MODE_18, `MODE_2, `MODE_2, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_18, `MODE_18, `MODE_2, `MODE_2, 1'd0
+					};
+				end
+				32, 36: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_36, `MODE_36, `MODE_2, `MODE_2, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_36, `MODE_36, `MODE_2, `MODE_2, 1'd0
+					};
+				end
+				default: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_1, `MODE_2, `MODE_2, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_1, `MODE_2, `MODE_2, 1'd0
+					};
+				end
+			endcase
+		end
+		4: begin
+			case (WR_DATA_WIDTH)
+				1: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_1, `MODE_4, `MODE_4, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_1, `MODE_4, `MODE_4, 1'd0
+					};
+				end
+				2: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_2, `MODE_2, `MODE_4, `MODE_4, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_2, `MODE_2, `MODE_4, `MODE_4, 1'd0
+					};
+				end
+				4: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_4, `MODE_4, `MODE_4, `MODE_4, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_4, `MODE_4, `MODE_4, `MODE_4, 1'd0
+					};
+				end
+				8, 9: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_9, `MODE_9, `MODE_4, `MODE_4, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_9, `MODE_9, `MODE_4, `MODE_4, 1'd0
+					};
+				end
+				16, 18: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_18, `MODE_18, `MODE_4, `MODE_4, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_18, `MODE_18, `MODE_4, `MODE_4, 1'd0
+					};
+				end
+				32, 36: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_36, `MODE_36, `MODE_4, `MODE_4, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_36, `MODE_36, `MODE_4, `MODE_4, 1'd0
+					};
+				end
+				default: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_1, `MODE_4, `MODE_4, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_1, `MODE_4, `MODE_4, 1'd0
+					};
+				end
+			endcase
+		end
+		8, 9: begin
+			case (WR_DATA_WIDTH)
+				1: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_1, `MODE_9, `MODE_9, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_1, `MODE_9, `MODE_9, 1'd0
+					};
+				end
+				2: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_2, `MODE_2, `MODE_9, `MODE_9, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_2, `MODE_2, `MODE_9, `MODE_9, 1'd0
+					};
+				end
+				4: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_4, `MODE_4, `MODE_9, `MODE_9, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_4, `MODE_4, `MODE_9, `MODE_9, 1'd0
+					};
+				end
+				8, 9: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_9, `MODE_9, `MODE_9, `MODE_9, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_9, `MODE_9, `MODE_9, `MODE_9, 1'd0
+					};
+				end
+				16, 18: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_18, `MODE_18, `MODE_9, `MODE_9, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_18, `MODE_18, `MODE_9, `MODE_9, 1'd0
+					};
+				end
+				32, 36: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_36, `MODE_36, `MODE_9, `MODE_9, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_36, `MODE_36, `MODE_9, `MODE_9, 1'd0
+					};
+				end
+				default: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_1, `MODE_9, `MODE_9, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_1, `MODE_9, `MODE_9, 1'd0
+					};
+				end
+			endcase
+		end
+		16, 18: begin
+			case (WR_DATA_WIDTH)
+				1: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_1, `MODE_18, `MODE_18, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_1, `MODE_18, `MODE_18, 1'd0
+					};
+				end
+				2: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_2, `MODE_2, `MODE_18, `MODE_18, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_2, `MODE_2, `MODE_18, `MODE_18, 1'd0
+					};
+				end
+				4: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_4, `MODE_4, `MODE_18, `MODE_18, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_4, `MODE_4, `MODE_18, `MODE_18, 1'd0
+					};
+				end
+				8, 9: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_9, `MODE_9, `MODE_18, `MODE_18, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_9, `MODE_9, `MODE_18, `MODE_18, 1'd0
+					};
+				end
+				16, 18: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_18, `MODE_18, `MODE_18, `MODE_18, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_18, `MODE_18, `MODE_18, `MODE_18, 1'd0
+					};
+				end
+				32, 36: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_36, `MODE_36, `MODE_18, `MODE_18, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_36, `MODE_36, `MODE_18, `MODE_18, 1'd0
+					};
+				end
+				default: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_1, `MODE_18, `MODE_18, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_1, `MODE_18, `MODE_18, 1'd0
+					};
+				end
+			endcase
+		end
+		32, 36: begin
+			case (WR_DATA_WIDTH)
+				1: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_1, `MODE_36, `MODE_36, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_1, `MODE_36, `MODE_36, 1'd0
+					};
+				end
+				2: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_2, `MODE_2, `MODE_36, `MODE_36, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_2, `MODE_2, `MODE_36, `MODE_36, 1'd0
+					};
+				end
+				4: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_4, `MODE_4, `MODE_36, `MODE_36, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_4, `MODE_4, `MODE_36, `MODE_36, 1'd0
+					};
+				end
+				8, 9: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_9, `MODE_9, `MODE_36, `MODE_36, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_9, `MODE_9, `MODE_36, `MODE_36, 1'd0
+					};
+				end
+				16, 18: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_18, `MODE_18, `MODE_36, `MODE_36, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_18, `MODE_18, `MODE_36, `MODE_36, 1'd0
+					};
+				end
+				32, 36: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_36, `MODE_36, `MODE_36, `MODE_36, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_36, `MODE_36, `MODE_36, `MODE_36, 1'd0
+					};
+				end
+				default: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_1, `MODE_36, `MODE_36, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_1, `MODE_36, `MODE_36, 1'd0
+					};
+				end
+			endcase
+		end
+		default: begin
+			case (WR_DATA_WIDTH)
+				1: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_1, `MODE_1, `MODE_1, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_1, `MODE_1, `MODE_1, 1'd0
+					};
+				end
+				2: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_2, `MODE_2, `MODE_1, `MODE_1, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_2, `MODE_2, `MODE_1, `MODE_1, 1'd0
+					};
+				end
+				4: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_4, `MODE_4, `MODE_1, `MODE_1, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_4, `MODE_4, `MODE_1, `MODE_1, 1'd0
+					};
+				end
+				8, 9: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_9, `MODE_9, `MODE_1, `MODE_1, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_9, `MODE_9, `MODE_1, `MODE_1, 1'd0
+					};
+				end
+				16, 18: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_18, `MODE_18, `MODE_1, `MODE_1, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_18, `MODE_18, `MODE_1, `MODE_1, 1'd0
+					};
+				end
+				32, 36: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_36, `MODE_36, `MODE_1, `MODE_1, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_36, `MODE_36, `MODE_1, `MODE_1, 1'd0
+					};
+				end
+				default: begin
+					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
+						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_1, `MODE_1, `MODE_1, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_1, `MODE_1, `MODE_1, 1'd0
+					};
+				end
+			endcase
+		end
+	endcase
+
+	// Apply shift
+	case (RD_DATA_WIDTH)
+		1: begin
+			assign RD_ADDR_SHIFTED = RD_ADDR_TOTAL;
+		end
+		2: begin
+			assign RD_ADDR_SHIFTED = RD_ADDR_TOTAL << 1;
+		end
+		4: begin
+			assign RD_ADDR_SHIFTED = RD_ADDR_TOTAL << 2;
+		end
+		8, 9: begin
+			assign RD_ADDR_SHIFTED = RD_ADDR_TOTAL << 3;
+		end
+		16, 18: begin
+			assign RD_ADDR_SHIFTED = RD_ADDR_TOTAL << 4;
+		end
+		32, 36: begin
+			assign RD_ADDR_SHIFTED = RD_ADDR_TOTAL << 5;
+		end
+		default: begin
+			assign RD_ADDR_SHIFTED = RD_ADDR_TOTAL;
+		end
+	endcase
+
+	case (WR_DATA_WIDTH)
+		1: begin
+			assign WR_ADDR_SHIFTED = WR_ADDR_TOTAL;
+		end
+		2: begin
+			assign WR_ADDR_SHIFTED = WR_ADDR_TOTAL << 1;
+		end
+		4: begin
+			assign WR_ADDR_SHIFTED = WR_ADDR_TOTAL << 2;
+		end
+		8, 9: begin
+			assign WR_ADDR_SHIFTED = WR_ADDR_TOTAL << 3;
+		end
+		16, 18: begin
+			assign WR_ADDR_SHIFTED = WR_ADDR_TOTAL << 4;
+		end
+		32, 36: begin
+			assign WR_ADDR_SHIFTED = WR_ADDR_TOTAL << 5;
+		end
+		default: begin
+			assign WR_ADDR_SHIFTED = WR_ADDR_TOTAL;
+		end
+	endcase
+
+	wire [14:0] PORT_A_ADDR = WR_EN ? WR_ADDR_SHIFTED : (RD_EN ? RD_ADDR_SHIFTED : 14'd0);
+	wire [14:0] PORT_A1_ADDR = PORT_A_ADDR;
+	wire [14:0] PORT_A2_ADDR = PORT_A_ADDR;
+
+	assign FLUSH1 = 1'b0;
+	assign FLUSH2 = 1'b0;
+
+	// TODO configure per width
+	wire [17:0] PORT_A1_RDATA;
+	wire [17:0] PORT_A2_RDATA;
+	always @(PORT_A1_RDATA, PORT_A2_RDATA) begin
+		if (RD_DATA_WIDTH > 18)
+			{RD_DATA_CMPL, RD_DATA} <= {PORT_A2_RDATA[17 - (READ_DATA_BITS_TO_SKIP / 2):17 - (READ_DATA_BITS_TO_SKIP / 2)], PORT_A1_RDATA[17 - (READ_DATA_BITS_TO_SKIP / 2):17 - (READ_DATA_BITS_TO_SKIP / 2)],PORT_A2_RDATA[17 - (READ_DATA_BITS_TO_SKIP / 2):0], PORT_A1_RDATA[17 - (READ_DATA_BITS_TO_SKIP / 2):0]};
+		else
+			{RD_DATA_CMPL, RD_DATA} <= {PORT_A1_RDATA[17 - (READ_DATA_BITS_TO_SKIP-18):17 - (READ_DATA_BITS_TO_SKIP-18)], PORT_A1_RDATA[17 - (READ_DATA_BITS_TO_SKIP-18):0]};
+	end
+
+	wire [17:0] PORT_A1_WDATA = {WR_DATA_CMPL, WR_DATA[15:0]};
+	wire [17:0] PORT_A2_WDATA = {WR_DATA_CMPL, WR_DATA[31:16]};
+	// TODO configure per width
+
+	wire PORT_A1_CLK = RD_CLK;
+	wire PORT_A2_CLK = RD_CLK;
+
+	wire PORT_A1_REN = RD_EN;
+	wire PORT_A1_WEN = WR_EN;
+	wire [1:0] PORT_A1_BE = {PORT_A1_WEN, PORT_A1_WEN};
+
+	wire PORT_A2_REN = RD_EN;
+	wire PORT_A2_WEN = WR_EN;
+	wire [1:0] PORT_A2_BE = {PORT_A2_WEN, PORT_A2_WEN};
+
+	TDP36K _TECHMAP_REPLACE_ (
+		.RESET_ni(1'b1),
+		.WDATA_A1_i(PORT_A1_WDATA),
+		.RDATA_A1_o(PORT_A1_RDATA),
+		.ADDR_A1_i(PORT_A1_ADDR),
+		.CLK_A1_i(PORT_A1_CLK),
+		.REN_A1_i(PORT_A1_REN),
+		.WEN_A1_i(PORT_A1_WEN),
+		.BE_A1_i(PORT_A1_BE),
+
+		.WDATA_A2_i(PORT_A2_WDATA),
+		.RDATA_A2_o(PORT_A2_RDATA),
+		.ADDR_A2_i(PORT_A2_ADDR),
+		.CLK_A2_i(PORT_A2_CLK),
+		.REN_A2_i(PORT_A2_REN),
+		.WEN_A2_i(PORT_A2_WEN),
+		.BE_A2_i(PORT_A2_BE),
+
+		.FLUSH1_i(FLUSH1),
+		.FLUSH2_i(FLUSH2)
+	);
+endmodule
+
