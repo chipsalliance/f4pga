@@ -84,7 +84,7 @@ module tb();
     endcase
 
     // UUT
-    wire signed [3:0] acc_fir_i = 4'h0;
+    wire signed [5:0] acc_fir_i = 6'h0;
     wire signed [19:0] A = coeff;
     wire signed [17:0] B = data;
     wire signed [37:0] Z;
@@ -92,7 +92,7 @@ module tb();
     dsp_t1_sim # (
     ) uut (
         .clock_i		(clk),
-        .reset_n_i		(~rst),
+        .s_reset		(rst),
         .a_i			((!stb) ? A : 20'h0),
         .b_i			((!stb) ? B : 18'h0),
         .acc_fir_i		((!stb) ? acc_fir_i : 4'h0),

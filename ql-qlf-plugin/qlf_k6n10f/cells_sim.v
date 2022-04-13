@@ -1269,7 +1269,7 @@ endmodule  /* QL_DSP1 */
 module QL_DSP2 ( // TODO: Name subject to change
       input  [19:0] a,
       input  [17:0] b,
-      input  [3:0] acc_fir,
+      input  [ 5:0] acc_fir,
       output [37:0] z,
       output [17:0] dly_b,
 
@@ -1300,8 +1300,6 @@ module QL_DSP2 ( // TODO: Name subject to change
       localparam NBITS_A = 20;
       localparam NBITS_B = 18;
       localparam NBITS_Z = 38;
-      localparam NBITS_COEF = 20;
-      localparam NBITS_AF = 4;
 
       wire [NBITS_Z-1:0] dsp_full_z;
       wire [(NBITS_Z/2)-1:0] dsp_frac0_z;
@@ -1319,16 +1317,14 @@ module QL_DSP2 ( // TODO: Name subject to change
         .NBITS_A(NBITS_A/2),
             .NBITS_B(NBITS_B/2),
             .NBITS_ACC(NBITS_ACC/2),
-            .NBITS_Z(NBITS_Z/2),
-            .NBITS_COEF(NBITS_COEF/2),
-            .NBITS_AF(NBITS_AF/2)
+            .NBITS_Z(NBITS_Z/2)
         ) dsp_frac0 (
             .a_i(a[(NBITS_A/2)-1:0]),
             .b_i(b[(NBITS_B/2)-1:0]),
             .z_o(dsp_frac0_z),
             .dly_b_o(dsp_frac0_dly_b),
 
-            .acc_fir_i(acc_fir[(NBITS_AF/2)-1:0]),
+            .acc_fir_i(acc_fir),
             .feedback_i(feedback),
             .load_acc_i(load_acc),
 
@@ -1336,7 +1332,7 @@ module QL_DSP2 ( // TODO: Name subject to change
             .unsigned_b_i(unsigned_b),
 
             .clock_i(clk),
-            .reset_n_i(reset),
+            .s_reset(reset),
 
             .saturate_enable_i(saturate_enable),
             .output_select_i(output_select),
@@ -1344,10 +1340,10 @@ module QL_DSP2 ( // TODO: Name subject to change
             .shift_right_i(shift_right),
             .subtract_i(subtract),
             .register_inputs_i(register_inputs),
-            .coef_0_i(COEFF_0[(NBITS_COEF/2)-1:0]),
-            .coef_1_i(COEFF_1[(NBITS_COEF/2)-1:0]),
-            .coef_2_i(COEFF_2[(NBITS_COEF/2)-1:0]),
-            .coef_3_i(COEFF_3[(NBITS_COEF/2)-1:0])
+            .coef_0_i(COEFF_0[(NBITS_A/2)-1:0]),
+            .coef_1_i(COEFF_1[(NBITS_A/2)-1:0]),
+            .coef_2_i(COEFF_2[(NBITS_A/2)-1:0]),
+            .coef_3_i(COEFF_3[(NBITS_A/2)-1:0])
         );
 
     // Output used when fmode == 1
@@ -1355,16 +1351,14 @@ module QL_DSP2 ( // TODO: Name subject to change
         .NBITS_A(NBITS_A/2),
             .NBITS_B(NBITS_B/2),
             .NBITS_ACC(NBITS_ACC/2),
-            .NBITS_Z(NBITS_Z/2),
-            .NBITS_COEF(NBITS_COEF/2),
-            .NBITS_AF(NBITS_AF/2)
+            .NBITS_Z(NBITS_Z/2)
         ) dsp_frac1 (
             .a_i(a[NBITS_A-1:NBITS_A/2]),
             .b_i(b[NBITS_B-1:NBITS_B/2]),
             .z_o(dsp_frac1_z),
             .dly_b_o(dsp_frac1_dly_b),
 
-            .acc_fir_i(acc_fir[NBITS_AF-1:NBITS_AF/2]),
+            .acc_fir_i(acc_fir),
             .feedback_i(feedback),
             .load_acc_i(load_acc),
 
@@ -1372,7 +1366,7 @@ module QL_DSP2 ( // TODO: Name subject to change
             .unsigned_b_i(unsigned_b),
 
             .clock_i(clk),
-            .reset_n_i(reset),
+            .s_reset(reset),
 
             .saturate_enable_i(saturate_enable),
             .output_select_i(output_select),
@@ -1380,10 +1374,10 @@ module QL_DSP2 ( // TODO: Name subject to change
             .shift_right_i(shift_right),
             .subtract_i(subtract),
             .register_inputs_i(register_inputs),
-            .coef_0_i(COEFF_0[NBITS_COEF-1:NBITS_COEF/2]),
-            .coef_1_i(COEFF_1[NBITS_COEF-1:NBITS_COEF/2]),
-            .coef_2_i(COEFF_2[NBITS_COEF-1:NBITS_COEF/2]),
-            .coef_3_i(COEFF_3[NBITS_COEF-1:NBITS_COEF/2])
+            .coef_0_i(COEFF_0[NBITS_A-1:NBITS_A/2]),
+            .coef_1_i(COEFF_1[NBITS_A-1:NBITS_A/2]),
+            .coef_2_i(COEFF_2[NBITS_A-1:NBITS_A/2]),
+            .coef_3_i(COEFF_3[NBITS_A-1:NBITS_A/2])
         );
 
     // Output used when fmode == 0
@@ -1391,9 +1385,7 @@ module QL_DSP2 ( // TODO: Name subject to change
              .NBITS_A(NBITS_A),
              .NBITS_B(NBITS_B),
              .NBITS_ACC(NBITS_ACC),
-             .NBITS_Z(NBITS_Z),
-             .NBITS_COEF(NBITS_COEF),
-             .NBITS_AF(NBITS_AF)
+             .NBITS_Z(NBITS_Z)
         ) dsp_full (
             .a_i(a),
             .b_i(b),
@@ -1408,7 +1400,7 @@ module QL_DSP2 ( // TODO: Name subject to change
             .unsigned_b_i(unsigned_b),
 
             .clock_i(clk),
-            .reset_n_i(reset),
+            .s_reset(reset),
 
             .saturate_enable_i(saturate_enable),
             .output_select_i(output_select),
@@ -1427,16 +1419,14 @@ module dsp_t1_sim # (
     parameter NBITS_ACC  = 64,
     parameter NBITS_A    = 20,
     parameter NBITS_B    = 18,
-    parameter NBITS_Z    = 38,
-    parameter NBITS_COEF = 20,
-    parameter NBITS_AF   = 4
+    parameter NBITS_Z    = 38
 )(
     input [NBITS_A-1:0] a_i,
     input [NBITS_B-1:0] b_i,
     output [NBITS_Z-1:0] z_o,
     output reg [NBITS_B-1:0] dly_b_o,
 
-    input [NBITS_AF-1:0] acc_fir_i,
+    input [5:0] acc_fir_i,
     input [2:0] feedback_i,
     input load_acc_i,
 
@@ -1444,7 +1434,7 @@ module dsp_t1_sim # (
     input unsigned_b_i,
 
     input clock_i,
-    input reset_n_i,
+    input s_reset,
 
     input saturate_enable_i,
     input [2:0] output_select_i,
@@ -1452,10 +1442,10 @@ module dsp_t1_sim # (
     input [5:0] shift_right_i,
     input subtract_i,
     input register_inputs_i,
-    input [NBITS_COEF-1:0] coef_0_i,
-    input [NBITS_COEF-1:0] coef_1_i,
-    input [NBITS_COEF-1:0] coef_2_i,
-    input [NBITS_COEF-1:0] coef_3_i
+    input [NBITS_A-1:0] coef_0_i,
+    input [NBITS_A-1:0] coef_1_i,
+    input [NBITS_A-1:0] coef_2_i,
+    input [NBITS_A-1:0] coef_3_i
 );
 
 // FIXME: The version of Icarus Verilog from Conda seems not to recognize the
@@ -1468,7 +1458,7 @@ module dsp_t1_sim # (
     // Input registers
     reg  [NBITS_A-1:0]  r_a;
     reg  [NBITS_B-1:0]  r_b;
-    reg  [NBITS_AF-1:0] r_acc_fir;
+    reg  [5:0]          r_acc_fir;
     reg                 r_unsigned_a;
     reg                 r_unsigned_b;
     reg                 r_load_acc;
@@ -1496,8 +1486,8 @@ module dsp_t1_sim # (
         r_rnd        <= 0;
     end
 
-    always @(posedge clock_i or negedge reset_n_i) begin
-        if (~reset_n_i) begin
+    always @(posedge clock_i or posedge s_reset) begin
+        if (s_reset) begin
 
             r_a <= 'h0;
             r_b <= 'h0;
@@ -1536,7 +1526,7 @@ module dsp_t1_sim # (
     wire [NBITS_A-1:0]  a = register_inputs_i ? r_a : a_i;
     wire [NBITS_B-1:0]  b = register_inputs_i ? r_b : b_i;
 
-    wire [NBITS_AF-1:0] acc_fir = register_inputs_i ? r_acc_fir : acc_fir_i;
+    wire [5:0] acc_fir = register_inputs_i ? r_acc_fir : acc_fir_i;
     wire       unsigned_a = register_inputs_i ? r_unsigned_a : unsigned_a_i;
     wire       unsigned_b = register_inputs_i ? r_unsigned_b : unsigned_b_i;
     wire [2:0] feedback   = register_inputs_i ? r_feedback   : feedback_i;
@@ -1564,12 +1554,12 @@ module dsp_t1_sim # (
     wire [NBITS_B-1:0] mult_b = (feedback == 2'h2) ? {NBITS_B{1'b0}}  : b;
 
     wire [NBITS_A-1:0] mult_sgn_a = mult_a[NBITS_A-1];
-    wire [NBITS_A-1:0] mult_mag_a = (mult_sgn_a) ? (~mult_a + 1) : mult_a;
+    wire [NBITS_A-1:0] mult_mag_a = (mult_sgn_a && !unsigned_a) ? (~mult_a + 1) : mult_a;
     wire [NBITS_B-1:0] mult_sgn_b = mult_b[NBITS_B-1];
-    wire [NBITS_B-1:0] mult_mag_b = (mult_sgn_b) ? (~mult_b + 1) : mult_b;
+    wire [NBITS_B-1:0] mult_mag_b = (mult_sgn_b && !unsigned_b) ? (~mult_b + 1) : mult_b;
 
     wire [NBITS_A+NBITS_B-1:0] mult_mag = mult_mag_a * mult_mag_b;
-    wire mult_sgn = mult_sgn_a ^ mult_sgn_b;
+    wire mult_sgn = (mult_sgn_a && !unsigned_a) ^ (mult_sgn_b && !unsigned_b);
 
     wire [NBITS_A+NBITS_B-1:0] mult = (unsigned_a && unsigned_b) ?
         (mult_a * mult_b) : (mult_sgn ? (~mult_mag + 1) : mult_mag);
@@ -1579,22 +1569,21 @@ module dsp_t1_sim # (
         {{(NBITS_ACC-NBITS_A-NBITS_B){1'b0}},                    mult[NBITS_A+NBITS_B-1:0]} :
         {{(NBITS_ACC-NBITS_A-NBITS_B){mult[NBITS_A+NBITS_B-1]}}, mult[NBITS_A+NBITS_B-1:0]};
 
-    wire [NBITS_ACC-1:0] a_xtnd = (unsigned_a) ?
-                  { {(NBITS_ACC - NBITS_A - NBITS_AF){1'b0}}, acc_fir, {a} } :
-                  { {(NBITS_ACC - NBITS_A - NBITS_AF){acc_fir[NBITS_AF-1]}}, acc_fir, {a[NBITS_A-1:0]} };
-
     // Adder
-    wire [NBITS_ACC-1:0] add_a = (subtract_i) ? (~mult_xtnd + 1) : mult_xtnd;
+    wire [NBITS_ACC-1:0] acc_fir_int = unsigned_a ? {{(NBITS_ACC-NBITS_A){1'b0}},         a} :
+                                                    {{(NBITS_ACC-NBITS_A){a[NBITS_A-1]}}, a} ;
+
+    wire [NBITS_ACC-1:0] add_a = (subtract) ? (~mult_xtnd + 1) : mult_xtnd;
     wire [NBITS_ACC-1:0] add_b = (feedback_i == 3'h0) ? acc :
-                                 (feedback_i == 3'h1) ? {{NBITS_ACC}{1'b0}} : a_xtnd;
+                                 (feedback_i == 3'h1) ? {{NBITS_ACC}{1'b0}} : (acc_fir_int << acc_fir);
 
     wire [NBITS_ACC-1:0] add_o = add_a + add_b;
 
     // Accumulator
     initial acc <= 0;
 
-    always @(posedge clock_i or negedge reset_n_i)
-        if (~reset_n_i) acc <= 'h0;
+    always @(posedge clock_i or posedge s_reset)
+        if (s_reset) acc <= 'h0;
         else begin
             if (load_acc)
                 acc <= add_o;
@@ -1631,8 +1620,8 @@ module dsp_t1_sim # (
 
     initial z1 <= 0;
 
-    always @(posedge clock_i or negedge reset_n_i)
-        if (!reset_n_i)
+    always @(posedge clock_i or posedge s_reset)
+        if (s_reset)
             z1 <= 0;
         else begin
             z1 <= (output_select_i == 3'b100) ? z0 : z2;
@@ -1651,8 +1640,8 @@ module dsp_t1_sim # (
     // B input delayed passthrough
     initial dly_b_o <= 0;
 
-    always @(posedge clock_i or negedge reset_n_i)
-        if (!reset_n_i)
+    always @(posedge clock_i or posedge s_reset)
+        if (s_reset)
             dly_b_o <= 0;
         else
             dly_b_o <= b_i;
@@ -1662,7 +1651,7 @@ endmodule
 module dsp_t1_20x18x64 (
     input  [19:0] a_i,
     input  [17:0] b_i,
-    input  [ 3:0] acc_fir_i,
+    input  [ 5:0] acc_fir_i,
     output [37:0] z_o,
     output [17:0] dly_b_o,
 
@@ -1723,7 +1712,7 @@ endmodule
 module dsp_t1_10x9x32 (
     input  [ 9:0] a_i,
     input  [ 8:0] b_i,
-    input  [ 1:0] acc_fir_i,
+    input  [ 5:0] acc_fir_i,
     output [18:0] z_o,
     output [ 8:0] dly_b_o,
 
@@ -1765,7 +1754,7 @@ module dsp_t1_10x9x32 (
 
     .f_mode(1'b1),  // 10x9x32 DSP
 
-    .acc_fir({2'd0, acc_fir_i}),
+    .acc_fir(acc_fir_i),
     .feedback(feedback_i),
     .load_acc(load_acc_i),
 

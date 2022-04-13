@@ -14,7 +14,7 @@ proc check_equiv {top} {
     techmap -wb -autoproc -map +/quicklogic/qlf_k6n10f/cells_sim.v
     yosys proc
     opt_expr
-    opt_clean
+    opt_clean -purge
 
     async2sync
     equiv_make gold gate equiv
@@ -53,6 +53,13 @@ yosys cd ${TOP}
 select -assert-count 1 t:QL_DSP2
 
 set TOP "mult_10x9"
+design -load read
+check_equiv ${TOP}
+design -load postopt
+yosys cd ${TOP}
+select -assert-count 1 t:QL_DSP2
+
+set TOP "mult_8x8_s"
 design -load read
 check_equiv ${TOP}
 design -load postopt
