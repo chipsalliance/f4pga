@@ -43,10 +43,7 @@ module dsp_t1_20x18x64 (
     parameter [19:0] COEFF_3 = 20'd0;
 
     QL_DSP2 # (
-        .COEFF_0            (COEFF_0),
-        .COEFF_1            (COEFF_1),
-        .COEFF_2            (COEFF_2),
-        .COEFF_3            (COEFF_3)
+        .MODE_BITS          ({COEFF_3, COEFF_2, COEFF_1, COEFF_0})
     ) _TECHMAP_REPLACE_ (
         .a                  (a_i),
         .b                  (b_i),
@@ -94,11 +91,7 @@ module dsp_t1_10x9x32 (
     input  [5:0]  shift_right_i,
     input         round_i,
     input         subtract_i,
-    input         register_inputs_i,
-    input  [ 9:0] coeff_0_i,
-    input  [ 9:0] coeff_1_i,
-    input  [ 9:0] coeff_2_i,
-    input  [ 9:0] coeff_3_i
+    input         register_inputs_i
 );
 
     parameter [9:0] COEFF_0 = 10'd0;
@@ -110,10 +103,10 @@ module dsp_t1_10x9x32 (
     wire [17:0] dly_b;
 
     QL_DSP2 # (
-        .COEFF_0            ({10'd0, COEFF_0}),
-        .COEFF_1            ({10'd0, COEFF_1}),
-        .COEFF_2            ({10'd0, COEFF_2}),
-        .COEFF_3            ({10'd0, COEFF_3})
+        .MODE_BITS          ({10'd0, COEFF_3,
+                              10'd0, COEFF_2,
+                              10'd0, COEFF_1,
+                              10'd0, COEFF_0})
     ) _TECHMAP_REPLACE_ (
         .a                  ({10'd0, a_i}),
         .b                  ({ 9'd0, b_i}),

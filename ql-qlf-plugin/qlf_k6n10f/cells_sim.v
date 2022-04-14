@@ -542,31 +542,36 @@ module TDP_BRAM36 (
     PL_ADDR_o,
     PL_DATA_o
 );
-    parameter SYNC_FIFO1_i = 1'b0;
-    parameter RMODE_A1_i = 3'b0;
-    parameter RMODE_B1_i = 3'b0;
-    parameter WMODE_A1_i = 3'b0;
-    parameter WMODE_B1_i = 3'b0;
-    parameter FMODE1_i = 1'b0;
-    parameter POWERDN1_i = 1'b0;
-    parameter SLEEP1_i = 1'b0;
-    parameter PROTECT1_i = 1'b0;
-    parameter UPAE1_i = 12'b0;
-    parameter UPAF1_i = 12'b0;
+    parameter [80:0] MODE_BITS = 81'd0;
 
-    parameter SYNC_FIFO2_i = 1'b0;
-    parameter RMODE_A2_i = 3'b0;
-    parameter RMODE_B2_i = 3'b0;
-    parameter WMODE_A2_i = 3'b0;
-    parameter WMODE_B2_i = 3'b0;
-    parameter FMODE2_i = 1'b0;
-    parameter POWERDN2_i = 1'b0;
-    parameter SLEEP2_i = 1'b0;
-    parameter PROTECT2_i = 1'b0;
-    parameter UPAE2_i = 12'b0;
-    parameter UPAF2_i = 12'b0;
+    // First 18K RAMFIFO (41 bits)
+    localparam [ 0:0] SYNC_FIFO1_i  = MODE_BITS[0];
+    localparam [ 2:0] RMODE_A1_i    = MODE_BITS[3 : 1];
+    localparam [ 2:0] RMODE_B1_i    = MODE_BITS[6 : 4];
+    localparam [ 2:0] WMODE_A1_i    = MODE_BITS[9 : 7];
+    localparam [ 2:0] WMODE_B1_i    = MODE_BITS[12:10];
+    localparam [ 0:0] FMODE1_i      = MODE_BITS[13];
+    localparam [ 0:0] POWERDN1_i    = MODE_BITS[14];
+    localparam [ 0:0] SLEEP1_i      = MODE_BITS[15];
+    localparam [ 0:0] PROTECT1_i    = MODE_BITS[16];
+    localparam [11:0] UPAE1_i       = MODE_BITS[28:17];
+    localparam [11:0] UPAF1_i       = MODE_BITS[40:29];
 
-    parameter SPLIT_i = 1'b0;
+    // Second 18K RAMFIFO (39 bits)
+    localparam [ 0:0] SYNC_FIFO2_i  = MODE_BITS[41];
+    localparam [ 0:0] RMODE_A2_i    = MODE_BITS[44:42];
+    localparam [ 0:0] RMODE_B2_i    = MODE_BITS[47:45];
+    localparam [ 0:0] WMODE_A2_i    = MODE_BITS[50:48];
+    localparam [ 0:0] WMODE_B2_i    = MODE_BITS[53:51];
+    localparam [ 0:0] FMODE2_i      = MODE_BITS[54];
+    localparam [ 0:0] POWERDN2_i    = MODE_BITS[55];
+    localparam [ 0:0] SLEEP2_i      = MODE_BITS[56];
+    localparam [ 0:0] PROTECT2_i    = MODE_BITS[57];
+    localparam [10:0] UPAE2_i       = MODE_BITS[68:58];
+    localparam [10:0] UPAF2_i       = MODE_BITS[79:69];
+
+    // Split (1 bit)
+    localparam [ 0:0] SPLIT_i       = MODE_BITS[80];
 
     parameter INITP_00 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
     parameter INITP_01 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
@@ -1291,10 +1296,12 @@ module QL_DSP2 ( // TODO: Name subject to change
     input         register_inputs
 );
 
-    parameter [19:0] COEFF_0 = 20'd0;
-    parameter [19:0] COEFF_1 = 20'd0;
-    parameter [19:0] COEFF_2 = 20'd0;
-    parameter [19:0] COEFF_3 = 20'd0;
+    parameter [79:0] MODE_BITS = 80'd0;
+
+    localparam [19:0] COEFF_0 = MODE_BITS[19:0];
+    localparam [19:0] COEFF_1 = MODE_BITS[39:20];
+    localparam [19:0] COEFF_2 = MODE_BITS[59:40];
+    localparam [19:0] COEFF_3 = MODE_BITS[79:60];
 
       localparam NBITS_ACC = 64;
       localparam NBITS_A = 20;
@@ -1678,10 +1685,7 @@ module dsp_t1_20x18x64 (
     parameter [19:0] COEFF_3 = 20'd0;
 
    QL_DSP2 #(
-        .COEFF_0(COEFF_0),
-        .COEFF_1(COEFF_1),
-        .COEFF_2(COEFF_2),
-        .COEFF_3(COEFF_3)
+    .MODE_BITS({COEFF_3, COEFF_2, COEFF_1, COEFF_0})
    ) dsp (
     .a(a_i),
     .b(b_i),
@@ -1742,10 +1746,10 @@ module dsp_t1_10x9x32 (
     wire [8:0] dly_b_rem;
 
     QL_DSP2 #(
-        .COEFF_0({10'd0, COEFF_0}),
-        .COEFF_1({10'd0, COEFF_1}),
-        .COEFF_2({10'd0, COEFF_2}),
-        .COEFF_3({10'd0, COEFF_3})
+    .MODE_BITS({10'd0, COEFF_3,
+                10'd0, COEFF_2,
+                10'd0, COEFF_1,
+                10'd0, COEFF_0})
    ) dsp (
     .a({10'd0, a_i}),
     .b({9'd0, b_i}),
