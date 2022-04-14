@@ -14,6 +14,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+`default_nettype wire
 module sram1024x18 (
 	clk_a,
 	cen_a,
@@ -130,3 +131,4 @@ module sram1024x18 (
 			rdata_a = rdata_a;
 	end
 endmodule
+`default_nettype none

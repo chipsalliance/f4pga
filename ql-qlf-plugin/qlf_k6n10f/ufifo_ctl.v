@@ -14,13 +14,13 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+`default_nettype wire
 module fifo_ctl (
 	raddr,
 	waddr,
 	fflags,
 	ren_o,
 	sync,
-	depth,
 	rmode,
 	wmode,
 	rclk,
@@ -34,13 +34,12 @@ module fifo_ctl (
 );
 	parameter ADDR_WIDTH = 11;
 	parameter FIFO_WIDTH = 3'd2;
-	localparam ADDR_PLUS_ONE = ADDR_WIDTH + 1;
+	parameter DEPTH = 6;
 	output wire [ADDR_WIDTH - 1:0] raddr;
 	output wire [ADDR_WIDTH - 1:0] waddr;
 	output wire [7:0] fflags;
 	output wire ren_o;
 	input wire sync;
-	input wire [2:0] depth;
 	input wire [1:0] rmode;
 	input wire [1:0] wmode;
 	(* clkbuf_sink *)
@@ -53,6 +52,7 @@ module fifo_ctl (
 	input wire wen;
 	input wire [ADDR_WIDTH - 1:0] upaf;
 	input wire [ADDR_WIDTH - 1:0] upae;
+	localparam ADDR_PLUS_ONE = ADDR_WIDTH + 1;
 	reg [ADDR_WIDTH:0] pushtopop1;
 	reg [ADDR_WIDTH:0] pushtopop2;
 	reg [ADDR_WIDTH:0] poptopush1;
@@ -65,23 +65,26 @@ module fifo_ctl (
 	assign smux_pushtopop = (sync ? pushtopop0 : pushtopop2);
 	always @(posedge rclk or negedge rst_R_n)
 		if (~rst_R_n) begin
-			pushtopop1 <= #(1) {ADDR_WIDTH + 1{1'h0}};
-			pushtopop2 <= #(1) {ADDR_WIDTH + 1{1'h0}};
+			pushtopop1 <= 'h0;
+			pushtopop2 <= 'h0;
 		end
 		else begin
-			pushtopop1 <= #(1) pushtopop0;
-			pushtopop2 <= #(1) pushtopop1;
+			pushtopop1 = pushtopop0;
+			pushtopop2 = pushtopop1;
 		end
 	always @(posedge wclk or negedge rst_W_n)
 		if (~rst_W_n) begin
-			poptopush1 <= #(1) {ADDR_WIDTH + 1{1'h0}};
-			poptopush2 <= #(1) {ADDR_WIDTH + 1{1'h0}};
+			poptopush1 <= 'h0;
+			poptopush2 <= 'h0;
 		end
 		else begin
-			poptopush1 <= #(1) poptopush0;
-			poptopush2 <= #(1) poptopush1;
+			poptopush1 <= poptopush0;
+			poptopush2 <= poptopush1;
 		end
-	fifo_push #(.ADDR_WIDTH(ADDR_WIDTH)) u_fifo_push(
+	fifo_push #(
+		.ADDR_WIDTH(ADDR_WIDTH),
+		.DEPTH(DEPTH)
+	) u_fifo_push(
 		.wclk(wclk),
 		.wen(wen),
 		.rst_n(rst_W_n),
@@ -90,13 +93,13 @@ module fifo_ctl (
 		.gcout(pushtopop0),
 		.gcin(smux_poptopush),
 		.ff_waddr(waddr),
-		.depth(depth),
 		.pushflags(fflags[7:4]),
 		.upaf(upaf)
 	);
 	fifo_pop #(
 		.ADDR_WIDTH(ADDR_WIDTH),
-		.FIFO_WIDTH(FIFO_WIDTH)
+		.FIFO_WIDTH(FIFO_WIDTH),
+		.DEPTH(DEPTH)
 	) u_fifo_pop(
 		.rclk(rclk),
 		.ren_in(ren),
@@ -107,7 +110,6 @@ module fifo_ctl (
 		.gcout(poptopush0),
 		.gcin(smux_pushtopop),
 		.out_raddr(raddr),
-		.depth(depth),
 		.popflags(fflags[3:0]),
 		.upae(upae)
 	);
@@ -121,22 +123,23 @@ module fifo_push (
 	wen,
 	rmode,
 	wmode,
-	depth,
 	gcin,
 	upaf
 );
 	parameter ADDR_WIDTH = 11;
+	parameter DEPTH = 6;
 	output wire [3:0] pushflags;
 	output wire [ADDR_WIDTH:0] gcout;
 	output wire [ADDR_WIDTH - 1:0] ff_waddr;
 	input rst_n;
+	(* clkbuf_sink *)
 	input wclk;
 	input wen;
 	input [1:0] rmode;
 	input [1:0] wmode;
-	input [2:0] depth;
 	input [ADDR_WIDTH:0] gcin;
 	input [ADDR_WIDTH - 1:0] upaf;
+	localparam ADDR_PLUS_ONE = ADDR_WIDTH + 1;
 	reg full_next;
 	reg full;
 	reg paf_next;
@@ -165,22 +168,13 @@ module fifo_push (
 	wire [ADDR_WIDTH:0] tmp;
 	wire [ADDR_WIDTH:0] next_count;
 	wire [ADDR_WIDTH:0] count;
-	reg [ADDR_WIDTH:0] fbytes;
+	wire [ADDR_WIDTH:0] fbytes;
 	genvar i;
 	assign next_count = fbytes - (waddr_next >= raddr_next ? waddr_next - raddr_next : (~raddr_next + waddr_next) + 1);
 	assign count = fbytes - (waddr >= raddr ? waddr - raddr : (~raddr + waddr) + 1);
+	assign fbytes = 1 << (DEPTH + 5);
 	always @(*) begin
-		case (depth)
-			3'b000: fbytes = {ADDR_WIDTH + 1{1'h0}} | 12'd2048;
-			3'b001: fbytes = {ADDR_WIDTH + 1{1'h0}} | 11'd1024;
-			3'b010: fbytes = {ADDR_WIDTH + 1{1'h0}} | 10'd512;
-			3'b011: fbytes = {ADDR_WIDTH + 1{1'h0}} | 9'd256;
-			3'b100: fbytes = {ADDR_WIDTH + 1{1'h0}} | 8'd128;
-			3'b101: fbytes = {ADDR_WIDTH + 1{1'h0}} | 7'd64;
-			3'b110: fbytes = {ADDR_WIDTH + 1{1'h0}} | 6'd32;
-			3'b111: fbytes = {ADDR_WIDTH + 1{1'h0}} | 13'd4096;
-		endcase
-		paf_thresh = (wmode ? (wmode[0] ? upaf << 1 : upaf) : upaf << 2);
+		paf_thresh = wmode[1] ? upaf : (wmode[0] ? upaf << 1 : upaf << 2);
 	end
 	always @(*)
 		case (wmode)
@@ -200,24 +194,24 @@ module fifo_push (
 		f2 = 1'b0;
 		p1 = 1'b0;
 		p2 = 1'b0;
-		q1 = next_count < paf_thresh;
-		q2 = count < paf_thresh;
+		q1 = next_count < {1'b0, paf_thresh};
+		q2 = count < {1'b0, paf_thresh};
 		case (wmode)
 			2'h0:
-				case (depth)
-					3'h0: begin
+				case (DEPTH)
+					3'h6: begin
 						f1 = {~waddr_next[11], waddr_next[10:2]} == raddr_next[11:2];
 						f2 = {~waddr[11], waddr[10:2]} == raddr_next[11:2];
 						p1 = ((waddr_next[10:2] + 1) & 9'h1ff) == raddr_next[10:2];
 						p2 = ((waddr[10:2] + 1) & 9'h1ff) == raddr_next[10:2];
 					end
-					3'h1: begin
+					3'h5: begin
 						f1 = {~waddr_next[10], waddr_next[9:2]} == raddr_next[10:2];
 						f2 = {~waddr[10], waddr[9:2]} == raddr_next[10:2];
 						p1 = ((waddr_next[9:2] + 1) & 8'hff) == raddr_next[9:2];
 						p2 = ((waddr[9:2] + 1) & 8'hff) == raddr_next[9:2];
 					end
-					3'h2: begin
+					3'h4: begin
 						f1 = {~waddr_next[9], waddr_next[8:2]} == raddr_next[9:2];
 						f2 = {~waddr[9], waddr[8:2]} == raddr_next[9:2];
 						p1 = ((waddr_next[8:2] + 1) & 7'h7f) == raddr_next[8:2];
@@ -229,19 +223,19 @@ module fifo_push (
 						p1 = ((waddr_next[7:2] + 1) & 6'h3f) == raddr_next[7:2];
 						p2 = ((waddr[7:2] + 1) & 6'h3f) == raddr_next[7:2];
 					end
-					3'h4: begin
+					3'h2: begin
 						f1 = {~waddr_next[7], waddr_next[6:2]} == raddr_next[7:2];
 						f2 = {~waddr[7], waddr[6:2]} == raddr_next[7:2];
 						p1 = ((waddr_next[6:2] + 1) & 5'h1f) == raddr_next[6:2];
 						p2 = ((waddr[6:2] + 1) & 5'h1f) == raddr_next[6:2];
 					end
-					3'h5: begin
+					3'h1: begin
 						f1 = {~waddr_next[6], waddr_next[5:2]} == raddr_next[6:2];
 						f2 = {~waddr[6], waddr[5:2]} == raddr_next[6:2];
 						p1 = ((waddr_next[5:2] + 1) & 4'hf) == raddr_next[5:2];
 						p2 = ((waddr[5:2] + 1) & 4'hf) == raddr_next[5:2];
 					end
-					3'h6: begin
+					3'h0: begin
 						f1 = {~waddr_next[5], waddr_next[4:2]} == raddr_next[5:2];
 						f2 = {~waddr[5], waddr[4:2]} == raddr_next[5:2];
 						p1 = ((waddr_next[4:2] + 1) & 3'h7) == raddr_next[4:2];
@@ -249,26 +243,26 @@ module fifo_push (
 					end
 					3'h7: begin
 						f1 = {~waddr_next[ADDR_WIDTH], waddr_next[ADDR_WIDTH - 1:2]} == raddr_next[ADDR_WIDTH:2];
-						f2 = {~waddr[ADDR_WIDTH], waddr[10:2]} == raddr_next[ADDR_WIDTH:2];
+						f2 = {~waddr[ADDR_WIDTH], waddr[ADDR_WIDTH - 1:2]} == raddr_next[ADDR_WIDTH:2];
 						p1 = ((waddr_next[ADDR_WIDTH - 1:2] + 1) & {ADDR_WIDTH - 2 {1'b1}}) == raddr_next[ADDR_WIDTH - 1:2];
 						p2 = ((waddr[ADDR_WIDTH - 1:2] + 1) & {ADDR_WIDTH - 2 {1'b1}}) == raddr_next[ADDR_WIDTH - 1:2];
 					end
 				endcase
 			2'h1:
-				case (depth)
-					3'h0: begin
+				case (DEPTH)
+					3'h6: begin
 						f1 = {~waddr_next[11], waddr_next[10:1]} == raddr_next[11:1];
 						f2 = {~waddr[11], waddr[10:1]} == raddr_next[11:1];
 						p1 = ((waddr_next[10:1] + 1) & 10'h3ff) == raddr_next[10:1];
 						p2 = ((waddr[10:1] + 1) & 10'h3ff) == raddr_next[10:1];
 					end
-					3'h1: begin
+					3'h5: begin
 						f1 = {~waddr_next[10], waddr_next[9:1]} == raddr_next[10:1];
 						f2 = {~waddr[10], waddr[9:1]} == raddr_next[10:1];
 						p1 = ((waddr_next[9:1] + 1) & 9'h1ff) == raddr_next[9:1];
 						p2 = ((waddr[9:1] + 1) & 9'h1ff) == raddr_next[9:1];
 					end
-					3'h2: begin
+					3'h4: begin
 						f1 = {~waddr_next[9], waddr_next[8:1]} == raddr_next[9:1];
 						f2 = {~waddr[9], waddr[8:1]} == raddr_next[9:1];
 						p1 = ((waddr_next[8:1] + 1) & 8'hff) == raddr_next[8:1];
@@ -280,19 +274,19 @@ module fifo_push (
 						p1 = ((waddr_next[7:1] + 1) & 7'h7f) == raddr_next[7:1];
 						p2 = ((waddr[7:1] + 1) & 7'h7f) == raddr_next[7:1];
 					end
-					3'h4: begin
+					3'h2: begin
 						f1 = {~waddr_next[7], waddr_next[6:1]} == raddr_next[7:1];
 						f2 = {~waddr[7], waddr[6:1]} == raddr_next[7:1];
 						p1 = ((waddr_next[6:1] + 1) & 6'h3f) == raddr_next[6:1];
 						p2 = ((waddr[6:1] + 1) & 6'h3f) == raddr_next[6:1];
 					end
-					3'h5: begin
+					3'h1: begin
 						f1 = {~waddr_next[6], waddr_next[5:1]} == raddr_next[6:1];
 						f2 = {~waddr[6], waddr[5:1]} == raddr_next[6:1];
 						p1 = ((waddr_next[5:1] + 1) & 5'h1f) == raddr_next[5:1];
 						p2 = ((waddr[5:1] + 1) & 5'h1f) == raddr_next[5:1];
 					end
-					3'h6: begin
+					3'h0: begin
 						f1 = {~waddr_next[5], waddr_next[4:1]} == raddr_next[5:1];
 						f2 = {~waddr[5], waddr[4:1]} == raddr_next[5:1];
 						p1 = ((waddr_next[4:1] + 1) & 4'hf) == raddr_next[4:1];
@@ -300,26 +294,26 @@ module fifo_push (
 					end
 					3'h7: begin
 						f1 = {~waddr_next[ADDR_WIDTH], waddr_next[ADDR_WIDTH - 1:1]} == raddr_next[ADDR_WIDTH:1];
-						f2 = {~waddr[11], waddr[ADDR_WIDTH - 1:1]} == raddr_next[ADDR_WIDTH:1];
+						f2 = {~waddr[ADDR_WIDTH], waddr[ADDR_WIDTH - 1:1]} == raddr_next[ADDR_WIDTH:1];
 						p1 = ((waddr_next[ADDR_WIDTH - 1:1] + 1) & {ADDR_WIDTH - 1 {1'b1}}) == raddr_next[ADDR_WIDTH - 1:1];
 						p2 = ((waddr[ADDR_WIDTH - 1:1] + 1) & {ADDR_WIDTH - 1 {1'b1}}) == raddr_next[ADDR_WIDTH - 1:1];
 					end
 				endcase
 			2'h2:
-				case (depth)
-					3'h0: begin
+				case (DEPTH)
+					3'h6: begin
 						f1 = {~waddr_next[11], waddr_next[10:0]} == raddr_next[11:0];
 						f2 = {~waddr[11], waddr[10:0]} == raddr_next[11:0];
 						p1 = ((waddr_next[10:0] + 1) & 11'h7ff) == raddr_next[10:0];
 						p2 = ((waddr[10:0] + 1) & 11'h7ff) == raddr_next[10:0];
 					end
-					3'h1: begin
+					3'h5: begin
 						f1 = {~waddr_next[10], waddr_next[9:0]} == raddr_next[10:0];
 						f2 = {~waddr[10], waddr[9:0]} == raddr_next[10:0];
 						p1 = ((waddr_next[9:0] + 1) & 10'h3ff) == raddr_next[9:0];
 						p2 = ((waddr[9:0] + 1) & 10'h3ff) == raddr_next[9:0];
 					end
-					3'h2: begin
+					3'h4: begin
 						f1 = {~waddr_next[9], waddr_next[8:0]} == raddr_next[9:0];
 						f2 = {~waddr[9], waddr[8:0]} == raddr_next[9:0];
 						p1 = ((waddr_next[8:0] + 1) & 9'h1ff) == raddr_next[8:0];
@@ -331,19 +325,19 @@ module fifo_push (
 						p1 = ((waddr_next[7:0] + 1) & 8'hff) == raddr_next[7:0];
 						p2 = ((waddr[7:0] + 1) & 8'hff) == raddr_next[7:0];
 					end
-					3'h4: begin
+					3'h2: begin
 						f1 = {~waddr_next[7], waddr_next[6:0]} == raddr_next[7:0];
 						f2 = {~waddr[7], waddr[6:0]} == raddr_next[7:0];
 						p1 = ((waddr_next[6:0] + 1) & 7'h7f) == raddr_next[6:0];
 						p2 = ((waddr[6:0] + 1) & 7'h7f) == raddr_next[6:0];
 					end
-					3'h5: begin
+					3'h1: begin
 						f1 = {~waddr_next[6], waddr_next[5:0]} == raddr_next[6:0];
 						f2 = {~waddr[6], waddr[5:0]} == raddr_next[6:0];
 						p1 = ((waddr_next[5:0] + 1) & 6'h3f) == raddr_next[5:0];
 						p2 = ((waddr[5:0] + 1) & 6'h3f) == raddr_next[5:0];
 					end
-					3'h6: begin
+					3'h0: begin
 						f1 = {~waddr_next[5], waddr_next[4:0]} == raddr_next[5:0];
 						f2 = {~waddr[5], waddr[4:0]} == raddr_next[5:0];
 						p1 = ((waddr_next[4:0] + 1) & 5'h1f) == raddr_next[4:0];
@@ -380,42 +374,42 @@ module fifo_push (
 				2'h2: gcout_next = gc8out_next;
 				2'h1: gcout_next = {1'b0, gc16out_next};
 				2'h0: gcout_next = {2'b00, gc32out_next};
-				default: gcout_next = 12'h000;
+				default: gcout_next = {ADDR_PLUS_ONE {1'b0}};
 			endcase
 		else
-			gcout_next = 12'h000;
+			gcout_next = {ADDR_PLUS_ONE {1'b0}};
 	always @(posedge wclk or negedge rst_n)
 		if (~rst_n) begin
-			full <= #(1) 1'b0;
-			fmo <= #(1) 1'b0;
-			paf <= #(1) 1'b0;
-			raddr <= #(1) ADDR_WIDTH + 1'h0;
+			full <= 1'b0;
+			fmo <= 1'b0;
+			paf <= 1'b0;
+			raddr <= {ADDR_PLUS_ONE {1'b0}};
 		end
 		else begin
-			full <= #(1) full_next;
-			fmo <= #(1) fmo_next;
-			paf <= #(1) paf_next;
+			full <= full_next;
+			fmo <= fmo_next;
+			paf <= paf_next;
 			case (gmode)
-				0: raddr <= #(1) raddr_next & {{ADDR_WIDTH - 1 {1'b1}}, 2'b00};
-				1: raddr <= #(1) raddr_next & {{ADDR_WIDTH {1'b1}}, 1'b0};
-				2: raddr <= #(1) raddr_next & {ADDR_WIDTH + 1 {1'b1}};
-				3: raddr <= #(1) 12'h000;
+				0: raddr <= raddr_next & {{ADDR_WIDTH - 1 {1'b1}}, 2'b00};
+				1: raddr <= raddr_next & {{ADDR_WIDTH {1'b1}}, 1'b0};
+				2: raddr <= raddr_next & {ADDR_WIDTH + 1 {1'b1}};
+				3: raddr <= 12'h000;
 			endcase
 		end
 	assign overflow_next = full & wen;
 	always @(posedge wclk or negedge rst_n)
 		if (~rst_n)
-			overflow <= #(1) 1'b0;
+			overflow <= 1'b0;
 		else if (wen == 1'b1)
-			overflow <= #(1) overflow_next;
+			overflow <= overflow_next;
 	always @(posedge wclk or negedge rst_n)
 		if (~rst_n) begin
-			waddr <= #(1) {ADDR_WIDTH + 1 {1'b0}};
-			gcout_reg <= #(1) {ADDR_WIDTH + 1 {1'b0}};
+			waddr <= {ADDR_WIDTH + 1 {1'b0}};
+			gcout_reg <= {ADDR_WIDTH + 1 {1'b0}};
 		end
 		else if (wen == 1'b1) begin
-			waddr <= #(1) waddr_next;
-			gcout_reg <= #(1) gcout_next;
+			waddr <= waddr_next;
+			gcout_reg <= gcout_next;
 		end
 	assign gcout = gcout_reg;
 	generate
@@ -431,7 +425,7 @@ module fifo_push (
 			default: raddr_next = {ADDR_WIDTH + 1 {1'b0}};
 		endcase
 	assign ff_waddr = waddr[ADDR_WIDTH - 1:0];
-	assign pushflags = (rst_n ? {full, fmo, paf, overflow} : 4'b1111);
+	assign pushflags = {full, fmo, paf, overflow};
 	assign waddr_next = waddr + (wmode == 2'h0 ? 'h4 : (wmode == 2'h1 ? 'h2 : 'h1));
 endmodule
 module fifo_pop (
@@ -445,23 +439,24 @@ module fifo_pop (
 	rmode,
 	wmode,
 	gcin,
-	depth,
 	upae
 );
 	parameter ADDR_WIDTH = 11;
 	parameter FIFO_WIDTH = 3'd2;
+	parameter DEPTH = 6;
 	output wire ren_o;
 	output wire [3:0] popflags;
 	output reg [ADDR_WIDTH - 1:0] out_raddr;
 	output wire [ADDR_WIDTH:0] gcout;
 	input rst_n;
+	(* clkbuf_sink *)
 	input rclk;
 	input ren_in;
 	input [1:0] rmode;
 	input [1:0] wmode;
 	input [ADDR_WIDTH:0] gcin;
 	input [ADDR_WIDTH - 1:0] upae;
-	input [2:0] depth;
+	localparam ADDR_PLUS_ONE = ADDR_WIDTH + 1;
 	reg empty;
 	reg epo;
 	reg pae;
@@ -491,24 +486,14 @@ module fifo_pop (
 	wire [ADDR_WIDTH:0] raddr_next;
 	wire [ADDR_WIDTH - 1:0] ff_raddr_next;
 	wire [ADDR_WIDTH:0] tmp;
-	wire [ADDR_WIDTH:0] next_count;
-	wire [ADDR_WIDTH:0] count;
-	reg [ADDR_WIDTH:0] fbytes;
+	wire [ADDR_PLUS_ONE:0] next_count;
+	wire [ADDR_PLUS_ONE:0] count;
+	wire [ADDR_PLUS_ONE:0] fbytes;
 	genvar i;
 	assign next_count = waddr - raddr_next;
 	assign count = waddr - raddr;
-	always @(*)
-		case (depth)
-			3'b000: fbytes = 'd2048;
-			3'b001: fbytes = 'd1024;
-			3'b010: fbytes = 'd512;
-			3'b011: fbytes = 'd256;
-			3'b100: fbytes = 'd128;
-			3'b101: fbytes = 'd64;
-			3'b110: fbytes = 'd32;
-			3'b111: fbytes = 'd4096;
-		endcase
-	always @(*) pae_thresh = rmode ? (rmode[0] ? upae << 1 : upae) : upae << 2;
+	assign fbytes = 1 << (DEPTH + 5);
+	always @(*) pae_thresh = rmode[1] ? upae : (rmode[0] ? upae << 1 : upae << 2);
 	assign ren_out = (empty ? 1'b1 : ren_in);
 	always @(*)
 		case (rmode)
@@ -522,8 +507,8 @@ module fifo_pop (
 		e2 = 1'b0;
 		o1 = 1'b0;
 		o2 = 1'b0;
-		q1 = next_count < pae_thresh;
-		q2 = count < pae_thresh;
+		q1 = next_count < {1'b0, pae_thresh};
+		q2 = count < {1'b0, pae_thresh};
 		case (rmode)
 			2'h0: begin
 				e1 = raddr_next[ADDR_WIDTH:2] == waddr_next[ADDR_WIDTH:2];
@@ -556,14 +541,14 @@ module fifo_pop (
 	assign pae_next = (ren_in & !empty ? q1 : q2);
 	always @(posedge rclk or negedge rst_n)
 		if (~rst_n) begin
-			empty <= #(1) 1'b1;
-			pae <= #(1) 1'b1;
-			epo <= #(1) 1'b0;
+			empty <= 1'b1;
+			pae <= 1'b1;
+			epo <= 1'b0;
 		end
 		else begin
-			empty <= #(1) empty_next;
-			pae <= #(1) pae_next;
-			epo <= #(1) epo_next;
+			empty <= empty_next;
+			pae <= pae_next;
+			epo <= epo_next;
 		end
 	assign gc8out_next = (raddr_next >> 1) ^ raddr_next;
 	assign gc16out_next = (raddr_next >> 2) ^ (raddr_next >> 1);
@@ -580,20 +565,20 @@ module fifo_pop (
 			gcout_next = 'h0;
 	always @(posedge rclk or negedge rst_n)
 		if (~rst_n)
-			waddr <= #(1) 12'h000;
+			waddr <= 12'h000;
 		else
-			waddr <= #(1) waddr_next;
+			waddr <= waddr_next;
 	always @(posedge rclk or negedge rst_n)
 		if (~rst_n) begin
-			underflow <= #(1) 1'b0;
-			bwl_sel <= #(1) 2'h0;
-			gcout_reg <= #(1) 12'h000;
+			underflow <= 1'b0;
+			bwl_sel <= 2'h0;
+			gcout_reg <= 12'h000;
 		end
 		else if (ren_in) begin
-			underflow <= #(1) empty;
+			underflow <= empty;
 			if (!empty) begin
-				bwl_sel <= #(1) raddr_next[1:0];
-				gcout_reg <= #(1) gcout_next;
+				bwl_sel <= raddr_next[1:0];
+				gcout_reg <= gcout_next;
 			end
 		end
 	generate
@@ -603,32 +588,33 @@ module fifo_pop (
 	endgenerate
 	always @(*)
 		case (gmode)
-			2'h0: waddr_next = {tmp[9:0], 2'b00} & 12'hffc;
-			2'h1: waddr_next = {tmp[10:0], 1'b0} & 12'hffe;
-			2'h2: waddr_next = {tmp[11:0]} & 12'hfff;
-			default: waddr_next = 12'h000;
+			2'h0: waddr_next = {tmp[ADDR_WIDTH - 2:0], 2'b00} & {{ADDR_WIDTH - 1 {1'b1}}, 2'b00};
+			2'h1: waddr_next = {tmp[ADDR_WIDTH - 1:0], 1'b0} & {{ADDR_WIDTH {1'b1}}, 1'b0};
+			2'h2: waddr_next = {tmp[ADDR_WIDTH:0]} & {ADDR_PLUS_ONE {1'b1}};
+			default: waddr_next = {ADDR_PLUS_ONE {1'b0}};
 		endcase
 	assign ff_raddr_next = ff_raddr + (rmode == 2'h0 ? 'h4 : (rmode == 2'h1 ? 'h2 : 'h1));
 	assign raddr_next = raddr + (rmode == 2'h0 ? 'h4 : (rmode == 2'h1 ? 'h2 : 'h1));
 	always @(posedge rclk or negedge rst_n)
 		if (~rst_n)
-			ff_raddr <= #(1) 1'sb0;
+			ff_raddr <= 1'sb0;
 		else if (empty & ~empty_next)
-			ff_raddr <= #(1) raddr_next[10:0];
+			ff_raddr <= raddr_next[ADDR_WIDTH - 1:0];
 		else if ((ren_in & !empty) & ~empty_next)
-			ff_raddr <= #(1) ff_raddr_next;
+			ff_raddr <= ff_raddr_next;
 	always @(posedge rclk or negedge rst_n)
 		if (~rst_n)
-			raddr <= #(1) 12'h000;
+			raddr <= 12'h000;
 		else if (ren_in & !empty)
-			raddr <= #(1) raddr_next;
+			raddr <= raddr_next;
 	always @(*)
 		case (FIFO_WIDTH)
+			3'h2: out_raddr = {ff_raddr[ADDR_WIDTH - 1:1], bwl_sel[0]};
+			3'h4: out_raddr = {ff_raddr[ADDR_WIDTH - 1:2], bwl_sel};
 			default: out_raddr = ff_raddr[ADDR_WIDTH - 1:0];
-			2: out_raddr = {ff_raddr[ADDR_WIDTH - 1:1], bwl_sel[0]};
-			4: out_raddr = {ff_raddr[ADDR_WIDTH - 1:2], bwl_sel};
 		endcase
 	assign ren_o = ren_out;
 	assign gcout = gcout_reg;
 	assign popflags = {empty, epo, pae, underflow};
 endmodule
+`default_nettype none
