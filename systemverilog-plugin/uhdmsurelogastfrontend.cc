@@ -70,10 +70,10 @@ std::vector<vpiHandle> executeCompilation(SURELOG::SymbolTable *symbolTable, SUR
     if (noFErrors == false) {
         noFatalErrors = false;
     }
-    if ((!noFatalErrors) || (!success))
+    if ((!noFatalErrors) || (!success) || (errors->getErrorStats().nbError))
         codedReturn |= 1;
     if (codedReturn) {
-        log_error("Encoraged fatal error when executing Surelog. Aborting!\n");
+        log_error("Error when parsing design. Aborting!\n");
     }
     return the_design;
 }
