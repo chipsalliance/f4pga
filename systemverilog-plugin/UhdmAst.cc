@@ -1480,6 +1480,12 @@ void UhdmAst::process_module()
                                       add_or_replace_child(current_node, node);
                                   }
                               });
+            // Primitives will have the same names (like "and"), so we need to make sure we don't replace them
+            visit_one_to_many({vpiPrimitive}, obj_h, [&](AST::AstNode *node) {
+                if (node) {
+                    current_node->children.push_back(node);
+                }
+            });
             current_node->children.insert(current_node->children.end(), children_after_process.begin(), children_after_process.end());
 
             auto it = current_node->attributes.find(UhdmAst::partial());
@@ -3721,6 +3727,47 @@ void UhdmAst::process_while()
     });
 }
 
+void UhdmAst::process_gate()
+{
+    current_node = make_ast_node(AST::AST_PRIMITIVE);
+    switch (vpi_get(vpiPrimType, obj_h)) {
+    case vpiAndPrim:
+        current_node->str = "and";
+        break;
+    case vpiNandPrim:
+        current_node->str = "nand";
+        break;
+    case vpiNorPrim:
+        current_node->str = "nor";
+        break;
+    case vpiOrPrim:
+        current_node->str = "or";
+        break;
+    case vpiXorPrim:
+        current_node->str = "xor";
+        break;
+    case vpiXnorPrim:
+        current_node->str = "xnor";
+        break;
+    case vpiBufPrim:
+        current_node->str = "buf";
+        break;
+    case vpiNotPrim:
+        current_node->str = "not";
+        break;
+    default:
+        log_file_error(current_node->filename, current_node->location.first_line, "Encountered unhandled gate type: %s", current_node->str.c_str());
+        break;
+    }
+    visit_one_to_many({vpiPrimTerm}, obj_h, [&](AST::AstNode *node) { current_node->children.push_back(node); });
+}
+
+void UhdmAst::process_primterm()
+{
+    current_node = make_ast_node(AST::AST_ARGUMENT);
+    visit_one_to_one({vpiExpr}, obj_h, [&](AST::AstNode *node) { current_node->children.push_back(node); });
+}
+
 void UhdmAst::process_unsupported_stmt(const UHDM::BaseClass *object)
 {
     log_error("%s:%d: Currently not supported object of type '%s'\n", object->VpiFile().c_str(), object->VpiLineNo(),
@@ -3962,6 +4009,12 @@ AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
         break;
     case vpiWhile:
         process_while();
+        break;
+    case vpiGate:
+        process_gate();
+        break;
+    case vpiPrimTerm:
+        process_primterm();
         break;
     case vpiClockingBlock:
         process_unsupported_stmt(object);
