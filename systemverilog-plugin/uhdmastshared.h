@@ -38,6 +38,10 @@ class UhdmAstShared
     // Flag that determines whether errors should be fatal
     bool stop_on_error = true;
 
+    // Flag that determines whether we should only parse the design
+    // applies only to read_systemverilog command
+    bool parse_only = false;
+
     // Top nodes of the design (modules, interfaces)
     std::unordered_map<std::string, AST::AstNode *> top_nodes;
 
