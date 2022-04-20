@@ -3981,7 +3981,7 @@ AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
     case vpiHierPath:
         process_hier_path();
         break;
-    case UHDM::uhdmimport:
+    case UHDM::uhdmimport_typespec:
         break;
     case vpiDelayControl:
         process_nonsynthesizable(object);
