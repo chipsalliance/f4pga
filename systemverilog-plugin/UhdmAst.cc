@@ -3363,6 +3363,32 @@ void UhdmAst::process_int_typespec()
     current_node->is_signed = true;
 }
 
+void UhdmAst::process_shortint_typespec()
+{
+    std::vector<AST::AstNode *> packed_ranges;   // comes before wire name
+    std::vector<AST::AstNode *> unpacked_ranges; // comes after wire name
+    current_node = make_ast_node(AST::AST_WIRE);
+    auto left_const = AST::AstNode::mkconst_int(16, true);
+    auto right_const = AST::AstNode::mkconst_int(0, true);
+    auto range = new AST::AstNode(AST::AST_RANGE, left_const, right_const);
+    packed_ranges.push_back(range);
+    add_multirange_wire(current_node, packed_ranges, unpacked_ranges);
+    current_node->is_signed = true;
+}
+
+void UhdmAst::process_time_typespec()
+{
+    std::vector<AST::AstNode *> packed_ranges;   // comes before wire name
+    std::vector<AST::AstNode *> unpacked_ranges; // comes after wire name
+    current_node = make_ast_node(AST::AST_WIRE);
+    auto left_const = AST::AstNode::mkconst_int(64, true);
+    auto right_const = AST::AstNode::mkconst_int(0, true);
+    auto range = new AST::AstNode(AST::AST_RANGE, left_const, right_const);
+    packed_ranges.push_back(range);
+    add_multirange_wire(current_node, packed_ranges, unpacked_ranges);
+    current_node->is_signed = false;
+}
+
 void UhdmAst::process_string_var()
 {
     current_node = make_ast_node(AST::AST_WIRE);
@@ -3992,6 +4018,12 @@ AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
     case vpiIntTypespec:
     case vpiIntegerTypespec:
         process_int_typespec();
+        break;
+    case vpiShortIntTypespec:
+        process_shortint_typespec();
+        break;
+    case vpiTimeTypespec:
+        process_time_typespec();
         break;
     case vpiBitTypespec:
         process_bit_typespec();

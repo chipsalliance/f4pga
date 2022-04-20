@@ -126,6 +126,8 @@ class UhdmAst
     void process_hier_path();
     void process_logic_typespec();
     void process_int_typespec();
+    void process_shortint_typespec();
+    void process_time_typespec();
     void process_bit_typespec();
     void process_string_var();
     void process_string_typespec();
