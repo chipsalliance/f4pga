@@ -124,6 +124,10 @@ struct UhdmSurelogAstFrontend : public UhdmCommonFrontend {
         delete clp;
         delete symbolTable;
         delete errors;
+        // on parse_only mode, don't try to load design
+        // into yosys
+        if (this->shared.parse_only)
+            return nullptr;
 
         UhdmAst uhdm_ast(this->shared);
         AST::AstNode *current_ast = uhdm_ast.visit_designs(uhdm_design);

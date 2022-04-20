@@ -63,6 +63,10 @@ void UhdmCommonFrontend::print_read_options()
     log("        only read the abstract syntax tree and defer actual compilation\n");
     log("        to a later 'hierarchy' command. Useful in cases where the default\n");
     log("        parameters of modules yield invalid or not synthesizable code.\n");
+    log("    -parse-only\n");
+    log("        this parameter only applies to read_systemverilog command,\n");
+    log("        it runs only Surelog to parse design, but doesn't load generated\n");
+    log("        tree into Yosys.\n");
     log("\n");
 }
 
@@ -108,6 +112,8 @@ void UhdmCommonFrontend::execute(std::istream *&f, std::string filename, std::ve
             dump_rtlil = true;
         } else if (args[i] == "-yydebug") {
             this->shared.debug_flag = true;
+        } else if (args[i] == "-parse-only") {
+            this->shared.parse_only = true;
         } else {
             unhandled_args.push_back(args[i]);
         }
@@ -128,9 +134,11 @@ void UhdmCommonFrontend::execute(std::istream *&f, std::string filename, std::ve
 
     AST::AstNode *current_ast = parse(filename);
 
-    AST::process(design, current_ast, dump_ast1, dump_ast2, no_dump_ptr, dump_vlog1, dump_vlog2, dump_rtlil, false, false, false, false, false, false,
-                 false, false, false, false, dont_redefine, false, defer, default_nettype_wire);
-    delete current_ast;
+    if (current_ast) {
+        AST::process(design, current_ast, dump_ast1, dump_ast2, no_dump_ptr, dump_vlog1, dump_vlog2, dump_rtlil, false, false, false, false, false,
+                     false, false, false, false, false, dont_redefine, false, defer, default_nettype_wire);
+        delete current_ast;
+    }
 }
 
 YOSYS_NAMESPACE_END
