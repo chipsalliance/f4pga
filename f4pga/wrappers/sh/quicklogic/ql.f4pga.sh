@@ -20,7 +20,7 @@ set -e
 
 BUILDDIR=build
 
-source $(f4pga-env bin)/vpr_common
+source "$F4PGA_ENV_BIN"/vpr_common
 
 VERSION="v2.0.1"
 
@@ -341,7 +341,7 @@ else
   PCF_MAKE="\${current_dir}/build/${TOP}_dummy.pcf"
 fi
 
-PROCESS_SDC=$(realpath $(f4pga-env bin)/python/process_sdc_constraints.py)
+PROCESS_SDC=$(realpath "$F4PGA_ENV_BIN"/python/process_sdc_constraints.py)
 if ! [ -z "$SDC" ]; then
   if ! [ -f "$SOURCE"/$SDC ];then
     echo "The sdc file: $SDC is missing at: $SOURCE"

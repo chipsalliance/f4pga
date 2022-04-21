@@ -36,14 +36,14 @@ else
   DEVICE_1=${DEVICE}
 fi
 
-SHARE_DIR_PATH=${SHARE_DIR_PATH:=$(f4pga-env share)}
+SHARE_DIR_PATH=${SHARE_DIR_PATH:="$F4PGA_ENV_SHARE"}
 
 PINMAP_XML=`realpath ${SHARE_DIR_PATH}/arch/${DEVICE_1}_${DEVICE_1}/${PINMAPXML}`
 
 PROJECT=$(basename -- "$EBLIF")
 IOPLACE_FILE="${PROJECT%.*}_io.place"
 
-python3 $(realpath $(f4pga-env bin)/python/create_ioplace.py) \
+python3 $(realpath "$F4PGA_ENV_BIN"/python/create_ioplace.py) \
   --pcf $PCF \
   --blif $EBLIF \
   --pinmap_xml $PINMAP_XML \

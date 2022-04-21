@@ -54,6 +54,6 @@ if [ -z $BIT ]; then
   exit 1
 fi
 
-DB_ROOT=$(f4pga-env share)/fasm_database/${DEVICE}
+DB_ROOT="$F4PGA_ENV_SHARE"/fasm_database/${DEVICE}
 
 `which qlf_fasm` --db-root ${DB_ROOT} --format ${BIT_FORMAT} --assemble $FASM $BIT

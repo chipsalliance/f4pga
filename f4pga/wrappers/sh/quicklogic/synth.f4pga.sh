@@ -18,8 +18,8 @@
 
 set -e
 
-export SHARE_DIR_PATH=${SHARE_DIR_PATH:=$(f4pga-env share)}
-VPRPATH=${VPRPATH:=$(f4pga-env bin)}
+export SHARE_DIR_PATH=${SHARE_DIR_PATH:="$F4PGA_ENV_SHARE"}
+VPRPATH=${VPRPATH:="$F4PGA_ENV_BIN"}
 SPLIT_INOUTS=`realpath ${VPRPATH}/python/split_inouts.py`
 CONVERT_OPTS=`realpath ${VPRPATH}/python/convert_compile_opts.py`
 

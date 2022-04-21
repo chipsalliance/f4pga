@@ -95,8 +95,8 @@ jobs:
         run: |
           . ./.github/scripts/activate.sh
 
-          f4pga-env bin
-          f4pga-env share
+          echo "F4PGA_ENV_BIN=$(f4pga-env bin)" >> "$GITHUB_ENV"
+          echo "F4PGA_ENV_SHARE=$(f4pga-env share)" >> "$GITHUB_ENV"
 
       - name: '🚧 Test make example'
         run: |

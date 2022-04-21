@@ -29,7 +29,7 @@ if [ ! -z $PCF ]; then
     PCF_OPTS="--pcf $PCF"
 fi
 
-SHARE_DIR_PATH=${SHARE_DIR_PATH:=$(f4pga-env share)}
+SHARE_DIR_PATH=${SHARE_DIR_PATH:="$F4PGA_ENV_SHARE"}
 
 PROJECT=$(basename -- "$EBLIF")
 IOPLACE_FILE="${PROJECT%.*}.ioplace"

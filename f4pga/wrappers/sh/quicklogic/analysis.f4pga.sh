@@ -19,7 +19,7 @@
 set -e
 
 if [ -z $VPRPATH ]; then
-  export VPRPATH=$(f4pga-env bin)
+  export VPRPATH="$F4PGA_ENV_BIN"
   export PYTHONPATH=${VPRPATH}/python:${VPRPATH}/python/prjxray:${PYTHONPATH}
 fi
 
@@ -32,7 +32,7 @@ run_vpr --analysis --gen_post_synthesis_netlist on --verify_file_digests off
 
 mv vpr_stdout.log analysis.log
 
-python3 $(f4pga-env bin)/python/vpr_fixup_post_synth.py \
+python3 "$F4PGA_ENV_BIN"/python/vpr_fixup_post_synth.py \
     --vlog-in ${TOP}_post_synthesis.v \
     --vlog-out ${TOP}_post_synthesis.v \
     --sdf-in ${TOP}_post_synthesis.sdf \
