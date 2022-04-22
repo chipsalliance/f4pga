@@ -42,21 +42,29 @@
 YOSYS_PATH ?= $(realpath $(dir $(shell which yosys))/..)
 
 # Find yosys-config, throw an error if not found
-YOSYS_CONFIG ?= $(YOSYS_PATH)/bin/yosys-config
+YOSYS_CONFIG = $(YOSYS_PATH)/bin/yosys-config
 ifeq (,$(wildcard $(YOSYS_CONFIG)))
-$(error "Didn't find 'yosys-config' under '$(YOSYS_PATH)'")
+  $(error "Didn't find 'yosys-config' under '$(YOSYS_PATH)'")
 endif
 
 CXX ?= $(shell $(YOSYS_CONFIG) --cxx)
-CXXFLAGS ?= $(shell $(YOSYS_CONFIG) --cxxflags) #-DSDC_DEBUG
-LDFLAGS ?= $(shell $(YOSYS_CONFIG) --ldflags)
-LDLIBS ?= $(shell $(YOSYS_CONFIG) --ldlibs)
-PLUGINS_DIR ?= $(shell $(YOSYS_CONFIG) --datdir)/plugins
-DATA_DIR ?= $(shell $(YOSYS_CONFIG) --datdir)
+CXXFLAGS = $(shell $(YOSYS_CONFIG) --cxxflags) #-DSDC_DEBUG
+LDFLAGS = $(shell $(YOSYS_CONFIG) --ldflags)
+LDLIBS = $(shell $(YOSYS_CONFIG) --ldlibs)
 EXTRA_FLAGS ?=
+
+ifdef DESTDIR
+  DATA_DIR = $(DESTDIR)
+else
+  DATA_DIR = $(shell $(YOSYS_CONFIG) --datdir)
+endif
+PLUGINS_DIR = $(DATA_DIR)/plugins
 
 OBJS := $(patsubst %.cc,%.o,$(SOURCES))
 DEPS ?=
+
+$(PLUGINS_DIR):
+	@mkdir -p $@
 
 all: $(NAME).so
 
@@ -69,7 +77,7 @@ $(NAME).so: $(OBJS)
 ../pmgen.py:
 	@$(MAKE) -C .. pmgen.py
 
-install_plugin: $(NAME).so
+install_plugin: $(NAME).so | $(PLUGINS_DIR)
 	install -D $< $(PLUGINS_DIR)/$<
 
 test:
