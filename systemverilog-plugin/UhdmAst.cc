@@ -2437,6 +2437,13 @@ void UhdmAst::process_operation()
     case vpiAssignmentPatternOp:
         process_assignment_pattern_op();
         break;
+    case vpiWildEqOp:
+    case vpiWildNeqOp: {
+        const uhdm_handle *const handle = (const uhdm_handle *)obj_h;
+        const UHDM::BaseClass *const object = (const UHDM::BaseClass *)handle->object;
+        report_error("%s:%d: Wildcard operators are not supported yet\n", object->VpiFile().c_str(), object->VpiLineNo());
+        break;
+    }
     default: {
         current_node = make_ast_node(AST::AST_NONE);
         visit_one_to_many({vpiOperand}, obj_h, [&](AST::AstNode *node) {
