@@ -36,70 +36,70 @@ def run_sh(script):
 
 
 def generate_constraints():
-    print("F4PGA (old) generate constraints")
+    print("[F4PGA] Running (deprecated) generate constraints")
     run_sh(ROOT / SH_SUBDIR / "generate_constraints.f4pga.sh")
 
 
 def pack():
-    print("F4PGA (old) pack")
+    print("[F4PGA] Running (deprecated) pack")
     run_sh(ROOT / SH_SUBDIR / "pack.f4pga.sh")
 
 
 def place():
-    print("F4PGA (old) place")
+    print("[F4PGA] Running (deprecated) place")
     run_sh(ROOT / SH_SUBDIR / "place.f4pga.sh")
 
 
 def route():
-    print("F4PGA (old) route")
+    print("[F4PGA] Running (deprecated) route")
     run_sh(ROOT / SH_SUBDIR / "route.f4pga.sh")
 
 
 def synth():
-    print("F4PGA (old) synth")
+    print("[F4PGA] Running (deprecated) synth")
     run_sh(ROOT / SH_SUBDIR / "synth.f4pga.sh")
 
 
 def write_bitstream():
-    print("F4PGA (old) write bitstream")
+    print("[F4PGA] Running (deprecated) write bitstream")
     run_sh(ROOT / SH_SUBDIR / "write_bitstream.f4pga.sh")
 
 
 def write_fasm():
-    print("F4PGA (old) write fasm")
+    print("[F4PGA] Running (deprecated) write fasm")
     run_sh(ROOT / SH_SUBDIR / "write_fasm.f4pga.sh")
 
 
 def write_xml_rr_graph():
-    print("F4PGA (old) write xlm rr graph")
+    print("[F4PGA] Running (deprecated) write xlm rr graph")
     run_sh(ROOT / SH_SUBDIR / "write_xml_rr_graph.f4pga.sh")
 
 
 def vpr_common():
-    print("F4PGA (old) vpr common")
+    print("[F4PGA] Running (deprecated) vpr common")
     run_sh(ROOT / SH_SUBDIR / "vpr_common.f4pga.sh")
 
 
 def analysis():
-    print("F4PGA (old) analysis")
+    print("[F4PGA] Running (deprecated) analysis")
     run_sh(ROOT / "quicklogic/analysis.f4pga.sh")
 
 
 def repack():
-    print("F4PGA (old) repack")
+    print("[F4PGA] Running (deprecated) repack")
     run_sh(ROOT / "quicklogic/repack.f4pga.sh")
 
 
 def generate_bitstream():
-    print("F4PGA (old) generate_bitstream")
+    print("[F4PGA] Running (deprecated) generate_bitstream")
     run_sh(ROOT / "quicklogic/generate_bitstream.f4pga.sh")
 
 
 def generate_libfile():
-    print("F4PGA (old) generate_libfile")
+    print("[F4PGA] Running (deprecated) generate_libfile")
     run_sh(ROOT / "quicklogic/generate_libfile.f4pga.sh")
 
 
 def ql():
-    print("F4PGA (old) ql")
+    print("[F4PGA] Running (deprecated) ql")
     run_sh(ROOT / "quicklogic/ql.f4pga.sh")
