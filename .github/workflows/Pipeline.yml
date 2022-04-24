@@ -21,12 +21,13 @@ on:
 
 jobs:
 
+
   Docs:
     runs-on: ubuntu-latest
     name: '📓 Docs'
     steps:
 
-      - name: '🧰 Checkout'
+      - name: 🧰 Checkout
         uses: actions/checkout@v3
         with:
           submodules: recursive
@@ -62,28 +63,28 @@ jobs:
           git push -u origin +HEAD:gh-pages
 
 
-  Example:
+  Deprecated:
     runs-on: ubuntu-latest
-    name: '🐍 Example'
     strategy:
       fail-fast: false
       matrix:
         include:
           - { fam: xc7, example: counter_test }
           - { fam: eos-s3, example: btn_counter }
+    name: '🚦 Example (deprecated sh) | ${{ matrix.fam }}'
     env:
       F4PGA_INSTALL_DIR: /opt/f4pga
       F4PGA_FAM: ${{ matrix.fam }}
 
     steps:
 
-      - name: '🧰 Checkout'
+      - name: 🧰 Checkout
         uses: actions/checkout@v3
 
-      - name: '🔧 Prepare environment'
+      - name: 🔧 Prepare environment
         run: ./.github/scripts/prepare_environment.sh
 
-      - name: '🐍 Install f4pga (pip)'
+      - name: 🐍 Install f4pga (pip)
         run: |
           . ./.github/scripts/activate.sh
 
@@ -91,14 +92,14 @@ jobs:
           pip install --use-feature=in-tree-build .
           cd ..
 
-      - name: '🚧 Test f4pga-env'
+      - name: 🚧 Test f4pga-env
         run: |
           . ./.github/scripts/activate.sh
 
           echo "F4PGA_ENV_BIN=$(f4pga-env bin)" >> "$GITHUB_ENV"
           echo "F4PGA_ENV_SHARE=$(f4pga-env share)" >> "$GITHUB_ENV"
 
-      - name: '🚧 Test make example'
+      - name: 🚧 Test make example
         run: |
           . ./.github/scripts/activate.sh
 
@@ -127,3 +128,47 @@ jobs:
           name: eos-s3-Bitstream
           path: f4pga-examples/eos-s3/btn_counter/build/top.bit
           if-no-files-found: error
+
+
+  pyF4PGA:
+    runs-on: ubuntu-latest
+    name: '🐍 Example'
+    env:
+      F4PGA_INSTALL_DIR: /opt/f4pga
+      F4PGA_FAM: xc7
+
+    steps:
+
+      - name: 🧰 Checkout
+        uses: actions/checkout@v3
+#        with:
+#          submodules: recursive
+
+      - name: 🔧 Prepare environment
+        run: ./.github/scripts/prepare_environment.sh
+
+      - name: 🐍 Install f4pga (pip)
+        run: |
+          . ./.github/scripts/activate.sh
+
+          cd f4pga
+          pip install --use-feature=in-tree-build .
+          cd ..
+
+      - name: 🚧 Test py4FPGA build
+        run: |
+          . ./.github/scripts/activate.sh
+
+          cd f4pga-examples
+          f4pga build --flow ../.github/sftest.json -t bitstream
+
+      - name: '📤 Upload artifact: Arty 35 bitstream'
+        uses: actions/upload-artifact@v3
+        with:
+          name: arty_35-Bitstream-pyF4PGA
+          path: f4pga-examples/build/arty_35/top.bit
+
+      - name: Test py4FPGA (PYTHONPATH)
+        run: |
+          PYTHONPATH=$(pwd) python3 f4pga/__init__.py
+          PYTHONPATH=$(pwd) python3 f4pga/__init__.py -h

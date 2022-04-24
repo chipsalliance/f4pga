@@ -57,7 +57,7 @@ SYMBICACHEPATH = '.symbicache'
 binpath = os.path.realpath(os.path.join(os.path.dirname(os.path.realpath(os.sys.argv[0])), '..'))
 mypath = str(Path(__file__).resolve().parent)
 
-share_dir_path = os.path.realpath(f"{environ.get('INSTALL_DIR', '/usr/local')}/xc7/install/share/symbiflow")
+share_dir_path = os.path.realpath(f"{environ.get('F4PGA_INSTALL_DIR', '/usr/local')}/xc7/install/share/symbiflow")
 
 class DependencyNotProducedException(Exception):
     dep_name: str
