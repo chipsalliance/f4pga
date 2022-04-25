@@ -2417,7 +2417,7 @@ void UhdmAst::process_begin(bool is_named)
     });
 }
 
-void UhdmAst::process_operation()
+void UhdmAst::process_operation(const UHDM::BaseClass *object)
 {
     auto operation = vpi_get(vpiOpType, obj_h);
     switch (operation) {
@@ -2439,8 +2439,6 @@ void UhdmAst::process_operation()
         break;
     case vpiWildEqOp:
     case vpiWildNeqOp: {
-        const uhdm_handle *const handle = (const uhdm_handle *)obj_h;
-        const UHDM::BaseClass *const object = (const UHDM::BaseClass *)handle->object;
         report_error("%s:%d: Wildcard operators are not supported yet\n", object->VpiFile().c_str(), object->VpiLineNo());
         break;
     }
@@ -2635,8 +2633,6 @@ void UhdmAst::process_operation()
         default: {
             delete current_node;
             current_node = nullptr;
-            const uhdm_handle *const handle = (const uhdm_handle *)obj_h;
-            const UHDM::BaseClass *const object = (const UHDM::BaseClass *)handle->object;
             report_error("%s:%d: Encountered unhandled operation type %d\n", object->VpiFile().c_str(), object->VpiLineNo(), operation);
         }
         }
@@ -3902,7 +3898,7 @@ AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
         break;
     case vpiCondition:
     case vpiOperation:
-        process_operation();
+        process_operation(object);
         break;
     case vpiTaggedPattern:
         process_tagged_pattern();

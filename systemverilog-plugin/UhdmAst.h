@@ -99,7 +99,7 @@ class UhdmAst
     void process_event_control(const UHDM::BaseClass *object);
     void process_initial();
     void process_begin(bool is_named);
-    void process_operation();
+    void process_operation(const UHDM::BaseClass *object);
     void process_stream_op();
     void process_list_op();
     void process_cast_op();
