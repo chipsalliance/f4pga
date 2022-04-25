@@ -2166,7 +2166,7 @@ void UhdmAst::process_packed_array_net()
     add_multirange_wire(current_node, packed_ranges, unpacked_ranges);
 }
 
-void UhdmAst::process_array_net()
+void UhdmAst::process_array_net(const UHDM::BaseClass *object)
 {
     current_node = make_ast_node(AST::AST_WIRE);
     vpiHandle itr = vpi_iterate(vpiNet, obj_h);
@@ -2177,7 +2177,12 @@ void UhdmAst::process_array_net()
         if (net_type == vpiLogicNet) {
             current_node->is_logic = true;
             current_node->is_signed = vpi_get(vpiSigned, net_h);
-            visit_one_to_many({vpiRange}, net_h, [&](AST::AstNode *node) { packed_ranges.push_back(node); });
+            if (vpiHandle typespec_h = vpi_handle(vpiTypespec, net_h)) {
+                visit_one_to_many({vpiRange}, typespec_h, [&](AST::AstNode *node) { packed_ranges.push_back(node); });
+                vpi_release_handle(typespec_h);
+            } else {
+                log_error("%s:%d: No typespec found for array net %s\n", object->VpiFile().c_str(), object->VpiLineNo(), current_node->str.c_str());
+            }
             shared.report.mark_handled(net_h);
         } else if (net_type == vpiStructNet) {
             visit_one_to_one({vpiTypespec}, net_h, [&](AST::AstNode *node) {
@@ -3622,7 +3627,7 @@ void UhdmAst::process_net()
             current_node->is_custom_type = true;
         }
     });
-    if(vpiHandle typespec_h = vpi_handle(vpiTypespec, obj_h)) {
+    if (vpiHandle typespec_h = vpi_handle(vpiTypespec, obj_h)) {
         visit_one_to_many({vpiRange}, typespec_h, [&](AST::AstNode *node) { packed_ranges.push_back(node); });
         vpi_release_handle(typespec_h);
     }
@@ -3901,7 +3906,7 @@ AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
         process_net();
         break;
     case vpiArrayNet:
-        process_array_net();
+        process_array_net(object);
         break;
     case vpiPackedArrayNet:
         process_packed_array_net();
