@@ -35,26 +35,26 @@ jobs:
         run: |
           sudo apt update -qq
           sudo apt install -y make
-          make env
+          make -C docs env
 
       - name: 📓 Build the documentation
         run: |
-          . ./env/conda/bin/activate f4pga-docs
-          make html
+          . ./docs/env/conda/bin/activate f4pga-docs
+          make -C docs html
 
       - name: '📤 Upload artifact: Sphinx HTML'
         uses: actions/upload-artifact@v3
         with:
           name: Documentation-HTML
-          path: _build/html
+          path: docs/_build/html
 
       - name: 🚀 Publish site to GitHub Pages
         if: github.event_name != 'pull_request'
         run: |
-          cd _build/html
+          cd docs/_build/html
           touch .nojekyll
           git init
-          cp ../../.git/config ./.git/config
+          cp ../../../.git/config ./.git/config
           git add .
           git config --local user.email "BuildTheDocs@GitHubActions"
           git config --local user.name "GitHub Actions"
