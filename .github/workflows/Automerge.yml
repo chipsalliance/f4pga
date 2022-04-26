@@ -17,7 +17,7 @@ jobs:
 
   Automerge:
     needs: Pipeline
-    if: github.event_name == 'pull_request' && github.actor == 'dependabot[bot]'
+    if: github.event_name == 'pull_request' && github.actor == 'dependabot[bot]' && github.repository == 'chipsalliance/f4pga'
     runs-on: ubuntu-latest
     name: Automerge dependabot PRs
     permissions:
