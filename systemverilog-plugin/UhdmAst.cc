@@ -2587,8 +2587,8 @@ void UhdmAst::process_operation(const UHDM::BaseClass *object)
         case vpiPostIncOp: {
             // TODO: Make this an actual post-increment op (currently it's a pre-increment)
             log_warning("%s:%d: Post-incrementation operations are handled as pre-incrementation.\n", object->VpiFile().c_str(), object->VpiLineNo());
+            [[fallthrough]];
         }
-        // fallthrough
         case vpiPreIncOp: {
             current_node->type = AST::AST_ASSIGN_EQ;
             auto id = current_node->children[0]->clone();
@@ -2601,8 +2601,8 @@ void UhdmAst::process_operation(const UHDM::BaseClass *object)
         case vpiPostDecOp: {
             // TODO: Make this an actual post-decrement op (currently it's a pre-decrement)
             log_warning("%s:%d: Post-decrementation operations are handled as pre-decrementation.\n", object->VpiFile().c_str(), object->VpiLineNo());
+            [[fallthrough]];
         }
-        // fallthrough
         case vpiPreDecOp: {
             current_node->type = AST::AST_ASSIGN_EQ;
             auto id = current_node->children[0]->clone();
