@@ -3360,10 +3360,7 @@ void UhdmAst::process_int_typespec()
     std::vector<AST::AstNode *> packed_ranges;   // comes before wire name
     std::vector<AST::AstNode *> unpacked_ranges; // comes after wire name
     current_node = make_ast_node(AST::AST_WIRE);
-    auto left_const = AST::AstNode::mkconst_int(31, true);
-    auto right_const = AST::AstNode::mkconst_int(0, true);
-    auto range = new AST::AstNode(AST::AST_RANGE, left_const, right_const);
-    packed_ranges.push_back(range);
+    packed_ranges.push_back(make_range(31, 0));
     add_multirange_wire(current_node, packed_ranges, unpacked_ranges);
     current_node->is_signed = true;
 }
@@ -3373,10 +3370,7 @@ void UhdmAst::process_shortint_typespec()
     std::vector<AST::AstNode *> packed_ranges;   // comes before wire name
     std::vector<AST::AstNode *> unpacked_ranges; // comes after wire name
     current_node = make_ast_node(AST::AST_WIRE);
-    auto left_const = AST::AstNode::mkconst_int(16, true);
-    auto right_const = AST::AstNode::mkconst_int(0, true);
-    auto range = new AST::AstNode(AST::AST_RANGE, left_const, right_const);
-    packed_ranges.push_back(range);
+    packed_ranges.push_back(make_range(16, 0));
     add_multirange_wire(current_node, packed_ranges, unpacked_ranges);
     current_node->is_signed = true;
 }
@@ -3386,10 +3380,7 @@ void UhdmAst::process_time_typespec()
     std::vector<AST::AstNode *> packed_ranges;   // comes before wire name
     std::vector<AST::AstNode *> unpacked_ranges; // comes after wire name
     current_node = make_ast_node(AST::AST_WIRE);
-    auto left_const = AST::AstNode::mkconst_int(64, true);
-    auto right_const = AST::AstNode::mkconst_int(0, true);
-    auto range = new AST::AstNode(AST::AST_RANGE, left_const, right_const);
-    packed_ranges.push_back(range);
+    packed_ranges.push_back(make_range(64, 0));
     add_multirange_wire(current_node, packed_ranges, unpacked_ranges);
     current_node->is_signed = false;
 }
