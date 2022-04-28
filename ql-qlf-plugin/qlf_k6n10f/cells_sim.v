@@ -14,12 +14,14 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+`default_nettype none
+
 (* abc9_flop, lib_whitebox *)
 module sh_dff(
     output reg Q,
-    input D,
+    input wire D,
     (* clkbuf_sink *)
-    input C
+    input wire C
 );
     parameter [0:0] INIT = 1'b0;
     initial Q = INIT;
@@ -30,11 +32,11 @@ endmodule
 
 (* abc9_box, lib_blackbox *)
 module adder_carry(
-    output sumout,
-    output cout,
-    input p,
-    input g,
-    input cin
+    output wire sumout,
+    output wire cout,
+    input wire p,
+    input wire g,
+    input wire cin
 );
     assign sumout = p ^ cin;
     assign cout = p ? cin : g;
@@ -43,12 +45,12 @@ endmodule
 
 (* abc9_box, lib_whitebox *)
 module adder_lut5(
-   output lut5_out,
+   output wire lut5_out,
    (* abc9_carry *)
-   output cout,
-   input [0:4] in,
+   output wire cout,
+   input wire [0:4] in,
    (* abc9_carry *)
-   input cin
+   input wire cin
 );
     parameter [0:15] LUT=0;
     parameter IN2_IS_CIN = 0;
@@ -77,10 +79,10 @@ endmodule
 
 (* abc9_lut=1, lib_whitebox *)
 module frac_lut6(
-    input [0:5] in,
-    output [0:3] lut4_out,
-    output [0:1] lut5_out,
-    output lut6_out
+    input wire [0:5] in,
+    output wire [0:3] lut4_out,
+    output wire [0:1] lut5_out,
+    output wire lut6_out
 );
     parameter [0:63] LUT = 0;
     // Effective LUT input
@@ -127,10 +129,10 @@ endmodule
 (* abc9_flop, lib_whitebox *)
 module dff(
     output reg Q,
-    input D,
+    input wire D,
     (* clkbuf_sink *)
     (* invertible_pin = "IS_C_INVERTED" *)
-    input C
+    input wire C
 );
     parameter [0:0] INIT = 1'b0;
     parameter [0:0] IS_C_INVERTED = 1'b0;
@@ -148,11 +150,11 @@ endmodule
 (* abc9_flop, lib_whitebox *)
 module dffr(
     output reg Q,
-    input D,
-    input R,
+    input wire D,
+    input wire R,
     (* clkbuf_sink *)
     (* invertible_pin = "IS_C_INVERTED" *)
-    input C
+    input wire C
 );
     parameter [0:0] INIT = 1'b0;
     parameter [0:0] IS_C_INVERTED = 1'b0;
@@ -176,12 +178,12 @@ endmodule
 (* abc9_flop, lib_whitebox *)
 module dffre(
     output reg Q,
-    input D,
-    input R,
-    input E,
+    input wire D,
+    input wire R,
+    input wire E,
     (* clkbuf_sink *)
     (* invertible_pin = "IS_C_INVERTED" *)
-    input C
+    input wire C
 );
     parameter [0:0] INIT = 1'b0;
     parameter [0:0] IS_C_INVERTED = 1'b0;
@@ -204,11 +206,11 @@ endmodule
 
 module dffs(
     output reg Q,
-    input D,
+    input wire D,
     (* clkbuf_sink *)
     (* invertible_pin = "IS_C_INVERTED" *)
-    input C,
-    input S
+    input wire C,
+    input wire S
 );
     parameter [0:0] INIT = 1'b0;
     parameter [0:0] IS_C_INVERTED = 1'b0;
@@ -231,12 +233,12 @@ endmodule
 
 module dffse(
     output reg Q,
-    input D,
+    input wire D,
     (* clkbuf_sink *)
     (* invertible_pin = "IS_C_INVERTED" *)
-    input C,
-    input S,
-    input E
+    input wire C,
+    input wire S,
+    input wire E
 );
     parameter [0:0] INIT = 1'b0;
     parameter [0:0] IS_C_INVERTED = 1'b0;
@@ -259,12 +261,12 @@ endmodule
 
 module dffsr(
     output reg Q,
-    input D,
+    input wire D,
     (* clkbuf_sink *)
     (* invertible_pin = "IS_C_INVERTED" *)
-    input C,
-    input R,
-    input S
+    input wire C,
+    input wire R,
+    input wire S
 );
     parameter [0:0] INIT = 1'b0;
     parameter [0:0] IS_C_INVERTED = 1'b0;
@@ -291,12 +293,12 @@ endmodule
 
 module dffsre(
     output reg Q,
-    input D,
+    input wire D,
     (* clkbuf_sink *)
-    input C,
-    input E,
-    input R,
-    input S
+    input wire C,
+    input wire E,
+    input wire R,
+    input wire S
 );
     parameter [0:0] INIT = 1'b0;
     initial Q = INIT;
@@ -313,12 +315,12 @@ endmodule
 
 module dffnsre(
     output reg Q,
-    input D,
+    input wire D,
     (* clkbuf_sink *)
-    input C,
-    input E,
-    input R,
-    input S
+    input wire C,
+    input wire E,
+    input wire R,
+    input wire S
 );
     parameter [0:0] INIT = 1'b0;
     initial Q = INIT;
@@ -336,11 +338,11 @@ endmodule
 (* abc9_flop, lib_whitebox *)
 module latchsre (
     output reg Q,
-    input S,
-    input R,
-    input D,
-    input G,
-    input E
+    input wire S,
+    input wire R,
+    input wire D,
+    input wire G,
+    input wire E
 );
     parameter [0:0] INIT = 1'b0;
     initial Q = INIT;
@@ -358,11 +360,11 @@ endmodule
 (* abc9_flop, lib_whitebox *)
 module latchnsre (
     output reg Q,
-    input S,
-    input R,
-    input D,
-    input G,
-    input E
+    input wire S,
+    input wire R,
+    input wire D,
+    input wire G,
+    input wire E
 );
     parameter [0:0] INIT = 1'b0;
     initial Q = INIT;
@@ -380,8 +382,8 @@ endmodule
 (* abc9_flop, lib_whitebox *)
 module scff(
     output reg Q,
-    input D,
-    input clk
+    input wire D,
+    input wire clk
 );
     parameter [0:0] INIT = 1'b0;
     initial Q = INIT;
@@ -392,29 +394,29 @@ endmodule
 
 module TDP_BRAM18 (
     (* clkbuf_sink *)
-    input CLOCKA,
+    input wire CLOCKA,
     (* clkbuf_sink *)
-    input CLOCKB,
-    input READENABLEA,
-    input READENABLEB,
-    input [13:0] ADDRA,
-    input [13:0] ADDRB,
-    input [15:0] WRITEDATAA,
-    input [15:0] WRITEDATAB,
-    input [1:0] WRITEDATAAP,
-    input [1:0] WRITEDATABP,
-    input WRITEENABLEA,
-    input WRITEENABLEB,
-    input [1:0] BYTEENABLEA,
-    input [1:0] BYTEENABLEB,
-    //input [2:0] WRITEDATAWIDTHA,
-    //input [2:0] WRITEDATAWIDTHB,
-    //input [2:0] READDATAWIDTHA,
-    //input [2:0] READDATAWIDTHB,
-    output [15:0] READDATAA,
-    output [15:0] READDATAB,
-    output [1:0] READDATAAP,
-    output [1:0] READDATABP
+    input wire CLOCKB,
+    input wire READENABLEA,
+    input wire READENABLEB,
+    input wire [13:0] ADDRA,
+    input wire [13:0] ADDRB,
+    input wire [15:0] WRITEDATAA,
+    input wire [15:0] WRITEDATAB,
+    input wire [1:0] WRITEDATAAP,
+    input wire [1:0] WRITEDATABP,
+    input wire WRITEENABLEA,
+    input wire WRITEENABLEB,
+    input wire [1:0] BYTEENABLEA,
+    input wire [1:0] BYTEENABLEB,
+    //input wire [2:0] WRITEDATAWIDTHA,
+    //input wire [2:0] WRITEDATAWIDTHB,
+    //input wire [2:0] READDATAWIDTHA,
+    //input wire [2:0] READDATAWIDTHB,
+    output wire [15:0] READDATAA,
+    output wire [15:0] READDATAB,
+    output wire [1:0] READDATAAP,
+    output wire [1:0] READDATABP
 );
     parameter INITP_00 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
     parameter INITP_01 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
@@ -495,7 +497,6 @@ module TDP_BRAM18 (
 
 endmodule
 
-`default_nettype wire
 module TDP36K (
     RESET_ni,
     WEN_A1_i,
@@ -705,7 +706,7 @@ module TDP36K (
     parameter INIT_7E = 256'h0000000000000000000000000000000000000000000000000000000000000000;
     parameter INIT_7F = 256'h0000000000000000000000000000000000000000000000000000000000000000;
 
-    input RESET_ni;
+    input wire RESET_ni;
     input wire WEN_A1_i;
     input wire WEN_B1_i;
     input wire REN_A1_i;
@@ -1153,50 +1154,49 @@ module TDP36K (
         .FMODE_i(ram_fmode2)
     );
 endmodule
-`default_nettype none
 
 (* blackbox *)
 module QL_DSP1 (
-    input  [19:0] a,
-    input  [17:0] b,
+    input wire [19:0] a,
+    input wire [17:0] b,
     (* clkbuf_sink *)
-    input  clk0,
+    input wire clk0,
     (* clkbuf_sink *)
-    input  clk1,
-    input  [ 1:0] feedback0,
-    input  [ 1:0] feedback1,
-    input  load_acc0,
-    input  load_acc1,
-    input  reset0,
-    input  reset1,
+    input wire clk1,
+    input wire [ 1:0] feedback0,
+    input wire [ 1:0] feedback1,
+    input wire        load_acc0,
+    input wire        load_acc1,
+    input wire        reset0,
+    input wire        reset1,
     output reg [37:0] z
 );
     parameter MODE_BITS = 27'b00000000000000000000000000;
 endmodule  /* QL_DSP1 */
 
 module QL_DSP2 ( // TODO: Name subject to change
-      input  [19:0] a,
-      input  [17:0] b,
-      input  [ 5:0] acc_fir,
-      output [37:0] z,
-      output [17:0] dly_b,
+    input  wire [19:0] a,
+    input  wire [17:0] b,
+    input  wire [ 5:0] acc_fir,
+    output wire [37:0] z,
+    output wire [17:0] dly_b,
 
     (* clkbuf_sink *)
-    input         clk,
-    input         reset,
+    input  wire       clk,
+    input  wire       reset,
 
-    input  [2:0]  feedback,
-    input         load_acc,
-    input         unsigned_a,
-    input         unsigned_b,
+    input  wire [2:0] feedback,
+    input  wire       load_acc,
+    input  wire       unsigned_a,
+    input  wire       unsigned_b,
 
-    input         f_mode,
-    input  [2:0]  output_select,
-    input         saturate_enable,
-    input  [5:0]  shift_right,
-    input         round,
-    input         subtract,
-    input         register_inputs
+    input  wire       f_mode,
+    input  wire [2:0] output_select,
+    input  wire       saturate_enable,
+    input  wire [5:0] shift_right,
+    input  wire       round,
+    input  wire       subtract,
+    input  wire       register_inputs
 );
 
     parameter [79:0] MODE_BITS = 80'd0;
@@ -1331,31 +1331,31 @@ module dsp_t1_sim # (
     parameter NBITS_B    = 18,
     parameter NBITS_Z    = 38
 )(
-    input [NBITS_A-1:0] a_i,
-    input [NBITS_B-1:0] b_i,
-    output [NBITS_Z-1:0] z_o,
-    output reg [NBITS_B-1:0] dly_b_o,
+    input  wire [NBITS_A-1:0] a_i,
+    input  wire [NBITS_B-1:0] b_i,
+    output wire [NBITS_Z-1:0] z_o,
+    output reg  [NBITS_B-1:0] dly_b_o,
 
-    input [5:0] acc_fir_i,
-    input [2:0] feedback_i,
-    input load_acc_i,
+    input  wire [5:0]         acc_fir_i,
+    input  wire [2:0]         feedback_i,
+    input  wire               load_acc_i,
 
-    input unsigned_a_i,
-    input unsigned_b_i,
+    input  wire               unsigned_a_i,
+    input  wire               unsigned_b_i,
 
-    input clock_i,
-    input s_reset,
+    input  wire               clock_i,
+    input  wire               s_reset,
 
-    input saturate_enable_i,
-    input [2:0] output_select_i,
-    input round_i,
-    input [5:0] shift_right_i,
-    input subtract_i,
-    input register_inputs_i,
-    input [NBITS_A-1:0] coef_0_i,
-    input [NBITS_A-1:0] coef_1_i,
-    input [NBITS_A-1:0] coef_2_i,
-    input [NBITS_A-1:0] coef_3_i
+    input  wire               saturate_enable_i,
+    input  wire [2:0]         output_select_i,
+    input  wire               round_i,
+    input  wire [5:0]         shift_right_i,
+    input  wire               subtract_i,
+    input  wire               register_inputs_i,
+    input  wire [NBITS_A-1:0] coef_0_i,
+    input  wire [NBITS_A-1:0] coef_1_i,
+    input  wire [NBITS_A-1:0] coef_2_i,
+    input  wire [NBITS_A-1:0] coef_3_i
 );
 
 // FIXME: The version of Icarus Verilog from Conda seems not to recognize the
@@ -1559,27 +1559,27 @@ module dsp_t1_sim # (
 endmodule
 
 module dsp_t1_20x18x64 (
-    input  [19:0] a_i,
-    input  [17:0] b_i,
-    input  [ 5:0] acc_fir_i,
-    output [37:0] z_o,
-    output [17:0] dly_b_o,
+    input  wire [19:0] a_i,
+    input  wire [17:0] b_i,
+    input  wire [ 5:0] acc_fir_i,
+    output wire [37:0] z_o,
+    output wire [17:0] dly_b_o,
 
     (* clkbuf_sink *)
-    input         clock_i,
-    input         reset_i,
+    input  wire        clock_i,
+    input  wire        reset_i,
 
-    input  [2:0]  feedback_i,
-    input         load_acc_i,
-    input         unsigned_a_i,
-    input         unsigned_b_i,
+    input  wire [ 2:0] feedback_i,
+    input  wire        load_acc_i,
+    input  wire        unsigned_a_i,
+    input  wire        unsigned_b_i,
 
-    input  [2:0]  output_select_i,
-    input         saturate_enable_i,
-    input  [5:0]  shift_right_i,
-    input         round_i,
-    input         subtract_i,
-    input         register_inputs_i
+    input  wire [ 2:0] output_select_i,
+    input  wire        saturate_enable_i,
+    input  wire [ 5:0] shift_right_i,
+    input  wire        round_i,
+    input  wire        subtract_i,
+    input  wire        register_inputs_i
 );
 
     parameter [19:0] COEFF_0 = 20'd0;
@@ -1617,27 +1617,27 @@ module dsp_t1_20x18x64 (
 endmodule
 
 module dsp_t1_10x9x32 (
-    input  [ 9:0] a_i,
-    input  [ 8:0] b_i,
-    input  [ 5:0] acc_fir_i,
-    output [18:0] z_o,
-    output [ 8:0] dly_b_o,
+    input  wire [ 9:0] a_i,
+    input  wire [ 8:0] b_i,
+    input  wire [ 5:0] acc_fir_i,
+    output wire [18:0] z_o,
+    output wire [ 8:0] dly_b_o,
 
     (* clkbuf_sink *)
-    input         clock_i,
-    input         reset_i,
+    input  wire        clock_i,
+    input  wire        reset_i,
 
-    input  [2:0]  feedback_i,
-    input         load_acc_i,
-    input         unsigned_a_i,
-    input         unsigned_b_i,
+    input  wire [ 2:0] feedback_i,
+    input  wire        load_acc_i,
+    input  wire        unsigned_a_i,
+    input  wire        unsigned_b_i,
 
-    input  [2:0]  output_select_i,
-    input         saturate_enable_i,
-    input  [5:0]  shift_right_i,
-    input         round_i,
-    input         subtract_i,
-    input         register_inputs_i
+    input  wire [ 2:0] output_select_i,
+    input  wire        saturate_enable_i,
+    input  wire [ 5:0] shift_right_i,
+    input  wire        round_i,
+    input  wire        subtract_i,
+    input  wire        register_inputs_i
 );
 
     parameter [9:0] COEFF_0 = 10'd0;
