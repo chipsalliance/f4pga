@@ -90,7 +90,7 @@ class UhdmAst
     void process_assignment();
     void process_net();
     void process_packed_array_net();
-    void process_array_net();
+    void process_array_net(const UHDM::BaseClass *object);
     void process_package();
     void process_interface();
     void process_modport();
@@ -126,6 +126,8 @@ class UhdmAst
     void process_hier_path();
     void process_logic_typespec();
     void process_int_typespec();
+    void process_shortint_typespec();
+    void process_time_typespec();
     void process_bit_typespec();
     void process_string_var();
     void process_string_typespec();

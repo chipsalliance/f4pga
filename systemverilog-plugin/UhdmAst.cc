@@ -2166,7 +2166,7 @@ void UhdmAst::process_packed_array_net()
     add_multirange_wire(current_node, packed_ranges, unpacked_ranges);
 }
 
-void UhdmAst::process_array_net()
+void UhdmAst::process_array_net(const UHDM::BaseClass *object)
 {
     current_node = make_ast_node(AST::AST_WIRE);
     vpiHandle itr = vpi_iterate(vpiNet, obj_h);
@@ -2177,7 +2177,16 @@ void UhdmAst::process_array_net()
         if (net_type == vpiLogicNet) {
             current_node->is_logic = true;
             current_node->is_signed = vpi_get(vpiSigned, net_h);
-            visit_one_to_many({vpiRange}, net_h, [&](AST::AstNode *node) { packed_ranges.push_back(node); });
+            vpiHandle typespec_h = vpi_handle(vpiTypespec, net_h);
+            if (!typespec_h) {
+                typespec_h = vpi_handle(vpiTypespec, obj_h);
+            }
+            if (typespec_h) {
+                visit_one_to_many({vpiRange}, typespec_h, [&](AST::AstNode *node) { packed_ranges.push_back(node); });
+                vpi_release_handle(typespec_h);
+            } else {
+                visit_one_to_many({vpiRange}, net_h, [&](AST::AstNode *node) { packed_ranges.push_back(node); });
+            }
             shared.report.mark_handled(net_h);
         } else if (net_type == vpiStructNet) {
             visit_one_to_one({vpiTypespec}, net_h, [&](AST::AstNode *node) {
@@ -3038,11 +3047,28 @@ void UhdmAst::process_case()
 void UhdmAst::process_case_item()
 {
     current_node = make_ast_node(AST::AST_COND);
-    visit_one_to_many({vpiExpr}, obj_h, [&](AST::AstNode *node) {
-        if (node) {
-            current_node->children.push_back(node);
+    vpiHandle itr = vpi_iterate(vpiExpr, obj_h);
+    while (vpiHandle expr_h = vpi_scan(itr)) {
+        // case ... inside statement, the operation is stored in UHDM inside case items
+        // Retrieve just the InsideOp arguments here, we don't add any special handling
+        // TODO: handle inside range (list operations) properly here
+        if (vpi_get(vpiType, expr_h) == vpiOperation && vpi_get(vpiOpType, expr_h) == vpiInsideOp) {
+            visit_one_to_many({vpiOperand}, expr_h, [&](AST::AstNode *node) {
+                if (node) {
+                    current_node->children.push_back(node);
+                }
+            });
+        } else {
+            UhdmAst uhdm_ast(this, shared, indent + "  ");
+            auto *node = uhdm_ast.process_object(expr_h);
+            if (node) {
+                current_node->children.push_back(node);
+            }
         }
-    });
+        // FIXME: If we release the handle here, visiting vpiStmt fails for some reason
+        // vpi_release_handle(expr_h);
+    }
+    vpi_release_handle(itr);
     if (current_node->children.empty()) {
         current_node->children.push_back(new AST::AstNode(AST::AST_DEFAULT));
     }
@@ -3355,12 +3381,29 @@ void UhdmAst::process_int_typespec()
     std::vector<AST::AstNode *> packed_ranges;   // comes before wire name
     std::vector<AST::AstNode *> unpacked_ranges; // comes after wire name
     current_node = make_ast_node(AST::AST_WIRE);
-    auto left_const = AST::AstNode::mkconst_int(31, true);
-    auto right_const = AST::AstNode::mkconst_int(0, true);
-    auto range = new AST::AstNode(AST::AST_RANGE, left_const, right_const);
-    packed_ranges.push_back(range);
+    packed_ranges.push_back(make_range(31, 0));
     add_multirange_wire(current_node, packed_ranges, unpacked_ranges);
     current_node->is_signed = true;
+}
+
+void UhdmAst::process_shortint_typespec()
+{
+    std::vector<AST::AstNode *> packed_ranges;   // comes before wire name
+    std::vector<AST::AstNode *> unpacked_ranges; // comes after wire name
+    current_node = make_ast_node(AST::AST_WIRE);
+    packed_ranges.push_back(make_range(16, 0));
+    add_multirange_wire(current_node, packed_ranges, unpacked_ranges);
+    current_node->is_signed = true;
+}
+
+void UhdmAst::process_time_typespec()
+{
+    std::vector<AST::AstNode *> packed_ranges;   // comes before wire name
+    std::vector<AST::AstNode *> unpacked_ranges; // comes after wire name
+    current_node = make_ast_node(AST::AST_WIRE);
+    packed_ranges.push_back(make_range(64, 0));
+    add_multirange_wire(current_node, packed_ranges, unpacked_ranges);
+    current_node->is_signed = false;
 }
 
 void UhdmAst::process_string_var()
@@ -3588,7 +3631,7 @@ void UhdmAst::process_net()
     current_node->is_logic = !current_node->is_reg;
     current_node->is_signed = vpi_get(vpiSigned, obj_h);
     visit_one_to_one({vpiTypespec}, obj_h, [&](AST::AstNode *node) {
-        if (node) {
+        if (node && !node->str.empty()) {
             auto wiretype_node = new AST::AstNode(AST::AST_WIRETYPE);
             wiretype_node->str = node->str;
             // wiretype needs to be 1st node
@@ -3596,7 +3639,10 @@ void UhdmAst::process_net()
             current_node->is_custom_type = true;
         }
     });
-    visit_one_to_many({vpiRange}, obj_h, [&](AST::AstNode *node) { packed_ranges.push_back(node); });
+    if (vpiHandle typespec_h = vpi_handle(vpiTypespec, obj_h)) {
+        visit_one_to_many({vpiRange}, typespec_h, [&](AST::AstNode *node) { packed_ranges.push_back(node); });
+        vpi_release_handle(typespec_h);
+    }
     add_multirange_wire(current_node, packed_ranges, unpacked_ranges);
 }
 
@@ -3636,9 +3682,11 @@ void UhdmAst::process_parameter()
         }
         case vpiStructTypespec: {
             visit_one_to_one({vpiTypespec}, obj_h, [&](AST::AstNode *node) {
-                auto wiretype_node = make_ast_node(AST::AST_WIRETYPE);
-                wiretype_node->str = node->str;
-                current_node->children.push_back(wiretype_node);
+                if (node && !node->str.empty()) {
+                    auto wiretype_node = make_ast_node(AST::AST_WIRETYPE);
+                    wiretype_node->str = node->str;
+                    current_node->children.push_back(wiretype_node);
+                }
                 current_node->is_custom_type = true;
                 auto it = shared.param_types.find(current_node->str);
                 if (it == shared.param_types.end())
@@ -3870,7 +3918,7 @@ AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
         process_net();
         break;
     case vpiArrayNet:
-        process_array_net();
+        process_array_net(object);
         break;
     case vpiPackedArrayNet:
         process_packed_array_net();
@@ -3979,7 +4027,7 @@ AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
     case vpiHierPath:
         process_hier_path();
         break;
-    case UHDM::uhdmimport:
+    case UHDM::uhdmimport_typespec:
         break;
     case vpiDelayControl:
         process_nonsynthesizable(object);
@@ -3990,6 +4038,12 @@ AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
     case vpiIntTypespec:
     case vpiIntegerTypespec:
         process_int_typespec();
+        break;
+    case vpiShortIntTypespec:
+        process_shortint_typespec();
+        break;
+    case vpiTimeTypespec:
+        process_time_typespec();
         break;
     case vpiBitTypespec:
         process_bit_typespec();
