@@ -3043,11 +3043,28 @@ void UhdmAst::process_case()
 void UhdmAst::process_case_item()
 {
     current_node = make_ast_node(AST::AST_COND);
-    visit_one_to_many({vpiExpr}, obj_h, [&](AST::AstNode *node) {
-        if (node) {
-            current_node->children.push_back(node);
+    vpiHandle itr = vpi_iterate(vpiExpr, obj_h);
+    while (vpiHandle expr_h = vpi_scan(itr)) {
+        // case ... inside statement, the operation is stored in UHDM inside case items
+        // Retrieve just the InsideOp arguments here, we don't add any special handling
+        // TODO: handle inside range (list operations) properly here
+        if (vpi_get(vpiType, expr_h) == vpiOperation && vpi_get(vpiOpType, expr_h) == vpiInsideOp) {
+            visit_one_to_many({vpiOperand}, expr_h, [&](AST::AstNode *node) {
+                if (node) {
+                    current_node->children.push_back(node);
+                }
+            });
+        } else {
+            UhdmAst uhdm_ast(this, shared, indent + "  ");
+            auto *node = uhdm_ast.process_object(expr_h);
+            if (node) {
+                current_node->children.push_back(node);
+            }
         }
-    });
+        // FIXME: If we release the handle here, visiting vpiStmt fails for some reason
+        // vpi_release_handle(expr_h);
+    }
+    vpi_release_handle(itr);
     if (current_node->children.empty()) {
         current_node->children.push_back(new AST::AstNode(AST::AST_DEFAULT));
     }
