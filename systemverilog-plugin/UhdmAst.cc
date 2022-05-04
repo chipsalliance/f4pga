@@ -972,7 +972,7 @@ static void clear_current_scope()
     AST_INTERNAL::current_ast_mod = nullptr;
 }
 
-static void mark_as_unsigned(AST::AstNode *node)
+static void mark_as_unsigned(AST::AstNode *node, const UHDM::BaseClass *object)
 {
     if (node->children.empty() || node->children.size() == 1) {
         node->is_signed = false;
@@ -980,7 +980,7 @@ static void mark_as_unsigned(AST::AstNode *node)
         node->children[0]->is_signed = false;
         node->children[1]->is_signed = false;
     } else {
-        log_error("Unsupported expression in mark_as_unsigned!\n");
+        log_error("%s:%d: Unsupported expression in mark_as_unsigned!\n", object->VpiFile().c_str(), object->VpiLineNo());
     }
 }
 
@@ -2513,12 +2513,12 @@ void UhdmAst::process_operation(const UHDM::BaseClass *object)
         case vpiLShiftOp:
             current_node->type = AST::AST_SHIFT_LEFT;
             log_assert(current_node->children.size() == 2);
-            mark_as_unsigned(current_node->children[1]);
+            mark_as_unsigned(current_node->children[1], object);
             break;
         case vpiRShiftOp:
             current_node->type = AST::AST_SHIFT_RIGHT;
             log_assert(current_node->children.size() == 2);
-            mark_as_unsigned(current_node->children[1]);
+            mark_as_unsigned(current_node->children[1], object);
             break;
         case vpiNotOp:
             current_node->type = AST::AST_LOGIC_NOT;
@@ -2574,12 +2574,12 @@ void UhdmAst::process_operation(const UHDM::BaseClass *object)
         case vpiArithLShiftOp:
             current_node->type = AST::AST_SHIFT_SLEFT;
             log_assert(current_node->children.size() == 2);
-            mark_as_unsigned(current_node->children[1]);
+            mark_as_unsigned(current_node->children[1], object);
             break;
         case vpiArithRShiftOp:
             current_node->type = AST::AST_SHIFT_SRIGHT;
             log_assert(current_node->children.size() == 2);
-            mark_as_unsigned(current_node->children[1]);
+            mark_as_unsigned(current_node->children[1], object);
             break;
         case vpiPowerOp:
             current_node->type = AST::AST_POW;
