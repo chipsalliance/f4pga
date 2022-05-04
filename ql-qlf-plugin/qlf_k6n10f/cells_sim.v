@@ -1559,6 +1559,593 @@ module QL_DSP2 ( // TODO: Name subject to change
         );
 endmodule
 
+module QL_DSP2_MULT ( // TODO: Name subject to change
+    input  wire [19:0] a,
+    input  wire [17:0] b,
+    output wire [37:0] z,
+
+    input  wire       reset,
+
+    input  wire       unsigned_a,
+    input  wire       unsigned_b,
+
+    input  wire       f_mode,
+    input  wire [2:0] output_select,
+    input  wire       register_inputs
+);
+
+    parameter [79:0] MODE_BITS = 80'd0;
+
+    localparam [19:0] COEFF_0 = MODE_BITS[19:0];
+    localparam [19:0] COEFF_1 = MODE_BITS[39:20];
+    localparam [19:0] COEFF_2 = MODE_BITS[59:40];
+    localparam [19:0] COEFF_3 = MODE_BITS[79:60];
+
+    QL_DSP2 #(
+        .MODE_BITS({COEFF_3, COEFF_2, COEFF_1, COEFF_0})
+    ) dsp (
+        .a(a),
+        .b(b),
+        .z(z),
+
+	.reset(reset),
+
+        .f_mode(f_mode),
+
+        .feedback(3'b0),
+
+        .unsigned_a(unsigned_a),
+        .unsigned_b(unsigned_b),
+
+        .output_select(3'b0),	// unregistered output: a * b (0)
+        .register_inputs(1'b0)  // unregistered inputs
+    );
+endmodule
+
+module QL_DSP2_MULT_REGIN ( // TODO: Name subject to change
+    input  wire [19:0] a,
+    input  wire [17:0] b,
+    output wire [37:0] z,
+
+    (* clkbuf_sink *)
+    input  wire       clk,
+    input  wire       reset,
+
+    input  wire       unsigned_a,
+    input  wire       unsigned_b,
+
+    input  wire       f_mode,
+    input  wire [2:0] output_select,
+    input  wire       register_inputs
+);
+
+    parameter [79:0] MODE_BITS = 80'd0;
+
+    localparam [19:0] COEFF_0 = MODE_BITS[19:0];
+    localparam [19:0] COEFF_1 = MODE_BITS[39:20];
+    localparam [19:0] COEFF_2 = MODE_BITS[59:40];
+    localparam [19:0] COEFF_3 = MODE_BITS[79:60];
+
+    QL_DSP2 #(
+        .MODE_BITS({COEFF_3, COEFF_2, COEFF_1, COEFF_0})
+    ) dsp (
+        .a(a),
+        .b(b),
+        .z(z),
+
+        .f_mode(f_mode),
+
+        .feedback(3'b0),
+
+        .unsigned_a(unsigned_a),
+        .unsigned_b(unsigned_b),
+
+        .clk(clk),
+	.reset(reset),
+
+        .output_select(3'b0),	// unregistered output: a * b (0)
+        .register_inputs(1'b1)  // registered inputs
+    );
+endmodule
+
+module QL_DSP2_MULT_REGOUT ( // TODO: Name subject to change
+    input  wire [19:0] a,
+    input  wire [17:0] b,
+    output wire [37:0] z,
+
+    (* clkbuf_sink *)
+    input  wire       clk,
+    input  wire       reset,
+
+    input  wire       unsigned_a,
+    input  wire       unsigned_b,
+    input  wire       f_mode,
+    input  wire [2:0] output_select,
+    input  wire       register_inputs
+);
+
+    parameter [79:0] MODE_BITS = 80'd0;
+
+    localparam [19:0] COEFF_0 = MODE_BITS[19:0];
+    localparam [19:0] COEFF_1 = MODE_BITS[39:20];
+    localparam [19:0] COEFF_2 = MODE_BITS[59:40];
+    localparam [19:0] COEFF_3 = MODE_BITS[79:60];
+
+    QL_DSP2 #(
+        .MODE_BITS({COEFF_3, COEFF_2, COEFF_1, COEFF_0})
+    ) dsp (
+        .a(a),
+        .b(b),
+        .z(z),
+
+        .f_mode(f_mode),
+
+        .feedback(3'b0),
+
+        .unsigned_a(unsigned_a),
+        .unsigned_b(unsigned_b),
+
+        .clk(clk),
+	.reset(reset),
+
+        .output_select(3'b100),	// registered output: a * b (4)
+        .register_inputs(1'b0)  // unregistered inputs
+    );
+endmodule
+
+module QL_DSP2_MULT_REGIN_REGOUT ( // TODO: Name subject to change
+    input  wire [19:0] a,
+    input  wire [17:0] b,
+    output wire [37:0] z,
+
+    (* clkbuf_sink *)
+    input  wire       clk,
+    input  wire       reset,
+
+    input  wire       unsigned_a,
+    input  wire       unsigned_b,
+    input  wire       f_mode,
+    input  wire [2:0] output_select,
+    input  wire       register_inputs
+);
+
+    parameter [79:0] MODE_BITS = 80'd0;
+
+    localparam [19:0] COEFF_0 = MODE_BITS[19:0];
+    localparam [19:0] COEFF_1 = MODE_BITS[39:20];
+    localparam [19:0] COEFF_2 = MODE_BITS[59:40];
+    localparam [19:0] COEFF_3 = MODE_BITS[79:60];
+
+    QL_DSP2 #(
+        .MODE_BITS({COEFF_3, COEFF_2, COEFF_1, COEFF_0})
+    ) dsp (
+        .a(a),
+        .b(b),
+        .z(z),
+
+        .f_mode(f_mode),
+
+        .feedback(3'b0),
+
+        .unsigned_a(unsigned_a),
+        .unsigned_b(unsigned_b),
+
+        .clk(clk),
+	.reset(reset),
+
+        .output_select(3'b100),	// registered output: a * b (4)
+        .register_inputs(1'b1)  // registered inputs
+    );
+endmodule
+
+module QL_DSP2_MULTADD (
+    input  wire [19:0] a,
+    input  wire [17:0] b,
+    output wire [37:0] z,
+
+    (* clkbuf_sink *)
+    input  wire        clk,
+    input  wire        reset,
+
+    input  wire [ 2:0] feedback,
+    input  wire        load_acc,
+    input  wire        unsigned_a,
+    input  wire        unsigned_b,
+
+    input  wire        f_mode,
+    input  wire [ 2:0] output_select,
+    input  wire        subtract,
+    input  wire        register_inputs
+);
+
+    parameter [79:0] MODE_BITS = 80'd0;
+
+    localparam [19:0] COEFF_0 = MODE_BITS[19:0];
+    localparam [19:0] COEFF_1 = MODE_BITS[39:20];
+    localparam [19:0] COEFF_2 = MODE_BITS[59:40];
+    localparam [19:0] COEFF_3 = MODE_BITS[79:60];
+
+    QL_DSP2 #(
+        .MODE_BITS({COEFF_3, COEFF_2, COEFF_1, COEFF_0})
+    ) dsp (
+        .a(a),
+        .b(b),
+        .z(z),
+
+        .f_mode(f_mode),
+
+        .feedback(feedback),
+        .load_acc(load_acc),
+
+        .unsigned_a(unsigned_a),
+        .unsigned_b(unsigned_b),
+
+        .clk(clk),
+	.reset(reset),
+
+        .output_select(output_select),	// unregistered output: ACCin (2, 3)
+        .subtract(subtract),
+        .register_inputs(1'b0)  // unregistered inputs
+    );
+endmodule
+
+module QL_DSP2_MULTADD_REGIN (
+    input  wire [19:0] a,
+    input  wire [17:0] b,
+    output wire [37:0] z,
+
+    (* clkbuf_sink *)
+    input  wire        clk,
+    input  wire        reset,
+
+    input  wire [ 2:0] feedback,
+    input  wire        load_acc,
+    input  wire        unsigned_a,
+    input  wire        unsigned_b,
+
+    input  wire        f_mode,
+    input  wire [ 2:0] output_select,
+    input  wire        subtract,
+    input  wire        register_inputs
+);
+
+    parameter [79:0] MODE_BITS = 80'd0;
+
+    localparam [19:0] COEFF_0 = MODE_BITS[19:0];
+    localparam [19:0] COEFF_1 = MODE_BITS[39:20];
+    localparam [19:0] COEFF_2 = MODE_BITS[59:40];
+    localparam [19:0] COEFF_3 = MODE_BITS[79:60];
+
+    QL_DSP2 #(
+        .MODE_BITS({COEFF_3, COEFF_2, COEFF_1, COEFF_0})
+    ) dsp (
+        .a(a),
+        .b(b),
+        .z(z),
+
+        .f_mode(f_mode),
+
+        .feedback(feedback),
+        .load_acc(load_acc),
+
+        .unsigned_a(unsigned_a),
+        .unsigned_b(unsigned_b),
+
+        .clk(clk),
+	.reset(reset),
+
+        .output_select(output_select),	// unregistered output: ACCin (2, 3)
+        .subtract(subtract),
+        .register_inputs(1'b1)  // registered inputs
+    );
+endmodule
+
+module QL_DSP2_MULTADD_REGOUT (
+    input  wire [19:0] a,
+    input  wire [17:0] b,
+    output wire [37:0] z,
+
+    (* clkbuf_sink *)
+    input  wire        clk,
+    input  wire        reset,
+
+    input  wire [ 2:0] feedback,
+    input  wire        load_acc,
+    input  wire        unsigned_a,
+    input  wire        unsigned_b,
+
+    input  wire        f_mode,
+    input  wire [ 2:0] output_select,
+    input  wire        subtract,
+    input  wire        register_inputs
+);
+
+    parameter [79:0] MODE_BITS = 80'd0;
+
+    localparam [19:0] COEFF_0 = MODE_BITS[19:0];
+    localparam [19:0] COEFF_1 = MODE_BITS[39:20];
+    localparam [19:0] COEFF_2 = MODE_BITS[59:40];
+    localparam [19:0] COEFF_3 = MODE_BITS[79:60];
+
+    QL_DSP2 #(
+        .MODE_BITS({COEFF_3, COEFF_2, COEFF_1, COEFF_0})
+    ) dsp (
+        .a(a),
+        .b(b),
+        .z(z),
+
+        .f_mode(f_mode),
+
+        .feedback(feedback),
+        .load_acc(load_acc),
+
+        .unsigned_a(unsigned_a),
+        .unsigned_b(unsigned_b),
+
+        .clk(clk),
+	.reset(reset),
+
+        .output_select(output_select),	// registered output: ACCin (6, 7)
+        .subtract(subtract),
+        .register_inputs(1'b0)  // unregistered inputs
+    );
+endmodule
+
+module QL_DSP2_MULTADD_REGIN_REGOUT (
+    input  wire [19:0] a,
+    input  wire [17:0] b,
+    output wire [37:0] z,
+
+    (* clkbuf_sink *)
+    input  wire        clk,
+    input  wire        reset,
+
+    input  wire [ 2:0] feedback,
+    input  wire        load_acc,
+    input  wire        unsigned_a,
+    input  wire        unsigned_b,
+
+    input  wire        f_mode,
+    input  wire [ 2:0] output_select,
+    input  wire        subtract,
+    input  wire        register_inputs
+);
+
+    parameter [79:0] MODE_BITS = 80'd0;
+
+    localparam [19:0] COEFF_0 = MODE_BITS[19:0];
+    localparam [19:0] COEFF_1 = MODE_BITS[39:20];
+    localparam [19:0] COEFF_2 = MODE_BITS[59:40];
+    localparam [19:0] COEFF_3 = MODE_BITS[79:60];
+
+    QL_DSP2 #(
+        .MODE_BITS({COEFF_3, COEFF_2, COEFF_1, COEFF_0})
+    ) dsp (
+        .a(a),
+        .b(b),
+        .z(z),
+
+        .f_mode(f_mode),
+
+        .feedback(feedback),
+        .load_acc(load_acc),
+
+        .unsigned_a(unsigned_a),
+        .unsigned_b(unsigned_b),
+
+        .clk(clk),
+	.reset(reset),
+
+        .output_select(output_select),	// registered output: ACCin (6, 7)
+        .subtract(subtract),
+        .register_inputs(1'b1)  // registered inputs
+    );
+endmodule
+
+module QL_DSP2_MULTACC (
+    input  wire [19:0] a,
+    input  wire [17:0] b,
+    output wire [37:0] z,
+
+    (* clkbuf_sink *)
+    input  wire        clk,
+    input  wire        reset,
+
+    input  wire [ 2:0] feedback,
+    input  wire        load_acc,
+    input  wire        unsigned_a,
+    input  wire        unsigned_b,
+
+    input  wire        f_mode,
+    input  wire [ 2:0] output_select,
+    input  wire        subtract,
+    input  wire        register_inputs
+);
+
+    parameter [79:0] MODE_BITS = 80'd0;
+
+    localparam [19:0] COEFF_0 = MODE_BITS[19:0];
+    localparam [19:0] COEFF_1 = MODE_BITS[39:20];
+    localparam [19:0] COEFF_2 = MODE_BITS[59:40];
+    localparam [19:0] COEFF_3 = MODE_BITS[79:60];
+
+    QL_DSP2 #(
+        .MODE_BITS({COEFF_3, COEFF_2, COEFF_1, COEFF_0})
+    ) dsp (
+        .a(a),
+        .b(b),
+        .z(z),
+
+        .f_mode(f_mode),
+
+	.feedback(feedback),
+	.load_acc(load_acc),
+
+        .unsigned_a(unsigned_a),
+        .unsigned_b(unsigned_b),
+
+        .clk(clk),
+        .reset(reset),
+
+        .output_select(1'b1),	// unregistered output: ACCout (1)
+        .subtract(subtract),
+        .register_inputs(1'b0)  // unregistered inputs
+    );
+endmodule
+
+module QL_DSP2_MULTACC_REGIN (
+    input  wire [19:0] a,
+    input  wire [17:0] b,
+    output wire [37:0] z,
+
+    (* clkbuf_sink *)
+    input  wire        clk,
+    input  wire        reset,
+
+    input  wire [ 2:0] feedback,
+    input  wire        load_acc,
+    input  wire        unsigned_a,
+    input  wire        unsigned_b,
+
+    input  wire        f_mode,
+    input  wire [ 2:0] output_select,
+    input  wire        subtract,
+    input  wire        register_inputs
+);
+
+    parameter [79:0] MODE_BITS = 80'd0;
+
+    localparam [19:0] COEFF_0 = MODE_BITS[19:0];
+    localparam [19:0] COEFF_1 = MODE_BITS[39:20];
+    localparam [19:0] COEFF_2 = MODE_BITS[59:40];
+    localparam [19:0] COEFF_3 = MODE_BITS[79:60];
+
+    QL_DSP2 #(
+        .MODE_BITS({COEFF_3, COEFF_2, COEFF_1, COEFF_0})
+    ) dsp (
+        .a(a),
+        .b(b),
+        .z(z),
+
+        .f_mode(f_mode),
+
+        .feedback(feedback),
+        .load_acc(load_acc),
+
+        .unsigned_a(unsigned_a),
+        .unsigned_b(unsigned_b),
+
+        .clk(clk),
+	.reset(reset),
+
+        .output_select(1'b1),	// unregistered output: ACCout (1)
+        .subtract(subtract),
+        .register_inputs(1'b1)  // registered inputs
+    );
+endmodule
+
+module QL_DSP2_MULTACC_REGOUT (
+    input  wire [19:0] a,
+    input  wire [17:0] b,
+    output wire [37:0] z,
+
+    (* clkbuf_sink *)
+    input  wire        clk,
+    input  wire        reset,
+
+    input  wire [ 2:0] feedback,
+    input  wire        load_acc,
+    input  wire        unsigned_a,
+    input  wire        unsigned_b,
+
+    input  wire        f_mode,
+    input  wire [ 2:0] output_select,
+    input  wire        subtract,
+    input  wire        register_inputs
+);
+
+    parameter [79:0] MODE_BITS = 80'd0;
+
+    localparam [19:0] COEFF_0 = MODE_BITS[19:0];
+    localparam [19:0] COEFF_1 = MODE_BITS[39:20];
+    localparam [19:0] COEFF_2 = MODE_BITS[59:40];
+    localparam [19:0] COEFF_3 = MODE_BITS[79:60];
+
+    QL_DSP2 #(
+        .MODE_BITS({COEFF_3, COEFF_2, COEFF_1, COEFF_0})
+    ) dsp (
+        .a(a),
+        .b(b),
+        .z(z),
+
+        .f_mode(f_mode),
+
+        .feedback(feedback),
+	.load_acc(load_acc),
+
+        .unsigned_a(unsigned_a),
+        .unsigned_b(unsigned_b),
+
+        .clk(clk),
+	.reset(reset),
+
+        .output_select(3'b101),	// registered output: ACCout (5)
+        .subtract(subtract),
+        .register_inputs(1'b0)  // unregistered inputs
+    );
+endmodule
+
+module QL_DSP2_MULTACC_REGIN_REGOUT (
+    input  wire [19:0] a,
+    input  wire [17:0] b,
+    output wire [37:0] z,
+
+    (* clkbuf_sink *)
+    input  wire        clk,
+    input  wire        reset,
+
+    input  wire [ 2:0] feedback,
+    input  wire        load_acc,
+    input  wire        unsigned_a,
+    input  wire        unsigned_b,
+
+    input  wire        f_mode,
+    input  wire [ 2:0] output_select,
+    input  wire        subtract,
+    input  wire        register_inputs
+);
+
+    parameter [79:0] MODE_BITS = 80'd0;
+
+    localparam [19:0] COEFF_0 = MODE_BITS[19:0];
+    localparam [19:0] COEFF_1 = MODE_BITS[39:20];
+    localparam [19:0] COEFF_2 = MODE_BITS[59:40];
+    localparam [19:0] COEFF_3 = MODE_BITS[79:60];
+
+    QL_DSP2 #(
+        .MODE_BITS({COEFF_3, COEFF_2, COEFF_1, COEFF_0})
+    ) dsp (
+        .a(a),
+        .b(b),
+        .z(z),
+
+        .f_mode(f_mode),
+
+        .feedback(feedback),
+        .load_acc(load_acc),
+
+        .unsigned_a(unsigned_a),
+        .unsigned_b(unsigned_b),
+
+        .clk(clk),
+	.reset(reset),
+
+        .output_select(3'b101),	// registered output: ACCout (5)
+        .subtract(subtract),
+        .register_inputs(1'b1)  // registered inputs
+    );
+endmodule
+
 module dsp_t1_sim # (
     parameter NBITS_ACC  = 64,
     parameter NBITS_A    = 20,
