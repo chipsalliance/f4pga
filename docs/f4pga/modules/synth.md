@@ -20,17 +20,17 @@ will be generated upon a successful YOSYS run.
 
 The setup of the synth module follows the following specifications:
 
-## Parameters:
+## Parameters
 
 The `params` section of a stage configuration may contain a `produces` list.
 The list should specify additional targets that will be generated
-(`?` qualifier is allowedd).
+(`?` qualifier is allowed).
 
-## Values:
+## Values
 
 The `synth` module requires the following values:
 
-* `tcl_scripts` (string, required ): A path to a directory containing `synth.tcl`
+* `tcl_scripts` (string, required): A path to a directory containing `synth.tcl`
   and `conv.tcl` scripts that wiull be used by YOSYS.
 * `read_verilog_args` (list[string | number], optional) - If specified, the verilog
   sources will be read using the `read_verilog` procedure with options contained in

@@ -1,6 +1,6 @@
 # generic_script_wrapper
 
-This module provides a way to integrate an external command into an sfbuild flow.
+This module provides a way to integrate an external command into an f4pga flow.
 Its inputs and outputs are fully defined by the author of flow definition.
 
 ## Parameters

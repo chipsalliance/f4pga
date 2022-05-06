@@ -56,8 +56,8 @@ class ModuleContext:
     execution.
     """
 
-    share: str                 #  Absolute path to Symbiflow's share directory
-    bin: str                   #  Absolute path to Symbiflow's bin directory
+    share: str                 #  Absolute path to F4PGA's share directory
+    bin: str                   #  Absolute path to F4PGA's bin directory
     takes: SimpleNamespace     #  Maps symbolic dependency names to relative paths.
     produces: SimpleNamespace  #  Contains mappings for explicitely specified dependencies.
                                #  Useful mostly for checking for on-demand optional outputs (such as logs) with

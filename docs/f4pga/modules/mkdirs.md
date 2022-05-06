@@ -1,4 +1,4 @@
-# io_rename
+# mkdirs
 
 This modules creates directiories specified by the author of flow definition
 as its targets..

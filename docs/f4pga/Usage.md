@@ -77,7 +77,8 @@ All *dependencies* are tracked by a modification tracking system which stores ha
 When F4PGA constructs a *flow*, it will try to omit execution of modules which would receive the same data on their
 input.
 There is a strong _assumption_ there that a *module*'s output remains unchanged if the input configuration isn't
-change, ie. *modules* are deterministic.
+changed, ie. *modules* are deterministic. This is might be not true for some tools and in case you really want to re-run
+a stage, there's a `--nocache` option that treats the `.symbicache` file as if it was empty.
 
 ### Resolution
 
@@ -247,24 +248,21 @@ Project status:
     [N] sources:  ['counter.v']
     [O] xdc:  ['arty.xdc']
 
-F4PGA: DONE
+f4pga: DONE
 ```
 
 The letters in the boxes describe the status of a dependency which's name is next to the box.
 
  * **X** - dependency unresolved.
+   Dependency is not present or cannot be produced.
    This isn't always a bad sign. Some dependencies are not required to, such as `pcf`.
-
- * **U** - dependency unreachable.
-   The dependency has a module that could produce it, but the module's dependencies are unresolved.
-   This doesn't say whether the dependency was necessary or not.
 
  * **O** - dependency present, unchanged.
    This dependency is already built and is confirmed to stay unchanged during flow execution.
 
  * **N** - dependency present, new/changed.
    This dependency is already present on the persistent storage, but it was either missing earlier, or its content
-   changed from the last time.
+   changed since the last time it was used.
 
    :::{warning}
    It won't continue to be reported as "**N**" after a successful build of any target.
@@ -292,11 +290,8 @@ Additional info about a dependency will be displayed next to its name after a co
 * In case of unresolved dependencies (**X**), which are never produced by any module, a text sying "`MISSING`" will be
   displayed.
 
-* In case of unreachable dependencies, a name of such module that could produce them will be displayed followed by
-  `-> ???`.
-
 In the example above file `counter.v` has been modified and is now marked as "**N**".
-This couses a bunch of other dependencies to be reqbuilt ("**R**").
+This causes a bunch of other dependencies to be reqbuilt ("**R**").
 `build_dir` and `xdc` were already present, so they are marked as "**O**".
 
 ## Common targets and values
@@ -328,7 +323,7 @@ Below are lists of the target and value names along with their meanings.
 
 | Value name | type | Description |
 |------------|------|-------------|
-| `shareDir` | `string` | Path to symbiflow's installation "share" directory |
+| `shareDir` | `string` | Path to f4pga's installation "share" directory |
 | `python3` | `string` | Path to Python 3 executable |
 | `noisyWarnings` | `string` | Path to noisy warnings log (should be deprecated) |
 | `prjxray_db` | `string` | Path to Project X-Ray database |

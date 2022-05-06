@@ -458,8 +458,8 @@ def sfbuild_fail():
     sfbuild_done_str = Style.BRIGHT + Fore.RED + 'FAILED'
 
 def sfbuild_done():
-    sfprint(1, f'sfbuild: {sfbuild_done_str}'
-                f'{Style.RESET_ALL + Fore.RESET}')
+    sfprint(1, f'f4pga: {sfbuild_done_str}'
+               f'{Style.RESET_ALL + Fore.RESET}')
     exit(0)
 
 def setup_resolution_env():

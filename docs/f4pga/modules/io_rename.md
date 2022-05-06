@@ -19,3 +19,7 @@ Not specifying a mapping for a given entry will leave it with its original name.
 ## Values
 
 All values specified for this modules will be accessible by tyhe wrapped module.
+
+## Extra notes
+
+This module might be removed in the future in favor of a native renaming support.
