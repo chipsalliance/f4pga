@@ -59,13 +59,6 @@ def _setup_build_parser(parser: ArgumentParser):
     )
 
     parser.add_argument(
-        '-r',
-        '--requirements',
-        action='store_true',
-        help='Display info about project\'s requirements.'
-    )
-
-    parser.add_argument(
         '-p',
         '--part',
         metavar='part_name',
@@ -86,33 +79,13 @@ def _setup_build_parser(parser: ArgumentParser):
         default=[]
     )
 
-    # Currently unsupported
-    parser.add_argument(
-        '-M',
-        '--moduleinfo',
-        nargs=1,
-        metavar='module_name_or_path',
-        help='Display info about module. Requires `-p` option in case of module name'
-    )
-
-    parser.add_argument(
-        '-T',
-        '--take_explicit_paths',
-        nargs='+',
-        metavar='<name=path, ...>',
-        type=str,
-        help='Specify stage inputs explicitely. This might be required if some files got renamed or deleted and '
-             'f4pga is unable to deduce the flow that lead to dependencies required by the requested stage'
-    )
-
-
 def _setup_show_dep_parser(parser: ArgumentParser):
     parser.add_argument(
         '-p',
         '--platform',
         metavar='platform_name',
         type=str,
-        help='Name of the platform (use to display platform-specific values.'
+        help='Name of the platform (use to display platform-specific values.)'
     )
 
     parser.add_argument(
