@@ -11,134 +11,6 @@ def open_flow_cfg(path: str) -> dict:
     with Path(path).open('r') as rfptr:
         return json_load(rfptr)
 
-
-def save_flow_cfg(flow: dict, path: str):
-    with Path(path).open('w') as wfptr:
-        json_dump(flow, wfptr, indent=4)
-
-
-def _get_lazy_dict(parent: dict, name: str):
-    d = parent.get(name)
-    if d is None:
-        d = {}
-        parent[name] = d
-    return d
-
-
-def _get_ov_dict(
-    dname: str,
-    flow: dict,
-    platform: 'str | None' = None,
-    stage: 'str | None' = None
-):
-    if not platform:
-        return _get_lazy_dict(flow, dname)
-    platform_dict: dict = flow[platform]
-    if stage:
-        stage_dict: dict = _get_lazy_dict(platform_dict, stage)
-        return _get_lazy_dict(stage_dict, dname)
-    return _get_lazy_dict(platform_dict, dname)
-
-
-def _get_dep_dict(
-    flow: dict,
-    platform: 'str | None' = None,
-    stage: 'str | None' = None
-):
-    return _get_ov_dict('dependencies', flow, platform, stage)
-
-
-def _get_vals_dict(
-    flow: dict,
-    platform: 'str | None' = None,
-    stage: 'str | None' = None
-):
-    return _get_ov_dict('values', flow, platform, stage)
-
-
-def _add_ov(
-    ov_dict_getter,
-    failstr_constr,
-    flow_cfg: dict,
-    name: str,
-    values: list,
-    platform: 'str | None' = None,
-    stage: 'str | None' = None
-) -> bool:
-    d = ov_dict_getter(flow_cfg, platform, stage)
-    deps = d.get(name)
-    if type(deps) is list:
-        deps += values
-        return True
-
-    if deps is None:
-        d[name] = values
-        return True
-
-    print(failstr_constr(name))
-    return False
-
-
-def _rm_ov_by_values(
-    ov_dict_getter,
-    notset_str_constr,
-    notlist_str_constr,
-    flow: dict,
-    name: str,
-    vals: list,
-    platform: 'str | None' = None,
-    stage: 'str | None' = None
-) -> bool:
-    d = ov_dict_getter(flow, platform, stage)
-
-    vallist: list = d.get(name)
-    if type(vallist) is list:
-        d[name] = [val for val in vallist if val not in set(vals)]
-        return True
-
-    if type(vallist) is None:
-        print(notset_str_constr(name))
-        return False
-
-    print(notlist_str_constr(name))
-    return False
-
-
-def _rm_ov_by_idx(
-    ov_dict_getter,
-    notset_str_constr,
-    notlist_str_constr,
-    flow: dict,
-    name: str,
-    idcs: list,
-    platform: 'str | None' = None,
-    stage: 'str | None' = None
-) -> bool:
-    idcs.sort(reverse=True)
-
-    if len(idcs) == 0:
-        print(f'Index list is emtpy!')
-        return False
-
-    d = ov_dict_getter(flow, platform, stage)
-    vallist: list = d.get(name)
-    if type(vallist) is list:
-        if idcs[0] >= len(vallist) or idcs[len(idcs) - 1] < 0:
-            print(f'Index out of range (max: {len(vallist)}!')
-            return False
-
-        for idx in idcs:
-            vallist.pop(idx)
-        return True
-
-    if vallist is None:
-        print(notset_str_constr(name))
-        return False
-
-    print(notlist_str_constr(name))
-    return False
-
-
 def _get_ovs_raw(
     dict_name: str,
     flow_cfg,
@@ -159,113 +31,6 @@ def _get_ovs_raw(
 
     return vals
 
-
-def _remove_dependencies_by_values(
-    flow: dict,
-    name: str,
-    deps: list,
-    platform: 'str | None' = None,
-    stage: 'str | None' = None
-) -> bool:
-    def notset_str_constr(dname):
-        return f'Dependency `{dname}` is not set. Nothing to remove.'
-    def notlist_str_constr(dname):
-        return f'Dependency `{dname}` is not a list! Use unsetd instead.'
-    return _rm_ov_by_values(
-        _get_dep_dict,
-        notset_str_constr,
-        notlist_str_constr,
-        flow,
-        name,
-        deps,
-        platform,
-        stage
-    )
-
-
-def _remove_dependencies_by_idx(
-    flow: dict,
-    name: str,
-    idcs: list,
-    platform: 'str | None' = None,
-    stage: 'str | None' = None
-) -> bool:
-    def notset_str_constr(dname):
-        return f'Dependency `{dname}` is not set. Nothing to remove.'
-    def notlist_str_constr(dname):
-        return f'Dependency `{dname}` is not a list! Use unsetd instead.'
-    return _rm_ov_by_idx(
-        _get_dep_dict,
-        notset_str_constr,
-        notlist_str_constr,
-        flow,
-        name,
-        idcs,
-        platform,
-        stage
-    )
-
-
-def _remove_values_by_values(
-    flow: dict,
-    name: str,
-    deps: list,
-    platform: 'str | None' = None,
-    stage: 'str | None' = None
-) -> bool:
-    def notset_str_constr(vname):
-        return f'Value `{vname}` is not set. Nothing to remove.'
-    def notlist_str_constr(vname):
-        return f'Value `{vname}` is not a list! Use unsetv instead.'
-    return _rm_ov_by_values(
-        _get_vals_dict,
-        notset_str_constr,
-        notlist_str_constr,
-        flow,
-        name,
-        deps,
-        platform,
-        stage
-    )
-
-
-def _remove_values_by_idx(
-    flow: dict,
-    name: str,
-    idcs: list,
-    platform: 'str | None' = None,
-    stage: 'str | None' = None
-) -> bool:
-    def notset_str_constr(dname):
-        return f'Dependency `{dname}` is not set. Nothing to remove.'
-    def notlist_str_constr(dname):
-        return f'Dependency `{dname}` is not a list! Use unsetv instead.'
-    return _rm_ov_by_idx(
-        _get_vals_dict,
-        notset_str_constr,
-        notlist_str_constr,
-        flow,
-        name,
-        idcs,
-        platform,
-        stage
-    )
-
-
-def unset_dependency(
-    flow: dict,
-    name: str,
-    platform: 'str | None',
-    stage: 'str | None'
-):
-    d = _get_dep_dict(flow, platform, stage)
-    if d.get(name) is None:
-        print(f'Dependency `{name}` is not set!')
-        return False
-    d.pop(name)
-    return True
-
-
 def verify_platform_name(platform: str, mypath: str):
     for plat_def_filename in os_listdir(str(Path(mypath) / 'platforms')):
         platform_name = str(Path(plat_def_filename).stem)
@@ -280,14 +45,17 @@ def verify_stage(platform: str, stage: str, mypath: str):
 
 
 def _is_kword(w: str):
-    return \
-        (w == 'dependencies') | (w == 'values') | \
-        (w == 'default_platform') | (w == 'default_target')
+    kwords = {
+        'dependencies',
+        'values',
+        'default_platform',
+        'default_target'
+    }
+    return w in kwords
 
 
 class FlowDefinition:
-    # stage name -> module path mapping
-    stages: 'dict[str, Stage]'
+    stages: 'dict[str, Stage]' # stage name -> module path mapping
     r_env: ResolutionEnv
 
     def __init__(self, flow_def: dict, r_env: ResolutionEnv):
@@ -320,37 +88,16 @@ class FlowDefinition:
 
 class ProjectFlowConfig:
     flow_cfg: dict
-    # r_env: ResolutionEnv
     path: str
-    # platform_r_envs: 'dict[str, ResolutionEnv]'
 
     def __init__(self, path: str):
         self.flow_cfg = {}
         self.path = copy(path)
-        # self.r_env = ResolutionEnv({})
-        # self.platform_r_envs = {}
 
     def platforms(self):
         for platform, _ in self.flow_cfg.items():
             if not _is_kword(platform):
                 yield platform
-
-    def add_platform(self, device: str) -> bool:
-        d = self.flow_cfg.get(device)
-        if d:
-            print(f'Device {device} already exists')
-            return False
-
-        self.flow_cfg[device] = {}
-        return True
-
-    def set_default_platform(self, device: str) -> bool:
-        self.flow_cfg['default_platform'] = device
-        return True
-
-    def set_default_target(self, platform: str, target: str) -> bool:
-        self.flow_cfg[platform]['default_target'] = target
-        return True
 
     def get_default_platform(self) -> 'str | None':
         return self.flow_cfg.get('default_platform')
