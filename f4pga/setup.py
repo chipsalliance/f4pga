@@ -79,9 +79,7 @@ setuptools_setup(
     packages=[
         "f4pga",
         "f4pga.common_modules",
-        "f4pga.wrappers.sh",
-        "f4pga.wrappers",
-        "f4pga.wrappers.xc7"
+        "f4pga.wrappers.sh"
     ],
     package_dir={"f4pga": "."},
     package_data={
@@ -93,11 +91,7 @@ setuptools_setup(
     install_requires=list(set(get_requirements(requirementsFile))),
     entry_points={
         "console_scripts": [
-            "f4pga = f4pga.__init__:main",
-            "f4pga-place = f4pga.wrappers.xc7.__init__:place",
-            "f4pga-route = f4pga.wrappers.xc7.__init__:route",
-            "f4pga-synth = f4pga.wrappers.xc7.synth:main",
-            "f4pga-write-fasm = f4pga.wrappers.xc7.__init__:write_fasm",
+            "f4pga = f4pga.__init__:main"
         ] + wrapper_entrypoints
     },
 )
