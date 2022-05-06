@@ -11,10 +11,9 @@ To get started with a project that already uses `f4pga`, go to the project's dir
 generate a bitstream:
 
 ```bash
-$ f4pga flow.json -p platform_name -t bitstream
+$ f4pga build -f flow.json
 ```
 
-Substitute `platform_name` by the name of the target platform (eg. `x7a50t`).
 `flow.json` should be a *project flow configuration* file included with the project.
 If you are unsure if you got the right file, you can check an example of the contents of such file shown in the
 *Build a target* section below.
@@ -123,10 +122,12 @@ Typically *projects flow configuration* will be used to resolve dependencies for
 
 ## Build a target
 
+### Using flow configuration file
+
 To build a *target* `target_name`, use the following command:
 
 ```bash
-$ f4pga flow.json -p platform_device_name -t target_name
+$ f4pga build -f flow.json -p platform_device_name -t target_name
 ```
 where `flow.json` is a path to *projects flow configuration*.
 
@@ -134,14 +135,18 @@ For example, let's consider the following *projects flow configuration (flow.jso
 
 ```json
 {
+    "default_platform": "xc7a50t",
     "dependencies": {
         "sources": ["counter.v"],
         "xdc": ["arty.xdc"],
         "synth_log": "synth.log",
         "pack_log": "pack.log",
+    },
+    "values": {
         "top": "top"
     },
     "xc7a50t": {
+        "default_target": "bitstream",
         "dependencies": {
             "build_dir": "build/arty_35"
         }
@@ -166,8 +171,42 @@ With this flow configuration, you can build a bitstream for arty_35 using the
 following command:
 
 ```
-$ f4pga flow.json -p x7a50t -t bitstream
+$ f4pga build -f flow.json -p XC7A35TCSG324-1 -t bitstream
 ```
+
+Because we have `default_platform` defined, we can skip the `--platform` or `--part` argument.
+We can also skip the `--target` argument because we have a `default_target` defined for the
+chosen platform. This will default to the `bitstream` target of `xc7a50t` platform:
+
+```
+$ f4pga build -f flow.json
+```
+
+### Using Command-Line Interface
+
+Alternatively you can use CLI to pass the configuration without creating a flow file:
+
+```
+$ f4pga build -p XC7A35TCSG324-1 -Dsources=[counter.v] -Dxdc=[arty.xdc] -Dsynth_log=synth.log -Dpack_log=pack.log -Dbuild_dir=buils/arty_35 -Vtop=top -t bitstream
+```
+
+CLI flow configuration can be used alongside a flow configuration file and will override
+conflicting dependencies/values from the file.
+
+CLI configuration follows the following format:
+
+`<dependency/value identifier>=<expression>` 
+
+`<dependency/value identifier>` is the name of dependency or value optionally prefixed by a stage
+name and a dot (`.`). Using the notation with stage name sets the dependency/value only for the
+specified stage.
+
+`<expression>` is a form of defining a dependency path or a value. Characters are interpreted
+as strings unless the follow one of the following format:
+* `[item1,item2,item3,...]` - this is a list of strings
+* `{key1:value1,key2:value2,key3:value3,...}` - this is a dictionary
+
+Nesting structures is curently unsupported in CLI.
 
 ### Pretend mode
 
@@ -189,7 +228,7 @@ _on-demand_ is currently displayed.
 Example:
 
 ```bash
-$ f4pga flow.json -p x7a50t -i
+$ f4pga -v build flow.json --platform x7a50t -i
 ```
 
 ```
@@ -213,20 +252,48 @@ Platform dependencies/targets:
 This is only a snippet of the entire output.
 :::
 
-### Summary of all available options
+### Summary of global options
 
-| long       | short | arguments              | description                                     |
-|------------|:-----:|------------------------|-------------------------------------------------|
-| --platform | -p    | device name            | Specify target device name (eg. x7a100t)        |
-| --target   | -t    | target dependency name | Specify target to produce                       |
-| --info     | -i    | -                      | Display information about available targets     |
-| --pretend  | -P    | -                      | Resolve dependencies without executing the flow |
+| long      | short | arguments                | description                                                                |
+|-----------|:-----:|--------------------------|----------------------------------------------------------------------------|
+| --verobse | -v    | -                        | Constrol verbosity level. 0 for no verbose output. 2 for maximum verbisity |
+| --silent  | -s    | -                        | Surpress any output                                                        |
+
+### Summary of all available subcommands
+
+| name    | description                 |
+|---------|-----------------------------|
+| build   | Build a project             |
+| showd   | Print value of a dependency
+
+### Summary of all options available for `build` subcommand
+
+| long        | short | arguments                | description                                             |
+|-------------|:-----:|--------------------------|---------------------------------------------------------|
+| --flow      | -f    | flow configuration file  | Use flow configuration file                             |
+| --platform  |       | platform name            | Specify target platform name (eg. x7a100t)              |
+| --part      | -p    | part name                | Speify target platform by part name                     |
+| --target    | -t    | target dependency name   | Specify target to produce                               |
+| --info      | -i    | -                        | Display information about available targets             |
+| --pretend   | -P    | -                        | Resolve dependencies without executing the flow         |
+| --nocache   |       | -                        | Do not perform incremental build (do full a full build) |
+| --stageinfo | -S    | stage name               | Display information about a specified stage             |
+| --dep       | -D    | dependency_name=pathexpr | Add a dependency to configuration                       |
+| --val       | -V    | value_name=valueexpr     | Add a value to configuration                            |
+
+### Summary of all options available for `showd` subcommand
+
+| long        | short | arguments                | description                                                              |
+|-------------|:-----:|--------------------------|--------------------------------------------------------------------------|
+| --flow      | -f    | flow configuration file  | Use flow configuration file                                              |
+| --platform  | -p    | platform name            | Specify target platform name (to display platform-specific dependencies) |
+| --stage     | -s    | part name                | Specify stage name (to display stage-specific dependencies)              |      
 
 ### Dependency resolution display
 
 F4PGA displays some information about dependencies when requesting a target.
 
-Here's an example of a possible output when trying to build `bitstream` target:
+Here's an example of a possible output when trying to build `bitstream` target (use `-P`):
 
 ```
 F4PGA Build System

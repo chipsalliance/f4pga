@@ -96,6 +96,8 @@ The afromentioned _*exceptions_ are:
 * `default_platform` - default platform to chose in case it doesn't get specified
   by the user
 
+Those apply only to flow configuration file.
+
 ### Internal environmental variables
 
 It's very useful to be able to refer to some data within
