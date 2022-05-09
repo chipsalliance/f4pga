@@ -3025,16 +3025,17 @@ void UhdmAst::process_gen_scope()
         }
     });
 
-    visit_one_to_many({vpiParamAssign, vpiParameter, vpiNet, vpiArrayNet, vpiVariables, vpiContAssign, vpiProcess, vpiModule, vpiGenScopeArray},
-                      obj_h, [&](AST::AstNode *node) {
-                          if (node) {
-                              if ((node->type == AST::AST_PARAMETER || node->type == AST::AST_LOCALPARAM) && node->children.empty()) {
-                                  delete node; // skip parameters without any children
-                              } else {
-                                  current_node->children.push_back(node);
-                              }
-                          }
-                      });
+    visit_one_to_many(
+      {vpiParamAssign, vpiParameter, vpiNet, vpiArrayNet, vpiVariables, vpiContAssign, vpiProcess, vpiModule, vpiGenScopeArray, vpiTaskFunc}, obj_h,
+      [&](AST::AstNode *node) {
+          if (node) {
+              if ((node->type == AST::AST_PARAMETER || node->type == AST::AST_LOCALPARAM) && node->children.empty()) {
+                  delete node; // skip parameters without any children
+              } else {
+                  current_node->children.push_back(node);
+              }
+          }
+      });
 }
 
 void UhdmAst::process_case()
