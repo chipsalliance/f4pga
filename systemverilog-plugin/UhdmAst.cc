@@ -1717,6 +1717,18 @@ void UhdmAst::process_typespec_member()
         shared.report.mark_handled(typespec_h);
         break;
     }
+    case vpiByteTypespec: {
+        current_node->is_signed = true;
+        packed_ranges.push_back(make_range(7, 0));
+        shared.report.mark_handled(typespec_h);
+        break;
+    }
+    case vpiShortIntTypespec: {
+        current_node->is_signed = true;
+        packed_ranges.push_back(make_range(15, 0));
+        shared.report.mark_handled(typespec_h);
+        break;
+    }
     case vpiIntTypespec:
     case vpiIntegerTypespec: {
         current_node->is_signed = true;
@@ -3393,6 +3405,13 @@ void UhdmAst::process_shortint_typespec()
     std::vector<AST::AstNode *> unpacked_ranges; // comes after wire name
     current_node = make_ast_node(AST::AST_WIRE);
     packed_ranges.push_back(make_range(16, 0));
+
+void UhdmAst::process_byte_typespec()
+{
+    std::vector<AST::AstNode *> packed_ranges;   // comes before wire name
+    std::vector<AST::AstNode *> unpacked_ranges; // comes after wire name
+    current_node = make_ast_node(AST::AST_WIRE);
+    packed_ranges.push_back(make_range(7, 0));
     add_multirange_wire(current_node, packed_ranges, unpacked_ranges);
     current_node->is_signed = true;
 }
@@ -3669,6 +3688,11 @@ void UhdmAst::process_parameter()
             shared.report.mark_handled(typespec_h);
             break;
         }
+        case vpiByteTypespec: {
+            packed_ranges.push_back(make_range(7, 0));
+            shared.report.mark_handled(typespec_h);
+            break;
+        }
         case vpiEnumTypespec:
         case vpiRealTypespec:
         case vpiStringTypespec: {
@@ -3695,6 +3719,7 @@ void UhdmAst::process_parameter()
             });
             break;
         }
+        case vpiPackedArrayTypespec:
         case vpiArrayTypespec: {
             shared.report.mark_handled(typespec_h);
             visit_one_to_one({vpiElemTypespec}, typespec_h, [&](AST::AstNode *node) {
@@ -4048,6 +4073,9 @@ AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
         break;
     case vpiBitTypespec:
         process_bit_typespec();
+        break;
+    case vpiByteTypespec:
+        process_byte_typespec();
         break;
     case vpiStringVar:
         process_string_var();
