@@ -3404,7 +3404,10 @@ void UhdmAst::process_shortint_typespec()
     std::vector<AST::AstNode *> packed_ranges;   // comes before wire name
     std::vector<AST::AstNode *> unpacked_ranges; // comes after wire name
     current_node = make_ast_node(AST::AST_WIRE);
-    packed_ranges.push_back(make_range(16, 0));
+    packed_ranges.push_back(make_range(15, 0));
+    add_multirange_wire(current_node, packed_ranges, unpacked_ranges);
+    current_node->is_signed = true;
+}
 
 void UhdmAst::process_byte_typespec()
 {
@@ -3421,7 +3424,7 @@ void UhdmAst::process_time_typespec()
     std::vector<AST::AstNode *> packed_ranges;   // comes before wire name
     std::vector<AST::AstNode *> unpacked_ranges; // comes after wire name
     current_node = make_ast_node(AST::AST_WIRE);
-    packed_ranges.push_back(make_range(64, 0));
+    packed_ranges.push_back(make_range(63, 0));
     add_multirange_wire(current_node, packed_ranges, unpacked_ranges);
     current_node->is_signed = false;
 }
