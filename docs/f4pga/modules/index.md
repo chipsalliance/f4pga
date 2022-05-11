@@ -8,7 +8,7 @@ modules.
 
 ### Configuration interface:
 
-Modules are configured through an internal API by _**sfbuf4pgaild**_.
+Modules are configured through an internal API by _**f4pga**_.
 The basic requirement for a module script is to expose a class with `Module`
 interface.
 
@@ -17,7 +17,7 @@ _**f4pga**_ reads its configuration from two different sources:
 and **project's flow configuration**, which is a set of configuration options provided by the user
 through a JSON file or CLI interface.
 
-Thosse sources contain snippets of _module configurations_.
+Those sources contain snippets of _module configurations_.
 
 A _module configuration_ is a structure with the following fields:
 
@@ -37,12 +37,12 @@ A _module configuration_ is a structure with the following fields:
 In case of **platform's flow definition**, a `values` dictionary can be defined
 globally and the values defined there will be passed to every module's config.
 
-Those values can be overriden per-module through `module_options` dictionary.
+Those values can be overridden per-module through `module_options` dictionary.
 
 Parameters used during module's construction can also be defined in `module_options`
 as `params` (those are not a part of _module configuration_, instead they are used
 during the actual construction of a module instance, before it declares any of its
-input/outputs etc.. This is typically used to acieve some parametrization over module's
+input/outputs etc.. This is typically used to achieve some parametrization over module's
 I/O).
 
 Defining dictionaries for `takes` and `produces` is currently disallowed within
@@ -65,12 +65,12 @@ Unlike **platform's flow definition**, **project's flow configuration** may cont
 names to actual paths. Most dependencies can have their paths resolved implicitly
 without the need to provide explicit paths, which is a mechanism that is described
 in a later section of this document. However some dependencies must be provided
-explicitelly, eg. paths to project's verilog source files. It should be noted that
+explicitly, eg. paths to project's Verilog source files. It should be noted that
 depending on the flow definition and the dependency in question, the path does not
 necessarily have to point to an already existing file. If the dependency is a
 product of a module within the flow, the path assigned to it will be used
 by the module to build that dependency. This is also used to in case of _on-demand_
-dependencies, which won't be produced unless the user explicitelly provides a path
+dependencies, which won't be produced unless the user explicitly provides a path
 for them.
 
 **project's flow configuration** cannot specify `params` for modules and does not
@@ -85,11 +85,11 @@ overload the `dependecies` and `values` defined in a global scope of
 is treated as a _stage-specific-configuration_. The key is a name of a stage within
 a flow for the specified platform and the values are dicts which may contain
 `dependencies` and `values` fields that overload `dependencies` and `values`
-repespectively, locally for the stage. Additionally a `default_target` field can be
-provided to specify a default target to built when the user does not specify it throgh
-a CLI inteface.
+respectively, locally for the stage. Additionally a `default_target` field can be
+provided to specify a default target to built when the user does not specify it through
+a CLI interface.
 
-The afromentioned _*exceptions_ are:
+The aforementioned _*exceptions_ are:
 
 * `dependencies` - dependencies shared by all platforms.
 * `values` - values shared by all platforms
@@ -145,7 +145,7 @@ With the following values defined
 ```
 
 Be careful when using this kind of resolution, as it's computational and memory
-complexity grows exponentially in ragards to the number of list variables being
+complexity grows exponentially in regards to the number of list variables being
 referenced, which is a rather obvious fact, but it's still worth mentioning.
 
 The variables that can be referenced within a definition/configuration fall into 3
@@ -171,7 +171,7 @@ categories:
 
 ### `Module` class
 
-Each nmodule is represented as a class derived from `Module` class.
+Each module is represented as a class derived from `Module` class.
 
 The class should implement the following methods:
 
@@ -187,7 +187,7 @@ when instantiating a module.
 
 ### Module's execution modes
 
-A module ahas essentially two execution modes:
+A module has essentially two execution modes:
 
 * _mapping_ mode
 * _exec_ mode
@@ -196,7 +196,7 @@ A module ahas essentially two execution modes:
 
 In _mapping_ mode the module is provided with an incomplete configuration which
 includes:
-  * `takes` namespace: this maps names of input dependecies to the paths of these
+  * `takes` namespace: this maps names of input dependencies to the paths of these
     dependencies
   * `values` namespace: this maps names of variables to the values of those
     variables.
@@ -218,7 +218,7 @@ In _exec_ mode the module does the actual work.
 
 The configuration passed into this mode is full and it includes:
 
-* `takes` namespace: this maps names of input dependecies to the paths of these
+* `takes` namespace: this maps names of input dependencies to the paths of these
     dependencies
 * `values` namespace: this maps names of variables to the values of those
    variables.
@@ -235,7 +235,7 @@ described in `outputs` should be present.
 In the the `__init__` method of module's class, the following fields should be
 set:
 
-* `takes` - a list of symbolic dependency names for dependencies used byb the module
+* `takes` - a list of symbolic dependency names for dependencies used by the module
 * `produces` - a list of symbolic dependencies names for dependencies produced
   by the module.
 * `values` - a list of names given to the variables used withing the module
@@ -251,9 +251,9 @@ ways:
 
 * '`?`' _suffix_
   * In `takes` - the dependency is not necessary for the module to execute
-  * In `produces` - the dependency may be produceed, but it is not guaranteed.
+  * In `produces` - the dependency may be produced, but it is not guaranteed.
   * In `values` the value is not required for the module to execute.
-    Refferreing to it through `ModuleContext.values.value_name` won't raise an
+    Referring to it through `ModuleContext.values.value_name` won't raise an
     exception if the value is not present, instead `None` will be returned.
 * '`!`' _suffix_
   * In `produces` - the dependency is going to be produced only if the user

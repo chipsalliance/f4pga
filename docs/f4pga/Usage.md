@@ -31,7 +31,7 @@ If you want to create a new project, it's highly recommended that you read this 
 
 ### f4pga
 
-`f4pga` is a modular build system designed to handle various _Verilog-to-bitsream_ flows for FPGAs.
+`f4pga` is a modular build system designed to handle various _Verilog-to-bitstream_ flows for FPGAs.
 It works by wrapping the necessary tools in Python, which are called *f4pga modules*.
 Modules are then referenced in *platform flow definition* files, together with configuration specific for a given
 platform.
@@ -55,7 +55,7 @@ _modules_ and f4pga _modules_) is a Python script that wraps a tool used within 
 The main purpose of the wrappers is to provide a unified interface for `f4pga` to use and to configure the tool,
 as well as provide information about files required and produced by the tool.
 
-### Dependecies
+### Dependencies
 
 A *dependency* is any file, directory or a list of such that a *module* takes as its input or produces on its output.
 
@@ -83,10 +83,10 @@ a stage, there's a `--nocache` option that treats the `.symbicache` file as if i
 
 ### Resolution
 
-A *dependency* is said to be *resolved* if it meets one of the following critereia:
+A *dependency* is said to be *resolved* if it meets one of the following criteria:
 
 * it exists on persistent storage and its hash matches the one stored in .symbicache
-* there exists such *flow* that all of the dependieces of its modules are *resolved* and it produces the *dependency* in
+* there exists such *flow* that all of the dependencies of its modules are *resolved* and it produces the *dependency* in
   question.
 
 ### Platform's flow definition
@@ -99,12 +99,12 @@ the modules can reference.
 In case of some modules it may also define a set of parameters used during their construction.
 `mkdirs` module uses that to allow production of of multiple directories as separate dependencies.
 This however is an experimental feature which possibly will be removed in favor of having multiple instances of the same
-module with renameable ouputs.
+module with renameable outputs.
 
 Not all *dependencies** have to be *resolved* at this stage, a *platform's flow definition* for example won't be able to
 provide a list of source files needed in a *flow*.
 
-### Projects's flow configuration
+### Project's flow configuration
 
 Similarly to *platform flow definition*, *Projects flow configuration* is a _JSON_ that is used to configure *modules*. There are however a couple differences here and there.
 
@@ -157,10 +157,10 @@ For example, let's consider the following *projects flow configuration (flow.jso
 ```
 
 It specifies list of paths to Verilog source files as `sources` dependency.
-Similarily it also provides an `XDC` file with constrains (`xdc` dependency).
+Similarly it also provides an `XDC` file with constrains (`xdc` dependency).
 
 It also names a path for synthesis and logs (`synth_log`, `pack_log`).
-These two are optional on-demand outputs, meaning they won't be produces unless their paths are explicitely set.
+These two are optional on-demand outputs, meaning they won't be produces unless their paths are explicitly set.
 
 `top` value is set to in order to specify the name of top Verilog module, which is required during synthesis.
 
@@ -208,20 +208,20 @@ as strings unless the follow one of the following format:
 * `[item1,item2,item3,...]` - this is a list of strings
 * `{key1:value1,key2:value2,key3:value3,...}` - this is a dictionary
 
-Nesting structures is curently unsupported in CLI.
+Nesting structures is currently unsupported in CLI.
 
 ### Pretend mode
 
 You can also add a `--pretend` (`-P`) option if you just want to see the results of dependency resolution for a
 specified target without building it.
-This is useful when you just want to know what files will be generated and where wilh they be stored.
+This is useful when you just want to know what files will be generated and where will they be stored.
 
 ### Info mode
 
 Modules have the ability to include description to the dependencies they produce.
 
-Running `f4pga` with `--info` (`-i`) flag allows youn to see descriptions of these dependencies.
-This option doesn't require a target to be specified, but you still have to provuide a flow configuration and platform
+Running `f4pga` with `--info` (`-i`) flag allows you to see descriptions of these dependencies.
+This option doesn't require a target to be specified, but you still have to provide a flow configuration and platform
 name.
 
 This is still an experimental option, most targets currently lack descriptions and no information whether the output is
@@ -258,23 +258,23 @@ This is only a snippet of the entire output.
 
 | long      | short | arguments                | description                                                                |
 |-----------|:-----:|--------------------------|----------------------------------------------------------------------------|
-| --verobse | -v    | -                        | Constrol verbosity level. 0 for no verbose output. 2 for maximum verbisity |
-| --silent  | -s    | -                        | Surpress any output                                                        |
+| --verbose | -v    | -                        | Control verbosity level. 0 for no verbose output. 2 for maximum verbosity  |
+| --silent  | -s    | -                        | Suppress any output                                                        |
 
-### Summary of all available subcommands
+### Summary of all available sub-commands
 
 | name    | description                 |
 |---------|-----------------------------|
 | build   | Build a project             |
 | showd   | Print value of a dependency
 
-### Summary of all options available for `build` subcommand
+### Summary of all options available for `build` sub-command
 
 | long        | short | arguments                | description                                             |
 |-------------|:-----:|--------------------------|---------------------------------------------------------|
 | --flow      | -f    | flow configuration file  | Use flow configuration file                             |
 | --platform  |       | platform name            | Specify target platform name (eg. x7a100t)              |
-| --part      | -p    | part name                | Speify target platform by part name                     |
+| --part      | -p    | part name                | Specify target platform by part name                    |
 | --target    | -t    | target dependency name   | Specify target to produce                               |
 | --info      | -i    | -                        | Display information about available targets             |
 | --pretend   | -P    | -                        | Resolve dependencies without executing the flow         |
@@ -283,7 +283,7 @@ This is only a snippet of the entire output.
 | --dep       | -D    | dependency_name=pathexpr | Add a dependency to configuration                       |
 | --val       | -V    | value_name=valueexpr     | Add a value to configuration                            |
 
-### Summary of all options available for `showd` subcommand
+### Summary of all options available for `showd` sub-command
 
 | long        | short | arguments                | description                                                              |
 |-------------|:-----:|--------------------------|--------------------------------------------------------------------------|
@@ -320,7 +320,7 @@ Project status:
 f4pga: DONE
 ```
 
-The letters in the boxes describe the status of a dependency which's name is next to the box.
+The letters in the boxes describe the status of a dependency whose name is next to the box.
 
  * **X** - dependency unresolved.
    Dependency is not present or cannot be produced.
@@ -339,11 +339,11 @@ The letters in the boxes describe the status of a dependency which's name is nex
    This should be fixed in the future.
    :::
 
- * **S** - depenendency not present, resolved.
+ * **S** - dependency not present, resolved.
    This dependency is not currently available on the persistent storage, however it will be produced within flow's
    execution.
 
- * **R** - depenendency present, resolved, requires rebuild.
+ * **R** - dependency present, resolved, requires rebuild.
   This dependency is currently available on the persistent storage, however it has to be rebuilt due to the changes in
   the project.
 
@@ -356,11 +356,11 @@ Additional info about a dependency will be displayed next to its name after a co
 * In case of dependencies which do not require execution of any modules, only a path or list of paths to
   file(s)/directory(ies) that will be displayed.
 
-* In case of unresolved dependencies (**X**), which are never produced by any module, a text sying "`MISSING`" will be
+* In case of unresolved dependencies (**X**), which are never produced by any module, a text saying "`MISSING`" will be
   displayed.
 
 In the example above file `counter.v` has been modified and is now marked as "**N**".
-This causes a bunch of other dependencies to be reqbuilt ("**R**").
+This causes a bunch of other dependencies to be rebuilt ("**R**").
 `build_dir` and `xdc` were already present, so they are marked as "**O**".
 
 ## Common targets and values
@@ -379,31 +379,31 @@ Below are lists of the target and value names along with their meanings.
 
 ### Available in most flows
 
-| Target name | list | Description |
-|-------------|:----:|-------------|
-| `eblif` | no | Extended blif file |
-| `bitstream` | no | Bitstream |
-| `net` | no | Netlist |
-| `fasm` | no | Final FPGA Assembly |
-| `fasm_extra` | no | Additional FPGA assembly that may be generated during synthesis |
-| `build_dir` | no | A directory to put the output files in |
+| Target name  | list | Description                                                     |
+|--------------|:----:|-----------------------------------------------------------------|
+| `eblif`      | no   | Extended blif file                                              |
+| `bitstream`  | no   | Bitstream                                                       |
+| `net`        | no   | Netlist                                                         |
+| `fasm`       | no   | Final FPGA Assembly                                             |
+| `fasm_extra` | no   | Additional FPGA assembly that may be generated during synthesis |
+| `build_dir`  | no   | A directory to put the output files in                          |
 
 ### Built-in values
 
-| Value name | type | Description |
-|------------|------|-------------|
-| `shareDir` | `string` | Path to f4pga's installation "share" directory |
-| `python3` | `string` | Path to Python 3 executable |
+| Value name      | type     | Description                                       |
+|-----------------|----------|---------------------------------------------------|
+| `shareDir`      | `string` | Path to f4pga's installation "share" directory    |
+| `python3`       | `string` | Path to Python 3 executable                       |
 | `noisyWarnings` | `string` | Path to noisy warnings log (should be deprecated) |
-| `prjxray_db` | `string` | Path to Project X-Ray database |
+| `prjxray_db`    | `string` | Path to Project X-Ray database                    |
 
 ### Used in flow definitions
 
-| Value name | type | Description |
-|------------|------|-------------|
-| `top` | `string` | Top module name |
-| `build_dir` | `string` | Path to build directory (should be optional) |
-| `device` | `string` | Name of the device |
-| `vpr_options` | `dict[string -> string \| number]` | Named ptions passed to VPR. No `--` prefix included. |
-| `part_name` | `string` | Name of the chip used. The distinction between `device` and `part_name` is ambiguous at the moment and should be addressed in the future. |
-| `arch_def` | `string` | Path to an XML file containing architecture definition. |
+| Value name    | type                               | Description                                                                                                                               |
+|---------------|------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|
+| `top`         | `string`                           | Top module name                                                                                                                           |
+| `build_dir`   | `string`                           | Path to build directory (should be optional)                                                                                              |
+| `device`      | `string`                           | Name of the device                                                                                                                        |
+| `vpr_options` | `dict[string -> string \| number]` | Named options passed to VPR. No `--` prefix included.                                                                                     |
+| `part_name`   | `string`                           | Name of the chip used. The distinction between `device` and `part_name` is ambiguous at the moment and should be addressed in the future. |
+| `arch_def`    | `string`                           | Path to an XML file containing architecture definition.                                                                                   |

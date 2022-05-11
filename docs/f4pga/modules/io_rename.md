@@ -1,7 +1,7 @@
 # io_rename
 
 This module provides a way to rename (ie. change) dependencies and values of an
-instance of a different module. It wraps another, module whoose name is specified in `params.module` and changes the names of the dependencies and values it relies on.
+instance of a different module. It wraps another, module whose name is specified in `params.module` and changes the names of the dependencies and values it relies on.
 
 ## Parameters
 
@@ -18,7 +18,7 @@ Not specifying a mapping for a given entry will leave it with its original name.
 
 ## Values
 
-All values specified for this modules will be accessible by tyhe wrapped module.
+All values specified for this modules will be accessible by the wrapped module.
 
 ## Extra notes
 

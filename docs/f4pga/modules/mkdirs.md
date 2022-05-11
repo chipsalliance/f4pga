@@ -1,9 +1,9 @@
 # mkdirs
 
-This modules creates directiories specified by the author of flow definition
+This modules creates directories specified by the author of flow definition
 as its targets..
 
 ## Parameters
 
-Each key serves as aname of a directory to becreated, while the value is the
+Each key serves as a name of a directory to be created, while the value is the
 path for that directory.

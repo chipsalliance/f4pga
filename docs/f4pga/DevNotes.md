@@ -11,17 +11,17 @@ For more detailed, up-to-date information about the code, refer to the pydoc doc
 
 ## Project's structure
 
-* `__init__.py` contains the logic and entrypoint of the build system
+* `__init__.py` contains the logic and entry point of the build system
 * `argparser.py` contains boring code for CLI interface
 * `cache.py` contains code needed for tracking modifications in the project.
 * `common.py` contains code shared by the main utility and the modules
 * `flow_config.py` contains code for reading and accessing flow definitions and configurations
-* `module_inspector.py` contains utilities for inpecting I/O of modules
-* `module_runner.py` contains code required to load modules at runtime
+* `module_inspector.py` contains utilities for inspecting I/O of modules
+* `module_runner.py` contains code required to load modules at run-time
 * `module.py` contains definitions required for writing and using f4pga modules
 * `part_db.json` contains mappings from part names to platform names
 * `setup.py` contains a package installation script
-* `stage.py` contains classes relevant  to stage represetation
+* `stage.py` contains classes relevant  to stage representation
 * `modules` contains loadable modules
 * `platforms` contains platform flow definitions
 
@@ -51,7 +51,7 @@ _DFS_ approach to invoke modules and check their inputs and outputs.
 ### Modification tracking
 
 Modification tracking is done by taking, comparing and keeping track of `adler32`
-hashes of all dependencies. Each dependency has a set of hashes associted with it.
+hashes of all dependencies. Each dependency has a set of hashes associated with it.
 The reason for having multiple hashes is that a dependency may have multiple
 "_consumers_", ie. _stages_ which take it as input. Each hash is associated with
 particular consumer. This is necessary, because the system tries to avoid rebuilds
@@ -67,9 +67,9 @@ _f4pga_ exposes some data to the user as well as reads some using internal
 environmental variables. These can be referenced by users in
 _platform flow definitions_ and _project flow configurations_ using the
 `${variable_name}` syntax when defining values. They can also be read inside
-_f4pga modules_ by accesing the `ctx.values` namespace.
+_f4pga modules_ by accessing the `ctx.values` namespace.
 
-The core of tis system is the `ResolutionEnvironemt` class which can be found
+The core of its system is the `ResolutionEnvironemt` class which can be found
 inside the `common` module.
 
 ### Installation
@@ -84,18 +84,18 @@ Check `CMakeLists.txt`.
 
 * Force "_on-demand_" outputs if they are required by another stage.
   This may require redesigning the "on-demand" feature, which currently works
-  by producing a dependency if and only if the user explicitely provides the
+  by producing a dependency if and only if the user explicitly provides the
   path. Otherwise the path is unknown.
 
 * Make commenting style consistent
 
-* Document writing flow defintions
+* Document writing flow definitions
 
 * Extend the metadata system for modules, perhaps make it easier to use.
 
 * Add missing metadata for module targets.
 
-* (_suggestion_) Generate platform defintions using CMake.
+* (_suggestion_) Generate platform definitions using CMake.
 
 ### Out of the current scope
 

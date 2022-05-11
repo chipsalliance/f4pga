@@ -1,6 +1,6 @@
 # fasm
 
-The _fasm_ module generates FPGA assebly using `genfasm` (VPR-only).
+The _fasm_ module generates FPGA assembly using `genfasm` (VPR-only).
 
 The module should guarantee the following outputs:
  * `fasm`
@@ -14,5 +14,5 @@ The setup of the synth module follows the following specifications:
 
 The `fasm` module accepts the following values:
 
-* `pnr_corner` (string, optional): PnR conrenr to use. Relevant only for Quicklogic's
+* `pnr_corner` (string, optional): PnR corner to use. Relevant only for Quicklogic's
   eFPGAs.
