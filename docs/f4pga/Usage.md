@@ -35,11 +35,13 @@ If you want to create a new project, it's highly recommended that you read this 
 It works by wrapping the necessary tools in Python, which are called *f4pga modules*.
 Modules are then referenced in *platform flow definition* files, together with configuration specific for a given
 platform.
-Flow definition files for the following platforms are included as a part of `f4pga`:
+Flow definition files for the following platforms are included as a part of _f4pga_:
 
-* x7a50t
-* x7a100t
-* x7a200t (_soon_)
+* **AMD Xilinx x7a50t** (and architecturally equivalent devices, such as x7a35t)
+* **AMD Xilinx x7a100t**
+* **AMD Xilinx x7a200t**
+* **Quicklogic EOS-S3** (currently unsupported, provided only for development purposes)
+* **Quicklogic K4N8** (currently unsupported, provided only for development purposes)
 
 You can also write your own *platform flow definition* file if you want to bring support for a different device.
 
