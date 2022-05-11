@@ -170,15 +170,41 @@ module BRAM2x18_TDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1ADDR, C1DATA,
 	assign FLUSH1 = 1'b0;
 	assign FLUSH2 = 1'b0;
 
-	wire [17:0] PORT_A1_RDATA = {A1_RDATA_CMPL, A1DATA};
-	wire [17:0] PORT_B1_RDATA = {C1_RDATA_CMPL, C1DATA};
-	wire [17:0] PORT_A2_RDATA = {E1_RDATA_CMPL, E1DATA};
-	wire [17:0] PORT_B2_RDATA = {G1_RDATA_CMPL, G1DATA};
+	wire [17:0] PORT_A1_RDATA;
+	wire [17:0] PORT_B1_RDATA;
+	wire [17:0] PORT_A2_RDATA;
+	wire [17:0] PORT_B2_RDATA;
 
-	wire [17:0] PORT_A1_WDATA = {B1_WDATA_CMPL, B1DATA};
-	wire [17:0] PORT_B1_WDATA = {D1_WDATA_CMPL, D1DATA};
-	wire [17:0] PORT_A2_WDATA = {F1_WDATA_CMPL, F1DATA};
-	wire [17:0] PORT_B2_WDATA = {H1_WDATA_CMPL, H1DATA};
+	wire [17:0] PORT_A1_WDATA;
+	wire [17:0] PORT_B1_WDATA;
+	wire [17:0] PORT_A2_WDATA;
+	wire [17:0] PORT_B2_WDATA;
+
+	// Assign read/write data - handle special case for 9bit mode
+	// parity bit for 9bit mode is placed in R/W port on bit #16
+	case (CFG_DBITS)
+		9: begin
+			assign A1DATA = {PORT_A1_RDATA[16], PORT_A1_RDATA[7:0]};
+			assign C1DATA = {PORT_B1_RDATA[16], PORT_B1_RDATA[7:0]};
+			assign E1DATA = {PORT_A2_RDATA[16], PORT_A2_RDATA[7:0]};
+			assign G1DATA = {PORT_B2_RDATA[16], PORT_B2_RDATA[7:0]};
+			assign PORT_A1_WDATA = {B1_WDATA_CMPL[17], B1DATA[8], B1_WDATA_CMPL[16:9], B1DATA[7:0]};
+			assign PORT_B1_WDATA = {D1_WDATA_CMPL[17], D1DATA[8], D1_WDATA_CMPL[16:9], D1DATA[7:0]};
+			assign PORT_A2_WDATA = {F1_WDATA_CMPL[17], F1DATA[8], F1_WDATA_CMPL[16:9], F1DATA[7:0]};
+			assign PORT_B2_WDATA = {H1_WDATA_CMPL[17], H1DATA[8], H1_WDATA_CMPL[16:9], H1DATA[7:0]};
+		end
+		default: begin
+			assign A1DATA = PORT_A1_RDATA[CFG_DBITS-1:0];
+			assign C1DATA = PORT_B1_RDATA[CFG_DBITS-1:0];
+			assign E1DATA = PORT_A2_RDATA[CFG_DBITS-1:0];
+			assign G1DATA = PORT_B2_RDATA[CFG_DBITS-1:0];
+			assign PORT_A1_WDATA = {B1_WDATA_CMPL, B1DATA};
+			assign PORT_B1_WDATA = {D1_WDATA_CMPL, D1DATA};
+			assign PORT_A2_WDATA = {F1_WDATA_CMPL, F1DATA};
+			assign PORT_B2_WDATA = {H1_WDATA_CMPL, H1DATA};
+
+		end
+	endcase
 
 	wire PORT_A1_CLK = CLK1;
 	wire PORT_A2_CLK = CLK3;

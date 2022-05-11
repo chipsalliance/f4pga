@@ -65,13 +65,34 @@ module \$__QLF_FACTOR_BRAM36_TDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1
 	wire [14:0] D1ADDR_TOTAL = {D1ADDR_CMPL, D1ADDR};
 
 	wire [35:CFG_DBITS] A1DATA_CMPL;
+	wire [35:CFG_DBITS] B1DATA_CMPL;
 	wire [35:CFG_DBITS] C1DATA_CMPL;
+	wire [35:CFG_DBITS] D1DATA_CMPL;
 
-	wire [35:0] A1DATA_TOTAL = {A1DATA_CMPL, A1DATA};
-	wire [35:0] C1DATA_TOTAL = {C1DATA_CMPL, C1DATA};
+	wire [35:0] A1DATA_TOTAL;
+	wire [35:0] B1DATA_TOTAL;
+	wire [35:0] C1DATA_TOTAL;
+	wire [35:0] D1DATA_TOTAL;
 
 	wire [14:0] PORT_A_ADDR;
 	wire [14:0] PORT_B_ADDR;
+
+	// Assign read/write data - handle special case for 9bit mode
+	// parity bit for 9bit mode is placed in R/W port on bit #16
+	case (CFG_DBITS)
+		9: begin
+			assign A1DATA = {A1DATA_TOTAL[16], A1DATA_TOTAL[7:0]};
+			assign C1DATA = {C1DATA_TOTAL[16], C1DATA_TOTAL[7:0]};
+			assign B1DATA_TOTAL = {B1DATA_CMPL[35:17], B1DATA[8], B1DATA_CMPL[16:9], B1DATA[7:0]};
+			assign D1DATA_TOTAL = {D1DATA_CMPL[35:17], D1DATA[8], D1DATA_CMPL[16:9], D1DATA[7:0]};
+		end
+		default: begin
+			assign A1DATA = A1DATA_TOTAL[CFG_DBITS-1:0];
+			assign C1DATA = C1DATA_TOTAL[CFG_DBITS-1:0];
+			assign B1DATA_TOTAL = {B1DATA_CMPL, B1DATA};
+			assign D1DATA_TOTAL = {D1DATA_CMPL, D1DATA};
+		end
+	endcase
 
 	case (CFG_DBITS)
 		1: begin
@@ -144,8 +165,8 @@ module \$__QLF_FACTOR_BRAM36_TDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1
 
 	TDP36K _TECHMAP_REPLACE_ (
 		.RESET_ni(1'b1),
-		.WDATA_A1_i(B1DATA[17:0]),
-		.WDATA_A2_i(B1DATA[35:18]),
+		.WDATA_A1_i(B1DATA_TOTAL[17:0]),
+		.WDATA_A2_i(B1DATA_TOTAL[35:18]),
 		.RDATA_A1_o(A1DATA_TOTAL[17:0]),
 		.RDATA_A2_o(A1DATA_TOTAL[35:18]),
 		.ADDR_A1_i(PORT_A_ADDR),
@@ -159,8 +180,8 @@ module \$__QLF_FACTOR_BRAM36_TDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1
 		.BE_A1_i({B1EN[1],B1EN[0]}),
 		.BE_A2_i({B1EN[3],B1EN[2]}),
 
-		.WDATA_B1_i(D1DATA[17:0]),
-		.WDATA_B2_i(D1DATA[35:18]),
+		.WDATA_B1_i(D1DATA_TOTAL[17:0]),
+		.WDATA_B2_i(D1DATA_TOTAL[35:18]),
 		.RDATA_B1_o(C1DATA_TOTAL[17:0]),
 		.RDATA_B2_o(C1DATA_TOTAL[35:18]),
 		.ADDR_B1_i(PORT_B_ADDR),
@@ -306,8 +327,18 @@ module \$__QLF_FACTOR_BRAM36_SDP (CLK2, CLK3, A1ADDR, A1DATA, A1EN, B1ADDR, B1DA
 	assign A1ADDR_TOTAL = {A1ADDR_CMPL, A1ADDR};
 	assign B1ADDR_TOTAL = {B1ADDR_CMPL, B1ADDR};
 
-	assign A1DATA_TOTAL = {A1DATA_CMPL, A1DATA};
-	assign B1DATA_TOTAL = {B1DATA_CMPL, B1DATA};
+	// Assign read/write data - handle special case for 9bit mode
+	// parity bit for 9bit mode is placed in R/W port on bit #16
+	case (CFG_DBITS)
+		9: begin
+			assign A1DATA = {A1DATA_TOTAL[16], A1DATA_TOTAL[7:0]};
+			assign B1DATA_TOTAL = {B1DATA_CMPL[35:17], B1DATA[8], B1DATA_CMPL[16:9], B1DATA[7:0]};
+		end
+		default: begin
+			assign A1DATA = A1DATA_TOTAL[CFG_DBITS-1:0];
+			assign B1DATA_TOTAL = {B1DATA_CMPL, B1DATA};
+		end
+	endcase
 
 	case (CFG_DBITS)
 		1: begin
@@ -392,8 +423,8 @@ module \$__QLF_FACTOR_BRAM36_SDP (CLK2, CLK3, A1ADDR, A1DATA, A1EN, B1ADDR, B1DA
 		.BE_A1_i({A1EN, A1EN}),
 		.BE_A2_i({A1EN, A1EN}),
 
-		.WDATA_B1_i(B1DATA[17:0]),
-		.WDATA_B2_i(B1DATA[35:18]),
+		.WDATA_B1_i(B1DATA_TOTAL[17:0]),
+		.WDATA_B2_i(B1DATA_TOTAL[35:18]),
 		.RDATA_B1_o(DOBDO[17:0]),
 		.RDATA_B2_o(DOBDO[35:18]),
 		.ADDR_B1_i(B1ADDR_15),
