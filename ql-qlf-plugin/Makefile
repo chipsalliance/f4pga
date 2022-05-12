@@ -22,7 +22,8 @@ SOURCES = synth_quicklogic.cc \
           ql-edif.cc \
           ql-dsp-simd.cc \
           ql-dsp-macc.cc \
-          ql-bram-split.cc
+          ql-bram-split.cc \
+          ql-dsp-io-regs.cc
 
 DEPS = pmgen/ql-dsp-pm.h \
        pmgen/ql-dsp-macc.h
