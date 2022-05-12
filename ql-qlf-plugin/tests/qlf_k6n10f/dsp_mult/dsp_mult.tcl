@@ -36,33 +36,33 @@ design -load read
 check_equiv ${TOP}
 design -load postopt
 yosys cd ${TOP}
-select -assert-count 1 t:QL_DSP2
+select -assert-count 1 t:QL_DSP2_MULT
 
 set TOP "mult_20x18"
 design -load read
 check_equiv ${TOP}
 design -load postopt
 yosys cd ${TOP}
-select -assert-count 1 t:QL_DSP2
+select -assert-count 1 t:QL_DSP2_MULT
 
 set TOP "mult_8x8"
 design -load read
 check_equiv ${TOP}
 design -load postopt
 yosys cd ${TOP}
-select -assert-count 1 t:QL_DSP2
+select -assert-count 1 t:QL_DSP2_MULT
 
 set TOP "mult_10x9"
 design -load read
 check_equiv ${TOP}
 design -load postopt
 yosys cd ${TOP}
-select -assert-count 1 t:QL_DSP2
+select -assert-count 1 t:QL_DSP2_MULT
 
 set TOP "mult_8x8_s"
 design -load read
 check_equiv ${TOP}
 design -load postopt
 yosys cd ${TOP}
-select -assert-count 1 t:QL_DSP2
+select -assert-count 1 t:QL_DSP2_MULT
 

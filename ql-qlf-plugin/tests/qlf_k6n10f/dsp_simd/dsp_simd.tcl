@@ -38,7 +38,7 @@ check_equiv ${TOP}
 design -load postopt
 select -assert-count 0 t:dsp_t1_20x18x64
 select -assert-count 0 t:dsp_t1_10x9x32
-select -assert-count 1 t:QL_DSP2
+select -assert-count 1 t:QL_DSP2_MULT_REGIN
 
 set TOP "simd_mult_inferred"
 design -load read
@@ -48,7 +48,7 @@ design -load postopt
 yosys cd $TOP
 select -assert-count 0 t:dsp_t1_20x18x64
 select -assert-count 0 t:dsp_t1_10x9x32
-select -assert-count 1 t:QL_DSP2
+select -assert-count 1 t:QL_DSP2_MULT
 
 set TOP "simd_mult_odd"
 design -load read
@@ -58,7 +58,8 @@ design -load postopt
 yosys cd $TOP
 select -assert-count 0 t:dsp_t1_20x18x64
 select -assert-count 0 t:dsp_t1_10x9x32
-select -assert-count 2 t:QL_DSP2
+select -assert-count 0 t:QL_DSP2
+select -assert-count 2 t:QL_DSP2_MULT_REGIN
 
 set TOP "simd_mult_conflict"
 design -load read
@@ -68,5 +69,5 @@ design -load postopt
 yosys cd $TOP
 select -assert-count 0 t:dsp_t1_20x18x64
 select -assert-count 0 t:dsp_t1_10x9x32
-select -assert-count 2 t:QL_DSP2
+select -assert-count 2 t:QL_DSP2_MULT_REGIN
 
