@@ -3270,6 +3270,7 @@ void UhdmAst::process_logic_var()
         }
         delete node;
     });
+    // TODO: Handling below seems similar to other typespec accesses for range. Candidate for extraction to a function.
     if (auto typespec_h = vpi_handle(vpiTypespec, obj_h)) {
         visit_one_to_many({vpiRange}, typespec_h, [&](AST::AstNode *node) { packed_ranges.push_back(node); });
         vpi_release_handle(typespec_h);
