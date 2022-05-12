@@ -133,6 +133,7 @@ class UhdmAst
     void process_string_typespec();
     void process_repeat();
     void process_byte_var();
+    void process_byte_typespec();
     void process_long_int_var();
     void process_immediate_cover();
     void process_immediate_assume();
