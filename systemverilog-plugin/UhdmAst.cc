@@ -3282,7 +3282,13 @@ void UhdmAst::process_logic_var()
         }
         delete node;
     });
-    visit_one_to_many({vpiRange}, obj_h, [&](AST::AstNode *node) { packed_ranges.push_back(node); });
+    // TODO: Handling below seems similar to other typespec accesses for range. Candidate for extraction to a function.
+    if (auto typespec_h = vpi_handle(vpiTypespec, obj_h)) {
+        visit_one_to_many({vpiRange}, typespec_h, [&](AST::AstNode *node) { packed_ranges.push_back(node); });
+        vpi_release_handle(typespec_h);
+    } else {
+        visit_one_to_many({vpiRange}, obj_h, [&](AST::AstNode *node) { packed_ranges.push_back(node); });
+    }
     visit_default_expr(obj_h);
     add_multirange_wire(current_node, packed_ranges, unpacked_ranges);
 }
