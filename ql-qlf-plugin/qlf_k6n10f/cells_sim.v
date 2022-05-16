@@ -1564,6 +1564,7 @@ module QL_DSP2_MULT ( // TODO: Name subject to change
     input  wire [17:0] b,
     output wire [37:0] z,
 
+    // Port not available in architecture file
     input  wire       reset,
 
     input  wire       unsigned_a,
@@ -1609,6 +1610,7 @@ module QL_DSP2_MULT_REGIN ( // TODO: Name subject to change
 
     (* clkbuf_sink *)
     input  wire       clk,
+    // Port not available in architecture file
     input  wire       reset,
 
     input  wire       unsigned_a,
@@ -1655,6 +1657,7 @@ module QL_DSP2_MULT_REGOUT ( // TODO: Name subject to change
 
     (* clkbuf_sink *)
     input  wire       clk,
+    // Port not available in architecture file
     input  wire       reset,
 
     input  wire       unsigned_a,
@@ -1700,6 +1703,7 @@ module QL_DSP2_MULT_REGIN_REGOUT ( // TODO: Name subject to change
 
     (* clkbuf_sink *)
     input  wire       clk,
+    // Port not available in architecture file
     input  wire       reset,
 
     input  wire       unsigned_a,
@@ -1743,12 +1747,14 @@ module QL_DSP2_MULTADD (
     input  wire [17:0] b,
     output wire [37:0] z,
 
+    // begin: Ports not available in architecture file
     (* clkbuf_sink *)
     input  wire        clk,
     input  wire        reset,
 
     input  wire [ 2:0] feedback,
     input  wire        load_acc,
+    // end: Ports not available in architecture file
     input  wire        unsigned_a,
     input  wire        unsigned_b,
 
@@ -1796,6 +1802,7 @@ module QL_DSP2_MULTADD_REGIN (
 
     (* clkbuf_sink *)
     input  wire        clk,
+    // Port not available in architecture file
     input  wire        reset,
 
     input  wire [ 2:0] feedback,
@@ -1847,6 +1854,7 @@ module QL_DSP2_MULTADD_REGOUT (
 
     (* clkbuf_sink *)
     input  wire        clk,
+    // Port not available in architecture file
     input  wire        reset,
 
     input  wire [ 2:0] feedback,
@@ -1898,6 +1906,7 @@ module QL_DSP2_MULTADD_REGIN_REGOUT (
 
     (* clkbuf_sink *)
     input  wire        clk,
+    // Port not available in architecture file
     input  wire        reset,
 
     input  wire [ 2:0] feedback,
@@ -1949,10 +1958,12 @@ module QL_DSP2_MULTACC (
 
     (* clkbuf_sink *)
     input  wire        clk,
+    // begin: Ports not available in architecture file
     input  wire        reset,
 
-    input  wire [ 2:0] feedback,
     input  wire        load_acc,
+    // end: Ports not available in architecture file
+    input  wire [ 2:0] feedback,
     input  wire        unsigned_a,
     input  wire        unsigned_b,
 
@@ -2000,6 +2011,7 @@ module QL_DSP2_MULTACC_REGIN (
 
     (* clkbuf_sink *)
     input  wire        clk,
+    // Port not available in architecture file
     input  wire        reset,
 
     input  wire [ 2:0] feedback,
@@ -2051,6 +2063,7 @@ module QL_DSP2_MULTACC_REGOUT (
 
     (* clkbuf_sink *)
     input  wire        clk,
+    // Port not available in architecture file
     input  wire        reset,
 
     input  wire [ 2:0] feedback,
@@ -2102,6 +2115,7 @@ module QL_DSP2_MULTACC_REGIN_REGOUT (
 
     (* clkbuf_sink *)
     input  wire        clk,
+    // Port not available in architecture file
     input  wire        reset,
 
     input  wire [ 2:0] feedback,
