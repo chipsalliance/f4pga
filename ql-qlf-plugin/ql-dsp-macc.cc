@@ -56,7 +56,7 @@ void create_ql_macc_dsp(ql_dsp_macc_pm &pm)
     }
 
     // Accept only posedge clocked FFs
-    if (st.ff->getParam(ID(CLK_POLARITY)) != RTLIL::S1) {
+    if (st.ff->getParam(ID(CLK_POLARITY)).as_int() != 1) {
         return;
     }
 
@@ -151,7 +151,7 @@ void create_ql_macc_dsp(ql_dsp_macc_pm &pm)
     RTLIL::SigSpec ena;
 
     if (st.ff->hasPort(ID(ARST))) {
-        if (st.ff->getParam(ID(ARST_POLARITY)) != RTLIL::S1) {
+        if (st.ff->getParam(ID(ARST_POLARITY)).as_int() != 1) {
             rst = pm.module->Not(NEW_ID, st.ff->getPort(ID(ARST)));
         } else {
             rst = st.ff->getPort(ID(ARST));
@@ -161,7 +161,7 @@ void create_ql_macc_dsp(ql_dsp_macc_pm &pm)
     }
 
     if (st.ff->hasPort(ID(EN))) {
-        if (st.ff->getParam(ID(EN_POLARITY)) != RTLIL::S1) {
+        if (st.ff->getParam(ID(EN_POLARITY)).as_int() != 1) {
             ena = pm.module->Not(NEW_ID, st.ff->getPort(ID(EN)));
         } else {
             ena = st.ff->getPort(ID(EN));
