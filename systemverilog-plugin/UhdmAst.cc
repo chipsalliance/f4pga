@@ -2412,15 +2412,28 @@ void UhdmAst::process_initial()
 void UhdmAst::process_begin(bool is_named)
 {
     current_node = make_ast_node(AST::AST_BLOCK);
-    // TODO: find out how to set VERILOG_FRONTEND::sv_mode to true
-    // simplify checks if sv_mode is set to ture when wire is declared inside unnamed block
-    if (is_named) {
-        visit_one_to_many({vpiVariables}, obj_h, [&](AST::AstNode *node) {
-            if (node) {
+    if (!is_named) {
+        // for unnamed block, reset block name
+        current_node->str = "";
+    }
+    AST::AstNode *hierarchy_node = nullptr;
+    static int unnamed_block_idx = 0;
+    visit_one_to_many({vpiVariables}, obj_h, [&](AST::AstNode *node) {
+        if (node) {
+            if (!is_named) {
+                if (!hierarchy_node) {
+                    // Create an implicit hierarchy scope
+                    // simplify checks if sv_mode is set to true when wire is declared inside unnamed block
+                    VERILOG_FRONTEND::sv_mode = true;
+                    hierarchy_node = make_ast_node(AST::AST_BLOCK);
+                    hierarchy_node->str = "$unnamed_block$" + std::to_string(unnamed_block_idx++);
+                }
+                hierarchy_node->children.push_back(node);
+            } else {
                 current_node->children.push_back(node);
             }
-        });
-    }
+        }
+    });
     visit_one_to_many({vpiStmt}, obj_h, [&](AST::AstNode *node) {
         if (node) {
             if ((node->type == AST::AST_ASSIGN_EQ || node->type == AST::AST_ASSIGN_LE) && node->children.size() == 1) {
@@ -2432,10 +2445,15 @@ void UhdmAst::process_begin(bool is_named)
                 wire_node->str = node->children[0]->str;
                 func_node->children.push_back(wire_node);
             } else {
-                current_node->children.push_back(node);
+                if (hierarchy_node)
+                    hierarchy_node->children.push_back(node);
+                else
+                    current_node->children.push_back(node);
             }
         }
     });
+    if (hierarchy_node)
+        current_node->children.push_back(hierarchy_node);
 }
 
 void UhdmAst::process_operation(const UHDM::BaseClass *object)
@@ -3984,8 +4002,6 @@ AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
         break;
     case vpiBegin:
         process_begin(false);
-        // for unnamed block, reset block name
-        current_node->str = "";
         break;
     case vpiCondition:
     case vpiOperation:
