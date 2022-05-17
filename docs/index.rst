@@ -10,6 +10,7 @@ The project aims to design tools that are highly extendable and multiplatform.
   :align: center
 
 
+
 .. toctree::
   :caption: About F4PGA
 
@@ -38,8 +39,18 @@ The project aims to design tools that are highly extendable and multiplatform.
 .. toctree::
   :caption: Development
 
-  development/building-docs
-  development/venv
+  contributing/building-docs
+  contributing/venv
+
+
+.. toctree::
+  :caption: Python utils
+  :maxdepth: 2
+
+  f4pga/index
+  f4pga/Usage
+  f4pga/modules/index
+  f4pga/DevNotes
 
 
 .. toctree::

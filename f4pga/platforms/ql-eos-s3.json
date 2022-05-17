@@ -1,0 +1,121 @@
+{
+    "stages": {
+        "mk_build_dir": "common:mkdirs",
+        "synth": "common:synth",
+        "pack": "common:pack",
+        "ioplace": "common:generic_script_wrapper",
+        "place": "common:place",
+        "route": "common:route",
+        "fasm": "common:fasm",
+        "bitstream": "common:generic_script_wrapper"
+    },
+
+    "values": {
+        "part_name": "pd64",
+        "device": "ql-eos-s3",
+        "device_alt": "ql-eos-s3_wlcsp",
+        "pinmap": "${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_PD64.csv",
+        "arch_def": "${shareDir}/arch/ql-eos-s3_wlcsp/arch.timing.xml",
+        "rr_graph_lookahead_bin": "${shareDir}/arch/ql-eos-s3_wlcsp/rr_graph_ql-eos-s3_wlcsp.lookahead.bin",
+        "rr_graph_real_bin": "${shareDir}/arch/ql-eos-s3_wlcsp/rr_graph_ql-eos-s3_wlcsp.rr_graph.real.bin",
+        "vpr_place_delay": "${shareDir}/arch/ql-eos-s3_wlcsp/rr_graph_ql-eos-s3_wlcsp.place_delay.bin",
+        "vpr_grid_layout_name": "ql-eos-s3",
+        "vpr_options": {
+            "max_router_iterations": 500,
+            "routing_failure_predictor": "off",
+            "router_high_fanout_threshold": -1,
+            "constant_net_method": "route",
+            "route_chan_width": 100,
+            "clock_modeling": "route",
+            "place_delay_model": "delta_override",
+            "router_lookahead": "extended_map",
+            "check_route": "quick",
+            "strict_checks": "off",
+            "allow_dangling_combinational_nodes": "on",
+            "disable_errors": "check_unbuffered_edges:check_route",
+            "congested_routing_iteration_threshold": "0.8",
+            "incremental_reroute_delay_ripup": "off",
+            "base_cost_type": "delay_normalized_length_bounded",
+            "bb_factor": "10",
+            "initial_pres_fac": "4.0",
+            "check_rr_graph": "off",
+            "pack_high_fanout_threshold": "PB-lOGIC:18",
+            "suppress_warnings": "${noisyWarnings},sum_pin_class:check_unbuffered_edges:load_rr_indexed_data_T_values:check_rr_node:trans_per_R:check_route:set_rr_graph_tool_comment "
+        }
+    },
+
+    "stage_options": {
+        "mk_build_dir": {
+            "params": {
+                "build_dir": "build/${device}"
+            }
+        },
+        "synth": {
+            "params": {
+                "takes": [ "pcf?" ],
+                "produces": [ "synth_v" ]
+            },
+            "values": {
+                "tcl_scripts": "${shareDir}/scripts/pp3",
+                "read_verilog_args": [],
+                "yosys_tcl_env": {
+                    "OUT_JSON": "${:json}",
+                    "OUT_SYNTH_V": "${:synth_v}",
+                    "OUT_EBLIF": "${:eblif}",
+                    "OUT_FASM_EXTRA": "${:fasm_extra}",
+                    "TECHMAP_PATH": "${shareDir}/techmaps/pp3",
+                    "DEVICE_CELLS_SIM": "${shareDir}/arch/ql-eos-s3_wlcsp/cells/ram_sim.v",
+                    "DEVICE_CELLS_MAP": "${shareDir}/arch/ql-eos-s3_wlcsp/cells/ram_map.v",
+                    "PINMAP_FILE": "${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_PD64.csv",
+                    "PCF_FILE": "${:pcf}"
+                }
+            }
+        },
+        "ioplace": {
+            "params": {
+                "stage_name": "ioplace",
+                "interpreter": "${python3}",
+                "script": "${binDir}/python/ql_pp3_create_ioplace.py",
+                "outputs": {
+                    "io_place": {
+                        "mode": "stdout",
+                        "target": "${:eblif[noext]}.ioplace"
+                    }
+                },
+                "inputs": {
+                    "blif": "${:eblif}",
+                    "net": "${:net}",
+                    "pcf": "${:pcf}",
+                    "map": "${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_PD64.csv",
+                    "$PYTHONPATH": "${binDir}/python/"
+                }
+            }
+        },
+        "bitstream": {
+            "params": {
+                "stage_name": "bitstream",
+                "script": "qlfasm",
+                "outputs": {
+                    "bitstream": {
+                        "mode": "file",
+                        "file": "bitstream-${device}.bit",
+                        "target": "${build_dir?}/bitstream-${device}.bit"
+                    },
+                    "bitstream_log": {
+                        "mode": "stdout",
+                        "target": "${build_dir?}/bitstream-${device}.log"
+                    }
+                },
+                "inputs": {
+                    "#1": "${:fasm}",
+                    "#2": "bitstream-${device}.bit",
+                    "dev-type": "ql-eos-s3",
+                    "db-root": "${shareDir}/fasm_database/pp3"
+                }
+            },
+            "values": {
+                "build_dir?": "."
+            }
+        }
+    }
+}

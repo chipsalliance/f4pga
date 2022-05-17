@@ -47,16 +47,24 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx_verilog_domain',
     'sphinxcontrib.bibtex',
+    'myst_parser'
 ]
 
 bibtex_default_style = 'plain'
 bibtex_bibfiles = ['refs.bib']
 
+myst_enable_extensions = [
+    "colon_fence",
+]
+
 numfig = True
 
 templates_path = ['_templates']
 
-source_suffix = ['.rst', '.md']
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.md': 'markdown'
+}
 
 master_doc = 'index'
 
