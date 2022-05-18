@@ -28,13 +28,6 @@ parse_args $@
 
 export OUT_NOISY_WARNINGS=noisy_warnings-${DEVICE}_analysis.log
 
-run_vpr --analysis --gen_post_synthesis_netlist on --verify_file_digests off
+run_vpr --analysis --gen_post_synthesis_netlist on --gen_post_implementation_merged_netlist on --verify_file_digests off
 
 mv vpr_stdout.log analysis.log
-
-python3 "$F4PGA_ENV_BIN"/python/vpr_fixup_post_synth.py \
-    --vlog-in ${TOP}_post_synthesis.v \
-    --vlog-out ${TOP}_post_synthesis.v \
-    --sdf-in ${TOP}_post_synthesis.sdf \
-    --sdf-out ${TOP}_post_synthesis.sdf \
-    --split-ports
