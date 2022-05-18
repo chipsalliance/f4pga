@@ -21,6 +21,9 @@ SOURCES = UhdmAst.cc \
 	  uhdmsurelogastfrontend.cc \
 	  uhdmastreport.cc
 
+# Directory to search for Surelog and UHDM libraries
+UHDM_INSTALL_DIR ?= /usr/local
+
 include ../Makefile_plugin.common
 
 CPPFLAGS += -std=c++17 -Wall -W -Wextra -Werror \
