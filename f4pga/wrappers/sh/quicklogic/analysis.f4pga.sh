@@ -28,6 +28,6 @@ parse_args $@
 
 export OUT_NOISY_WARNINGS=noisy_warnings-${DEVICE}_analysis.log
 
-run_vpr --analysis --gen_post_synthesis_netlist on --gen_post_implementation_merged_netlist on --verify_file_digests off
+run_vpr --analysis --gen_post_synthesis_netlist on --gen_post_implementation_merged_netlist on --post_synth_netlist_unconn_inputs nets --post_synth_netlist_unconn_outputs nets --verify_file_digests off
 
 mv vpr_stdout.log analysis.log
