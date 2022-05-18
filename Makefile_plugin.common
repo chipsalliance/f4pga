@@ -53,11 +53,7 @@ LDFLAGS = $(shell $(YOSYS_CONFIG) --ldflags)
 LDLIBS = $(shell $(YOSYS_CONFIG) --ldlibs)
 EXTRA_FLAGS ?=
 
-ifdef DESTDIR
-  DATA_DIR = $(DESTDIR)
-else
-  DATA_DIR = $(shell $(YOSYS_CONFIG) --datdir)
-endif
+DATA_DIR = $(DESTDIR)$(shell $(YOSYS_CONFIG) --datdir)
 PLUGINS_DIR = $(DATA_DIR)/plugins
 
 OBJS := $(patsubst %.cc,%.o,$(SOURCES))
