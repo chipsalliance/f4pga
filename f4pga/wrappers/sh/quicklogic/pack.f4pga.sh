@@ -28,6 +28,6 @@ parse_args $@
 
 export OUT_NOISY_WARNINGS=noisy_warnings-${DEVICE}_pack.log
 
-run_vpr --pack
+run_vpr --pack --write_block_usage block_usage.json
 
 mv vpr_stdout.log pack.log

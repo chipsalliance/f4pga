@@ -28,6 +28,6 @@ parse_args $@
 
 export OUT_NOISY_WARNINGS=noisy_warnings-${DEVICE}_pack.log
 
-run_vpr --route
+run_vpr --route --write_timing_summary timing_summary.json
 
 mv vpr_stdout.log route.log
