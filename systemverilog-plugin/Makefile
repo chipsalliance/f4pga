@@ -26,7 +26,7 @@ UHDM_INSTALL_DIR ?= /usr/local
 
 include ../Makefile_plugin.common
 
-CPPFLAGS += -std=c++17 -Wall -W -Wextra -Werror \
+CPPFLAGS += -std=c++17 -Wall -W -Wextra \
               -Wno-deprecated-declarations \
               -Wno-unused-parameter \
               -I${UHDM_INSTALL_DIR}/include \
