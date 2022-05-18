@@ -84,7 +84,7 @@ if [[ "$DEVICE" =~ ^(ql-eos-s3|ql-pp3e)$ ]]; then
     fi
 
     echo "Running fasm2bels"
-    python3 ${FASM2BELS} ${BIT} --phy-db ${VPR_DB} --package-name ${PART} --input-type bitstream --output-verilog ${VERILOG_FILE} ${PCF_ARGS} --output-pcf ${PCF_FILE} --output-qcf ${QCF_FILE}
+    python3 ${FASM2BELS} ${BIT} --phy-db ${VPR_DB} --device-name ${FASM2BELS_DEVICE} --package-name ${PART} --input-type bitstream --output-verilog ${VERILOG_FILE} ${PCF_ARGS} --output-pcf ${PCF_FILE} --output-qcf ${QCF_FILE}
 
 else
 

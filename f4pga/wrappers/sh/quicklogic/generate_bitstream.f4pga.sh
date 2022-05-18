@@ -64,7 +64,7 @@ if [[ "$DEVICE" =~ ^(qlf_k4n8.*)$ ]]; then
     DB_ROOT=`realpath ${MYPATH}/../share/symbiflow/fasm_database/${DEVICE}`
     ${QLF_FASM} --db-root ${DB_ROOT} --format ${BIT_FORMAT} --assemble $FASM $BIT
 elif [[ "$DEVICE" =~ ^(ql-eos-s3|ql-pp3e)$ ]]; then
-    qlfasm ${FASM} ${BIT}
+    qlfasm --dev-type ${DEVICE} ${FASM} ${BIT}
 else
     echo "ERROR: Unsupported device '${DEVICE}' for bitstream generation"
     exit -1
