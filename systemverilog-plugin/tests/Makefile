@@ -14,4 +14,9 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+TESTS = counter
+
 include $(shell pwd)/../../Makefile_test.common
+
+counter_verify = true
+
