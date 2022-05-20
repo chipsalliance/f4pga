@@ -27,6 +27,8 @@ UHDM_INSTALL_DIR ?= /usr/local
 include ../Makefile_plugin.common
 
 CPPFLAGS += -std=c++17 -Wall -W -Wextra -Werror \
+              -Wno-deprecated-declarations \
+              -Wno-unused-parameter \
               -I${UHDM_INSTALL_DIR}/include \
 	      -I${UHDM_INSTALL_DIR}/include/Surelog
 
