@@ -21,7 +21,8 @@ SOURCES = synth_quicklogic.cc \
           quicklogic_eqn.cc \
           ql-edif.cc \
           ql-dsp-simd.cc \
-          ql-dsp-macc.cc
+          ql-dsp-macc.cc \
+          ql-bram-split.cc
 
 DEPS = pmgen/ql-dsp-pm.h \
        pmgen/ql-dsp-macc.h
@@ -46,6 +47,7 @@ VERILOG_MODULES = $(COMMON)/cells_sim.v         \
                   $(QLF_K6N10_DIR)/lut_map.v   \
                   $(QLF_K6N10F_DIR)/arith_map.v \
                   $(QLF_K6N10F_DIR)/brams_map.v \
+                  $(QLF_K6N10F_DIR)/brams_final_map.v \
                   $(QLF_K6N10F_DIR)/brams.txt   \
                   $(QLF_K6N10F_DIR)/cells_sim.v \
                   $(QLF_K6N10F_DIR)/sram1024x18.v \

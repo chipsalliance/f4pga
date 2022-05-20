@@ -2,10 +2,16 @@ bram $__QLF_FACTOR_BRAM36_TDP
   init 1
   abits 10     @a10d36
   dbits 36     @a10d36
+  abits 10     @a10d32
+  dbits 32     @a10d32
   abits 11     @a11d18
   dbits 18     @a11d18
+  abits 11     @a11d16
+  dbits 16     @a11d16
   abits 12     @a12d9
   dbits  9     @a12d9
+  abits 12     @a12d8
+  dbits  8     @a12d8
   abits 13     @a13d4
   dbits  4     @a13d4
   abits 14     @a14d2
@@ -15,9 +21,9 @@ bram $__QLF_FACTOR_BRAM36_TDP
   groups 4
   ports  1 1 1 1
   wrmode 0 1 0 1
-  enable 1 4 1 4 @a10d36
-  enable 1 2 1 2 @a11d18
-  enable 1 1 1 1 @a12d9 @a13d4 @a14d2 @a15d1
+  enable 1 4 1 4 @a10d36 @a10d32
+  enable 1 2 1 2 @a11d18 @a11d16
+  enable 1 1 1 1 @a12d9 @a12d8 @a13d4 @a14d2 @a15d1
   transp 0 0 0 0
   clocks 1 1 2 2
   clkpol 1 1 1 1
@@ -27,10 +33,16 @@ bram $__QLF_FACTOR_BRAM36_SDP
   init 1
   abits 10     @a10d36
   dbits 36     @a10d36
+  abits 10     @a10d32
+  dbits 32     @a10d32
   abits 11     @a11d18
   dbits 18     @a11d18
+  abits 11     @a11d16
+  dbits 16     @a11d16
   abits 12     @a12d9
   dbits  9     @a12d9
+  abits 12     @a12d8
+  dbits  8     @a12d8
   abits 13     @a13d4
   dbits  4     @a13d4
   abits 14     @a14d2
@@ -40,33 +52,70 @@ bram $__QLF_FACTOR_BRAM36_SDP
   groups 2
   ports  1 1
   wrmode 0 1
-  enable 1 4   @a10d36
-  enable 1 2   @a11d18
-  enable 1 1   @a12d9 @a13d4 @a14d2 @a15d1
+  enable 1 4   @a10d36 @a10d32
+  enable 1 2   @a11d18 @a11d16
+  enable 1 1   @a12d9 @a12d8 @a13d4 @a14d2 @a15d1
   transp 0 0
   clocks 2 3
   clkpol 2 3
 endbram
 
+bram $__QLF_FACTOR_BRAM18_TDP
+  init 1
+  abits 10     @a10d18
+  dbits 18     @a10d18
+  abits 10     @a10d16
+  dbits 16     @a10d16
+  abits 11     @a11d9
+  dbits  9     @a11d9
+  abits 11     @a11d8
+  dbits  8     @a11d8
+  abits 12     @a12d4
+  dbits  4     @a12d4
+  abits 13     @a13d2
+  dbits  2     @a13d2
+  abits 14     @a14d1
+  dbits  1     @a14d1
+  groups 4
+  ports  1 1 1 1
+  wrmode 0 1 0 1
+  enable 1 2 1 2  @a10d18 @a10d16
+  enable 1 1 1 1  @a11d9 @a11d8 @a12d4 @a13d2 @a14d1
+  transp 0 0 0 0
+  clocks 1 1 2 2
+  clkpol 1 1 2 2
+endbram
 
 match $__QLF_FACTOR_BRAM36_TDP
+  min bits 18433
   min wports 1
   max wports 2
   min rports 1
   max rports 2
   min efficiency 1
-  min bits 128
   shuffle_enable B
   make_transp
   or_next_if_better
 endmatch
 
 match $__QLF_FACTOR_BRAM36_SDP
+  min bits 18433
   max wports 1
   max rports 1
   min efficiency 1
+  shuffle_enable B
+  make_transp
+  or_next_if_better
+endmatch
+
+match $__QLF_FACTOR_BRAM18_TDP
   min bits 128
+  max bits 18432
+  min wports 1
+  max wports 2
+  min rports 1
+  max rports 2
+  min efficiency 1
   shuffle_enable B
   make_transp
 endmatch
-

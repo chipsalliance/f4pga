@@ -159,8 +159,8 @@ module TB;
 	end
 
 	case (`STRINGIFY(`TOP))
-		"BRAM_TDP_32x512": begin
-			BRAM_TDP_32x512 #() bram (
+		"BRAM_TDP_36x1024": begin
+			BRAM_TDP_36x1024 #() bram (
 				.clk_a(clk_a),
 				.rce_a(rce_a),
 				.ra_a(ra_a),
@@ -177,8 +177,8 @@ module TB;
 				.wd_b(wd_b)
 			);
 		end
-		"BRAM_TDP_16x1024": begin
-			BRAM_TDP_16x1024 #() bram (
+		"BRAM_TDP_32x1024": begin
+			BRAM_TDP_32x1024 #() bram (
 				.clk_a(clk_a),
 				.rce_a(rce_a),
 				.ra_a(ra_a),
@@ -195,8 +195,8 @@ module TB;
 				.wd_b(wd_b)
 			);
 		end
-		"BRAM_TDP_8x2048": begin
-			BRAM_TDP_8x2048 #() bram (
+		"BRAM_TDP_18x2048": begin
+			BRAM_TDP_18x2048 #() bram (
 				.clk_a(clk_a),
 				.rce_a(rce_a),
 				.ra_a(ra_a),
@@ -213,8 +213,98 @@ module TB;
 				.wd_b(wd_b)
 			);
 		end
-		"BRAM_TDP_4x4096": begin
-			BRAM_TDP_4x4096 #() bram (
+		"BRAM_TDP_16x2048": begin
+			BRAM_TDP_16x2048 #() bram (
+				.clk_a(clk_a),
+				.rce_a(rce_a),
+				.ra_a(ra_a),
+				.rq_a(rq_a),
+				.wce_a(wce_a),
+				.wa_a(wa_a),
+				.wd_a(wd_a),
+				.clk_b(clk_b),
+				.rce_b(rce_b),
+				.ra_b(ra_b),
+				.rq_b(rq_b),
+				.wce_b(wce_b),
+				.wa_b(wa_b),
+				.wd_b(wd_b)
+			);
+		end
+		"BRAM_TDP_9x4096": begin
+			BRAM_TDP_9x4096 #() bram (
+				.clk_a(clk_a),
+				.rce_a(rce_a),
+				.ra_a(ra_a),
+				.rq_a(rq_a),
+				.wce_a(wce_a),
+				.wa_a(wa_a),
+				.wd_a(wd_a),
+				.clk_b(clk_b),
+				.rce_b(rce_b),
+				.ra_b(ra_b),
+				.rq_b(rq_b),
+				.wce_b(wce_b),
+				.wa_b(wa_b),
+				.wd_b(wd_b)
+			);
+		end
+		"BRAM_TDP_8x4096": begin
+			BRAM_TDP_8x4096 #() bram (
+				.clk_a(clk_a),
+				.rce_a(rce_a),
+				.ra_a(ra_a),
+				.rq_a(rq_a),
+				.wce_a(wce_a),
+				.wa_a(wa_a),
+				.wd_a(wd_a),
+				.clk_b(clk_b),
+				.rce_b(rce_b),
+				.ra_b(ra_b),
+				.rq_b(rq_b),
+				.wce_b(wce_b),
+				.wa_b(wa_b),
+				.wd_b(wd_b)
+			);
+		end
+		"BRAM_TDP_4x8192": begin
+			BRAM_TDP_4x8192 #() bram (
+				.clk_a(clk_a),
+				.rce_a(rce_a),
+				.ra_a(ra_a),
+				.rq_a(rq_a),
+				.wce_a(wce_a),
+				.wa_a(wa_a),
+				.wd_a(wd_a),
+				.clk_b(clk_b),
+				.rce_b(rce_b),
+				.ra_b(ra_b),
+				.rq_b(rq_b),
+				.wce_b(wce_b),
+				.wa_b(wa_b),
+				.wd_b(wd_b)
+			);
+		end
+		"BRAM_TDP_2x16384": begin
+			BRAM_TDP_2x16384 #() bram (
+				.clk_a(clk_a),
+				.rce_a(rce_a),
+				.ra_a(ra_a),
+				.rq_a(rq_a),
+				.wce_a(wce_a),
+				.wa_a(wa_a),
+				.wd_a(wd_a),
+				.clk_b(clk_b),
+				.rce_b(rce_b),
+				.ra_b(ra_b),
+				.rq_b(rq_b),
+				.wce_b(wce_b),
+				.wa_b(wa_b),
+				.wd_b(wd_b)
+			);
+		end
+		"BRAM_TDP_1x32768": begin
+			BRAM_TDP_1x32768 #() bram (
 				.clk_a(clk_a),
 				.rce_a(rce_a),
 				.ra_a(ra_a),
