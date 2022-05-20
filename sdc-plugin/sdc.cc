@@ -17,6 +17,7 @@
  */
 #include <algorithm>
 #include <array>
+#include <iterator>
 
 #include "clocks.h"
 #include "kernel/log.h"
