@@ -1,3 +1,5 @@
 *.pyc
 *.sw*
-/f4pga/build/
+/build
+/dist
+/*.egg-info

@@ -90,7 +90,6 @@ setuptools_setup(
         "f4pga.common_modules",
         "f4pga.wrappers.sh"
     ],
-    package_dir={"f4pga": "."},
     package_data={
         'f4pga': ['*.json', 'platforms/*.json'],
         'f4pga.wrappers.sh': ['xc7/*.f4pga.sh', 'quicklogic/*.f4pga.sh']
