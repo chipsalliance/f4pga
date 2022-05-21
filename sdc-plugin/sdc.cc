@@ -17,7 +17,14 @@
  */
 #include <algorithm>
 #include <array>
+#include <istream>
 #include <iterator>
+#include <map>
+#include <memory>
+#include <ostream>
+#include <sstream>
+#include <string>
+#include <vector>
 
 #include "clocks.h"
 #include "kernel/log.h"
