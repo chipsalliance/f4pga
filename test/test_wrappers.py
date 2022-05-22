@@ -5,18 +5,6 @@ from subprocess import check_call
 
 
 @mark.xfail
-@mark.parametrize("wrapper", ['place', 'route', 'synth', 'write-fasm'])
-def test_wrapper(wrapper):
-    print(f"\n::group::Test {wrapper}")
-    stdout.flush()
-    stderr.flush()
-    try:
-        check_call(f"f4pga-{wrapper}")
-    finally:
-        print("\n::endgroup::")
-
-
-@mark.xfail
 @mark.parametrize(
     "wrapper",
     [
