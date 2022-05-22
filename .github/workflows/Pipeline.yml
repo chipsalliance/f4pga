@@ -215,4 +215,4 @@ jobs:
           . ./.github/scripts/activate.sh
 
           pip3 install -r ./test/requirements.txt
-          pytest -vsrA --color=yes test/wrappers.py
+          pytest --verbose --capture=no -rA --color=yes test/
