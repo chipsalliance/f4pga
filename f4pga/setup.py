@@ -62,11 +62,19 @@ wrapper_entrypoints = [
     f"{sf}_write_bitstream = {shwrappers}:write_bitstream",
     f"{sf}_write_fasm = {shwrappers}:write_fasm",
 ] if F4PGA_FAM == 'xc7' else [
+    f"{sf}_synth = {shwrappers}:synth",
     f"{sf}_pack = {shwrappers}:pack",
+    f"{sf}_repack = {shwrappers}:repack",
     f"{sf}_place = {shwrappers}:place",
     f"{sf}_route = {shwrappers}:route",
     f"{sf}_write_fasm = {shwrappers}:write_fasm",
+    f"{sf}_generate_bitstream = {shwrappers}:generate_bitstream",
+    f"{sf}_analysis = {shwrappers}:analysis",
+    f"ql_{sf} = {shwrappers}:ql",
+    f"vpr_common = {shwrappers}:vpr_common",
 ]
+
+
 
 setuptools_setup(
     name=packagePath.name,
