@@ -20,7 +20,9 @@ set -e
 
 BUILDDIR=build
 
-source "$F4PGA_ENV_BIN"/vpr_common
+SHARE_DIR_PATH=${SHARE_DIR_PATH:="$F4PGA_ENV_SHARE"}
+
+source $(dirname "$0")/vpr_common.f4pga.sh
 
 VERSION="v2.0.1"
 
