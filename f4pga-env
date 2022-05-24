@@ -11,10 +11,7 @@ case "$1" in
   ;;
   share)
     (
-        case "$F4PGA_FAM" in
-          xc7) cd $(dirname "$0")/../share/symbiflow;;
-          eos-s3) cd $(dirname "$0")/../share;;
-        esac
+        cd $(dirname "$0")/../share/symbiflow
         pwd
     )
   ;;
