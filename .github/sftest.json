@@ -14,7 +14,7 @@
         "default_target": "bitstream",
         "dependencies": {
             "xdc": [
-                "arty200.xdc"
+                "xc7/counter_test/arty200.xdc"
             ],
             "build_dir": "build/arty_200"
         }
@@ -23,7 +23,7 @@
         "default_target": "bitstream",
         "dependencies": {
             "xdc": [
-                "arty.xdc"
+                "xc7/counter_test/arty.xdc"
             ],
             "build_dir": "build/arty100"
         }
@@ -33,7 +33,7 @@
         "dependencies": {
             "build_dir": "build/arty_35",
             "xdc": [
-                "arty.xdc"
+                "xc7/counter_test/arty.xdc"
             ]
         },
         "values": {

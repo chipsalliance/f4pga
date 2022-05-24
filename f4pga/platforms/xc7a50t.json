@@ -81,7 +81,7 @@
                     "OUT_EBLIF": "${:eblif}",
                     "PYTHON3": "${python3}",
                     "UTILS_PATH": "${shareDir}/scripts",
-                    "INPUT_XDC_FILES": "xc7/counter_test/arty.xdc"
+                    "INPUT_XDC_FILES": "${:xdc}"
                 }
             }
         },
