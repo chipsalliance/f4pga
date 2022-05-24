@@ -37,7 +37,7 @@ hierarchy -top $TOP
 check_equiv $TOP
 design -load postopt
 yosys cd $TOP
-select -assert-count 1 t:QL_DSP2
+select -assert-count 1 t:QL_DSP2_MULTACC
 select -assert-count 1 t:*
 
 set TOP "macc_simple_clr"
@@ -46,7 +46,7 @@ hierarchy -top $TOP
 check_equiv $TOP
 design -load postopt
 yosys cd $TOP
-select -assert-count 1 t:QL_DSP2
+select -assert-count 1 t:QL_DSP2_MULTACC
 select -assert-count 1 t:*
 
 set TOP "macc_simple_arst"
@@ -55,29 +55,26 @@ hierarchy -top $TOP
 check_equiv $TOP
 design -load postopt
 yosys cd $TOP
-select -assert-count 1 t:QL_DSP2
+select -assert-count 1 t:QL_DSP2_MULTACC
 select -assert-count 1 t:*
 
-#FIXME: DSP not inferred (got $mux instead of $dffe)
-#set TOP "macc_simple_ena"
-#design -load read
-#hierarchy -top $TOP
-#check_equiv $TOP
-#design -load postopt
-#yosys cd $TOP
-#select -assert-count 1 t:QL_DSP2
-#select -assert-count 1 t:*
+set TOP "macc_simple_ena"
+design -load read
+hierarchy -top $TOP
+check_equiv $TOP
+design -load postopt
+yosys cd $TOP
+select -assert-count 1 t:QL_DSP2_MULTACC
+select -assert-count 1 t:*
 
-#FIXME: DSP not inferred (got $mux instead of $dffe)
-#set TOP "macc_simple_arst_clr_ena"
-#design -load read
-#hierarchy -top $TOP
-#check_equiv $TOP
-#design -load postopt
-#yosys cd $TOP
-#select -assert-count 1 t:QL_DSP2
-#select -assert-count 1 t:\$lut
-#select -assert-count 2 t:*
+set TOP "macc_simple_arst_clr_ena"
+design -load read
+hierarchy -top $TOP
+check_equiv $TOP
+design -load postopt
+yosys cd $TOP
+select -assert-count 1 t:QL_DSP2_MULTACC
+select -assert-count 1 t:*
 
 set TOP "macc_simple_preacc"
 design -load read
@@ -85,7 +82,7 @@ hierarchy -top $TOP
 check_equiv $TOP
 design -load postopt
 yosys cd $TOP
-select -assert-count 1 t:QL_DSP2
+select -assert-count 1 t:QL_DSP2_MULTADD
 select -assert-count 1 t:*
 
 set TOP "macc_simple_preacc_clr"
@@ -94,6 +91,6 @@ hierarchy -top $TOP
 check_equiv $TOP
 design -load postopt
 yosys cd $TOP
-select -assert-count 1 t:QL_DSP2
+select -assert-count 1 t:QL_DSP2_MULTADD
 select -assert-count 1 t:*
 

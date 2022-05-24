@@ -275,6 +275,7 @@ struct SynthQuickLogicPass : public ScriptPass {
                     run("techmap -map +/quicklogic/" + family + "/dsp_map.v", "(for qlf_k6n10f if not -no_dsp)");
                     run("ql_dsp_simd                   ", "(for qlf_k6n10f if not -no_dsp)");
                     run("techmap -map +/quicklogic/" + family + "/dsp_final_map.v", "(for qlf_k6n10f if not -no_dsp)");
+                    run("ql_dsp_io_regs");
                 } else if (!nodsp) {
 
                     run("wreduce t:$mul");
@@ -291,6 +292,7 @@ struct SynthQuickLogicPass : public ScriptPass {
                     run("techmap -map +/quicklogic/" + family + "/dsp_map.v");
                     run("ql_dsp_simd");
                     run("techmap -map +/quicklogic/" + family + "/dsp_final_map.v");
+                    run("ql_dsp_io_regs");
                 }
             }
 
