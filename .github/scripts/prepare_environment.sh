@@ -53,7 +53,7 @@ case "$F4PGA_FAM" in
     wget -qO- https://storage.googleapis.com/symbiflow-arch-defs/artifacts/prod/foss-fpga-tools/symbiflow-arch-defs/continuous/install/535/20220128-000432/symbiflow-arch-defs-xc7a50t_test-5fa5e715.tar.xz | tar -xJC $F4PGA_INSTALL_DIR/xc7/install
   ;;
   eos-s3)
-    wget -qO- https://storage.googleapis.com/symbiflow-arch-defs-install/quicklogic-arch-defs-63c3d8f9.tar.gz | tar -xz -C $F4PGA_INSTALL_DIR_FAM
+    wget -qO- https://storage.googleapis.com/symbiflow-arch-defs-install/quicklogic-arch-defs-qlf-fc5d8da.tar.gz | tar -xz -C $F4PGA_INSTALL_DIR_FAM
   ;;
 esac
 echo '::endgroup::'
