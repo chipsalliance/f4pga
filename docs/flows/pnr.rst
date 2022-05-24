@@ -34,7 +34,7 @@ step to find more optimal solutions.
 Routing
 =======
 
-Routing is one of the most demanding tasks of the the whole process.
+Routing is one of the most demanding tasks of the whole process.
 All possible connections between the placed blocks and the information on
 the signals propagation timings, form a complex graph.
 The tool tries to find the optimal path connecting all the placed
