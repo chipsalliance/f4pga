@@ -276,6 +276,46 @@ module \$__QLF_FACTOR_BRAM18_TDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1
 	);
 endmodule
 
+module \$__QLF_FACTOR_BRAM18_SDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, CLK1, CLK2);
+	parameter CFG_ABITS = 11;
+	parameter CFG_DBITS = 18;
+	parameter CFG_ENABLE_B = 4;
+
+	parameter CLKPOL2 = 1;
+	parameter CLKPOL3 = 1;
+	parameter [18431:0] INIT = 18432'bx;
+
+	input CLK1;
+	input CLK2;
+
+	input [CFG_ABITS-1:0] A1ADDR;
+	output [CFG_DBITS-1:0] A1DATA;
+	input A1EN;
+
+	input [CFG_ABITS-1:0] B1ADDR;
+	input [CFG_DBITS-1:0] B1DATA;
+	input [CFG_ENABLE_B-1:0] B1EN;
+
+	BRAM2x18_SDP #(
+		.CFG_ABITS(CFG_ABITS),
+		.CFG_DBITS(CFG_DBITS),
+		.CFG_ENABLE_B(CFG_ENABLE_B),
+		.CLKPOL2(CLKPOL2),
+		.CLKPOL3(CLKPOL3),
+		.INIT0(INIT),
+	) _TECHMAP_REPLACE_ (
+		.A1ADDR(A1ADDR),
+		.A1DATA(A1DATA),
+		.A1EN(A1EN),
+		.CLK1(CLK1),
+
+		.B1ADDR(B1ADDR),
+		.B1DATA(B1DATA),
+		.B1EN(B1EN),
+		.CLK2(CLK2)
+	);
+endmodule
+
 module \$__QLF_FACTOR_BRAM36_SDP (CLK2, CLK3, A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN);
 	parameter CFG_ABITS = 10;
 	parameter CFG_DBITS = 36;
