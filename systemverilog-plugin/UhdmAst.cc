@@ -3732,6 +3732,11 @@ void UhdmAst::process_parameter()
             shared.report.mark_handled(typespec_h);
             break;
         }
+        case vpiShortIntTypespec: {
+            packed_ranges.push_back(make_range(15, 0));
+            shared.report.mark_handled(typespec_h);
+            break;
+        }
         case vpiStructTypespec: {
             visit_one_to_one({vpiTypespec}, obj_h, [&](AST::AstNode *node) {
                 if (node && !node->str.empty()) {
