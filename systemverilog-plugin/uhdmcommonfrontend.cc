@@ -33,7 +33,7 @@ void UhdmCommonFrontend::print_read_options()
     log("        ignore assert() statements");
     log("\n");
     log("    -debug\n");
-    log("        alias for -dump_ast1 -dump_ast2 -dump_vlog1 -dump_vlog2 -yydebug\n");
+    log("        alias for -dump_ast1 -dump_ast2 -dump_vlog1 -dump_vlog2\n");
     log("\n");
     log("    -dump_ast1\n");
     log("        dump abstract syntax tree (before simplification)\n");
@@ -52,9 +52,6 @@ void UhdmCommonFrontend::print_read_options()
     log("\n");
     log("    -dump_rtlil\n");
     log("        dump generated RTLIL netlist\n");
-    log("\n");
-    log("    -yydebug\n");
-    log("        enable parser debug output\n");
     log("\n");
     log("    -report [directory]\n");
     log("        write a coverage report for the UHDM file\n");
@@ -110,8 +107,6 @@ void UhdmCommonFrontend::execute(std::istream *&f, std::string filename, std::ve
             no_dump_ptr = true;
         } else if (args[i] == "-dump_rtlil") {
             dump_rtlil = true;
-        } else if (args[i] == "-yydebug") {
-            this->shared.debug_flag = true;
         } else if (args[i] == "-parse-only") {
             this->shared.parse_only = true;
         } else {
