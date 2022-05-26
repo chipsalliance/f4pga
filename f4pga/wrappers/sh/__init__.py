@@ -24,15 +24,24 @@ from pathlib import Path
 from subprocess import check_call
 
 
+f4pga_environ = environ.copy()
+
 ROOT = Path(__file__).resolve().parent
-F4PGA_FAM = environ.get('F4PGA_FAM', 'xc7')
-SH_SUBDIR = 'quicklogic' if F4PGA_FAM == 'eos-s3' else F4PGA_FAM
+F4PGA_FAM = f4pga_environ.get('F4PGA_FAM', 'xc7')
+isQuickLogic = F4PGA_FAM == 'eos-s3'
+SH_SUBDIR = 'quicklogic' if isQuickLogic else F4PGA_FAM
+
+F4PGA_INSTALL_DIR = Path(f4pga_environ.get('F4PGA_INSTALL_DIR'))
+f4pga_environ['F4PGA_ENV_BIN'] = f4pga_environ.get('F4PGA_ENV_BIN', str(F4PGA_INSTALL_DIR / F4PGA_FAM / 'conda/bin'))
+f4pga_environ['F4PGA_ENV_SHARE'] = f4pga_environ.get('F4PGA_ENV_SHARE', str(F4PGA_INSTALL_DIR / F4PGA_FAM / (
+    'share' if isQuickLogic else 'install/share/symbiflow'
+)))
 
 
 def run_sh(script):
     stdout.flush()
     stderr.flush()
-    check_call([str(script)]+sys_argv[1:])
+    check_call([str(script)]+sys_argv[1:], env=f4pga_environ)
 
 
 def generate_constraints():
