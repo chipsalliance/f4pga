@@ -1,6 +1,5 @@
 {
     "values": {
-        "part_name": "xc7a100tcsg324-1",
         "device": "xc7a100t_test",
         "bitstream_device": "artix7",
         "pinmap": "${shareDir}/arch/xc7a100t_test/vpr_grid_map.csv",

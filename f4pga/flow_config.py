@@ -14,18 +14,18 @@ def open_flow_cfg(path: str) -> dict:
 def _get_ovs_raw(
     dict_name: str,
     flow_cfg,
-    platform: 'str | None',
+    part: 'str | None',
     stage: 'str | None'
 ):
     vals = flow_cfg.get(dict_name)
     if vals is None:
         vals = {}
-    if platform is not None:
-        platform_vals= flow_cfg[platform].get(dict_name)
+    if part is not None:
+        platform_vals = flow_cfg[part].get(dict_name)
         if platform_vals is not None:
             vals.update(platform_vals)
         if stage is not None:
-            stage_deps = flow_cfg[platform][stage].get(dict_name)
+            stage_deps = flow_cfg[part][stage].get(dict_name)
             if stage_deps is not None:
                 vals.update(stage_deps)
 
@@ -37,11 +37,6 @@ def verify_platform_name(platform: str, mypath: str):
         if platform == platform_name:
             return True
     return False
-
-
-def verify_stage(platform: str, stage: str, mypath: str):
-    # TODO: Verify stage
-    return True
 
 
 def _is_kword(w: str):
@@ -79,13 +74,6 @@ class FlowDefinition:
     def stage_names(self):
         return self.stages.keys()
 
-    def get_stage_r_env(self, stage_name: 'str') -> ResolutionEnv:
-        stage = self.stages[stage_name]
-        r_env = copy(self.r_env)
-        r_env.add_values(stage.value_overrides)
-        return r_env
-
-
 class ProjectFlowConfig:
     flow_cfg: dict
     path: str
@@ -94,45 +82,35 @@ class ProjectFlowConfig:
         self.flow_cfg = {}
         self.path = copy(path)
 
-    def platforms(self):
-        for platform, _ in self.flow_cfg.items():
-            if not _is_kword(platform):
-                yield platform
+    def parts(self):
+        for part in self.flow_cfg.keys():
+            if not _is_kword(part):
+                yield part
 
-    def get_default_platform(self) -> 'str | None':
-        return self.flow_cfg.get('default_platform')
+    def get_default_part(self) -> 'str | None':
+        return self.flow_cfg.get('default_part')
 
-    def get_default_target(self, platform: str) -> 'str | None':
-        return self.flow_cfg[platform].get('default_target')
+    def get_default_target(self, part: str) -> 'str | None':
+        return self.flow_cfg[part].get('default_target')
 
-    def get_stage_r_env(self, platform: str, stage: str) -> ResolutionEnv:
-        r_env = self._cache_platform_r_env(platform)
-
-        stage_cfg = self.flow_cfg[platform][stage]
-        stage_values = stage_cfg.get('values')
-        if stage_values:
-            r_env.add_values(stage_values)
-
-        return r_env
-
-    def get_dependencies_raw(self, platform: 'str | None' = None):
+    def get_dependencies_raw(self, part: 'str | None' = None):
         """
         Get dependencies without value resolution applied.
         """
-        return _get_ovs_raw('dependencies', self.flow_cfg, platform, None)
+        return _get_ovs_raw('dependencies', self.flow_cfg, part, None)
 
     def get_values_raw(
         self,
-        platform: 'str | None' = None,
+        part: 'str | None' = None,
         stage: 'str | None' = None
     ):
         """
         Get values without value resolution applied.
         """
-        return _get_ovs_raw('values', self.flow_cfg, platform, stage)
+        return _get_ovs_raw('values', self.flow_cfg, part, stage)
 
-    def get_stage_value_overrides(self, platform: str, stage: str):
-        stage_cfg = self.flow_cfg[platform].get(stage)
+    def get_stage_value_overrides(self, part: str, stage: str):
+        stage_cfg = self.flow_cfg[part].get(stage)
         if stage_cfg is None:
             return {}
         stage_vals_ovds = stage_cfg.get('values')
@@ -140,34 +118,34 @@ class ProjectFlowConfig:
             return {}
         return stage_vals_ovds
 
-    def get_dependency_platform_overrides(self, platform: str):
-        platform_ovds = self.flow_cfg[platform].get('dependencies')
+    def get_dependency_platform_overrides(self, part: str):
+        platform_ovds = self.flow_cfg[part].get('dependencies')
         if platform_ovds is None:
             return {}
         return platform_ovds
 
 
 class FlowConfig:
-    platform: str
+    part: str
     r_env: ResolutionEnv
     dependencies_explicit: 'dict[str, ]'
     stages: 'dict[str, Stage]'
 
     def __init__(self, project_config: ProjectFlowConfig,
-                 platform_def: FlowDefinition, platform: str):
+                 platform_def: FlowDefinition, part: str):
         self.r_env = platform_def.r_env
-        platform_vals = project_config.get_values_raw(platform)
+        platform_vals = project_config.get_values_raw(part)
         self.r_env.add_values(platform_vals)
         self.stages = platform_def.stages
-        self.platform = platform
+        self.part = part
 
-        raw_project_deps = project_config.get_dependencies_raw(platform)
+        raw_project_deps = project_config.get_dependencies_raw(part)
 
         self.dependencies_explicit = deep(lambda p: str(Path(p).resolve()))(self.r_env.resolve(raw_project_deps))
 
         for stage_name, stage in platform_def.stages.items():
             project_val_ovds = \
-                project_config.get_stage_value_overrides(platform, stage_name)
+                project_config.get_stage_value_overrides(part, stage_name)
             stage.value_overrides.update(project_val_ovds)
 
     def get_dependency_overrides(self):

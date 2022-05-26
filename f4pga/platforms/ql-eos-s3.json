@@ -11,7 +11,6 @@
     },
 
     "values": {
-        "part_name": "pd64",
         "device": "ql-eos-s3",
         "device_alt": "ql-eos-s3_wlcsp",
         "pinmap": "${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_PD64.csv",

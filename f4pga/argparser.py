@@ -24,12 +24,6 @@ def _setup_build_parser(parser: ArgumentParser):
     )
 
     parser.add_argument(
-        '--platform',
-        metavar='platform_name',
-        help='Target platform_name'
-    )
-
-    parser.add_argument(
         '-P',
         '--pretend',
         action='store_true',
@@ -82,10 +76,10 @@ def _setup_build_parser(parser: ArgumentParser):
 def _setup_show_dep_parser(parser: ArgumentParser):
     parser.add_argument(
         '-p',
-        '--platform',
-        metavar='platform_name',
+        '--part',
+        metavar='part_name',
         type=str,
-        help='Name of the platform (use to display platform-specific values.)'
+        help='Name of the part (use to display part-specific values.)'
     )
 
     parser.add_argument(
@@ -274,28 +268,28 @@ def _parse_cli_value(s: str):
     return s.replace('\\', '')
 
 
-def get_cli_flow_config(args: Namespace, platform: str):
+def get_cli_flow_config(args: Namespace, part: str):
     def create_defdict():
         return {
             'dependencies': {},
             'values': {},
         }
 
-    platform_flow_config = create_defdict()
+    part_flow_config = create_defdict()
 
     def add_entries(arglist: 'list[str]', dict_name: str):
         for value_def in (_parse_depval(cliv) for cliv in arglist):
             stage = value_def['stage']
             if stage is None:
-                platform_flow_config[dict_name][value_def['name']] = \
+                part_flow_config[dict_name][value_def['name']] = \
                     value_def['value']
             else:
-                if platform_flow_config.get(stage) is None:
-                    platform_flow_config[stage] = create_defdict()
-                platform_flow_config[stage][dict_name][value_def['name']] = \
+                if part_flow_config.get(stage) is None:
+                    part_flow_config[stage] = create_defdict()
+                part_flow_config[stage][dict_name][value_def['name']] = \
                     value_def['value']
 
     add_entries(args.dep, 'dependencies')
     add_entries(args.val, 'values')
 
-    return { platform: platform_flow_config }
+    return { part: part_flow_config }
