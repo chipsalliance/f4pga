@@ -100,4 +100,4 @@ This will cause flow to re-execute from the beggining.""")
     def save(self):
         """Saves cache's state to the persistent storage."""
         with Path(self.cachefile_path).open('w') as wfptr:
-            json_dump(str(self.hashes), wfptr, indent=4)
+            json_dump(self.hashes, wfptr, indent=4)

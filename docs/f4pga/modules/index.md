@@ -232,7 +232,7 @@ described in `outputs` should be present.
 
 ### Module initialization/instantiation
 
-In the the `__init__` method of module's class, the following fields should be
+In the `__init__` method of module's class, the following fields should be
 set:
 
 * `takes` - a list of symbolic dependency names for dependencies used by the module
