@@ -82,7 +82,7 @@ def req_exists(r):
     """ Checks whether a dependency exists on a drive. """
 
     if type(r) is str:
-        if not Path(r).is_file() and not Path(r).is_symlink() and not Path(r).is_dir():
+        if not Path(r).exists():
             return False
     elif type(r) is list:
         return not (False in map(req_exists, r))
@@ -146,7 +146,7 @@ def prepare_stage_input(stage: Stage, values: dict, dep_paths: 'dict[str, ]',
 
 def update_dep_statuses(paths, consumer: str, symbicache: SymbiCache):
     if type(paths) is str:
-        return symbicache.update(paths, consumer)
+        return symbicache.update(Path(paths), consumer)
     elif type(paths) is list:
         for p in paths:
             return update_dep_statuses(p, consumer, symbicache)
@@ -163,8 +163,6 @@ def dep_differ(paths, consumer: str, symbicache: SymbiCache):
 
     if type(paths) is str:
         s = symbicache.get_status(paths, consumer)
-        if s == 'untracked':
-            symbicache.update(paths, consumer)
         return symbicache.get_status(paths, consumer) != 'same'
     elif type(paths) is list:
         return True in [dep_differ(p, consumer, symbicache) for p in paths]
@@ -361,7 +359,7 @@ class Flow:
                     assert (p_dep.spec != 'req')
                     continue
 
-                if self.symbicache:
+                if self.symbicache is not None:
                     any_dep_differ |= \
                         update_dep_statuses(self.dep_paths[p_dep.name],
                                             provider.name, self.symbicache)

@@ -2,6 +2,7 @@ from pathlib import Path
 from zlib import adler32 as zlib_adler32
 from json import dump as json_dump, load as json_load, JSONDecodeError
 
+from f4pga.common import sfprint
 
 class SymbiCache:
     """
@@ -42,7 +43,7 @@ class SymbiCache:
             self.status[path] = {}
         self.status[path][consumer] = status
 
-    def update(self, path: str, consumer: str):
+    def update(self, path: Path, consumer: str):
         """ Add/remove a file to.from the tracked files, update checksum if necessary and calculate status.
 
         Multiple hashes are stored per file, one for each consumer module.
@@ -50,23 +51,25 @@ class SymbiCache:
         by a module within the active flow.
         """
 
-        isdir = Path(path).is_dir()
-        if not (Path(path).is_file() or Path(path).is_symlink() or isdir):
-            self._try_pop_consumer(path, consumer)
+        exists = path.exists()
+
+        isdir = path.is_dir()
+        if not exists:
+            self._try_pop_consumer(path.as_posix(), consumer)
             return True
         hash = 0 # Directories always get '0' hash.
-        if not isdir:
-            with Path(path).open('rb') as rfptr:
+        if (not isdir) and exists:
+            with path.open('rb') as rfptr:
                 hash = str(zlib_adler32(rfptr.read()))
 
-        last_hashes = self.hashes.get(path)
+        last_hashes = self.hashes.get(path.as_posix())
         last_hash = None if last_hashes is None else last_hashes.get(consumer)
 
         if hash != last_hash:
-            self._try_push_consumer_status(path, consumer, 'changed')
-            self._try_push_consumer_hash(path, consumer, hash)
+            self._try_push_consumer_status(path.as_posix(), consumer, 'changed')
+            self._try_push_consumer_hash(path.as_posix(), consumer, hash)
             return True
-        self._try_push_consumer_status(path, consumer, 'same')
+        self._try_push_consumer_status(path.as_posix(), consumer, 'same')
         return False
 
     def get_status(self, path: str, consumer: str):
@@ -89,12 +92,12 @@ class SymbiCache:
             with Path(self.cachefile_path).open('r') as rfptr:
                 self.hashes = json_load(rfptr)
         except JSONDecodeError as jerr:
-            print("""WARNING: .symbicache is corrupted!
-This will cause flow to re-execute from the beggining.""")
+            sfprint(0, 'WARNING: .symbicache is corrupted!\n'
+                       'This will cause flow to re-execute from the beginning.')
             self.hashes = {}
         except FileNotFoundError:
-            print("""Couldn\'t open .symbicache cache file.
-This will cause flow to re-execute from the beggining.""")
+            sfprint(0, 'Couldn\'t open .symbicache cache file.\n'
+                       'This will cause flow to re-execute from the beginning.')
             self.hashes = {}
 
     def save(self):
