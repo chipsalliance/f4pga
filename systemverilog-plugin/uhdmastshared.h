@@ -42,6 +42,14 @@ class UhdmAstShared
     // applies only to read_systemverilog command
     bool parse_only = false;
 
+    // Flag that determines whether we should defer the elaboration
+    // applies only to read_systemverilog command
+    bool defer = false;
+
+    // Flag that determines whether we should perform the elaboration now
+    // applies only to read_systemverilog command
+    bool link = false;
+
     // Top nodes of the design (modules, interfaces)
     std::unordered_map<std::string, AST::AstNode *> top_nodes;
 

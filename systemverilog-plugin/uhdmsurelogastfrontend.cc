@@ -108,9 +108,19 @@ struct UhdmSurelogAstFrontend : public UhdmCommonFrontend {
         // Force -parse flag settings even if it wasn't specified
         clp->setwritePpOutput(true);
         clp->setParse(true);
-        clp->setCompile(true);
-        clp->setElaborate(true);
         clp->fullSVMode(true);
+        clp->setCacheAllowed(true);
+        if (this->shared.defer) {
+            clp->setCompile(false);
+            clp->setElaborate(false);
+            clp->setSepComp(true);
+        } else {
+            clp->setCompile(true);
+            clp->setElaborate(true);
+        }
+        if (this->shared.link) {
+            clp->setLink(true);
+        }
 
         SURELOG::scompiler *compiler = nullptr;
         const std::vector<vpiHandle> uhdm_design = executeCompilation(symbolTable, errors, clp, compiler);
@@ -136,6 +146,8 @@ struct UhdmSurelogAstFrontend : public UhdmCommonFrontend {
             return nullptr;
 
         UhdmAst uhdm_ast(this->shared);
+        if (this->shared.defer && !this->shared.link)
+            return nullptr;
         AST::AstNode *current_ast = uhdm_ast.visit_designs(uhdm_design);
         if (!this->report_directory.empty()) {
             this->shared.report.write(this->report_directory);
