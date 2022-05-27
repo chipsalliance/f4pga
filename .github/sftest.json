@@ -1,5 +1,5 @@
 {
-    "default_platform": "xc7a50t",
+    "default_part": "XC7A35TCSG324-1",
     "values": {
         "top": "top"
     },
@@ -10,25 +10,7 @@
         "synth_log": "synth.log",
         "pack_log": "pack.log"
     },
-    "xc7a200t": {
-        "default_target": "bitstream",
-        "dependencies": {
-            "xdc": [
-                "xc7/counter_test/arty200.xdc"
-            ],
-            "build_dir": "build/arty_200"
-        }
-    },
-    "xc7a100t": {
-        "default_target": "bitstream",
-        "dependencies": {
-            "xdc": [
-                "xc7/counter_test/arty.xdc"
-            ],
-            "build_dir": "build/arty100"
-        }
-    },
-    "xc7a50t": {
+    "XC7A35TCSG324-1": {
         "default_target": "bitstream",
         "dependencies": {
             "build_dir": "build/arty_35",
