@@ -11,7 +11,7 @@ The flow defeinition file list modules available for that platform and may tweak
 
 A basic example of using F4PGA:
 
-$ f4pga build --platform arty_35 -t bitstream
+$ f4pga build --flow flow.json --part XC7A35TCSG324-1 -t bitstream
 
 This will make F4PGA attempt to create a bitstream for arty_35 platform.
 ``flow.json`` is a flow configuration file, which should be created for a project that uses F4PGA.
