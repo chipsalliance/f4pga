@@ -71,21 +71,21 @@ file or derived from the paths of the dependencies taken by the module.
 
 A *flow* is set of *modules* executed in a right order to produce a *target*.
 
-### .symbicache
+### .f4cache
 
 All *dependencies* are tracked by a modification tracking system which stores hashes of the files
-(directories get always `'0'` hash) in `.symbicache` file in the root of the project.
+(directories get always `'0'` hash) in `.f4cache` file in the root of the project.
 When F4PGA constructs a *flow*, it will try to omit execution of modules which would receive the same data on their
 input.
 There is a strong _assumption_ there that a *module*'s output remains unchanged if the input configuration isn't
 changed, ie. *modules* are deterministic. This is might be not true for some tools and in case you really want to re-run
-a stage, there's a `--nocache` option that treats the `.symbicache` file as if it was empty.
+a stage, there's a `--nocache` option that treats the `.f4cache` file as if it was empty.
 
 ### Resolution
 
 A *dependency* is said to be *resolved* if it meets one of the following criteria:
 
-* it exists on persistent storage and its hash matches the one stored in .symbicache
+* it exists on persistent storage and its hash matches the one stored in .f4cache
 * there exists such *flow* that all of the dependencies of its modules are *resolved* and it produces the *dependency* in
   question.
 

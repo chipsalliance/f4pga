@@ -4,9 +4,9 @@ from json import dump as json_dump, load as json_load, JSONDecodeError
 
 from f4pga.common import sfprint
 
-class SymbiCache:
+class F4Cache:
     """
-    `SymbiCache` is used to track changes among dependencies and keep the status of the files on a persistent storage.
+    `F4Cache` is used to track changes among dependencies and keep the status of the files on a persistent storage.
     Files which are tracked get their checksums calculated and stored in a file.
     If file's checksum differs from the one saved in a file, that means, the file has changed.
     """
@@ -91,13 +91,13 @@ class SymbiCache:
         try:
             with Path(self.cachefile_path).open('r') as rfptr:
                 self.hashes = json_load(rfptr)
-        except JSONDecodeError as jerr:
-            sfprint(0, 'WARNING: .symbicache is corrupted!\n'
-                       'This will cause flow to re-execute from the beginning.')
+        except JSONDecodeError:
+            sfprint(0, f'WARNING: `{self.cachefile_path}` f4cache is corrupted!\n'
+                        'This will cause flow to re-execute from the beginning.')
             self.hashes = {}
         except FileNotFoundError:
-            sfprint(0, 'Couldn\'t open .symbicache cache file.\n'
-                       'This will cause flow to re-execute from the beginning.')
+            sfprint(0, f'Couldn\'t open `{self.cachefile_path}` cache file.\n'
+                        'This will cause flow to re-execute from the beginning.')
             self.hashes = {}
 
     def save(self):
