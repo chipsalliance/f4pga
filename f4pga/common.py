@@ -71,11 +71,13 @@ def deep(fun):
     """
     def d(paths, *args, **kwargs):
         if type(paths) is str:
-            return fun(paths)
+            return fun(paths, *args, **kwargs)
         elif type(paths) is list:
-            return [d(p) for p in paths];
+            return [d(p, *args, **kwargs) for p in paths];
         elif type(paths) is dict:
-            return dict([(k, d(p)) for k, p in paths.items()])
+            return dict([(k, d(p, *args, **kwargs)) for k, p in paths.items()])
+        else:
+            raise RuntimeError(f'paths is of type {type(paths)}')
     return d
 
 

@@ -4,6 +4,12 @@ from json import dump as json_dump, load as json_load, JSONDecodeError
 
 from f4pga.common import sfprint
 
+def _get_hash(path: Path):
+    if not path.is_dir():
+        with path.open('rb') as rfptr:
+            return zlib_adler32(rfptr.read())
+    return 0 # Directories always get '0' hash.
+
 class F4Cache:
     """
     `F4Cache` is used to track changes among dependencies and keep the status of the files on a persistent storage.
@@ -12,6 +18,7 @@ class F4Cache:
     """
 
     hashes: 'dict[str, dict[str, str]]'
+    current_hashes: 'dict[str, str]'
     status: 'dict[str, str]'
     cachefile_path: str
 
@@ -21,6 +28,7 @@ class F4Cache:
         """
 
         self.status = {}
+        self.current_hashes = {}
         self.cachefile_path = cachefile_path
         self.load()
 
@@ -42,6 +50,12 @@ class F4Cache:
         if not self.status.get(path):
             self.status[path] = {}
         self.status[path][consumer] = status
+    
+    def process_file(self, path: Path):
+        """ Process file for tracking with f4cache. """
+
+        hash = _get_hash(path)
+        self.current_hashes[path.as_posix()] = hash
 
     def update(self, path: Path, consumer: str):
         """ Add/remove a file to.from the tracked files, update checksum if necessary and calculate status.
@@ -51,34 +65,41 @@ class F4Cache:
         by a module within the active flow.
         """
 
-        exists = path.exists()
+        posix_path = path.as_posix()
 
-        isdir = path.is_dir()
-        if not exists:
-            self._try_pop_consumer(path.as_posix(), consumer)
+        assert self.current_hashes.get(posix_path) is not None
+
+        if not path.exists():
+            self._try_pop_consumer(posix_path, consumer)
             return True
-        hash = 0 # Directories always get '0' hash.
-        if (not isdir) and exists:
-            with path.open('rb') as rfptr:
-                hash = str(zlib_adler32(rfptr.read()))
 
-        last_hashes = self.hashes.get(path.as_posix())
+        hash = self.current_hashes[posix_path]
+        last_hashes = self.hashes.get(posix_path)
         last_hash = None if last_hashes is None else last_hashes.get(consumer)
 
         if hash != last_hash:
-            self._try_push_consumer_status(path.as_posix(), consumer, 'changed')
-            self._try_push_consumer_hash(path.as_posix(), consumer, hash)
+            self._try_push_consumer_status(posix_path, consumer, 'changed')
+            self._try_push_consumer_hash(posix_path, consumer, hash)
             return True
-        self._try_push_consumer_status(path.as_posix(), consumer, 'same')
+        self._try_push_consumer_status(posix_path, consumer, 'same')
         return False
 
     def get_status(self, path: str, consumer: str):
         """ Get status for a file with a given path.
-        returns 'untracked' if the file is not tracked or hasn't been treated with `update` procedure before calling
-        `get_status`.
+        returns 'untracked' if the file is not tracked.
         """
+
+        assert self.current_hashes.get(path) is not None
+
         statuses = self.status.get(path)
         if not statuses:
+            hashes = self.hashes.get(path)
+            if hashes is not None:
+                last_hash = hashes.get(consumer)
+                if last_hash is not None:
+                    if self.current_hashes[path] != last_hash:
+                        return 'changed'
+                    return 'same'
             return 'untracked'
         status = statuses.get(consumer)
         if not status:
