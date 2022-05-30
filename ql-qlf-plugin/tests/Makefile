@@ -44,7 +44,8 @@ SIM_TESTS = \
 POST_SYNTH_SIM_TESTS = \
     qlf_k6n10f/bram_tdp \
     qlf_k6n10f/bram_sdp \
-    qlf_k6n10f/bram_tdp_split
+    qlf_k6n10f/bram_tdp_split \
+    qlf_k6n10f/bram_sdp_split
 
 include $(shell pwd)/../../Makefile_test.common
 
