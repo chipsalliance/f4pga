@@ -31,9 +31,13 @@ F4PGA_FAM = f4pga_environ.get('F4PGA_FAM', 'xc7')
 isQuickLogic = F4PGA_FAM == 'eos-s3'
 SH_SUBDIR = 'quicklogic' if isQuickLogic else F4PGA_FAM
 
-F4PGA_INSTALL_DIR = Path(f4pga_environ.get('F4PGA_INSTALL_DIR'))
-f4pga_environ['F4PGA_ENV_BIN'] = f4pga_environ.get('F4PGA_ENV_BIN', str(F4PGA_INSTALL_DIR / F4PGA_FAM / 'conda/bin'))
-f4pga_environ['F4PGA_ENV_SHARE'] = f4pga_environ.get('F4PGA_ENV_SHARE', str(F4PGA_INSTALL_DIR / F4PGA_FAM / (
+F4PGA_INSTALL_DIR = f4pga_environ.get('F4PGA_INSTALL_DIR')
+if F4PGA_INSTALL_DIR is None:
+    raise(Exception("Required environment variable F4PGA_INSTALL_DIR is undefined!"))
+F4PGA_INSTALL_DIR_PATH = Path(F4PGA_INSTALL_DIR)
+
+f4pga_environ['F4PGA_ENV_BIN'] = f4pga_environ.get('F4PGA_ENV_BIN', str(F4PGA_INSTALL_DIR_PATH / F4PGA_FAM / 'conda/bin'))
+f4pga_environ['F4PGA_ENV_SHARE'] = f4pga_environ.get('F4PGA_ENV_SHARE', str(F4PGA_INSTALL_DIR_PATH / F4PGA_FAM / (
     'share' if isQuickLogic else 'install/share/symbiflow'
 )))
 
