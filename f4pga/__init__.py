@@ -11,7 +11,7 @@ The flow defeinition file list modules available for that platform and may tweak
 
 A basic example of using F4PGA:
 
-$ f4pga build --platform arty_35 -t bitstream
+$ f4pga build --flow flow.json --part XC7A35TCSG324-1 -t bitstream
 
 This will make F4PGA attempt to create a bitstream for arty_35 platform.
 ``flow.json`` is a flow configuration file, which should be created for a project that uses F4PGA.
@@ -41,8 +41,7 @@ from f4pga.flow_config import (
     FlowConfig,
     FlowDefinition,
     open_project_flow_cfg,
-    verify_platform_name,
-    verify_stage
+    verify_platform_name
 )
 from f4pga.module_runner import *
 from f4pga.module_inspector import get_module_info
@@ -122,8 +121,8 @@ def get_stage_values_override(og_values: dict, stage: Stage):
 def prepare_stage_io_input(stage: Stage):
     return { 'params': stage.params } if stage.params is not None else {}
 
-def prepare_stage_input(stage: Stage, platform_name: str, values: dict,
-                        dep_paths: 'dict[str, ]', config_paths: 'dict[str, ]'):
+def prepare_stage_input(stage: Stage, values: dict, dep_paths: 'dict[str, ]',
+                        config_paths: 'dict[str, ]'):
     takes = {}
     for take in stage.takes:
         paths = dep_paths.get(take.name)
@@ -140,8 +139,7 @@ def prepare_stage_input(stage: Stage, platform_name: str, values: dict,
     stage_mod_cfg = {
         'takes': takes,
         'produces': produces,
-        'values': values,
-        'platform': platform_name,
+        'values': values
     }
 
     return stage_mod_cfg
@@ -194,11 +192,11 @@ def _print_unreachable_stage_message(provider: Stage, take: str):
                'unreachable due to unmet dependency '
               f'`{Style.BRIGHT + take.name + Style.RESET_ALL}`')
 
-def config_mod_runctx(stage: Stage, platform_name: str, values: 'dict[str, ]',
+def config_mod_runctx(stage: Stage, values: 'dict[str, ]',
                       dep_paths: 'dict[str, str | list[str]]',
                       config_paths: 'dict[str, str | list[str]]'):
-    config = prepare_stage_input(stage, platform_name, values,
-                                  dep_paths, config_paths)
+    config = prepare_stage_input(stage, values,
+                                 dep_paths, config_paths)
     return ModRunCtx(share_dir_path, binpath, config)
 
 class Flow:
@@ -278,8 +276,7 @@ class Flow:
                 self.deps_rebuilds[take.name] += 1
 
         stage_values = self.cfg.get_r_env(provider.name).values
-        modrunctx = config_mod_runctx(provider, self.cfg.platform,
-                                      stage_values, self.dep_paths,
+        modrunctx = config_mod_runctx(provider, stage_values, self.dep_paths,
                                       self.cfg.get_dependency_overrides())
 
         outputs = module_map(provider.module, modrunctx)
@@ -358,7 +355,7 @@ class Flow:
         else:
             assert(provider)
 
-            any_dep_differ = False if self.symbicache else True
+            any_dep_differ = False if (self.symbicache is not None) else True
             for p_dep in provider.takes:
                 if not self._build_dep(p_dep.name):
                     assert (p_dep.spec != 'req')
@@ -382,8 +379,7 @@ class Flow:
                 return True
 
             stage_values = self.cfg.get_r_env(provider.name).values
-            modrunctx = config_mod_runctx(provider, self.cfg.platform,
-                                          stage_values, self.dep_paths,
+            modrunctx = config_mod_runctx(provider, stage_values, self.dep_paths,
                                           self.cfg.get_dependency_overrides())
             module_exec(provider.module, modrunctx)
 
@@ -497,21 +493,15 @@ def open_project_flow_config(path: str) -> ProjectFlowConfig:
         fatal(-1, 'The provided flow configuration file does not exist')
     return flow_cfg
 
-def verify_platform_stage_params(flow_cfg: FlowConfig,
-                                 platform: 'str | None' = None,
-                                 stage: 'str | None' = None):
-    if platform:
-        if not verify_platform_name(platform, mypath):
-            sfprint(0, f'Platform `{platform}`` is unsupported.')
+def verify_part_stage_params(flow_cfg: FlowConfig,
+                             part: 'str | None' = None):
+    if part:
+        platform_name = get_platform_name_for_part(part)
+        if not verify_platform_name(platform_name, mypath):
+            sfprint(0, f'Platform `{part}`` is unsupported.')
             return False
-        if args.platform not in flow_cfg.platforms():
-            sfprint(0, f'Platform `{platform}`` is not in project.')
-            return False
-
-    if stage:
-        if not verify_stage(platform, stage, mypath):
-            sfprint(0, f'Stage `{stage}` is invalid.')
-            sfbuild_fail()
+        if part not in flow_cfg.part():
+            sfprint(0, f'Platform `{part}`` is not in project.')
             return False
 
     return True
@@ -530,24 +520,28 @@ def cmd_build(args: Namespace):
 
     project_flow_cfg: ProjectFlowConfig = None
 
-    platform = args.platform
-    if platform is None:
-        if args.part:
-            platform = get_platform_name_for_part(args.part)
+    platform: 'str | None' = None
+    part_name = args.part
+    if args.part:
+        platform = get_platform_name_for_part(args.part)
 
     if args.flow:
         project_flow_cfg = open_project_flow_config(args.flow)
-    elif platform is not None:
+    elif part_name is not None:
         project_flow_cfg = ProjectFlowConfig('.temp.flow.json')
         project_flow_cfg.flow_cfg = get_cli_flow_config(args, platform)
-    if platform is None and project_flow_cfg is not None:
-        platform = project_flow_cfg.get_default_platform()
-        if platform is None:
-            fatal(-1, 'You have to specify a platform name or a part name or '
-                      'configure a default platform.')
-    if platform is None or project_flow_cfg is None:
-        fatal(-1, 'No configuration was provided. Use `--flow`, `--platform` or '
-                  '`--part` to configure flow..')
+    if part_name is None and project_flow_cfg is not None:
+        part_name = project_flow_cfg.get_default_part()
+    
+    platform = get_platform_name_for_part(part_name)
+    if platform is None:
+        fatal(-1, 'You have to specify a part name or configure a default part.')
+    if project_flow_cfg is None:
+        fatal(-1, 'No configuration was provided. Use `--flow`, and/or '
+                  '`--part` to configure flow.')
+    
+    if part_name not in project_flow_cfg.parts():
+        fatal('Project flow configuration does not support requested part.')
 
     platform_path = str(Path(mypath) / f'platforms/{platform}.json')
     platform_def = None
@@ -560,13 +554,14 @@ def cmd_build(args: Namespace):
             'cannot be found.')
 
     r_env = setup_resolution_env()
+    r_env.add_values({'part_name': part_name.lower()})
 
     sfprint(2, 'Scanning modules...')
     scan_modules(mypath)
 
     flow_definition_dict = json_loads(platform_def)
     flow_def = FlowDefinition(flow_definition_dict, r_env)
-    flow_cfg = FlowConfig(project_flow_cfg, flow_def, platform)
+    flow_cfg = FlowConfig(project_flow_cfg, flow_def, part_name)
 
 
     if len(flow_cfg.stages) == 0:
@@ -582,7 +577,7 @@ def cmd_build(args: Namespace):
 
     target = args.target
     if target is None:
-        target = project_flow_cfg.get_default_target(platform)
+        target = project_flow_cfg.get_default_target(part_name)
         if target is None:
             fatal(-1, 'Please specify desired target using `--target` option '
                       'or configure a default target.')
@@ -615,14 +610,14 @@ def cmd_show_dependencies(args: Namespace):
 
     flow_cfg = open_project_flow_config(args.flow)
 
-    if not verify_platform_stage_params(flow_cfg, args.platform):
+    if not verify_part_stage_params(flow_cfg, args.part):
         sfbuild_fail()
         return
 
     platform_overrides: 'set | None' = None
     if args.platform is not None:
         platform_overrides = \
-            set(flow_cfg.get_dependency_platform_overrides(args.platform).keys())
+            set(flow_cfg.get_dependency_platform_overrides(args.part).keys())
 
     display_list = []
 

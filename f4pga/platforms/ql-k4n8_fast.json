@@ -12,7 +12,6 @@
     },
 
     "values": {
-        "part_name": "k4n8",
         "device": "qlf_k4n8_umc22",
         "rr_graph_lookahead_bin": "${shareDir}/arch/qlf_k4n8-qlf_k4n8_umc22_fast_qlf_k4n8-qlf_k4n8_umc22_fast/rr_graph_qlf_k4n8-qlf_k4n8_umc22_fast_qlf_k4n8-qlf_k4n8_umc22_fast.lookahead.bin",
         "rr_graph_real_bin": "${shareDir}/arch/qlf_k4n8-qlf_k4n8_umc22_fast_qlf_k4n8-qlf_k4n8_umc22_fast/qlf_k4n8-qlf_k4n8_umc22_fast.rr_graph.bin",

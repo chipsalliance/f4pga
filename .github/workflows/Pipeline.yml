@@ -160,14 +160,13 @@ jobs:
           . ./.github/scripts/activate.sh
 
           cd f4pga-examples
-          f4pga build --flow ../.github/sftest.json -t bitstream
+          f4pga build --flow ../.github/sftest.json
 
       - name: '📤 Upload artifact: Arty 35 bitstream'
         uses: actions/upload-artifact@v3
         with:
           name: arty_35-Bitstream-pyF4PGA
           path: f4pga-examples/build/arty_35/top.bit
-
 
   PYTHONPATH:
     runs-on: ubuntu-latest

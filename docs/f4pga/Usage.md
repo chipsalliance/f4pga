@@ -137,7 +137,7 @@ For example, let's consider the following *projects flow configuration (flow.jso
 
 ```json
 {
-    "default_platform": "xc7a50t",
+    "default_part": "XC7A35TCSG324-1",
     "dependencies": {
         "sources": ["counter.v"],
         "xdc": ["arty.xdc"],
@@ -147,7 +147,7 @@ For example, let's consider the following *projects flow configuration (flow.jso
     "values": {
         "top": "top"
     },
-    "xc7a50t": {
+    "XC7A35TCSG324-1": {
         "default_target": "bitstream",
         "dependencies": {
             "build_dir": "build/arty_35"
@@ -176,7 +176,7 @@ following command:
 $ f4pga build -f flow.json -p XC7A35TCSG324-1 -t bitstream
 ```
 
-Because we have `default_platform` defined, we can skip the `--platform` or `--part` argument.
+Because we have `default_platform` defined, we can skip the `--part` argument.
 We can also skip the `--target` argument because we have a `default_target` defined for the
 chosen platform. This will default to the `bitstream` target of `xc7a50t` platform:
 
@@ -189,7 +189,7 @@ $ f4pga build -f flow.json
 Alternatively you can use CLI to pass the configuration without creating a flow file:
 
 ```
-$ f4pga build -p XC7A35TCSG324-1 -Dsources=[counter.v] -Dxdc=[arty.xdc] -Dsynth_log=synth.log -Dpack_log=pack.log -Dbuild_dir=buils/arty_35 -Vtop=top -t bitstream
+$ f4pga build -p XC7A35TCSG324-1 -Dsources=[counter.v] -Dxdc=[arty.xdc] -Dsynth_log=synth.log -Dpack_log=pack.log -Dbuild_dir=build/arty_35 -Vtop=top -t bitstream
 ```
 
 CLI flow configuration can be used alongside a flow configuration file and will override
@@ -230,7 +230,7 @@ _on-demand_ is currently displayed.
 Example:
 
 ```bash
-$ f4pga -v build flow.json --platform x7a50t -i
+$ f4pga -v build -f flow.json -p XC7A35TCSG324-1 -i
 ```
 
 ```
@@ -273,8 +273,7 @@ This is only a snippet of the entire output.
 | long        | short | arguments                | description                                             |
 |-------------|:-----:|--------------------------|---------------------------------------------------------|
 | --flow      | -f    | flow configuration file  | Use flow configuration file                             |
-| --platform  |       | platform name            | Specify target platform name (eg. x7a100t)              |
-| --part      | -p    | part name                | Specify target platform by part name                    |
+| --part      | -p    | part name                | Specify target part name                                |
 | --target    | -t    | target dependency name   | Specify target to produce                               |
 | --info      | -i    | -                        | Display information about available targets             |
 | --pretend   | -P    | -                        | Resolve dependencies without executing the flow         |
@@ -285,11 +284,11 @@ This is only a snippet of the entire output.
 
 ### Summary of all options available for `showd` sub-command
 
-| long        | short | arguments                | description                                                              |
-|-------------|:-----:|--------------------------|--------------------------------------------------------------------------|
-| --flow      | -f    | flow configuration file  | Use flow configuration file                                              |
-| --platform  | -p    | platform name            | Specify target platform name (to display platform-specific dependencies) |
-| --stage     | -s    | part name                | Specify stage name (to display stage-specific dependencies)              |      
+| long        | short | arguments                | description                                                 |
+|-------------|:-----:|--------------------------|-------------------------------------------------------------|
+| --flow      | -f    | flow configuration file  | Use flow configuration file                                 |
+| --part      | -p    | part name                | Specify target part name                                    |
+| --stage     | -s    | part name                | Specify stage name (to display stage-specific dependencies) |      
 
 ### Dependency resolution display
 

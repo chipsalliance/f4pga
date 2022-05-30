@@ -12,7 +12,6 @@
     },
 
     "values": {
-        "part_name": "xc7a35tcsg324-1",
         "device": "xc7a50t_test",
         "bitstream_device": "artix7",
         "pinmap": "${shareDir}/arch/xc7a50t_test/vpr_grid_map.csv",
