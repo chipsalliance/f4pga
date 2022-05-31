@@ -23,7 +23,7 @@ if [ -z $VPRPATH ]; then
   export PYTHONPATH=${VPRPATH}/python:${VPRPATH}/python/prjxray:${PYTHONPATH}
 fi
 
-source ${VPRPATH}/vpr_common
+source $(dirname "$0")/vpr_common.f4pga.sh
 parse_args $@
 
 DESIGN=${EBLIF/.eblif/}
