@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+#
 # Copyright (C) 2020-2022 F4PGA Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
