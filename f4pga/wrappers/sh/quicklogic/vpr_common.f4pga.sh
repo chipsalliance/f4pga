@@ -16,6 +16,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+SHARE_DIR_PATH=${SHARE_DIR_PATH:="$F4PGA_ENV_SHARE"}
+
 function parse_args {
 
      OPTS=d:f:e:p:n:P:j:s:t:c:
@@ -109,20 +111,31 @@ function parse_args {
      export CORNER=$CORNER
      if [[ "$DEVICE" == "qlf_k4n8_qlf_k4n8" ]]; then
 	     DEVICE_1="qlf_k4n8-qlf_k4n8_umc22_${CORNER}"
+	     DEVICE_2=${DEVICE_1}
      elif [[ "$DEVICE" == "qlf_k6n10_qlf_k6n10" ]];then
 	     DEVICE_1="qlf_k6n10-qlf_k6n10_gf12"
+	     DEVICE_2=${DEVICE_1}
+     else
+	     DEVICE_1=${DEVICE}
+	     DEVICE_2="wlcsp"
      fi
      export TOP=$TOP
 
-     export ARCH_DIR=`realpath ${MYPATH}/../share/symbiflow/arch/${DEVICE_1}_${DEVICE_1}`
-     export ARCH_DEF=${ARCH_DIR}/arch_${DEVICE_1}_${DEVICE_1}.xml
+     export ARCH_DIR=`realpath ${SHARE_DIR_PATH}/arch/${DEVICE_1}_${DEVICE_2}`
+     export ARCH_DEF=${ARCH_DIR}/arch_${DEVICE_1}_${DEVICE_2}.xml
+
+     # qlf* devices use different naming scheme than pp3* ones.
      export RR_GRAPH=${ARCH_DIR}/${DEVICE_1}.rr_graph.bin
-     export PLACE_DELAY=${ARCH_DIR}/rr_graph_${DEVICE_1}_${DEVICE_1}.place_delay.bin
-     export ROUTE_DELAY=${ARCH_DIR}/rr_graph_${DEVICE_1}_${DEVICE_1}.lookahead.bin
+     if [ ! -f ${RR_GRAPH} ]; then
+	     export RR_GRAPH=${ARCH_DIR}/rr_graph_${DEVICE_1}_${DEVICE_2}.rr_graph.real.bin
+     fi
+
+     export PLACE_DELAY=${ARCH_DIR}/rr_graph_${DEVICE_1}_${DEVICE_2}.place_delay.bin
+     export ROUTE_DELAY=${ARCH_DIR}/rr_graph_${DEVICE_1}_${DEVICE_2}.lookahead.bin
 
      export DEVICE_NAME=${DEVICE_1}
 
-     export VPR_CONFIG=`realpath ${MYPATH}/../share/symbiflow/scripts/${FAMILY}/vpr_config.sh`
+     export VPR_CONFIG=`realpath ${SHARE_DIR_PATH}/scripts/${FAMILY}/vpr_config.sh`
 }
 
 function run_vpr {

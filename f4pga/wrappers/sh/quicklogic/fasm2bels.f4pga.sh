@@ -18,8 +18,8 @@
 
 set -e
 
-MYPATH=`realpath $0`
-MYPATH=`dirname ${MYPATH}`
+SHARE_DIR_PATH=${SHARE_DIR_PATH:="$F4PGA_ENV_SHARE"}
+BIN_DIR_PATH=${BIN_DIR_PATH:="$F4PGA_BIN_SHARE"}
 
 OPTS=d:P:p:b:
 LONGOPTS=device:,part:,pcf:,bit:,
@@ -70,8 +70,8 @@ fi
 # Run fasm2bels
 if [[ "$DEVICE" =~ ^(ql-eos-s3|ql-pp3e)$ ]]; then
 
-    VPR_DB=`readlink -f ${MYPATH}/../share/symbiflow/arch/${DEVICE}_wlcsp/db_phy.pickle`
-    FASM2BELS=`readlink -f ${MYPATH}/../bin/python/fasm2bels.py`
+    VPR_DB=`readlink -f ${SHARE_DIR_PATH}/arch/${DEVICE}_wlcsp/db_phy.pickle`
+    FASM2BELS=`readlink -f ${BIN_DIR_PATH}/python/fasm2bels.py`
     FASM2BELS_DEVICE=${DEVICE/ql-/}
     VERILOG_FILE="${BIT}.v"
     PCF_FILE="${BIT}.v.pcf"

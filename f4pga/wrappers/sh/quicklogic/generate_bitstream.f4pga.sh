@@ -18,6 +18,7 @@
 
 set -e
 
+SHARE_DIR_PATH=${SHARE_DIR_PATH:="$F4PGA_ENV_SHARE"}
 OPTS=d:f:r:b:P:
 LONGOPTS=device:,fasm:,format:,bit:,part:
 
@@ -61,7 +62,7 @@ DB_ROOT="$F4PGA_ENV_SHARE"/fasm_database/${DEVICE}
 # qlf
 if [[ "$DEVICE" =~ ^(qlf_k4n8.*)$ ]]; then
     QLF_FASM=`which qlf_fasm`
-    DB_ROOT=`realpath ${MYPATH}/../share/symbiflow/fasm_database/${DEVICE}`
+    DB_ROOT=`realpath ${SHARE_DIR_PATH}//fasm_database/${DEVICE}`
     ${QLF_FASM} --db-root ${DB_ROOT} --format ${BIT_FORMAT} --assemble $FASM $BIT
 elif [[ "$DEVICE" =~ ^(ql-eos-s3|ql-pp3e)$ ]]; then
     qlfasm --dev-type ${DEVICE} ${FASM} ${BIT}
