@@ -1709,6 +1709,8 @@ void UhdmAst::process_typespec_member()
     current_node->str = current_node->str.substr(1);
     vpiHandle typespec_h = vpi_handle(vpiTypespec, obj_h);
     int typespec_type = vpi_get(vpiType, typespec_h);
+    const uhdm_handle *const handle = (const uhdm_handle *)typespec_h;
+    const UHDM::BaseClass *const object = (const UHDM::BaseClass *)handle->object;
     switch (typespec_type) {
     case vpiBitTypespec:
     case vpiLogicTypespec: {
@@ -1733,6 +1735,13 @@ void UhdmAst::process_typespec_member()
     case vpiIntegerTypespec: {
         current_node->is_signed = true;
         packed_ranges.push_back(make_range(31, 0));
+        shared.report.mark_handled(typespec_h);
+        break;
+    }
+    case vpiTimeTypespec:
+    case vpiLongIntTypespec: {
+        current_node->is_signed = true;
+        packed_ranges.push_back(make_range(63, 0));
         shared.report.mark_handled(typespec_h);
         break;
     }
@@ -1797,9 +1806,13 @@ void UhdmAst::process_typespec_member()
             }
         });
         break;
+    case vpiVoidTypespec: {
+        report_error("%s:%d: Void typespecs are currently unsupported", object->VpiFile().c_str(), object->VpiLineNo());
+    }
+    case vpiClassTypespec: {
+        report_error("%s:%d: Class typespecs are unsupported", object->VpiFile().c_str(), object->VpiLineNo());
+    }
     default: {
-        const uhdm_handle *const handle = (const uhdm_handle *)typespec_h;
-        const UHDM::BaseClass *const object = (const UHDM::BaseClass *)handle->object;
         report_error("%s:%d: Encountered unhandled typespec in process_typespec_member: '%s' of type '%s'\n", object->VpiFile().c_str(),
                      object->VpiLineNo(), object->VpiName().c_str(), UHDM::VpiTypeName(typespec_h).c_str());
         break;
@@ -1838,6 +1851,7 @@ void UhdmAst::process_enum_typespec()
             shared.report.mark_handled(typespec_h);
             break;
         }
+        case vpiByteTypespec:
         case vpiIntTypespec:
         case vpiIntegerTypespec: {
             current_node->is_signed = true;
@@ -3734,6 +3748,12 @@ void UhdmAst::process_parameter()
         }
         case vpiShortIntTypespec: {
             packed_ranges.push_back(make_range(15, 0));
+            shared.report.mark_handled(typespec_h);
+            break;
+        }
+        case vpiTimeTypespec:
+        case vpiLongIntTypespec: {
+            packed_ranges.push_back(make_range(63, 0));
             shared.report.mark_handled(typespec_h);
             break;
         }
