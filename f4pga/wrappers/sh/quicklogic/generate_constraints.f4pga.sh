@@ -29,6 +29,9 @@ CORNER=$7
 PROJECT=$(basename -- "$EBLIF")
 IOPLACE_FILE="${PROJECT%.*}_io.place"
 
+BIN_DIR_PATH=${BIN_DIR_PATH:="$F4PGA_ENV_BIN"}
+SHARE_DIR_PATH=${SHARE_DIR_PATH:="$F4PGA_ENV_SHARE"}
+
 if [[ "$DEVICE" =~ ^(qlf_.*)$ ]]; then
   if [[ "$DEVICE" =~ ^(qlf_k4n8_qlf_k4n8)$ ]];then
     DEVICE_1="qlf_k4n8-qlf_k4n8_umc22_$CORNER"
@@ -43,9 +46,8 @@ if [[ "$DEVICE" =~ ^(qlf_.*)$ ]]; then
     exit -1
   fi
 
-  SHARE_DIR_PATH=${SHARE_DIR_PATH:="$F4PGA_ENV_SHARE"}
   PINMAP_XML=`realpath ${SHARE_DIR_PATH}/arch/${DEVICE_1}_${DEVICE_1}/${PINMAPXML}`
-  IOGEN=`realpath ${MYPATH}/python/qlf_k4n8_create_ioplace.py`
+  IOGEN=`realpath ${BIN_DIR_PATH}/python/qlf_k4n8_create_ioplace.py`
 
   python3 ${IOGEN} --pcf $PCF --blif $EBLIF --pinmap_xml $PINMAP_XML --csv_file $PART --net $NET > ${IOPLACE_FILE}
 
@@ -64,12 +66,11 @@ elif [[ "$DEVICE" =~ ^(ql-.*)$ ]]; then
   echo "PINMAP FILE : $PINMAPCSV"
   echo "CLKMAP FILE : $CLKMAPCSV"
 
-  SHARE_DIR_PATH=${SHARE_DIR_PATH:="$F4PGA_ENV_SHARE"}
   PINMAP=`realpath ${SHARE_DIR_PATH}/arch/${DEVICE_1}_${DEVICE_2}/${PINMAPCSV}`
   CLKMAP=`realpath ${SHARE_DIR_PATH}/arch/${DEVICE_1}_${DEVICE_2}/${CLKMAPCSV}`
 
-  IOGEN=`realpath ${MYPATH}/python/pp3_create_ioplace.py`
-  PLACEGEN=`realpath ${MYPATH}/python/pp3_create_place_constraints.py`
+  IOGEN=`realpath ${BIN_DIR_PATH}/python/pp3_create_ioplace.py`
+  PLACEGEN=`realpath ${BIN_DIR_PATH}/python/pp3_create_place_constraints.py`
 
   PLACE_FILE="${PROJECT%.*}_constraints.place"
 
@@ -79,7 +80,7 @@ elif [[ "$DEVICE" =~ ^(ql-.*)$ ]]; then
   # EOS-S3 IOMUX configuration
   if [[ "$DEVICE" =~ ^(ql-eos-s3)$ ]]; then
 
-      IOMUXGEN=`realpath ${MYPATH}/python/pp3_eos_s3_iomux_config.py`
+      IOMUXGEN=`realpath ${BIN_DIR_PATH}/python/pp3_eos_s3_iomux_config.py`
 
       IOMUX_JLINK="${PROJECT%.*}_iomux.jlink"
       IOMUX_OPENOCD="${PROJECT%.*}_iomux.openocd"

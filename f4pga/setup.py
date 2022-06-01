@@ -69,6 +69,7 @@ wrapper_entrypoints = [
     f"{sf}_route = {shwrappers}:route",
     f"{sf}_write_fasm = {shwrappers}:write_fasm",
     f"{sf}_generate_bitstream = {shwrappers}:generate_bitstream",
+    f"{sf}_generate_constraints = {shwrappers}:generate_constraints",
     f"{sf}_analysis = {shwrappers}:analysis",
     f"ql_{sf} = {shwrappers}:ql",
     f"vpr_common = {shwrappers}:vpr_common",
