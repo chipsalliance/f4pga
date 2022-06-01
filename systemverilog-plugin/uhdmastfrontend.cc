@@ -57,6 +57,8 @@ struct UhdmAstFrontend : public UhdmCommonFrontend {
         }
         for (auto design : restoredDesigns)
             vpi_release_handle(design);
+
+        serializer.Purge();
         return current_ast;
     }
     void call_log_header(RTLIL::Design *design) override { log_header(design, "Executing UHDM frontend.\n"); }
