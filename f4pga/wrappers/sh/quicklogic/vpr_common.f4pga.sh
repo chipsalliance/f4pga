@@ -135,7 +135,7 @@ function parse_args {
 
      export DEVICE_NAME=${DEVICE_1}
 
-     export VPR_CONFIG=`realpath ${SHARE_DIR_PATH}/scripts/${FAMILY}/vpr_config.sh`
+     export VPR_CONFIG=`realpath $(dirname "$0")/vpr_config.f4pga.sh`
 }
 
 function run_vpr {
