@@ -22,6 +22,20 @@ on:
 jobs:
 
 
+  License-check:
+    name: Check license headers
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Check Licenses
+        uses: SymbiFlow/actions/checks@main
+
+
   Docs:
     runs-on: ubuntu-latest
     name: '📓 Docs'
@@ -186,7 +200,7 @@ jobs:
           PYTHONPATH=$(pwd) python3 f4pga/__init__.py -h
 
 
-  pyWrappers:
+  Tests:
     runs-on: ubuntu-latest
     name: '🐍 Python wrappers'
     env:
