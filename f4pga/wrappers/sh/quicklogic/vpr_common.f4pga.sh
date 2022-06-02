@@ -18,6 +18,16 @@
 
 SHARE_DIR_PATH=${SHARE_DIR_PATH:="$F4PGA_ENV_SHARE"}
 
+if [ -z $VPR_OPTIONS ]; then
+     echo "Using default VPR options."
+     VPR_OPTIONS="
+       --max_router_iterations 500
+       --routing_failure_predictor off
+       --router_high_fanout_threshold -1
+       --constant_net_method route
+       "
+fi
+
 function parse_args {
 
      OPTS=d:f:e:p:n:P:j:s:t:c:
@@ -135,13 +145,38 @@ function parse_args {
 
      export DEVICE_NAME=${DEVICE_1}
 
-     export VPR_CONFIG=`realpath $(dirname "$0")/vpr_config.f4pga.sh`
+     if [[ "$DEVICE" == "qlf_k4n8_qlf_k4n8" ]]; then
+	     VPR_OPTIONS="$VPR_OPTIONS
+	     --route_chan_width 10
+	     --clock_modeling ideal
+	     --place_delta_delay_matrix_calculation_method dijkstra
+	     --place_delay_model delta_override
+	     --router_lookahead extended_map
+	     --allow_dangling_combinational_nodes on
+	     --absorb_buffer_luts off"
+     else
+	     VPR_OPTIONS="$VPR_OPTIONS
+	     --route_chan_width 100
+	     --clock_modeling route
+	     --place_delay_model delta_override
+	     --router_lookahead extended_map
+	     --check_route quick
+	     --strict_checks off
+	     --allow_dangling_combinational_nodes on
+	     --disable_errors check_unbuffered_edges:check_route
+	     --congested_routing_iteration_threshold 0.8
+	     --incremental_reroute_delay_ripup off
+	     --base_cost_type delay_normalized_length_bounded
+	     --bb_factor 10
+	     --initial_pres_fac 4.0
+	     --check_rr_graph off
+	     --pack_high_fanout_threshold PB-LOGIC:18
+	     --suppress_warnings ${OUT_NOISY_WARNINGS},sum_pin_class:check_unbuffered_edges:load_rr_indexed_data_T_values:check_rr_node:trans_per_R:check_route:set_rr_graph_tool_comment"
+     fi
 }
 
 function run_vpr {
      set -e
-
-     source ${VPR_CONFIG}
 
      SDC_OPTIONS=""
      if [ ! -z $SDC ]
@@ -151,11 +186,11 @@ function run_vpr {
 
      vpr ${ARCH_DEF} \
          ${EBLIF} \
+         --read_rr_graph ${RR_GRAPH} \
          --device ${DEVICE_NAME} \
          ${VPR_OPTIONS} \
-         --read_rr_graph ${RR_GRAPH} \
-         --read_placement_delay_lookup ${PLACE_DELAY} \
          --read_router_lookahead ${ROUTE_DELAY} \
+         --read_placement_delay_lookup ${PLACE_DELAY} \
          ${SDC_OPTIONS} \
          $@
 
@@ -164,8 +199,6 @@ function run_vpr {
 
 function run_genfasm {
      set -e
-
-     source ${VPR_CONFIG}
 
      genfasm ${ARCH_DEF} \
          ${EBLIF} \
