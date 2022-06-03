@@ -46,6 +46,7 @@ from typing import Iterable
 from colorama import Fore, Style
 
 from f4pga.common import (
+    F4PGAException,
     ResolutionEnv,
     fatal,
     scan_modules,
@@ -74,17 +75,15 @@ mypath = str(Path(__file__).resolve().parent)
 
 share_dir_path = str(Path(f"{environ.get('F4PGA_INSTALL_DIR', '/usr/local')}/xc7/install/share/symbiflow").resolve())
 
-class DependencyNotProducedException(Exception):
+class DependencyNotProducedException(F4PGAException):
     dep_name: str
     provider: str
 
     def __init__(self, dep_name: str, provider: str):
         self.dep_name = dep_name
         self.provider = provider
-
-    def __str__(self) -> str:
-        return f'Stage `{self.provider}` did not produce promised ' \
-               f'dependency `{self.dep_name}`'
+        self.message = f'Stage `{self.provider}` did not produce promised ' \
+                       f'dependency `{self.dep_name}`'
 
 def dep_value_str(dep: str):
     return ':' + dep
@@ -563,33 +562,24 @@ def get_platform_name_for_part(part_name: str):
     with (Path(mypath) / 'part_db.json').open('r') as rfptr:
         return json_load(rfptr).get(part_name.upper())
 
-def cmd_build(args: Namespace):
-    """ sfbuild's `build` command implementation """
+def make_flow_config(project_flow_cfg: ProjectFlowConfig, part_name: str) -> FlowConfig:
+    """ Create `FlowConfig` from given project flow configuration and part name """
 
-    project_flow_cfg: ProjectFlowConfig = None
-
-    platform: 'str | None' = None
-    part_name = args.part
-    if args.part:
-        platform = get_platform_name_for_part(args.part)
-
-    if args.flow:
-        project_flow_cfg = open_project_flow_config(args.flow)
-    elif part_name is not None:
-        project_flow_cfg = ProjectFlowConfig('.temp.flow.json')
-        project_flow_cfg.flow_cfg = get_cli_flow_config(args, platform)
-    if part_name is None and project_flow_cfg is not None:
-        part_name = project_flow_cfg.get_default_part()
-    
     platform = get_platform_name_for_part(part_name)
     if platform is None:
-        fatal(-1, 'You have to specify a part name or configure a default part.')
-    if project_flow_cfg is None:
-        fatal(-1, 'No configuration was provided. Use `--flow`, and/or '
-                  '`--part` to configure flow.')
+        raise F4PGAException(
+            message='You have to specify a part name or configure a default part.'
+        )
     
     if part_name not in project_flow_cfg.parts():
-        fatal('Project flow configuration does not support requested part.')
+        raise F4PGAException(
+            message='Project flow configuration does not support requested part.'
+        )
+
+    r_env = setup_resolution_env()
+    r_env.add_values({'part_name': part_name.lower()})
+    
+    scan_modules(mypath)
 
     platform_path = str(Path(mypath) / f'platforms/{platform}.json')
     platform_def = None
@@ -597,23 +587,41 @@ def cmd_build(args: Namespace):
         with open(platform_path) as platform_file:
             platform_def = platform_file.read()
     except FileNotFoundError as _:
-        fatal(-1, f'The platform flow definition file {platform_path} for the platform '
-            f'{platform} referenced in flow definition file {args.flow} '
-            'cannot be found.')
-
-    r_env = setup_resolution_env()
-    r_env.add_values({'part_name': part_name.lower()})
-
-    sfprint(2, 'Scanning modules...')
-    scan_modules(mypath)
-
+        raise F4PGAException(
+            message=f'The platform flow definition file {platform_path} for the platform ' \
+                    f'{platform} cannot be found.'
+        )
+    
     flow_definition_dict = json_loads(platform_def)
     flow_def = FlowDefinition(flow_definition_dict, r_env)
     flow_cfg = FlowConfig(project_flow_cfg, flow_def, part_name)
 
-
     if len(flow_cfg.stages) == 0:
-        fatal(-1, 'Platform flow does not define any stage')
+        raise F4PGAException(message = 'Platform flow does not define any stage')
+    
+    return flow_cfg
+
+
+def cmd_build(args: Namespace):
+    """ sfbuild's `build` command implementation """
+
+    project_flow_cfg: ProjectFlowConfig = None
+
+    part_name = args.part
+
+    if args.flow:
+        project_flow_cfg = open_project_flow_config(args.flow)
+    elif part_name is not None:
+        project_flow_cfg = ProjectFlowConfig('.temp.flow.json')
+        project_flow_cfg.flow_cfg = get_cli_flow_config(args, part_name)
+    if part_name is None and project_flow_cfg is not None:
+        part_name = project_flow_cfg.get_default_part()
+
+    if project_flow_cfg is None:
+        fatal(-1, 'No configuration was provided. Use `--flow`, and/or '
+                  '`--part` to configure flow.')
+    
+    flow_cfg = make_flow_config(project_flow_cfg, part_name)
 
     if args.info:
         display_dep_info(flow_cfg.stages.values())
@@ -629,7 +637,7 @@ def cmd_build(args: Namespace):
         if target is None:
             fatal(-1, 'Please specify desired target using `--target` option '
                       'or configure a default target.')
-
+    
     flow = Flow(
         target=target,
         cfg=flow_cfg,
