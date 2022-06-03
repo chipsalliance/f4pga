@@ -58,8 +58,8 @@ particular consumer. This is necessary, because the system tries to avoid rebuil
 when possible and status of each file (modified/unmodified) may differ in regards
 to individual stages.
 
-Keeping track of status of each file is done using `SymbiCache` class, which is
-defined in `sf_cache.py` file. `SymbiCache` is used mostly inside `Flow`'s methods.
+Keeping track of status of each file is done using `F4Cache` class, which is
+defined in `cache.py` file. `F4Cache` is used mostly inside `Flow`'s methods.
 
 ### Internal environmental variable system
 

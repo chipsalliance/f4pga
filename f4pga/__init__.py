@@ -54,7 +54,7 @@ from f4pga.common import (
     sub as common_sub
 )
 from f4pga.module import *
-from f4pga.cache import SymbiCache
+from f4pga.cache import F4Cache
 from f4pga.flow_config import (
     ProjectFlowConfig,
     FlowConfig,
@@ -67,7 +67,7 @@ from f4pga.module_inspector import get_module_info
 from f4pga.stage import Stage
 from f4pga.argparser import setup_argparser, get_cli_flow_config
 
-SYMBICACHEPATH = '.symbicache'
+F4CACHEPATH = '.f4cache'
 
 binpath = str(Path(sys_argv[0]).resolve().parent.parent)
 mypath = str(Path(__file__).resolve().parent)
@@ -101,7 +101,7 @@ def req_exists(r):
     """ Checks whether a dependency exists on a drive. """
 
     if type(r) is str:
-        if not Path(r).is_file() and not Path(r).is_symlink() and not Path(r).is_dir():
+        if not Path(r).exists():
             return False
     elif type(r) is list:
         return not (False in map(req_exists, r))
@@ -128,9 +128,9 @@ def map_outputs_to_stages(stages: 'list[Stage]'):
                                  'provider at most.')
     return os_map
 
-def filter_existing_deps(deps: 'dict[str, ]', symbicache):
+def filter_existing_deps(deps: 'dict[str, ]', f4cache):
     return [(n, p) for n, p in deps.items() \
-            if req_exists(p)] # and not dep_differ(p, symbicache)]
+            if req_exists(p)] # and not dep_differ(p, f4cache)]
 
 def get_stage_values_override(og_values: dict, stage: Stage):
     values = og_values.copy()
@@ -163,37 +163,36 @@ def prepare_stage_input(stage: Stage, values: dict, dep_paths: 'dict[str, ]',
 
     return stage_mod_cfg
 
-def update_dep_statuses(paths, consumer: str, symbicache: SymbiCache):
+def update_dep_statuses(paths, consumer: str, f4cache: F4Cache):
     if type(paths) is str:
-        return symbicache.update(paths, consumer)
+        return f4cache.update(Path(paths), consumer)
     elif type(paths) is list:
         for p in paths:
-            return update_dep_statuses(p, consumer, symbicache)
+            return update_dep_statuses(p, consumer, f4cache)
     elif type(paths) is dict:
         for _, p in paths.items():
-            return update_dep_statuses(p, consumer, symbicache)
+            return update_dep_statuses(p, consumer, f4cache)
     fatal(-1, 'WRONG PATHS TYPE')
 
-def dep_differ(paths, consumer: str, symbicache: SymbiCache):
+def dep_differ(paths, consumer: str, f4cache: F4Cache):
     """
     Check if a dependency differs from its last version, lack of dependency is
     treated as "differs"
     """
 
     if type(paths) is str:
-        s = symbicache.get_status(paths, consumer)
-        if s == 'untracked':
-            symbicache.update(paths, consumer)
-        return symbicache.get_status(paths, consumer) != 'same'
+        if not Path(paths).exists():
+            return True
+        return f4cache.get_status(paths, consumer) != 'same'
     elif type(paths) is list:
-        return True in [dep_differ(p, consumer, symbicache) for p in paths]
+        return True in [dep_differ(p, consumer, f4cache) for p in paths]
     elif type(paths) is dict:
-        return True in [dep_differ(p, consumer, symbicache) \
+        return True in [dep_differ(p, consumer, f4cache) \
                         for _, p in paths.items()]
     return False
 def dep_will_differ(target: str, paths, consumer: str,
                     os_map: 'dict[str, Stage]', run_stages: 'set[str]',
-                    symbicache: SymbiCache):
+                    f4cache: F4Cache):
     """
     Check if a dependency or any of the dependencies it depends on differ from
     their last versions.
@@ -202,8 +201,8 @@ def dep_will_differ(target: str, paths, consumer: str,
     provider = os_map.get(target)
     if provider:
         return (provider.name in run_stages) or \
-               dep_differ(paths, consumer, symbicache)
-    return dep_differ(paths, consumer, symbicache)
+               dep_differ(paths, consumer, f4cache)
+    return dep_differ(paths, consumer, f4cache)
 
 def _print_unreachable_stage_message(provider: Stage, take: str):
     sfprint(0, '    Stage '
@@ -217,6 +216,10 @@ def config_mod_runctx(stage: Stage, values: 'dict[str, ]',
     config = prepare_stage_input(stage, values,
                                  dep_paths, config_paths)
     return ModRunCtx(share_dir_path, binpath, config)
+
+def _process_dep_path(path: str, f4cache: F4Cache):
+    f4cache.process_file(Path(path))
+_cache_deps = deep(_process_dep_path)
 
 class Flow:
     """ Describes a complete, configured flow, ready for execution. """
@@ -235,33 +238,39 @@ class Flow:
     run_stages: 'set[str]'
     # Number of stages that relied on outdated version of a (checked) dependency
     deps_rebuilds: 'dict[str, int]'
-    symbicache: 'SymbiCache | None'
+    f4cache: 'F4Cache | None'
     flow_cfg: FlowConfig
 
     def __init__(self, target: str, cfg: FlowConfig,
-                 symbicache: 'SymbiCache | None'):
+                 f4cache: 'F4Cache | None'):
         self.target = target
         self.os_map = map_outputs_to_stages(cfg.stages.values())
 
         explicit_deps = cfg.get_dependency_overrides()
-        # print(explicit_deps)
+        self.dep_paths = dict(filter_existing_deps(explicit_deps, f4cache))
+        if f4cache is not None:
+            for dep in self.dep_paths.values():
+                _cache_deps(dep, f4cache)
 
-        self.dep_paths = dict(filter_existing_deps(explicit_deps, symbicache))
         self.run_stages = set()
-        self.symbicache = symbicache
+        self.f4cache = f4cache
         self.cfg = cfg
         self.deps_rebuilds = {}
 
         self._resolve_dependencies(self.target, set())
 
     def _dep_will_differ(self, dep: str, paths, consumer: str):
-        if not self.symbicache: # Handle --nocache mode
+        if not self.f4cache: # Handle --nocache mode
             return True
         return dep_will_differ(dep, paths, consumer,
                                self.os_map, self.run_stages,
-                               self.symbicache)
+                               self.f4cache)
 
-    def _resolve_dependencies(self, dep: str, stages_checked: 'set[str]'):
+    def _resolve_dependencies(self, dep: str, stages_checked: 'set[str]',
+                              skip_dep_warnings: 'set[str]' = None):
+        if skip_dep_warnings is None:
+            skip_dep_warnings = set()
+        
         # Initialize the dependency status if necessary
         if self.deps_rebuilds.get(dep) is None:
             self.deps_rebuilds[dep] = 0
@@ -278,7 +287,7 @@ class Flow:
         # config if it is.
 
         for take in provider.takes:
-            self._resolve_dependencies(take.name, stages_checked)
+            self._resolve_dependencies(take.name, stages_checked, skip_dep_warnings)
             # If any of the required dependencies is unavailable, then the
             # provider stage cannot be run
             take_paths = self.dep_paths.get(take.name)
@@ -288,9 +297,22 @@ class Flow:
             if not take_paths and take.spec == 'req':
                 _print_unreachable_stage_message(provider, take)
                 return
+            
+            will_differ = False
+            if take_paths is None:
+                # TODO: This won't trigger rebuild if an optional dependency got removed
+                will_differ = False
+            elif req_exists(take_paths):
+                will_differ = self._dep_will_differ(take.name, take_paths, provider.name)
+            else:
+                will_differ = True
 
-            if self._dep_will_differ(take.name, take_paths, provider.name):
-                sfprint(2, f'{take.name} is causing rebuild for {provider.name}')
+
+            if will_differ:
+                if take.name not in skip_dep_warnings:
+                    sfprint(2, f'{Style.BRIGHT}{take.name}{Style.RESET_ALL} is causing '
+                               f'rebuild for `{Style.BRIGHT}{provider.name}{Style.RESET_ALL}`')
+                    skip_dep_warnings.add(take.name)
                 self.run_stages.add(provider.name)
                 self.deps_rebuilds[take.name] += 1
 
@@ -299,6 +321,9 @@ class Flow:
                                       self.cfg.get_dependency_overrides())
 
         outputs = module_map(provider.module, modrunctx)
+        for output_paths in outputs.values():
+            if req_exists(output_paths) and self.f4cache:
+                _cache_deps(output_paths, self.f4cache)
 
         stages_checked.add(provider.name)
         self.dep_paths.update(outputs)
@@ -309,7 +334,6 @@ class Flow:
 
         # Verify module's outputs and add paths as values.
         outs = outputs.keys()
-        # print(outs)
         for o in provider.produces:
             if o.name not in outs:
                 if o.spec == 'req' or (o.spec == 'demand' and \
@@ -372,18 +396,18 @@ class Flow:
         if req_exists(paths) and not run:
             return True
         else:
-            assert(provider)
+            assert provider
 
-            any_dep_differ = False if (self.symbicache is not None) else True
+            any_dep_differ = False if (self.f4cache is not None) else True
             for p_dep in provider.takes:
                 if not self._build_dep(p_dep.name):
                     assert (p_dep.spec != 'req')
                     continue
 
-                if self.symbicache:
+                if self.f4cache is not None:
                     any_dep_differ |= \
                         update_dep_statuses(self.dep_paths[p_dep.name],
-                                            provider.name, self.symbicache)
+                                            provider.name, self.f4cache)
 
             # If dependencies remained the same, consider the dep as up-to date
             # For example, when changing a comment in Verilog source code,
@@ -404,17 +428,22 @@ class Flow:
 
             self.run_stages.discard(provider.name)
 
-            if not req_exists(paths):
-                raise DependencyNotProducedException(dep, provider.name)
+            for product in provider.produces:
+                exists = req_exists(paths)
+                if (product.spec == 'req') and not exists:
+                    raise DependencyNotProducedException(dep, provider.name)
+                if exists and self.f4cache:
+                    _cache_deps(self.dep_paths[product.name], self.f4cache)
 
         return True
 
     def execute(self):
         self._build_dep(self.target)
-        if self.symbicache:
+        if self.f4cache:
+            _cache_deps(self.dep_paths[self.target], self.f4cache)
             update_dep_statuses(self.dep_paths[self.target], '__target',
-                                self.symbicache)
-        sfprint(0, f'Target `{Style.BRIGHT + self.target + Style.RESET_ALL}` '
+                                self.f4cache)
+        sfprint(0, f'Target {Style.BRIGHT + self.target + Style.RESET_ALL} '
                    f'-> {self.dep_paths[self.target]}')
 
 def display_dep_info(stages: 'Iterable[Stage]'):
@@ -604,7 +633,7 @@ def cmd_build(args: Namespace):
     flow = Flow(
         target=target,
         cfg=flow_cfg,
-        symbicache=SymbiCache(SYMBICACHEPATH) if not args.nocache else None
+        f4cache=F4Cache(F4CACHEPATH) if not args.nocache else None
     )
 
     dep_print_verbosity = 0 if args.pretend else 2
@@ -617,12 +646,14 @@ def cmd_build(args: Namespace):
 
     try:
         flow.execute()
+    except AssertionError as e:
+        raise e
     except Exception as e:
-        sfprint(0, e)
+        sfprint(0, f'{e}')
         sfbuild_fail()
 
-    if flow.symbicache:
-        flow.symbicache.save()
+    if flow.f4cache:
+        flow.f4cache.save()
 
 def cmd_show_dependencies(args: Namespace):
     """ sfbuild's `showd` command implementation """
