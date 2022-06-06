@@ -117,3 +117,8 @@ def generate_libfile():
 def ql():
     print("[F4PGA] Running (deprecated) ql")
     run_sh(ROOT / "quicklogic/ql.f4pga.sh")
+
+
+def fasm2bels():
+    print("[F4PGA] Running (deprecated) fasm2bels")
+    run_sh(ROOT / "quicklogic/fasm2bels.f4pga.sh")
