@@ -20,9 +20,7 @@ set -e
 
 PYTHON3=`which python3`
 
-MYPATH=$(dirname "$(readlink -f "$BASH_SOURCE")")
-
-source ${MYPATH}/env
+source $(dirname "$(readlink -f "$BASH_SOURCE")")/env
 
 BIT2BINARY="${PYTHON3} -m quicklogic_fasm.bitstream_to_binary"
 
