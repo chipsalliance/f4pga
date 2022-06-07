@@ -16,7 +16,7 @@ emerging software-inspired paradigms like
 `Migen ➚ <https://m-labs.hk/gateware/migen/>`_, or
 :gh:`Amaranth ➚ <amaranth-lang>`.
 Since early 2000s, free and open source tools allow simulating HDLs.
-However, for several decades the major problem lied in the frontend and backend, where there was no established
+However, for several decades the major problem lay in the frontend and backend, where there was no established
 standard vendor-neutral tooling that would cover all the necessary components for an end-to-end flow.
 This pertains both to ASIC and FPGA workflows.
 Although F4PGA focuses on the latter, some parts of F4PGA will also be useful in the former.
