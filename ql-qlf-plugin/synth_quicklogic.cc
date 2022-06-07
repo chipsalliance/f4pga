@@ -121,7 +121,17 @@ struct SynthQuickLogicPass : public ScriptPass {
 
         size_t argidx;
         for (argidx = 1; argidx < args.size(); argidx++) {
-            if (args[argidx] == "-top" && argidx + 1 < args.size()) {
+			if (args[argidx] == "-run" && argidx+1 < args.size()) {
+				size_t pos = args[argidx+1].find(':');
+				if (pos == std::string::npos) {
+					run_from = args[++argidx];
+					run_to = args[argidx];
+				} else {
+					run_from = args[++argidx].substr(0, pos);
+					run_to = args[argidx].substr(pos+1);
+				}
+				continue;
+			}            if (args[argidx] == "-top" && argidx + 1 < args.size()) {
                 top_opt = "-top " + args[++argidx];
                 continue;
             }
