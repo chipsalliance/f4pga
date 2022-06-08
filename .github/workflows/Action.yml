@@ -137,3 +137,81 @@ jobs:
           name: Action-SymbiFlow-eos-s3-Bitstream
           path: f4pga-examples/eos-s3/btn_counter/build/top.bit
           if-no-files-found: error
+
+
+  Test-Verilog:
+    runs-on: ubuntu-latest
+    name: 🎬 Verilog
+
+    steps:
+
+      - name: 🧰 Checkout
+        uses: actions/checkout@v3
+
+      - name: 🚧 F4PGA Action (arty_35 | verilog/counter)
+        uses: ./action
+        with:
+          image: xc7/a50t
+          cmd: |
+            cd test/verilog/counter
+            f4pga build --flow arty_35.json
+
+      - name: '📤 Upload artifact: Arty 35 bitstream'
+        uses: actions/upload-artifact@v3
+        with:
+          name: arty_35-Bitstream-Verilog-Counter
+          path: test/verilog/counter/top.bit
+
+
+  Test-VHDL:
+    runs-on: ubuntu-latest
+    name: 🎬 VHDL
+
+    steps:
+
+      - name: 🧰 Checkout
+        uses: actions/checkout@v3
+
+      - name: 🚧 GHDL synth
+        run: make -C test/vhdl/counter synth
+
+      - name: 🚧 F4PGA Action (arty_35 | vhdl/counter)
+        uses: ./action
+        with:
+          image: xc7/a50t
+          cmd: |
+            cd test/vhdl/counter
+            f4pga build --flow arty_35.json
+
+      - name: '📤 Upload artifact: Arty 35 bitstream'
+        uses: actions/upload-artifact@v3
+        with:
+          name: arty_35-Bitstream-VHDL-Counter
+          path: test/vhdl/counter/top.bit
+
+
+  Test-VHDL-plugin:
+    runs-on: ubuntu-latest
+    name: 🎬 VHDL-plugin
+
+    steps:
+
+      - name: 🧰 Checkout
+        uses: actions/checkout@v3
+
+      - name: 🚧 GHDL synth
+        run: make -C test/vhdl/counter synth-plugin
+
+      - name: 🚧 F4PGA Action (arty_35 | vhdl/counter)
+        uses: ./action
+        with:
+          image: xc7/a50t
+          cmd: |
+            cd test/vhdl/counter
+            f4pga build --flow arty_35.json
+
+      - name: '📤 Upload artifact: Arty 35 bitstream'
+        uses: actions/upload-artifact@v3
+        with:
+          name: arty_35-Bitstream-VHDL-plugin-Counter
+          path: test/vhdl/counter/top.bit
