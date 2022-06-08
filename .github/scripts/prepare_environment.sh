@@ -28,12 +28,12 @@ cd f4pga-examples
 echo '::endgroup::'
 
 
-F4PGA_FAM=${F4PGA_FAM:=xc7}
+FPGA_FAM=${FPGA_FAM:=xc7}
 
 echo '::group::Install Miniconda3'
 wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O conda_installer.sh
 
-F4PGA_INSTALL_DIR_FAM="$F4PGA_INSTALL_DIR/$F4PGA_FAM"
+F4PGA_INSTALL_DIR_FAM="$F4PGA_INSTALL_DIR/$FPGA_FAM"
 
 bash conda_installer.sh -u -b -p "$F4PGA_INSTALL_DIR_FAM"/conda
 source "$F4PGA_INSTALL_DIR_FAM"/conda/etc/profile.d/conda.sh
@@ -41,12 +41,12 @@ echo '::endgroup::'
 
 
 echo '::group::Create environment'
-conda env create -f "$F4PGA_FAM"/environment.yml
+conda env create -f "$FPGA_FAM"/environment.yml
 echo '::endgroup::'
 
 
 echo '::group::Install arch-defs'
-case "$F4PGA_FAM" in
+case "$FPGA_FAM" in
   xc7)
     mkdir -p "$F4PGA_INSTALL_DIR_FAM"/install
     wget -qO- https://storage.googleapis.com/symbiflow-arch-defs/artifacts/prod/foss-fpga-tools/symbiflow-arch-defs/continuous/install/535/20220128-000432/symbiflow-arch-defs-install-5fa5e715.tar.xz | tar -xJC $F4PGA_INSTALL_DIR/xc7/install
@@ -64,7 +64,7 @@ cd ..
 
 echo '::group::Add f4pga-env'
 
-case "$F4PGA_FAM" in
+case "$FPGA_FAM" in
   xc7) F4PGA_DIR_ROOT='install';;
   eos-s3) F4PGA_DIR_ROOT='quicklogic-arch-defs';;
 esac
@@ -78,7 +78,7 @@ echo '::group::🗑️ Remove the wrappers (pre-packaged from arch-defs)'
 
 cd "$F4PGA_DIR_BIN"
 
-case "$F4PGA_FAM" in
+case "$FPGA_FAM" in
   xc7)
     rm -vrf \
       env \
