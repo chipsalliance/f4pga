@@ -25,11 +25,13 @@ on:
 
 jobs:
 
-
   Pipeline:
     if: ${{ !(github.event_name != 'pull_request' && github.actor == 'dependabot[bot]') }}
     uses: ./.github/workflows/Pipeline.yml
 
+  Action:
+    if: ${{ !(github.event_name != 'pull_request' && github.actor == 'dependabot[bot]') }}
+    uses: ./.github/workflows/Action.yml
 
   Automerge:
     needs: Pipeline

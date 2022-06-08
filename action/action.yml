@@ -1,0 +1,42 @@
+# Copyright (C) 2020-2022 F4PGA Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+name: F4PGA Action
+description: Use FOSS Flows For FPGA (F4PGA)
+
+inputs:
+  cmd:
+    description: 'Script or commands to execute'
+    default: './run.py'
+  image:
+    description: 'Container image to run the script/command on'
+    default: xc7/a100t
+
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        docker run --rm -i \
+        -v $(pwd):/wrk -w /wrk \
+        gcr.io/hdl-containers/conda/f4pga/${{ inputs.image }} \
+        bash -le <<'EOF'
+          ${{ inputs.cmd }}
+        EOF
+
+branding:
+  icon: cpu
+  color: blue
