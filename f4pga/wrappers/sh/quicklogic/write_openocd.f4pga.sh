@@ -18,11 +18,7 @@
 
 set -e
 
-PYTHON3=`which python3`
-
 source $(dirname "$(readlink -f "$BASH_SOURCE")")/env
 
-BIT2OPENOCD="${PYTHON3} -m quicklogic_fasm.bitstream_to_openocd"
-
 echo "Converting bitstream to OpenOCD script"
-${BIT2OPENOCD} $@
+`which python3` -m quicklogic_fasm.bitstream_to_openocd $@

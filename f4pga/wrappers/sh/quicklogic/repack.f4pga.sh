@@ -32,7 +32,7 @@ DESIGN=${EBLIF/.eblif/}
 
 export PYTHONPATH=$F4PGA_ENV_BIN/python:$PYTHONPATH
 
-python3 "$F4PGA_ENV_BIN"/python/repacker/repack.py \
+`which python3` "$F4PGA_ENV_BIN"/python/repacker/repack.py \
   --vpr-arch ${ARCH_DEF} \
   --repacking-rules ${ARCH_DIR}/${DEVICE_1}.repacking_rules.json \
   $JSON_ARGS \

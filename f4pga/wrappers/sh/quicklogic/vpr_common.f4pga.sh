@@ -184,7 +184,7 @@ function run_vpr {
           SDC_OPTIONS="--sdc_file $SDC"
      fi
 
-     vpr ${ARCH_DEF} \
+     `which vpr` ${ARCH_DEF} \
          ${EBLIF} \
          --read_rr_graph ${RR_GRAPH} \
          --device ${DEVICE_NAME} \
@@ -200,7 +200,7 @@ function run_vpr {
 function run_genfasm {
      set -e
 
-     genfasm ${ARCH_DEF} \
+     `which genfasm` ${ARCH_DEF} \
          ${EBLIF} \
          --device ${DEVICE_NAME} \
          ${VPR_OPTIONS} \

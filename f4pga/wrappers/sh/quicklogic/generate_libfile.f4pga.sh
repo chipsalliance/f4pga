@@ -34,7 +34,7 @@ fi
 ARCH_DIR="$F4PGA_ENV_SHARE"/arch/${DEVICE_1}_${DEVICE_1}
 PINMAP_XML=${ARCH_DIR}/${PINMAPXML}
 
-python3 "$F4PGA_ENV_BIN"/python/create_lib.py \
+`which python3` "$F4PGA_ENV_BIN"/python/create_lib.py \
   -n ${DEV}_0P72_SSM40 \
   -m fpga_top \
   -c $PART \

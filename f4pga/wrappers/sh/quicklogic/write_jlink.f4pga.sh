@@ -18,11 +18,7 @@
 
 set -e
 
-PYTHON3=`which python3`
-
 source $(dirname "$(readlink -f "$BASH_SOURCE")")/env
 
-BIT2JLINK="${PYTHON3} -m quicklogic_fasm.bitstream_to_jlink"
-
 echo "Converting bitstream to JLink script"
-${BIT2JLINK} $@
+`which python3` -m quicklogic_fasm.bitstream_to_jlink $@

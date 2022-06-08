@@ -32,6 +32,8 @@ IOPLACE_FILE="${PROJECT%.*}_io.place"
 BIN_DIR_PATH=${BIN_DIR_PATH:="$F4PGA_ENV_BIN"}
 SHARE_DIR_PATH=${SHARE_DIR_PATH:="$F4PGA_ENV_SHARE"}
 
+PYTHON3=$(which python3)
+
 if [[ "$DEVICE" =~ ^(qlf_.*)$ ]]; then
   if [[ "$DEVICE" =~ ^(qlf_k4n8_qlf_k4n8)$ ]];then
     DEVICE_1="qlf_k4n8-qlf_k4n8_umc22_$CORNER"
@@ -49,7 +51,7 @@ if [[ "$DEVICE" =~ ^(qlf_.*)$ ]]; then
   PINMAP_XML=`realpath ${SHARE_DIR_PATH}/arch/${DEVICE_1}_${DEVICE_1}/${PINMAPXML}`
   IOGEN=`realpath ${BIN_DIR_PATH}/python/qlf_k4n8_create_ioplace.py`
 
-  python3 ${IOGEN} --pcf $PCF --blif $EBLIF --pinmap_xml $PINMAP_XML --csv_file $PART --net $NET > ${IOPLACE_FILE}
+  ${PYTHON3} ${IOGEN} --pcf $PCF --blif $EBLIF --pinmap_xml $PINMAP_XML --csv_file $PART --net $NET > ${IOPLACE_FILE}
 
 elif [[ "$DEVICE" =~ ^(ql-.*)$ ]]; then
   DEVICE_1=${DEVICE}
@@ -74,8 +76,8 @@ elif [[ "$DEVICE" =~ ^(ql-.*)$ ]]; then
 
   PLACE_FILE="${PROJECT%.*}_constraints.place"
 
-  python3 ${IOGEN} --pcf $PCF --blif $EBLIF --map $PINMAP --net $NET > ${IOPLACE_FILE}
-  python3 ${PLACEGEN} --blif $EBLIF --map $CLKMAP -i ${IOPLACE_FILE} > ${PLACE_FILE}
+  ${PYTHON3} ${IOGEN} --pcf $PCF --blif $EBLIF --map $PINMAP --net $NET > ${IOPLACE_FILE}
+  ${PYTHON3} ${PLACEGEN} --blif $EBLIF --map $CLKMAP -i ${IOPLACE_FILE} > ${PLACE_FILE}
 
   # EOS-S3 IOMUX configuration
   if [[ "$DEVICE" =~ ^(ql-eos-s3)$ ]]; then
@@ -86,9 +88,9 @@ elif [[ "$DEVICE" =~ ^(ql-.*)$ ]]; then
       IOMUX_OPENOCD="${PROJECT%.*}_iomux.openocd"
       IOMUX_BINARY="${PROJECT%.*}_iomux.bin"
 
-      python3 ${IOMUXGEN} --eblif $EBLIF --pcf $PCF --map $PINMAP --output-format=jlink > ${IOMUX_JLINK}
-      python3 ${IOMUXGEN} --eblif $EBLIF --pcf $PCF --map $PINMAP --output-format=openocd > ${IOMUX_OPENOCD}
-      python3 ${IOMUXGEN} --eblif $EBLIF --pcf $PCF --map $PINMAP --output-format=binary > ${IOMUX_BINARY}
+      ${PYTHON3} ${IOMUXGEN} --eblif $EBLIF --pcf $PCF --map $PINMAP --output-format=jlink > ${IOMUX_JLINK}
+      ${PYTHON3} ${IOMUXGEN} --eblif $EBLIF --pcf $PCF --map $PINMAP --output-format=openocd > ${IOMUX_OPENOCD}
+      ${PYTHON3} ${IOMUXGEN} --eblif $EBLIF --pcf $PCF --map $PINMAP --output-format=binary > ${IOMUX_BINARY}
   fi
 
 else

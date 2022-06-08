@@ -18,11 +18,7 @@
 
 set -e
 
-PYTHON3=`which python3`
-
 source $(dirname "$(readlink -f "$BASH_SOURCE")")/env
 
-BIT2HEADER="${PYTHON3} -m quicklogic_fasm.bitstream_to_header"
-
 echo "Converting bitstream to C Header"
-${BIT2HEADER} $@
+`which python3` -m quicklogic_fasm.bitstream_to_header $@

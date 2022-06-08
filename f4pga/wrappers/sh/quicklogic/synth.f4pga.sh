@@ -178,6 +178,6 @@ if [ ! -z "${YOSYS_COMMANDS}" ]; then
   YOSYS_SCRIPT="$YOSYS_COMMANDS; $YOSYS_SCRIPT"
 fi
 
-yosys -p "${YOSYS_SCRIPT}" -l $LOG
-python3 ${SPLIT_INOUTS} -i ${OUT_JSON} -o ${SYNTH_JSON}
-yosys -p "read_json $SYNTH_JSON; tcl ${CONV_TCL_PATH}"
+`which yosys` -p "${YOSYS_SCRIPT}" -l $LOG
+`which python3` ${SPLIT_INOUTS} -i ${OUT_JSON} -o ${SYNTH_JSON}
+`which yosys` -p "read_json $SYNTH_JSON; tcl ${CONV_TCL_PATH}"
