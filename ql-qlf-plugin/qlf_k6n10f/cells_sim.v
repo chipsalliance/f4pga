@@ -23,11 +23,11 @@ module sh_dff(
     (* clkbuf_sink *)
     input wire C
 );
-    parameter [0:0] INIT = 1'b0;
-    initial Q = INIT;
 
+    initial Q <= 1'b0;
     always @(posedge C)
-            Q <= D;
+        Q <= D;
+
 endmodule
 
 (* abc9_box, lib_blackbox *)
