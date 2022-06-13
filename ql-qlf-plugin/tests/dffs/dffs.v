@@ -434,7 +434,67 @@ module my_dffsre_nnn (
     else if (en) q <= d;
 endmodule
 
-module my_dffs_clk_p (
+module my_sdffr_n (
+    input d,
+    clk,
+    clr,
+    output reg q
+);
+  initial q <= 0;
+  always @(posedge clk)
+    if (!clr) q <= 1'b0;
+    else q <= d;
+endmodule
+
+module my_sdffs_n (
+    input d,
+    clk,
+    pre,
+    output reg q
+);
+  initial q <= 0;
+  always @(posedge clk)
+    if (!pre) q <= 1'b1;
+    else q <= d;
+endmodule
+
+module my_sdffnr_n (
+    input d,
+    clk,
+    clr,
+    output reg q
+);
+  initial q <= 0;
+  always @(negedge clk)
+    if (!clr) q <= 1'b0;
+    else q <= d;
+endmodule
+
+module my_sdffns_n(
+    input d,
+    clk,
+    pre,
+    output reg q
+);
+  initial q <= 0;
+  always @(negedge clk)
+    if (!pre) q <= 1'b1;
+    else q <= d;
+endmodule
+
+module my_sdffr_p (
+    input d,
+    clk,
+    clr,
+    output reg q
+);
+  initial q <= 0;
+  always @(posedge clk)
+    if (clr) q <= 1'b0;
+    else q <= d;
+endmodule
+
+module my_sdffs_p (
     input d,
     clk,
     pre,
@@ -446,7 +506,7 @@ module my_dffs_clk_p (
     else q <= d;
 endmodule
 
-module my_dffs_clk_n (
+module my_sdffnr_p (
     input d,
     clk,
     clr,
@@ -454,7 +514,126 @@ module my_dffs_clk_n (
 );
   initial q <= 0;
   always @(negedge clk)
-    if (!clr) q <= 1'b0;
+    if (clr) q <= 1'b0;
     else q <= d;
+endmodule
+
+module my_sdffns_p (
+    input d,
+    clk,
+    pre,
+    output reg q
+);
+  initial q <= 0;
+  always @(negedge clk)
+    if (pre) q <= 1'b1;
+    else q <= d;
+endmodule
+
+
+module my_latch (
+    input  wire d, g,
+    output reg  q
+);
+    always @(*)
+        if (g) q <= d;
+endmodule
+
+module my_latchn (
+    input  wire d, g,
+    output reg  q
+);
+    always @(*)
+        if (!g) q <= d;
+endmodule
+
+
+module my_latchs_p (
+    input  wire d, g, s,
+    output reg  q
+);
+    always @(*)
+        if (s)
+            q <= 1'b1;
+        else if (g)
+            q <= d;
+endmodule
+
+module my_latchs_n (
+    input  wire d, g, s,
+    output reg  q
+);
+    always @(*)
+        if (!s)
+            q <= 1'b1;
+        else if (g)
+            q <= d;
+endmodule
+
+module my_latchr_p (
+    input  wire d, g, r,
+    output reg  q
+);
+    always @(*)
+        if (r)
+            q <= 1'b0;
+        else if (g)
+            q <= d;
+endmodule
+
+module my_latchr_n (
+    input  wire d, g, r,
+    output reg  q
+);
+    always @(*)
+        if (!r)
+            q <= 1'b0;
+        else if (g)
+            q <= d;
+endmodule
+
+
+module my_latchns_p (
+    input  wire d, g, s,
+    output reg  q
+);
+    always @(*)
+        if (s)
+            q <= 1'b1;
+        else if (!g)
+            q <= d;
+endmodule
+
+module my_latchns_n (
+    input  wire d, g, s,
+    output reg  q
+);
+    always @(*)
+        if (!s)
+            q <= 1'b1;
+        else if (!g)
+            q <= d;
+endmodule
+
+module my_latchnr_p (
+    input  wire d, g, r,
+    output reg  q
+);
+    always @(*)
+        if (r)
+            q <= 1'b0;
+        else if (!g)
+            q <= d;
+endmodule
+
+module my_latchnr_n (
+    input  wire d, g, r,
+    output reg  q
+);
+    always @(*)
+        if (!r)
+            q <= 1'b0;
+        else if (!g)
+            q <= d;
 endmodule
 
