@@ -1,4 +1,13 @@
-# FOSS Flow For FPGA (F4PGA) project
+# FOSS Flows For FPGA (F4PGA) project
+
+<p align="center">
+  <a title="Website" href="https://f4pga.org"><img src="https://img.shields.io/website?longCache=true&style=flat-square&label=f4pga.org&up_color=10cfc9&url=https%3A%2F%2Ff4pga.org%2Findex.html&labelColor=fff"></a><!--
+  -->
+  <a title="Community" href="https://f4pga.readthedocs.io/en/latest/community.html#communication"><img src="https://img.shields.io/badge/Chat-IRC%20%7C%20Slack-white?longCache=true&style=flat-square&logo=Slack&logoColor=fff"></a><!--
+  -->
+  <a title="'Automerge' workflow status" href="https://github.com/chipsalliance/f4pga/actions/workflows/Doc.yml"><img alt="'Automerge' workflow status" src="https://img.shields.io/github/workflow/status/chipsalliance/f4pga/Automerge/main?longCache=true&style=flat-square&label=Tests&logo=Github%20Actions&logoColor=fff"></a><!--
+  -->
+</p>
 
 This is the top-level repository for the [F4PGA](https://f4pga.org/) project, which is a Workgroup under the [CHIPS Alliance](https://chipsalliance.org).
 The elements of the project include (but are not limited to):
@@ -6,9 +15,9 @@ The elements of the project include (but are not limited to):
 * The F4PGA open source FPGA toolchains for programming FPGAs (formerly known as [SymbiFlow](https://github.com/SymbiFlow)).
   This includes:
 
-  * F4PGA documentation: [f4pga.readthedocs.io](https://f4pga.readthedocs.io) (knowledge base)
-  * F4PGA Architecture Definitions: [f4pga.readthedocs.io/projects/arch-defs](https://f4pga.readthedocs.io/projects/arch-defs)
-  * F4PGA examples: [f4pga-examples.readthedocs.io](https://f4pga-examples.readthedocs.io)
+  * [![Documentation](https://img.shields.io/website?longCache=true&style=flat-square&label=Documentation&up_color=1226aa&up_message=%E2%9E%9A&url=https%3A%2F%2Ff4pga.readthedocs.io%2Fen%2Flatest%2Findex.html&labelColor=fff)](https://f4pga.readthedocs.io)
+  * F4PGA Architecture Definitions [![Arch-Defs (for Developers)](https://img.shields.io/website?longCache=true&style=flat-square&label=For%20Developers&up_color=231f20&up_message=%E2%9E%9A&url=https%3A%2F%2Ff4pga.readthedocs.io%2Fprojects%2Farch-defs%2Fen%2Flatest%2Findex.html&labelColor=fff)](https://f4pga.readthedocs.io/projects/arch-defs)
+  * F4PGA Examples [![Examples (for Users)](https://img.shields.io/website?longCache=true&style=flat-square&label=For%20Users&up_color=231f20&up_message=%E2%9E%9A&url=https%3A%2F%2Ff4pga-examples.readthedocs.io%2Fen%2Flatest%2Findex.html&labelColor=fff)](https://f4pga-examples.readthedocs.io)
   * [F4PGA Yosys plugins](https://github.com/chipsalliance/yosys-f4pga-plugins)
 
 * The FPGA interchange format (an interchange format defined by CHIPS Alliance to enable interoperability between
