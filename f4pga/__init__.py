@@ -531,11 +531,14 @@ def setup_resolution_env():
         """
         Generate initial values, available in configs.
         """
-        return {
-            'prjxray_db': common_sub('prjxray-config').decode().replace('\n', ''),
+        conf = {
             'python3': common_sub('which', 'python3').decode().replace('\n', ''),
             'noisyWarnings': _noisy_warnings()
         }
+        if (FPGA_FAM == 'xc7'):
+            conf['prjxray_db'] = common_sub('prjxray-config').decode().replace('\n', '')
+
+        return conf
 
     r_env.add_values(_generate_values())
     return r_env
