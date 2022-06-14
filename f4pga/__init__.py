@@ -269,7 +269,7 @@ class Flow:
                               skip_dep_warnings: 'set[str]' = None):
         if skip_dep_warnings is None:
             skip_dep_warnings = set()
-        
+
         # Initialize the dependency status if necessary
         if self.deps_rebuilds.get(dep) is None:
             self.deps_rebuilds[dep] = 0
@@ -296,7 +296,7 @@ class Flow:
             if not take_paths and take.spec == 'req':
                 _print_unreachable_stage_message(provider, take)
                 return
-            
+
             will_differ = False
             if take_paths is None:
                 # TODO: This won't trigger rebuild if an optional dependency got removed
@@ -506,7 +506,7 @@ def sfbuild_done():
     exit(0)
 
 def setup_resolution_env():
-    """ Sets up a ResolutionEnv with sfbuild's default built-ins. """
+    """ Sets up a ResolutionEnv with default built-ins. """
 
     r_env = ResolutionEnv({
         'shareDir': share_dir_path,
@@ -570,7 +570,7 @@ def make_flow_config(project_flow_cfg: ProjectFlowConfig, part_name: str) -> Flo
         raise F4PGAException(
             message='You have to specify a part name or configure a default part.'
         )
-    
+
     if part_name not in project_flow_cfg.parts():
         raise F4PGAException(
             message='Project flow configuration does not support requested part.'
@@ -578,7 +578,7 @@ def make_flow_config(project_flow_cfg: ProjectFlowConfig, part_name: str) -> Flo
 
     r_env = setup_resolution_env()
     r_env.add_values({'part_name': part_name.lower()})
-    
+
     scan_modules(mypath)
 
     platform_path = str(Path(mypath) / f'platforms/{platform}.json')
@@ -591,19 +591,19 @@ def make_flow_config(project_flow_cfg: ProjectFlowConfig, part_name: str) -> Flo
             message=f'The platform flow definition file {platform_path} for the platform ' \
                     f'{platform} cannot be found.'
         )
-    
+
     flow_definition_dict = json_loads(platform_def)
     flow_def = FlowDefinition(flow_definition_dict, r_env)
     flow_cfg = FlowConfig(project_flow_cfg, flow_def, part_name)
 
     if len(flow_cfg.stages) == 0:
         raise F4PGAException(message = 'Platform flow does not define any stage')
-    
+
     return flow_cfg
 
 
 def cmd_build(args: Namespace):
-    """ sfbuild's `build` command implementation """
+    """ `build` command implementation """
 
     project_flow_cfg: ProjectFlowConfig = None
 
@@ -620,7 +620,7 @@ def cmd_build(args: Namespace):
     if project_flow_cfg is None:
         fatal(-1, 'No configuration was provided. Use `--flow`, and/or '
                   '`--part` to configure flow.')
-    
+
     flow_cfg = make_flow_config(project_flow_cfg, part_name)
 
     if args.info:
@@ -637,7 +637,7 @@ def cmd_build(args: Namespace):
         if target is None:
             fatal(-1, 'Please specify desired target using `--target` option '
                       'or configure a default target.')
-    
+
     flow = Flow(
         target=target,
         cfg=flow_cfg,
@@ -664,7 +664,7 @@ def cmd_build(args: Namespace):
         flow.f4cache.save()
 
 def cmd_show_dependencies(args: Namespace):
-    """ sfbuild's `showd` command implementation """
+    """ `showd` command implementation """
 
     flow_cfg = open_project_flow_config(args.flow)
 
