@@ -66,7 +66,9 @@
                     "DEVICE_CELLS_SIM": "${shareDir}/arch/ql-eos-s3_wlcsp/cells/ram_sim.v",
                     "DEVICE_CELLS_MAP": "${shareDir}/arch/ql-eos-s3_wlcsp/cells/ram_map.v",
                     "PINMAP_FILE": "${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_PD64.csv",
-                    "PCF_FILE": "${:pcf}"
+                    "PCF_FILE": "${:pcf}",
+                    "PYTHON3": "${python3}",
+                    "UTILS_PATH": "${binDir}/python"
                 }
             }
         },
