@@ -110,6 +110,7 @@ struct UhdmSurelogAstFrontend : public UhdmCommonFrontend {
         clp->setParse(true);
         clp->setCompile(true);
         clp->setElaborate(true);
+        clp->fullSVMode(true);
 
         SURELOG::scompiler *compiler = nullptr;
         const std::vector<vpiHandle> uhdm_design = executeCompilation(symbolTable, errors, clp, compiler);
