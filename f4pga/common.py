@@ -25,6 +25,16 @@ from shutil import move as sh_mv
 from subprocess import run
 from re import match as re_match, finditer as re_finditer
 
+class F4PGAException(Exception):
+    def __init__(self, message = 'unknown exception'):
+        self.message = message
+    
+    def __repr__(self):
+        return f'F4PGAException(message = \'{self.message}\')'
+    
+    def __str__(self):
+        return self.message
+        
 
 def decompose_depname(name: str):
     spec = 'req'
