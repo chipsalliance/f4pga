@@ -2,6 +2,7 @@
     "stages": {
         "mk_build_dir": "common:mkdirs",
         "synth": "common:synth",
+        "prepare_sdc": "common:generic_script_wrapper",
         "pack": "common:pack",
         "ioplace": "common:generic_script_wrapper",
         "place": "common:place",
@@ -52,7 +53,9 @@
         "synth": {
             "params": {
                 "takes": [ "pcf?" ],
-                "produces": [ "synth_v" ]
+                "produces": [
+                    "synth_v"
+                ]
             },
             "values": {
                 "tcl_scripts": "${shareDir}/scripts/pp3",
@@ -69,6 +72,28 @@
                     "PCF_FILE": "${:pcf}",
                     "PYTHON3": "${python3}",
                     "UTILS_PATH": "${binDir}/python"
+                }
+            }
+        },
+        "prepare_sdc": {
+            "params": {
+                "stage_name": "prepare_sdc",
+                "interpreter": "${python3}",
+                "script": "${binDir}/python/process_sdc_constraints.py",
+                "outputs": {
+                    "sdc": {
+                        "mode": "file",
+                        "file": "${:eblif[noext]}.sdc",
+                        "target": "${:eblif[noext]}.sdc"
+                    }
+                },
+                "inputs": {
+                    "eblif": "${:eblif}",
+                    "sdc-in": "${:sdc-in}",
+                    "sdc-out": "${:eblif[noext]}.sdc",
+                    "pcf": "${:pcf}",
+                    "pin-map": "",
+                    "$PYTHONPATH": "${binDir}/python/"
                 }
             }
         },
