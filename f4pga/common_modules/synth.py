@@ -97,12 +97,11 @@ class SynthModule(Module):
         return mapping
 
     def execute(self, ctx: ModuleContext):
-        split_inouts = os.path.join(ctx.share, 'scripts/split_inouts.py')
-        synth_tcl = os.path.join(ctx.values.tcl_scripts, 'synth.tcl')
-        conv_tcl = os.path.join(ctx.values.tcl_scripts, 'conv.tcl')
-
         tcl_env = yosys_setup_tcl_env(ctx.values.yosys_tcl_env) \
             if ctx.values.yosys_tcl_env else {}
+        split_inouts = os.path.join(tcl_env["UTILS_PATH"], 'split_inouts.py')
+        synth_tcl = os.path.join(ctx.values.tcl_scripts, 'synth.tcl')
+        conv_tcl = os.path.join(ctx.values.tcl_scripts, 'conv.tcl')
 
         if get_verbosity_level() >= 2:
             yield f'Synthesizing sources: {ctx.takes.sources}...'
