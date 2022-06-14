@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/bin/bash
 #
 # Copyright (C) 2020-2022 F4PGA Authors.
 #
@@ -16,4 +16,9 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-VPR_OPTIONS="@VPR_ARGS@"
+set -e
+
+source $(dirname "$(readlink -f "$BASH_SOURCE")")/env
+
+echo "Converting bitstream to flashable binary format"
+`which python3` -m quicklogic_fasm.bitstream_to_binary $@

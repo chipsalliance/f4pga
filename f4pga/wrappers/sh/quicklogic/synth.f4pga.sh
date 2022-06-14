@@ -134,9 +134,13 @@ export SYNTH_JSON=${TOP}_io.json
 export OUT_SYNTH_V=${TOP}_synth.v
 export OUT_EBLIF=${TOP}.eblif
 export OUT_FASM_EXTRA=${TOP}_fasm_extra.fasm
+export PYTHON3=$(which python3)
+export UTILS_PATH=${VPRPATH}/python/
 
 if [ -s $PCF ]; then
     export PCF_FILE=$PCF
+else
+    export PCF_FILE=""
 fi
 
 DEVICE_PATH="${SHARE_DIR_PATH}/arch/${DEVICE}_${DEVICE}"
@@ -174,6 +178,6 @@ if [ ! -z "${YOSYS_COMMANDS}" ]; then
   YOSYS_SCRIPT="$YOSYS_COMMANDS; $YOSYS_SCRIPT"
 fi
 
-yosys -p "${YOSYS_SCRIPT}" -l $LOG
-python3 ${SPLIT_INOUTS} -i ${OUT_JSON} -o ${SYNTH_JSON}
-yosys -p "read_json $SYNTH_JSON; tcl ${CONV_TCL_PATH}"
+`which yosys` -p "${YOSYS_SCRIPT}" -l $LOG
+`which python3` ${SPLIT_INOUTS} -i ${OUT_JSON} -o ${SYNTH_JSON}
+`which yosys` -p "read_json $SYNTH_JSON; tcl ${CONV_TCL_PATH}"

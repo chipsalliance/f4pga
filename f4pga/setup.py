@@ -23,7 +23,7 @@ from typing import List
 from setuptools import setup as setuptools_setup
 
 from os import environ
-F4PGA_FAM = environ.get('F4PGA_FAM', 'xc7')
+FPGA_FAM = environ.get('FPGA_FAM', 'xc7')
 
 
 packagePath = Path(__file__).resolve().parent
@@ -61,12 +61,22 @@ wrapper_entrypoints = [
     f"{sf}_synth = {shwrappers}:synth",
     f"{sf}_write_bitstream = {shwrappers}:write_bitstream",
     f"{sf}_write_fasm = {shwrappers}:write_fasm",
-] if F4PGA_FAM == 'xc7' else [
+] if FPGA_FAM == 'xc7' else [
+    f"{sf}_synth = {shwrappers}:synth",
     f"{sf}_pack = {shwrappers}:pack",
+    f"{sf}_repack = {shwrappers}:repack",
     f"{sf}_place = {shwrappers}:place",
     f"{sf}_route = {shwrappers}:route",
     f"{sf}_write_fasm = {shwrappers}:write_fasm",
+    f"{sf}_generate_bitstream = {shwrappers}:generate_bitstream",
+    f"{sf}_generate_constraints = {shwrappers}:generate_constraints",
+    f"{sf}_analysis = {shwrappers}:analysis",
+    f"{sf}_fasm2bels = {shwrappers}:fasm2bels",
+    f"ql_{sf} = {shwrappers}:ql",
+    f"vpr_common = {shwrappers}:vpr_common",
 ]
+
+
 
 setuptools_setup(
     name=packagePath.name,

@@ -18,15 +18,15 @@
 
 set -e
 
-BUILDDIR=build
+SHARE_DIR_PATH=${SHARE_DIR_PATH:="$F4PGA_ENV_SHARE"}
 
-source "$F4PGA_ENV_BIN"/vpr_common
+source $(dirname "$0")/vpr_common.f4pga.sh
 
 VERSION="v2.0.1"
 
 if [ ! -n $1 ]; then
   echo "Please enter a valid command: Refer help ql_symbiflow --help"
-  exit 0
+  exit 1
 elif [[ $1 == "-synth" || $1 == "-compile" ]]; then
   echo -e "----------------- \n"
 elif [[ $1 == "-h"  ||  $1 == "--help" ]];then
@@ -35,13 +35,14 @@ elif [[ $1 == "-h"  ||  $1 == "--help" ]];then
 \t>ql_symbiflow -synth -src <source_dir path> -d <device> -P <pinmap csv file> -t <top module name> -v <verilog file/files> -p <pcf file>\n\
  To run synthesis, pack, place and route:\n\
 \t>ql_symbiflow -compile -src <source_dir path> -d <device> -P <pinmap csv file> -t <top module name> -v <verilog file/files> -p <pcf file> -P <pinmap csv file> -s <SDC file> \n\
-Device supported:qlf_k4n8" || exit
+Devices supported: ql-eos-s3, qlf_k4n8 \n\
+Support temporarily disabled for: ql-pp3, qlf_k6n10" || exit
 elif [[ $1 == "-v" || $1 == "--version" ]];then
   echo "Symbiflow Tool Version : ${VERSION}"
-  exit
+  exit 0
 else
   echo -e "Please provide a valid command : Refer -h/--help\n"
-  exit
+  exit 1
 fi
 
 
@@ -61,8 +62,11 @@ JSON=""
 PNR_CORNER="slow"
 ANALYSIS_CORNER="slow"
 COMPILE_EXTRA_ARGS=()
-
+BUILDDIR="build"
+DEVICE_CHECK="INVALID"
 OPT=""
+RUN_TILL=""
+
 for arg in $@; do
   case $arg in
   -src|--source)    OPT="src"  ;;
@@ -80,6 +84,7 @@ for arg in $@; do
   -synth|-compile)  OPT="synth" ;;
   -y|+incdir+*|+libext+*|+define+*) OPT="compile_xtra" ;;
   -f)                               OPT="options_file" ;;
+  -build_dir)                       OPT="build_dir" ;;
   -h|--help) exit 0 ;;
   *)
     case $OPT in
@@ -135,6 +140,10 @@ for arg in $@; do
       options_file)
         COMPILE_EXTRA_ARGS+=("-f \"`realpath $arg`\" ")
       ;;
+      build_dir)
+        BUILDDIR=$arg
+        OPT=""
+      ;;
       *)
         echo "Refer help for more details: ql_symbiflow -h "
         exit 1
@@ -151,10 +160,20 @@ case ${DEVICE} in
   qlf_k4n8)
     DEVICE="${DEVICE}_${DEVICE}"
     FAMILY="qlf_k4n8"
+    DEVICE_CHECK="VALID"
+    USE_PINMAP=1
+  ;;
+  qlf_k6n10)
+    DEVICE="${DEVICE}_${DEVICE}"
+    FAMILY="qlf_k6n10"
+    DEVICE_CHECK="VALID"
+    USE_PINMAP=1
   ;;
   ql-eos-s3)
     DEVICE="${DEVICE}"
     FAMILY="pp3"
+    DEVICE_CHECK="VALID"
+    USE_PINMAP=0
   ;;
   *)
     echo "Unsupported device '${DEVICE}'"
@@ -181,7 +200,7 @@ else
     if [ -f $SOURCE/v_list_tmp ];then
       rm -f $SOURCE/v_list_tmp
     fi
-    if [ $VERILOG_FILES == "*.v" ];then
+    if [ "$VERILOG_FILES" == "*.v" ];then
       VERILOG_FILES=`cd ${SOURCE};ls *.v`
     fi
     echo "$VERILOG_FILES" >${SOURCE}/v_list
@@ -202,30 +221,21 @@ else
 fi
 
 if [[ $1 == "-compile" || $1 == "-post_verilog" ]]; then
-  # Allow no PCF/pinmap for some devices
-  if [[ ! "$DEVICE" =~ ^(qlf_k4n8_qlf_k4n8)$ ]]; then
-    if [ -z "$PCF" ]; then
-      echo "PCF file option is missing. Refer -h/--help"
-      exit 1
-    elif ! [ -f "$SOURCE/$PCF" ]; then
-      echo "The pcf file: $PCF is missing at: $SOURCE"
-      exit 1
-    fi
-  fi
   if [ -z "$DEVICE" ]; then
     echo "DEVICE name is missing. Refer -h/--help"
     exit 1
-  elif ! [[ "$DEVICE" =~ ^(qlf_k4n8_qlf_k4n8)$ ]]; then
-    echo "Invalid Device name, supported qlf_k4n8"
+  elif ! [[ "$DEVICE_CHECK" =~ ^(VALID)$ ]]; then
+    echo "Invalid Device name, supported: ql-eos-s3, qlf_k4n8 \n\
+      Support temporarily disabled for: qlf_k6n10"
     exit 1
   fi
   if [ -z "$TOP" ]; then
     echo "TOP module name is missing. Refer -h/--help"
     exit 1
   fi
-  if [[  "$DEVICE" =~ ^(qlf_k4n8_qlf_k4n8)$ ]]; then
+  if [[  "$DEVICE_CHECK" =~ ^(VALID)$ ]]; then
     if [ -z "$PART" ]; then
-      if [ -n "$PCF" ];then
+      if [[ -n "$PCF" && $USE_PINMAP -ne 0 ]]; then
         echo "Error: pcf file cannot be used without declaring PINMAP CSV file"
         exit 1
       fi
@@ -272,12 +282,19 @@ if [ -f "$SOURCE/v_list_tmp" ]; then
 fi
 
 # FIXME: Some devices do not have fasm2bels yet
+# FIXME: Some device do not support bitstream generation yet
 RUN_TILL=""
 if [[ "$DEVICE" =~ ^(qlf_k4n8.*)$ ]]; then
   HAVE_FASM2BELS=0
   RUN_TILL="bit"
-else
+elif [[ "$DEVICE" =~ ^(qlf_k6n10.*)$ ]]; then
+  HAVE_FASM2BELS=0
+  RUN_TILL="route"
+elif [[ "$DEVICE" =~ ^(ql-eos-s3)$ ]]; then
   HAVE_FASM2BELS=1
+  RUN_TILL="bit"
+else
+  HAVE_FASM2BELS=0
   RUN_TILL="route"
 fi
 
@@ -290,7 +307,6 @@ fi
 
 export PCF_FILE=$PCF
 export JSON=$JSON
-export TOP_F=$TOP
 export PINMAP_FILE=$PINMAPCSV
 export MAX_CRITICALITY=$MAX_CRITICALITY
 
@@ -302,7 +318,7 @@ else
   CURR_DIR="${PWD}/${SOURCE}"
 fi
 
-if [ -n "$PART" ]; then
+if [[ -n "$PART" && $USE_PINMAP -ne 0 ]]; then
   if [[ -f $SOURCE/$PART ]];then
     CSV_PATH=`realpath $SOURCE/$PART`
   elif [[ -f $PART ]];then
@@ -327,7 +343,11 @@ elif [[ -f $PCF ]];then
   PCF_PATH=`realpath $PCF`
 fi
 
-export PART=${CSV_PATH}
+if [[ $USE_PINMAP -ne 0 ]]; then
+    export PART=${CSV_PATH}
+else
+    export PART=${PART}
+fi
 export JSON=${JSON_PATH}
 export PCF_PATH=${PCF_PATH}
 
@@ -337,8 +357,8 @@ LOG_FILE=${CURR_DIR}/${BUILDDIR}/${TOP}.log
 if [ -f "$SOURCE"/$PCF_FILE ];then
   PCF_MAKE="\${current_dir}/$PCF_FILE"
 else
-  touch ${CURR_DIR}/build/${TOP}_dummy.pcf
-  PCF_MAKE="\${current_dir}/build/${TOP}_dummy.pcf"
+  touch ${CURR_DIR}/${BUILDDIR}/${TOP}_dummy.pcf
+  PCF_MAKE="\${current_dir}/${BUILDDIR}/${TOP}_dummy.pcf"
 fi
 
 PROCESS_SDC=$(realpath "$F4PGA_ENV_BIN"/python/process_sdc_constraints.py)
@@ -350,15 +370,15 @@ if ! [ -z "$SDC" ]; then
     SDC_MAKE="$SOURCE/$SDC"
   fi
 else
-  touch ${CURR_DIR}/build/${TOP}_dummy.sdc
-  SDC_MAKE="\${current_dir}/build/${TOP}_dummy.sdc"
+  touch ${CURR_DIR}/${BUILDDIR}/${TOP}_dummy.sdc
+  SDC_MAKE="\${current_dir}/${BUILDDIR}/${TOP}_dummy.sdc"
 fi
 
 if ! [ -z "$CSV_PATH" ]; then
   CSV_MAKE=$CSV_PATH
 else
-  touch ${CURR_DIR}/build/${TOP}_dummy.csv
-  CSV_MAKE="\${current_dir}/build/${TOP}_dummy.csv"
+  touch ${CURR_DIR}/${BUILDDIR}/${TOP}_dummy.csv
+  CSV_MAKE="\${current_dir}/${BUILDDIR}/${TOP}_dummy.csv"
 fi
 
 echo -e ".PHONY:\${BUILDDIR}\n
@@ -375,7 +395,7 @@ PNR_CORNER := $ANALYSIS_CORNER\n\
 PCF := $PCF_MAKE\n\
 PINMAP_CSV := $CSV_MAKE\n\
 SDC_IN := $SDC_MAKE\n\
-BUILDDIR := build\n\n\
+BUILDDIR := $BUILDDIR\n\n\
 SDC := \${current_dir}/\${BUILDDIR}/\${TOP}.sdc
 
 all: \${BUILDDIR}/\${TOP}.${RUN_TILL}\n\
@@ -384,10 +404,11 @@ all: \${BUILDDIR}/\${TOP}.${RUN_TILL}\n\
   ifneq (\"\$(wildcard \$(HEX_FILES))\",\"\")\n\
 	\$(shell cp \${current_dir}/*.hex \${BUILDDIR})\n\
   endif\n\
-	cd \${BUILDDIR} && symbiflow_synth -t \${TOP} -v \${VERILOG} -F \${FAMILY} -d \${DEVICE} -p \${PCF} ${COMPILE_EXTRA_ARGS[*]} > $LOG_FILE 2>&1\n\
+	cd \${BUILDDIR} && symbiflow_synth -t \${TOP} -v \${VERILOG} -F \${FAMILY} -d \${DEVICE} -p \${PCF} -P \${PART} ${COMPILE_EXTRA_ARGS[*]} > $LOG_FILE 2>&1\n\
 \n\
 \${BUILDDIR}/\${TOP}.sdc: \${BUILDDIR}/\${TOP}.eblif\n\
 	python3 ${PROCESS_SDC} --sdc-in \${SDC_IN} --sdc-out \$@ --pcf \${PCF} --eblif \${BUILDDIR}/\${TOP}.eblif --pin-map \${PINMAP_CSV}\n\
+\n\
 \${BUILDDIR}/\${TOP}.net: \${BUILDDIR}/\${TOP}.eblif \${BUILDDIR}/\${TOP}.sdc\n\
 	cd \${BUILDDIR} && symbiflow_pack -e \${TOP}.eblif -f \${FAMILY} -d \${DEVICE} -s \${SDC} -c \${PNR_CORNER} >> $LOG_FILE 2>&1\n\
 \n\
@@ -418,7 +439,11 @@ fi
 \n\
 \${BUILDDIR}/\${TOP}.fasm: \${BUILDDIR}/\${TOP_FINAL}.route\n\
 	cd \${BUILDDIR} && symbiflow_write_fasm -e \${TOP_FINAL}.eblif -f \${FAMILY} -d \${DEVICE} -s \${SDC} -c \${PNR_CORNER} >> $LOG_FILE 2>&1\n\
-\n\
+    " >>$MAKE_FILE
+
+# Bitstream
+if [ "$FAMILY" == "qlf_k4n8" ]; then
+    echo -e "\
 \${BUILDDIR}/\${TOP}.bit: \${BUILDDIR}/\${TOP}.fasm\n\
 	cd \${BUILDDIR} && symbiflow_generate_bitstream -d \${FAMILY} -f \${TOP}.fasm -r 4byte -b \${TOP}.bit >> $LOG_FILE 2>&1\n\
 	cd \${BUILDDIR} && symbiflow_generate_bitstream -d \${FAMILY} -f \${TOP}.fasm -r txt -b \${TOP}.bin >> $LOG_FILE 2>&1\n\
@@ -427,16 +452,43 @@ fi
 	cd \${BUILDDIR} && symbiflow_generate_libfile \${PARTNAME} \${DEVICE} \${PNR_CORNER} >> $LOG_FILE 2>&1\n\
 " >>$MAKE_FILE
 
+elif [ "$FAMILY" == "pp3" ]; then
+    echo -e "\
+\${BUILDDIR}/\${TOP}.bit: \${BUILDDIR}/\${TOP}.fasm\n\
+	cd \${BUILDDIR} && symbiflow_generate_bitstream -d \${DEVICE} -f \${TOP}.fasm -P \${PARTNAME} -b \${TOP}.bit >> $LOG_FILE 2>&1\n\
+    " >>$MAKE_FILE
+fi
+
+# EOS-S3 specific targets
+if [ "$DEVICE" == "ql-eos-s3" ]; then
+    echo -e "\
+\${BUILDDIR}/\${TOP}_bit.h: \${BUILDDIR}/\${TOP}.bit\n\
+	symbiflow_write_bitheader \$^ \$@ >> $LOG_FILE 2>&1\n\
+\n\
+\${BUILDDIR}/\${TOP}.bin: \${BUILDDIR}/\${TOP}.bit\n\
+	symbiflow_write_binary \$^ \$@ >> $LOG_FILE 2>&1\n\
+\n\
+\${BUILDDIR}/\${TOP}.jlink: \${BUILDDIR}/\${TOP}.bit\n\
+	symbiflow_write_jlink \$^ \$@ >> $LOG_FILE 2>&1\n\
+\n\
+\${BUILDDIR}/\${TOP}.openocd: \${BUILDDIR}/\${TOP}.bit\n\
+	symbiflow_write_openocd \$^ \$@ >> $LOG_FILE 2>&1\n\
+\n\
+    " >>$MAKE_FILE
+fi
+
+# fasm2bels
 if [ "$HAVE_FASM2BELS" != 0 ]; then
     echo -e "\
-	cd \${BUILDDIR} && symbiflow_write_fasm2bels -e \${TOP}.eblif -d \${DEVICE} -p \${PCF} -n \${TOP}.net -P \${PARTNAME}\n\
+\${BUILDDIR}/\${TOP}.bit.v: \${BUILDDIR}/\${TOP}.bit\n\
+	cd \${BUILDDIR} && symbiflow_fasm2bels -b \${TOP}.bit -d \${DEVICE} -p \${PCF} -P \${PARTNAME} >> $LOG_FILE 2>&1\n\
     " >>$MAKE_FILE
 fi
 
 echo -e "\
 clean:\n\
 	rm -rf \${BUILDDIR}\n\
-" >>$MAKE_FILE
+   " >>$MAKE_FILE
 
 ## Remove temporary files
 rm -f $SOURCE/f_list_temp $SOURCE/v_list_tmp $SOURCE/v_list
@@ -444,14 +496,31 @@ rm -f $SOURCE/f_list_temp $SOURCE/v_list_tmp $SOURCE/v_list
 ## Make file Targets
 if [ $1 == "-synth" ]; then
   echo -e "Performing Synthesis "
-  cd $SOURCE;make -f Makefile.symbiflow ${BUILDDIR}/${TOP}.eblif || exit
+  cd $SOURCE;make -f Makefile.symbiflow ${BUILDDIR}/${TOP}.eblif || (cat $LOG_FILE && exit 1)
 elif [[ ! -z "$OUT" && $1 == "-compile" ]];then
   if [[ " ${OUT_ARR[@]} " =~ " post_verilog " ]];then
-    cd $SOURCE;make -f Makefile.symbiflow ${BUILDDIR}/${TOP}.post_v || exit
+    cd $SOURCE;make -f Makefile.symbiflow ${BUILDDIR}/${TOP}.post_v || (cat $LOG_FILE && exit 1)
+  fi
+  if [ "$DEVICE" == "ql-eos-s3" ]; then
+    if [[ " ${OUT_ARR[@]} " =~ " jlink " ]]; then
+     cd $SOURCE;make -f Makefile.symbiflow ${BUILDDIR}/${TOP}.jlink || (cat $LOG_FILE && exit 1)
+    fi
+    if [[ " ${OUT_ARR[@]} " =~ " openocd " ]]; then
+     cd $SOURCE;make -f Makefile.symbiflow ${BUILDDIR}/${TOP}.openocd || (cat $LOG_FILE && exit 1)
+    fi
+    if [[ " ${OUT_ARR[@]} " =~ " post_verilog " ]]; then
+     cd $SOURCE;make -f Makefile.symbiflow  ${BUILDDIR}/${TOP}.bit.v || (cat $LOG_FILE && exit 1)
+    fi
+    if [[ " ${OUT_ARR[@]} " =~ " header " ]]; then
+     cd $SOURCE;make -f Makefile.symbiflow ${BUILDDIR}/${TOP}_bit.h || (cat $LOG_FILE && exit 1)
+    fi
+    if [[ " ${OUT_ARR[@]} " =~ " binary " ]]; then
+     cd $SOURCE;make -f Makefile.symbiflow ${BUILDDIR}/${TOP}.bin || (cat $LOG_FILE && exit 1)
+    fi
   fi
 else
   if [ $1 == "-compile" ]; then
     echo -e "Running Synth->Pack->Place->Route->FASM->bitstream"
-    cd $SOURCE;make -f Makefile.symbiflow ${BUILDDIR}/${TOP}.${RUN_TILL}  || exit
+    cd $SOURCE;make -f Makefile.symbiflow ${BUILDDIR}/${TOP}.${RUN_TILL} || (cat $LOG_FILE && exit 1)
   fi
 fi

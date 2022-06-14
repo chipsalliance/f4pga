@@ -20,10 +20,10 @@ set -e
 
 if [ -z $VPRPATH ]; then
   export VPRPATH="$F4PGA_ENV_BIN"
-  export PYTHONPATH=${VPRPATH}/python:${VPRPATH}/python/prjxray:${PYTHONPATH}
+  export PYTHONPATH=${VPRPATH}/python:${PYTHONPATH}
 fi
 
-source ${VPRPATH}/vpr_common
+source $(dirname "$0")/vpr_common.f4pga.sh
 parse_args $@
 
 if [ -z $PCF ]; then

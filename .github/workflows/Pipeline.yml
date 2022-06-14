@@ -88,7 +88,7 @@ jobs:
     name: '🚦 Example (deprecated sh) | ${{ matrix.fam }}'
     env:
       F4PGA_INSTALL_DIR: /opt/f4pga
-      F4PGA_FAM: ${{ matrix.fam }}
+      FPGA_FAM: ${{ matrix.fam }}
 
     steps:
 
@@ -149,7 +149,7 @@ jobs:
     name: '🐍 Example | xc7'
     env:
       F4PGA_INSTALL_DIR: /opt/f4pga
-      F4PGA_FAM: xc7
+      FPGA_FAM: xc7
 
     steps:
 
@@ -187,7 +187,7 @@ jobs:
     name: '🐍 PYTHONPATH'
     env:
       F4PGA_INSTALL_DIR: /opt/f4pga
-      F4PGA_FAM: xc7
+      FPGA_FAM: xc7
 
     steps:
 
@@ -205,7 +205,7 @@ jobs:
     name: '🐍 Python wrappers'
     env:
       F4PGA_INSTALL_DIR: /opt/f4pga
-      F4PGA_FAM: xc7
+      FPGA_FAM: xc7
 
     steps:
 
