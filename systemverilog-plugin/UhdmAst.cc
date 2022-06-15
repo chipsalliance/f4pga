@@ -1808,9 +1808,11 @@ void UhdmAst::process_typespec_member()
         break;
     case vpiVoidTypespec: {
         report_error("%s:%d: Void typespecs are currently unsupported", object->VpiFile().c_str(), object->VpiLineNo());
+        break;
     }
     case vpiClassTypespec: {
         report_error("%s:%d: Class typespecs are unsupported", object->VpiFile().c_str(), object->VpiLineNo());
+        break;
     }
     default: {
         report_error("%s:%d: Encountered unhandled typespec in process_typespec_member: '%s' of type '%s'\n", object->VpiFile().c_str(),
