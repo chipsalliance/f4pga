@@ -5,6 +5,7 @@
         "prepare_sdc": "common:generic_script_wrapper",
         "pack": "common:pack",
         "ioplace": "common:generic_script_wrapper",
+        "place_constraints": "common:generic_script_wrapper",
         "place": "common:place",
         "route": "common:route",
         "fasm": "common:fasm",
@@ -101,7 +102,7 @@
             "params": {
                 "stage_name": "ioplace",
                 "interpreter": "${python3}",
-                "script": "${binDir}/python/ql_pp3_create_ioplace.py",
+                "script": "${binDir}/python/pp3_create_ioplace.py",
                 "outputs": {
                     "io_place": {
                         "mode": "stdout",
@@ -113,6 +114,25 @@
                     "net": "${:net}",
                     "pcf": "${:pcf}",
                     "map": "${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_PD64.csv",
+                    "$PYTHONPATH": "${binDir}/python/"
+                }
+            }
+        },
+        "place_constraints": {
+            "params": {
+                "stage_name": "place_constraints",
+                "interpreter": "${python3}",
+                "script": "${binDir}/python/pp3_create_place_constraints.py",
+                "outputs": {
+                    "place_constraints": {
+                        "mode": "stdout",
+                        "target": "${:eblif[noext]}_constraints.place"
+                    }
+                },
+                "inputs": {
+                    "blif": "${:eblif}",
+                    "map": "${shareDir}/arch/ql-eos-s3_wlcsp/clkmap_PD64.csv",
+                    "i": "${:io_place}",
                     "$PYTHONPATH": "${binDir}/python/"
                 }
             }
