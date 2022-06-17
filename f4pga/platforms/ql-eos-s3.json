@@ -11,6 +11,7 @@
         "iomux_binary": "common:generic_script_wrapper",
         "place": "common:place",
         "route": "common:route",
+        "analysis": "common:analysis",
         "fasm": "common:fasm",
         "bitstream": "common:generic_script_wrapper"
     },
@@ -247,6 +248,45 @@
                 "vpr_grid_layout_name": "ql-eos-s3",
                 "vpr_options": {
                     "write_timing_summary": "timing_summary.json",
+                    "max_router_iterations": 500,
+                    "routing_failure_predictor": "off",
+                    "router_high_fanout_threshold": -1,
+                    "constant_net_method": "route",
+                    "route_chan_width": 100,
+                    "clock_modeling": "route",
+                    "place_delay_model": "delta_override",
+                    "router_lookahead": "extended_map",
+                    "check_route": "quick",
+                    "strict_checks": "off",
+                    "allow_dangling_combinational_nodes": "on",
+                    "disable_errors": "check_unbuffered_edges:check_route",
+                    "congested_routing_iteration_threshold": "0.8",
+                    "incremental_reroute_delay_ripup": "off",
+                    "base_cost_type": "delay_normalized_length_bounded",
+                    "bb_factor": "10",
+                    "initial_pres_fac": "4.0",
+                    "check_rr_graph": "off",
+                    "pack_high_fanout_threshold": "PB-lOGIC:18",
+                    "suppress_warnings": "${noisyWarnings},sum_pin_class:check_unbuffered_edges:load_rr_indexed_data_T_values:check_rr_node:trans_per_R:check_route:set_rr_graph_tool_comment "
+                }
+            }
+        },
+        "analysis": {
+            "values": {
+                "device": "ql-eos-s3",
+                "device_alt": "ql-eos-s3_wlcsp",
+                "pinmap": "${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_PD64.csv",
+                "arch_def": "${shareDir}/arch/ql-eos-s3_wlcsp/arch.timing.xml",
+                "rr_graph_lookahead_bin": "${shareDir}/arch/ql-eos-s3_wlcsp/rr_graph_ql-eos-s3_wlcsp.lookahead.bin",
+                "rr_graph_real_bin": "${shareDir}/arch/ql-eos-s3_wlcsp/rr_graph_ql-eos-s3_wlcsp.rr_graph.real.bin",
+                "vpr_place_delay": "${shareDir}/arch/ql-eos-s3_wlcsp/rr_graph_ql-eos-s3_wlcsp.place_delay.bin",
+                "vpr_grid_layout_name": "ql-eos-s3",
+                "vpr_options": {
+                    "gen_post_synthesis_netlist": "on",
+                    "gen_post_implementation_merged_netlist": "on",
+                    "post_synth_netlist_unconn_inputs": "nets",
+                    "post_synth_netlist_unconn_outputs": "nets",
+                    "verify_file_digests": "off",
                     "max_router_iterations": 500,
                     "routing_failure_predictor": "off",
                     "router_high_fanout_threshold": -1,

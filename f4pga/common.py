@@ -174,6 +174,8 @@ def vpr(mode: str, vprargs: VprArgs, cwd=None):
         modeargs = ['--place']
     elif mode == 'route':
         modeargs = ['--route']
+    elif mode == 'analysis':
+        modeargs = ['--analysis']
 
     return sub(*([
         'vpr',

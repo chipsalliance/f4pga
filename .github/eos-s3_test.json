@@ -8,7 +8,8 @@
             "eos-s3/btn_counter/btn_counter.v"
         ],
         "synth_log": "synth.log",
-        "pack_log": "pack.log"
+        "pack_log": "pack.log",
+        "analysis_log": "analysis.log"
     },
     "EOS3FF512-PDN64": {
         "default_target": "bitstream",
@@ -18,8 +19,7 @@
             "sdc-in": "eos-s3/btn_counter/dummy.sdc"
         },
         "values": {
-            "part": "ql-eos-s3",
-            "package": "PD64"
+            "part": "ql-eos-s3"
         }
     }
 }
