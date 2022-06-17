@@ -250,14 +250,12 @@ struct QLEdifBackend : public Backend {
                 }
                 int width = port_it.second;
                 int start = 0;
-                bool upto = false;
                 auto m = design->module(cell_it.first);
                 if (m) {
                     auto w = m->wire(port_it.first);
                     if (w) {
                         width = GetSize(w);
                         start = w->start_offset;
-                        upto = w->upto;
                     }
                 }
                 if (width == 1)
