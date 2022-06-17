@@ -6,6 +6,9 @@
         "pack": "common:pack",
         "ioplace": "common:generic_script_wrapper",
         "place_constraints": "common:generic_script_wrapper",
+        "iomux_jlink": "common:generic_script_wrapper",
+        "iomux_openocd": "common:generic_script_wrapper",
+        "iomux_binary": "common:generic_script_wrapper",
         "place": "common:place",
         "route": "common:route",
         "fasm": "common:fasm",
@@ -133,6 +136,66 @@
                     "blif": "${:eblif}",
                     "map": "${shareDir}/arch/ql-eos-s3_wlcsp/clkmap_PD64.csv",
                     "i": "${:io_place}",
+                    "$PYTHONPATH": "${binDir}/python/"
+                }
+            }
+        },
+        "iomux_jlink": {
+            "params": {
+                "stage_name": "iomux_jlink",
+                "interpreter": "${python3}",
+                "script": "${binDir}/python/pp3_eos_s3_iomux_config.py",
+                "outputs": {
+                    "iomux_jlink": {
+                        "mode": "stdout",
+                        "target": "${:eblif[noext]}_iomux.jlink"
+                    }
+                },
+                "inputs": {
+                    "eblif": "${:eblif}",
+                    "pcf": "${:pcf}",
+                    "map": "${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_PD64.csv",
+                    "output-format": "jlink",
+                    "$PYTHONPATH": "${binDir}/python/"
+                }
+            }
+        },
+        "iomux_openocd": {
+            "params": {
+                "stage_name": "iomux_openocd",
+                "interpreter": "${python3}",
+                "script": "${binDir}/python/pp3_eos_s3_iomux_config.py",
+                "outputs": {
+                    "iomux_openocd": {
+                        "mode": "stdout",
+                        "target": "${:eblif[noext]}_iomux.openocd"
+                    }
+                },
+                "inputs": {
+                    "eblif": "${:eblif}",
+                    "pcf": "${:pcf}",
+                    "map": "${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_PD64.csv",
+                    "output-format": "openocd",
+                    "$PYTHONPATH": "${binDir}/python/"
+                }
+            }
+        },
+        "iomux_binary": {
+            "params": {
+                "stage_name": "iomux_binary",
+                "interpreter": "${python3}",
+                "script": "${binDir}/python/pp3_eos_s3_iomux_config.py",
+                "outputs": {
+                    "iomux_binary": {
+                        "mode": "stdout",
+                        "target": "${:eblif[noext]}_iomux.bin"
+                    }
+                },
+                "inputs": {
+                    "eblif": "${:eblif}",
+                    "pcf": "${:pcf}",
+                    "map": "${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_PD64.csv",
+                    "output-format": "binary",
                     "$PYTHONPATH": "${binDir}/python/"
                 }
             }
