@@ -328,8 +328,7 @@
                 "inputs": {
                     "#1": "${:fasm}",
                     "#2": "bitstream-${device}.bit",
-                    "dev-type": "ql-eos-s3",
-                    "db-root": "${shareDir}/fasm_database/pp3"
+                    "dev-type": "ql-eos-s3"
                 }
             },
             "values": {
