@@ -332,7 +332,7 @@
                 }
             },
             "values": {
-                "build_dir?": "."
+                "build_dir": "."
             }
         }
     }
