@@ -1,7 +1,9 @@
 namespace AST
 {
 enum AstNodeTypeExtended {
-    AST_DOT = AST::AST_BIND + 1 // here we always want to point to the last element of yosys' AstNodeType
+    AST_DOT = AST::AST_BIND + 1, // here we always want to point to the last element of yosys' AstNodeType
+    AST_BREAK,
+    AST_CONTINUE
 };
 }
 

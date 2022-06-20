@@ -33,6 +33,9 @@ class UhdmAst
     // the given vpiHandle.
     AST::AstNode *make_ast_node(AST::AstNodeType type, std::vector<AST::AstNode *> children = {}, bool prefer_full_name = false);
 
+    // Create an identifier AstNode
+    AST::AstNode *make_identifier(const std::string &name);
+
     // Makes the passed node a cell node of the specified type
     void make_cell(vpiHandle obj_h, AST::AstNode *node, AST::AstNode *type);
 
@@ -47,6 +50,9 @@ class UhdmAst
 
     // Processes the value connected to the specified node
     AST::AstNode *process_value(vpiHandle obj_h);
+
+    // Transforms break and continue nodes into structures accepted by the AST frontend
+    void transform_breaks_continues(AST::AstNode *loop, AST::AstNode *decl_block);
 
     // The parent UhdmAst
     UhdmAst *parent;

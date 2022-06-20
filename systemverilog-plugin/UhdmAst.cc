@@ -1151,6 +1151,125 @@ AST::AstNode *UhdmAst::process_value(vpiHandle obj_h)
     return nullptr;
 }
 
+void UhdmAst::transform_breaks_continues(AST::AstNode *loop, AST::AstNode *decl_block)
+{
+    AST::AstNode *break_wire = nullptr;
+    AST::AstNode *continue_wire = nullptr;
+    // Creates a 1-bit wire with the given name
+    const auto make_cond_var = [this](const std::string &var_name) {
+        auto cond_var =
+          make_ast_node(AST::AST_WIRE, {make_ast_node(AST::AST_RANGE, {AST::AstNode::mkconst_int(0, false), AST::AstNode::mkconst_int(0, false)}),
+                                        AST::AstNode::mkconst_int(0, false)});
+        cond_var->str = var_name;
+        cond_var->is_reg = true;
+        return cond_var;
+    };
+    // Creates a conditional like 'if (!casevar) block'
+    auto make_case = [this](AST::AstNode *block, const std::string &casevar_name) {
+        auto *case_node = make_ast_node(AST::AST_CASE);
+        auto *id = make_identifier(casevar_name);
+        case_node->children.push_back(id);
+        auto *constant = AST::AstNode::mkconst_int(0, false, 1);
+        auto *cond_node = make_ast_node(AST::AST_COND);
+        cond_node->children.push_back(constant);
+        cond_node->children.push_back(block);
+        case_node->children.push_back(cond_node);
+        return case_node;
+    };
+    // Pre-declare this function to be able to call it recursively
+    std::function<bool(AST::AstNode *)> transform_block;
+    // Transforms the given block if it has a break or continue; recurses into child blocks; return true if a break/continue was encountered
+    transform_block = [&](AST::AstNode *block) {
+        auto wrap_and_transform = [&](decltype(block->children)::iterator it) {
+            // Move the (it, end()) statements into a new block under 'if (!continue) {...}'
+            auto *new_block = make_ast_node(AST::AST_BLOCK, {it, block->children.end()});
+            block->children.erase(it, block->children.end());
+            auto *case_node = make_case(new_block, continue_wire->str);
+            block->children.push_back(case_node);
+            transform_block(new_block);
+        };
+
+        for (auto it = block->children.begin(); it != block->children.end(); it++) {
+            auto type = static_cast<int>((*it)->type);
+            switch (type) {
+            case AST::AST_BLOCK: {
+                if (transform_block(*it)) {
+                    // If there was a break/continue, we need to wrap the rest of the block in an if
+                    wrap_and_transform(it + 1);
+                    return true;
+                }
+                break;
+            }
+            case AST::AST_CASE: {
+                // Go over each block in a case
+                bool has_jump = false;
+                for (auto *node : (*it)->children) {
+                    if (node->type == AST::AST_COND)
+                        has_jump = has_jump || transform_block(node->children.back());
+                }
+                if (has_jump) {
+                    // If there was a break/continue, we need to wrap the rest of the block in an if
+                    wrap_and_transform(it + 1);
+                    return true;
+                }
+                break;
+            }
+            case AST::AST_BREAK:
+            case AST::AST_CONTINUE: {
+                std::for_each(it, block->children.end(), [](auto *node) { delete node; });
+                block->children.erase(it, block->children.end());
+                if (!continue_wire)
+                    continue_wire = make_cond_var("$continue");
+                auto *continue_id = make_identifier(continue_wire->str);
+                block->children.push_back(make_ast_node(AST::AST_ASSIGN_EQ, {continue_id, AST::AstNode::mkconst_int(1, false)}));
+                if (type == AST::AST_BREAK) {
+                    if (!break_wire)
+                        break_wire = make_cond_var("$break");
+                    auto *break_id = make_identifier(break_wire->str);
+                    block->children.push_back(make_ast_node(AST::AST_ASSIGN_EQ, {break_id, AST::AstNode::mkconst_int(1, false)}));
+                }
+                return true;
+            }
+            }
+        }
+        return false;
+    };
+
+    // Actual transformation starts here
+    transform_block(loop->children.back());
+    if (continue_wire) {
+        auto *continue_id = make_identifier(continue_wire->str);
+        // Reset $continue each iteration
+        auto *continue_assign = make_ast_node(AST::AST_ASSIGN_EQ, {continue_id, AST::AstNode::mkconst_int(0, false)});
+        decl_block->children.insert(decl_block->children.begin(), continue_wire);
+        loop->children.back()->children.insert(loop->children.back()->children.begin(), continue_assign);
+    }
+    if (break_wire) {
+        auto *break_id = make_identifier(break_wire->str);
+        // Reset $break before the loop
+        auto *break_assign = make_ast_node(AST::AST_ASSIGN_EQ, {break_id, AST::AstNode::mkconst_int(0, false)});
+        decl_block->children.insert(decl_block->children.begin(), break_assign);
+        decl_block->children.insert(decl_block->children.begin(), break_wire);
+        if (loop->type == AST::AST_REPEAT || loop->type == AST::AST_FOR) {
+            // Wrap loop body in 'if (!break) {...}'
+            // Changing the for loop condition won't work here,
+            // as then simplify fails with error "2nd expression of procedural for-loop is not constant!"
+            auto *case_node = make_case(loop->children.back(), break_wire->str);
+            auto *new_block = make_ast_node(AST::AST_BLOCK);
+            new_block->children.push_back(case_node);
+            new_block->str = loop->children.back()->str;
+            loop->children.back() = new_block;
+        } else if (loop->type == AST::AST_WHILE) {
+            // Add the break var to the loop condition
+            auto *break_id = make_identifier(break_wire->str);
+            AST::AstNode *&loop_cond = loop->children[0];
+            loop_cond = make_ast_node(AST::AST_LOGIC_AND, {make_ast_node(AST::AST_LOGIC_NOT, {break_id}), loop_cond});
+        } else {
+            log_error("break unsupported for this loop type");
+        }
+    }
+}
+
 AST::AstNode *UhdmAst::make_ast_node(AST::AstNodeType type, std::vector<AST::AstNode *> children, bool prefer_full_name)
 {
     auto node = new AST::AstNode(type);
@@ -1165,6 +1284,13 @@ AST::AstNode *UhdmAst::make_ast_node(AST::AstNodeType type, std::vector<AST::Ast
         node->location.first_line = node->location.last_line = line;
     }
     node->children = children;
+    return node;
+}
+
+AST::AstNode *UhdmAst::make_identifier(const std::string &name)
+{
+    auto *node = make_ast_node(AST::AST_IDENTIFIER);
+    node->str = name;
     return node;
 }
 
@@ -2998,24 +3124,23 @@ void UhdmAst::process_if_else()
 
 void UhdmAst::process_for()
 {
-    current_node = make_ast_node(AST::AST_FOR);
-    auto loop = current_node;
+    current_node = make_ast_node(AST::AST_BLOCK);
     auto loop_id = shared.next_loop_id();
-    current_node->str = "$loop" + std::to_string(loop_id);
+    current_node->str = "$fordecl_block" + std::to_string(loop_id);
+    auto loop = make_ast_node(AST::AST_FOR);
+    loop->str = "$loop" + std::to_string(loop_id);
+    current_node->children.push_back(loop);
     visit_one_to_many({vpiForInitStmt}, obj_h, [&](AST::AstNode *node) {
         if (node->type == AST::AST_ASSIGN_LE)
             node->type = AST::AST_ASSIGN_EQ;
         auto lhs = node->children[0];
         if (lhs->type == AST::AST_WIRE) {
-            current_node = make_ast_node(AST::AST_BLOCK);
-            current_node->str = "$fordecl_block" + std::to_string(loop_id);
             auto *wire = lhs->clone();
             wire->is_reg = true;
             current_node->children.push_back(wire);
             lhs->type = AST::AST_IDENTIFIER;
             lhs->is_signed = false;
             lhs->delete_children();
-            current_node->children.push_back(loop);
         }
         loop->children.push_back(node);
     });
@@ -3038,6 +3163,7 @@ void UhdmAst::process_for()
             loop->children.push_back(node);
         }
     });
+    transform_breaks_continues(loop, current_node);
 }
 
 void UhdmAst::process_gen_scope()
@@ -3511,19 +3637,23 @@ void UhdmAst::process_bit_typespec()
 
 void UhdmAst::process_repeat()
 {
-    current_node = make_ast_node(AST::AST_REPEAT);
-    visit_one_to_one({vpiCondition}, obj_h, [&](AST::AstNode *node) { current_node->children.push_back(node); });
+    auto loop_id = shared.next_loop_id();
+    current_node = make_ast_node(AST::AST_BLOCK);
+    current_node->str = "$repeatdecl_block" + std::to_string(loop_id);
+    auto *loop = make_ast_node(AST::AST_REPEAT);
+    loop->str = "$loop" + std::to_string(loop_id);
+    current_node->children.push_back(loop);
+    visit_one_to_one({vpiCondition}, obj_h, [&](AST::AstNode *node) { loop->children.push_back(node); });
     visit_one_to_one({vpiStmt}, obj_h, [&](AST::AstNode *node) {
-        if (node) {
-            AST::AstNode *block = nullptr;
-            if (node->type != AST::AST_BLOCK) {
-                block = new AST::AstNode(AST::AST_BLOCK, node);
-            } else {
-                block = node;
-            }
-            current_node->children.push_back(block);
+        if (node->type != AST::AST_BLOCK) {
+            node = new AST::AstNode(AST::AST_BLOCK, node);
         }
+        if (node->str == "") {
+            node->str = loop->str; // Needed in simplify step
+        }
+        loop->children.push_back(node);
     });
+    transform_breaks_continues(loop, current_node);
 }
 
 void UhdmAst::process_var_select()
@@ -3838,21 +3968,23 @@ void UhdmAst::process_immediate_assume()
 
 void UhdmAst::process_while()
 {
-    current_node = make_ast_node(AST::AST_WHILE);
-    visit_one_to_one({vpiCondition}, obj_h, [&](AST::AstNode *node) { current_node->children.push_back(node); });
+    auto loop_id = shared.next_loop_id();
+    current_node = make_ast_node(AST::AST_BLOCK);
+    current_node->str = "$whiledecl_block" + std::to_string(loop_id);
+    auto *loop = make_ast_node(AST::AST_WHILE);
+    loop->str = "$loop" + std::to_string(loop_id);
+    current_node->children.push_back(loop);
+    visit_one_to_one({vpiCondition}, obj_h, [&](AST::AstNode *node) { loop->children.push_back(node); });
     visit_one_to_one({vpiStmt}, obj_h, [&](AST::AstNode *node) {
         if (node->type != AST::AST_BLOCK) {
-            auto *statements = make_ast_node(AST::AST_BLOCK);
-            statements->str = current_node->str; // Needed in simplify step
-            statements->children.push_back(node);
-            current_node->children.push_back(statements);
-        } else {
-            if (node->str == "") {
-                node->str = current_node->str;
-                current_node->children.push_back(node);
-            }
+            node = make_ast_node(AST::AST_BLOCK, {node});
         }
+        if (node->str.empty()) {
+            node->str = loop->str; // Needed in simplify step
+        }
+        loop->children.push_back(node);
     });
+    transform_breaks_continues(loop, current_node);
 }
 
 void UhdmAst::process_gate()
@@ -4044,6 +4176,14 @@ AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
         break;
     case vpiFor:
         process_for();
+        break;
+    case vpiBreak:
+        // Will be resolved later by loop processor
+        current_node = make_ast_node(static_cast<AST::AstNodeType>(AST::AST_BREAK));
+        break;
+    case vpiContinue:
+        // Will be resolved later by loop processor
+        current_node = make_ast_node(static_cast<AST::AstNodeType>(AST::AST_CONTINUE));
         break;
     case vpiGenScopeArray:
         process_gen_scope_array();
