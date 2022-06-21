@@ -18,7 +18,5 @@
 
 set -e
 
-source $(dirname "$(readlink -f "$BASH_SOURCE")")/env
-
 echo "Converting bitstream to flashable binary format"
 `which python3` -m quicklogic_fasm.bitstream_to_binary $@

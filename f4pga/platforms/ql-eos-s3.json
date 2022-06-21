@@ -13,7 +13,11 @@
         "route": "common:route",
         "analysis": "common:analysis",
         "fasm": "common:fasm",
-        "bitstream": "common:generic_script_wrapper"
+        "bitstream": "common:generic_script_wrapper",
+        "bitstream_bitheader": "common:generic_script_wrapper",
+        "bitstream_binary": "common:generic_script_wrapper",
+        "bitstream_jlink": "common:generic_script_wrapper",
+        "bitstream_openocd": "common:generic_script_wrapper"
     },
 
     "values": {
@@ -333,6 +337,94 @@
             },
             "values": {
                 "build_dir": "."
+            }
+        },
+        "bitstream_bitheader": {
+            "params": {
+                "stage_name": "bitstream_bitheader",
+                "script": "symbiflow_write_bitheader",
+                "outputs": {
+                    "bitstream_bitheader": {
+                        "mode": "file",
+                        "file": "${:bitstream}.h",
+                        "target": "${:bitstream}.h"
+                    },
+                    "bitstream_bitheader_log": {
+                        "mode": "stdout",
+                        "target": "${:bitstream}.h.log"
+                    }
+                },
+                "inputs": {
+                    "#1": "${:bitstream}",
+                    "#2": "${:bitstream}.h",
+                    "#3": "${:iomux_binary}"
+                }
+            }
+        },
+        "bitstream_jlink": {
+            "params": {
+                "stage_name": "bitstream_jlink",
+                "script": "symbiflow_write_jlink",
+                "outputs": {
+                    "bitstream_jlink": {
+                        "mode": "file",
+                        "file": "${:bitstream}.jlink",
+                        "target": "${:bitstream}.jlink"
+                    },
+                    "bitstream_jlink_log": {
+                        "mode": "stdout",
+                        "target": "${:bitstream}.jlink.log"
+                    }
+                },
+                "inputs": {
+                    "#1": "${:bitstream}",
+                    "#2": "${:bitstream}.jlink",
+                    "#3": "${:iomux_jlink}"
+                }
+            }
+        },
+        "bitstream_openocd": {
+            "params": {
+                "stage_name": "bitstream_openocd",
+                "script": "symbiflow_write_openocd",
+                "outputs": {
+                    "bitstream_openocd": {
+                        "mode": "file",
+                        "file": "${:bitstream}.openocd",
+                        "target": "${:bitstream}.openocd"
+                    },
+                    "bitstream_openocd_log": {
+                        "mode": "stdout",
+                        "target": "${:bitstream}.openocd.log"
+                    }
+                },
+                "inputs": {
+                    "#1": "${:bitstream}",
+                    "#2": "${:bitstream}.openocd",
+                    "#3": "${:iomux_openocd}"
+                }
+            }
+        },
+        "bitstream_binary": {
+            "params": {
+                "stage_name": "bitstream_binary",
+                "script": "symbiflow_write_binary",
+                "outputs": {
+                    "bitstream_binary": {
+                        "mode": "file",
+                        "file": "${:bitstream}.bin",
+                        "target": "${:bitstream}.bin"
+                    },
+                    "bitstream_binary_log": {
+                        "mode": "stdout",
+                        "target": "${:bitstream}.bin.log"
+                    }
+                },
+                "inputs": {
+                    "#1": "${:bitstream}",
+                    "#2": "${:bitstream}.bin",
+                    "#3": "${:iomux_binary}"
+                }
             }
         }
     }
