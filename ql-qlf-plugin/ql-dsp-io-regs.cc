@@ -82,7 +82,7 @@ void ql_dsp_io_regs_pass(RTLIL::Module *module)
             for (auto portname : ports2del) {
                 const RTLIL::SigSpec *port = &dsp->getPort(RTLIL::escape_id(portname));
                 if (!port)
-                    log_error("%s port not found!", portname);
+                    log_error("%s port not found!", portname.c_str());
                 dsp->connections_.erase(RTLIL::escape_id(portname));
             }
         }

@@ -162,11 +162,6 @@ struct QlBramSplitPass : public Pass {
                 groups[key].push_back(cell);
             }
 
-            for (const auto &it : groups) {
-                const auto &group = it.second;
-                const auto &config = it.first;
-            }
-
             std::vector<const RTLIL::Cell *> cellsToRemove;
 
             // Map cell pairs to the target BRAM 2x18 cell
