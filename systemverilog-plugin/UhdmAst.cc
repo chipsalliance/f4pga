@@ -1840,17 +1840,6 @@ void UhdmAst::process_enum_typespec()
         switch (typespec_type) {
         case vpiLogicTypespec: {
             current_node->is_logic = true;
-            bool has_range = false;
-            visit_range(typespec_h, [&](AST::AstNode *node) {
-                has_range = true;
-                for (auto child : current_node->children) {
-                    child->children.push_back(node->clone());
-                }
-                delete node;
-            });
-            if (!has_range) // range is needed for simplify
-                for (auto child : current_node->children)
-                    child->children.push_back(make_ast_node(AST::AST_RANGE, {AST::AstNode::mkconst_int(0, true)}));
             shared.report.mark_handled(typespec_h);
             break;
         }
@@ -1862,17 +1851,6 @@ void UhdmAst::process_enum_typespec()
             break;
         }
         case vpiBitTypespec: {
-            bool has_range = false;
-            visit_range(typespec_h, [&](AST::AstNode *node) {
-                has_range = true;
-                for (auto child : current_node->children) {
-                    child->children.push_back(node->clone());
-                }
-                delete node;
-            });
-            if (!has_range) // range is needed for simplify
-                for (auto child : current_node->children)
-                    child->children.push_back(make_ast_node(AST::AST_RANGE, {AST::AstNode::mkconst_int(0, true)}));
             shared.report.mark_handled(typespec_h);
             break;
         }
@@ -1896,6 +1874,10 @@ void UhdmAst::process_enum_const()
         constant_node->filename = current_node->filename;
         constant_node->location = current_node->location;
         current_node->children.push_back(constant_node);
+        auto left_const = AST::AstNode::mkconst_int(constant_node->range_left, true);
+        auto right_const = AST::AstNode::mkconst_int(constant_node->range_right, true);
+        auto range = make_ast_node(AST::AST_RANGE, {left_const, right_const});
+        current_node->children.push_back(range);
     }
 }
 
