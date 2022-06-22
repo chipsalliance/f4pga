@@ -126,34 +126,6 @@ endmodule
 
 
 (* abc9_flop, lib_whitebox *)
-module dff(
-    output reg Q,
-    input wire D,
-    (* clkbuf_sink *)
-    input wire C
-);
-    initial Q <= 1'b0;
-
-    always @(posedge C)
-      Q <= D;
-
-endmodule
-
-(* abc9_flop, lib_whitebox *)
-module dffn(
-    output reg Q,
-    input wire D,
-    (* clkbuf_sink *)
-    input wire C
-);
-    initial Q <= 1'b0;
-
-    always @(negedge C)
-      Q <= D;
-
-endmodule
-
-(* abc9_flop, lib_whitebox *)
 module dffsre(
     output reg Q,
     input wire D,
@@ -238,32 +210,6 @@ module sdffnsre(
         Q <= 1'b1;
       else if (E)
         Q <= D;
-
-endmodule
-
-(* abc9_flop, lib_whitebox *)
-module latch (
-    output reg Q,
-    input wire D,
-    input wire G
-);
-    initial Q <= 1'b0;
-
-    always @(G)
-      if (G) Q <= D;
-
-endmodule
-
-(* abc9_flop, lib_whitebox *)
-module latchn (
-    output reg Q,
-    input wire D,
-    input wire G
-);
-    initial Q <= 1'b0;
-
-    always @(G)
-      if (!G) Q <= D;
 
 endmodule
 

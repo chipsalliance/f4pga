@@ -363,7 +363,10 @@ struct SynthQuickLogicPass : public ScriptPass {
                 //    $_DLATCH_SRPPP_ 0");
             } else if (family == "qlf_k6n10f") {
                 run("shregmap -minlen 8 -maxlen 20");
-                run("dfflegalize -cell $_DFF_?_ 0 -cell $_DFFSRE_?NNP_ 0 -cell $_SDFFE_?N?P_ 0 -cell $_DLATCH_?_ 0 -cell $_DLATCHSR_?NN_ 0");
+                // FIXME: dfflegalize seems to leave $_DLATCH_[NP]_ even if it
+                // is not allowed. So we allow them and map them later to
+                // $_DLATCHSR_[NP]NN_.
+                run("dfflegalize -cell $_DFFSRE_?NNP_ 0 -cell $_SDFFE_?N?P_ 0 -cell $_DLATCHSR_?NN_ 0 -cell $_DLATCH_?_ 0");
             } else if (family == "pp3") {
                 run("dfflegalize -cell $_DFFSRE_PPPP_ 0 -cell $_DLATCH_?_ x");
                 run("techmap -map +/quicklogic/" + family + "/cells_map.v");

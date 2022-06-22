@@ -424,7 +424,7 @@ equiv_opt -assert -async2sync -map +/quicklogic/qlf_k6n10f/cells_sim.v synth_qui
 design -load postopt
 yosys cd my_dff
 stat
-select -assert-count 1 t:dff
+select -assert-count 1 t:sdffsre
 
 # DFFN
 design -load read
@@ -434,7 +434,7 @@ equiv_opt -assert -async2sync -map +/quicklogic/qlf_k6n10f/cells_sim.v synth_qui
 design -load postopt
 yosys cd my_dffn
 stat
-select -assert-count 1 t:dffn
+select -assert-count 1 t:sdffnsre
 
 
 # DFFSRE from DFFR_N
@@ -617,7 +617,7 @@ equiv_opt -assert -async2sync -map +/quicklogic/qlf_k6n10f/cells_sim.v synth_qui
 design -load postopt
 yosys cd my_latch
 stat
-select -assert-count 1 t:latch
+select -assert-count 1 t:latchsre
 
 # LATCHN
 design -load read
@@ -627,7 +627,7 @@ equiv_opt -assert -async2sync -map +/quicklogic/qlf_k6n10f/cells_sim.v synth_qui
 design -load postopt
 yosys cd my_latchn
 stat
-select -assert-count 1 t:latchn
+select -assert-count 1 t:latchnsre
 
 
 ## LATCHSRE from LATCHR_N

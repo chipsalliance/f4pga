@@ -14,21 +14,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-// DFF, no set/reset, no enable
-module \$_DFF_P_ (D, C, Q);
-    input  D;
-    input  C;
-    output Q;
-    dff _TECHMAP_REPLACE_ (.C(C), .D(D), .Q(Q));
-endmodule
-
-module \$_DFF_N_ (D, C, Q);
-    input  D;
-    input  C;
-    output Q;
-    dffn _TECHMAP_REPLACE_ (.C(C), .D(D), .Q(Q));
-endmodule
-
 // DFF, asynchronous set/reset, enable
 module \$_DFFSRE_PNNP_ (C, S, R, E, D, Q);
     input  C;
@@ -89,11 +74,11 @@ endmodule
 
 // Latch, no set/reset, no enable
 module  \$_DLATCH_P_ (input E, D, output Q);
-    latch  _TECHMAP_REPLACE_ (.D(D), .Q(Q), .G(E));
+    latchsre  _TECHMAP_REPLACE_ (.D(D), .Q(Q), .E(1'b1), .G(E), .R(1'b1), .S(1'b1));
 endmodule
 
 module  \$_DLATCH_N_ (input E, D, output Q);
-    latchn _TECHMAP_REPLACE_ (.D(D), .Q(Q), .G(E));
+    latchnsre _TECHMAP_REPLACE_ (.D(D), .Q(Q), .E(1'b1), .G(E), .R(1'b1), .S(1'b1));
 endmodule
 
 // Latch with async set and reset and enable
