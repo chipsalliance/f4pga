@@ -1358,6 +1358,10 @@ void UhdmAst::move_type_to_new_typedef(AST::AstNode *current_node, AST::AstNode 
             wire_node->attributes["\\enum_type"] = AST::AstNode::mkconst_str(type_node->str);
             if (!type_node->children.empty() && type_node->children[0]->children.size() > 1) {
                 wire_node->children.push_back(type_node->children[0]->children[1]->clone());
+            } else {
+                // Add default range
+                auto range = make_range(31, 0);
+                wire_node->children.push_back(range);
             }
             typedef_node->children.push_back(wire_node);
             current_node->children.push_back(type_node);
