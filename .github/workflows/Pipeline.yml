@@ -123,7 +123,7 @@ jobs:
           cd ${{ matrix.fam }}
 
           case '${{ matrix.fam }}' in
-            xc7) TARGET="arty_35" make -C counter_test;;
+            xc7) TARGET="arty_35" F4PGA_USE_DEPRECATED=true make -C counter_test;;
             eos-s3) make -C btn_counter;;
           esac
 
