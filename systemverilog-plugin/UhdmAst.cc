@@ -1115,8 +1115,7 @@ AST::AstNode *UhdmAst::process_value(vpiHandle obj_h)
             // yosys is assuming that int/uint is 32 bit, so we are setting here correct size
             // NOTE: it *shouldn't* break on explicite 64 bit const values, as they *should* be handled
             // above by vpi*StrVal
-            // FIXME: Minimal int size should be resolved in UHDM, here we make sure it is at least 32
-            if (size == 64 || size < 32) {
+            if (size == 64) {
                 size = 32;
                 is_signed = true;
             }
