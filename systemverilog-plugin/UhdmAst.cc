@@ -1350,9 +1350,6 @@ void UhdmAst::move_type_to_new_typedef(AST::AstNode *current_node, AST::AstNode 
             delete type_node;
         } else {
             type_node->str = "$enum" + std::to_string(shared.next_enum_id());
-            for (auto *enum_item : type_node->children) {
-                enum_item->attributes["\\enum_base_type"] = AST::AstNode::mkconst_str(type_node->str);
-            }
             auto wire_node = new AST::AstNode(AST::AST_WIRE);
             wire_node->is_reg = true;
             wire_node->attributes["\\enum_type"] = AST::AstNode::mkconst_str(type_node->str);
