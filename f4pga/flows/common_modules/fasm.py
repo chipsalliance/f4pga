@@ -67,8 +67,9 @@ class FasmModule(Module):
         else:
             yield "No extra FASM to append"
 
-    def __init__(self, _):
-        self.name = "fasm"
+    def __init__(self, params, r_env, instance_name):
+        super().__init__(params, r_env, instance_name)
+
         self.no_of_phases = 2
         self.takes = ["eblif", "net", "place", "route", "fasm_extra?", "sdc?"]
         self.produces = ["fasm"]

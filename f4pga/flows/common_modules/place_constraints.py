@@ -54,8 +54,8 @@ class PlaceConstraintsModule(Module):
                 )
             )
 
-    def __init__(self, _):
-        self.name = "place_constraints"
+    def __init__(self, params, r_env, instance_name):
+        super().__init__(params, r_env, instance_name)
         self.no_of_phases = 2
         self.takes = ["eblif", "net", "io_place"]
         self.produces = ["place_constraints"]

@@ -80,12 +80,10 @@ setuptools_setup(
     url="https://github.com/chipsalliance/f4pga",
     package_dir={"f4pga": "."},
     package_data={
-        "f4pga.flows": [
-            "*.yml",
-        ],
+        "f4pga.flows": ["*.yml"],
         "f4pga.wrappers.sh": [
             "xc7/*.f4pga.sh",
-            "quicklogic/*.f4pga.sh",
+            "quicklogic/*.f4pga.sh"
         ],
         "f4pga.wrappers.tcl": [
             "*.f4pga.tcl",

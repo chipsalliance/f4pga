@@ -74,7 +74,9 @@ class FlowDefinition:
             self.r_env.add_values(global_vals)
 
         for stage_name, stage_def in flow_def["stages"].items():
-            self.stages[stage_name] = Stage(stage_name, stage_def)
+            # TODO: This won't take value overrides from platform flow config into
+            # consideration. We should fix that.
+            self.stages[stage_name] = Stage(stage_name, stage_def, self.r_env)
 
     def stage_names(self):
         return self.stages.keys()

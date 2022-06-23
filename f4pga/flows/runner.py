@@ -105,16 +105,13 @@ def module_io(module: Module):
     return {"name": module.name, "takes": module.takes, "produces": module.produces, "meta": get_mod_metadata(module)}
 
 
-_deep_resolve = deep(lambda p: str(Path(p).resolve()), allow_none=True)
-
-
 def module_map(module: Module, ctx: ModRunCtx):
     try:
         mod_ctx = ModuleContext(module, ctx.config, ctx.make_r_env(), ctx.share, ctx.bin)
     except Exception as e:
         raise ModuleFailException(module.name, "map", e)
 
-    return _deep_resolve(vars(mod_ctx.outputs))
+    return deep(lambda p: str(Path(p).resolve()), allow_none=True)(vars(mod_ctx.outputs))
 
 
 def module_exec(module: Module, ctx: ModRunCtx):
@@ -123,7 +120,7 @@ def module_exec(module: Module, ctx: ModRunCtx):
     except Exception as e:
         raise ModuleFailException(module.name, "exec", e)
 
-    sfprint(1, f"Executing module `{Style.BRIGHT + module.name + Style.RESET_ALL}`:")
+    sfprint(1, f"Executing stage `{Style.BRIGHT + module.name + Style.RESET_ALL}`:")
     current_phase = 1
     try:
         for phase_msg in module.execute(mod_ctx):
@@ -132,4 +129,4 @@ def module_exec(module: Module, ctx: ModRunCtx):
     except Exception as e:
         raise ModuleFailException(module.name, "exec", e)
 
-    sfprint(1, f"Module `{Style.BRIGHT + module.name + Style.RESET_ALL}` has finished its work!")
+    sfprint(1, f"Stage `{Style.BRIGHT + module.name + Style.RESET_ALL}` has finished its work!")

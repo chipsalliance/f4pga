@@ -108,7 +108,9 @@ class IORenameModule(Module):
         print(newctx.takes)
         return self.module.execute(newctx)
 
-    def __init__(self, params):
+    def __init__(self, params, r_env, instance_name):
+        super().__init__(params, r_env, instance_name)
+
         mod_path = resolve_modstr(params["module"])
         module_class = get_module(mod_path)
         module: Module = module_class(params.get("params"))
@@ -118,7 +120,6 @@ class IORenameModule(Module):
         self.rename_values = _or_empty_dict(params.get("rename_values"))
 
         self.module = module
-        self.name = f"{module.name}-io_renamed"
         self.no_of_phases = module.no_of_phases
         self.takes = _switch_entries(module.takes, self.rename_takes)
         self.produces = _switch_entries(module.produces, self.rename_produces)

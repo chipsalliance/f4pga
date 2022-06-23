@@ -59,7 +59,7 @@ Accepted module parameters:
 from pathlib import Path
 from re import match as re_match, finditer as re_finditer
 
-from f4pga.flows.common import decompose_depname, deep, get_verbosity_level, sub
+from f4pga.flows.common import decompose_depname, deep, get_verbosity_level, sub, get_input_references, InputReferences
 from f4pga.flows.module import Module, ModuleContext
 
 
@@ -78,34 +78,6 @@ def _parse_param_def(param_def: str):
     elif param_def[0] == "-":
         return "char", param_def[1:]
     return "named", param_def
-
-
-class InputReferences:
-    dependencies: "set[str]"
-    values: "set[str]"
-
-    def merge(self, other):
-        self.dependencies.update(other.dependencies)
-        self.values.update(other.values)
-
-    def __init__(self):
-        self.dependencies = set()
-        self.values = set()
-
-
-def _get_input_references(input: str) -> InputReferences:
-    refs = InputReferences()
-    if type(input) is not str:
-        return refs
-    for match in re_finditer("\$\{([^${}]*)\}", input):
-        match_str = match.group(1)
-        if match_str[0] != ":":
-            refs.values.add(match_str)
-            continue
-        if len(match_str) < 2:
-            raise Exception("Dependency name must be at least 1 character long")
-        refs.dependencies.add(re_match("([^\\[\\]]*)", match_str[1:]).group(1))
-    return refs
 
 
 def _make_noop1():
@@ -130,16 +102,7 @@ class GenericScriptWrapperModule(Module):
     interpreter: "None | str"
     cwd: "None | str"
 
-    @staticmethod
-    def _add_extra_values_to_env(ctx: ModuleContext):
-        for take_name, take_path in vars(ctx.takes).items():
-            if take_path is not None:
-                ctx.r_env.values[f":{take_name}[noext]"] = deep(lambda p: str(Path(p).with_suffix("")))(take_path)
-                ctx.r_env.values[f":{take_name}[dir]"] = deep(lambda p: str(Path(p).parent.resolve()))(take_path)
-
     def map_io(self, ctx: ModuleContext):
-        self._add_extra_values_to_env(ctx)
-
         outputs = {}
         for dep, _, out_path in self.file_outputs:
             out_path_resolved = ctx.r_env.resolve(out_path, final=True)
@@ -152,8 +115,6 @@ class GenericScriptWrapperModule(Module):
         return outputs
 
     def execute(self, ctx: ModuleContext):
-        self._add_extra_values_to_env(ctx)
-
         cwd = ctx.r_env.resolve(self.cwd)
 
         sub_args = (
@@ -175,7 +136,7 @@ class GenericScriptWrapperModule(Module):
         if get_verbosity_level() >= 2:
             yield f"Running script...\n           {cmd}"
         else:
-            yield f"Running an externel script..."
+            yield f"Running an external script..."
 
         data = sub(*sub_args, cwd=cwd, env=sub_env)
 
@@ -271,7 +232,7 @@ class GenericScriptWrapperModule(Module):
 
                 push = push_positional
 
-            input_refs = _get_input_references(input)
+            input_refs = get_input_references(input)
             refs.merge(input_refs)
 
             if push is not None:
@@ -316,9 +277,9 @@ class GenericScriptWrapperModule(Module):
         for val in refs.values:
             self.values.append(val)
 
-    def __init__(self, params):
-        stage_name = params.get("stage_name")
-        self.name = f"{'<unknown>' if stage_name is None else stage_name}-generic"
+    def __init__(self, params, r_env, instance_name):
+        super().__init__(params, r_env, instance_name)
+
         self.no_of_phases = 2
         self.script_path = params.get("script")
         self.interpreter = params.get("interpreter")

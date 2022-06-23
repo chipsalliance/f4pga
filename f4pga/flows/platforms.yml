@@ -59,31 +59,33 @@ xc7a50t: &xc7
       params:
         build_dir: 'build/${device}'
     synth:
-      module: 'common:synth'
+      module: 'common:yosys'
       params:
-        takes:
-          - xdc?
-        produces:
-          - sdc
-          - synth_v
-        prod_meta:
-          sdc: Standard Design Constraints file for X7 series.
+        tcl_script: '${devDir}/scripts/xc7/synth.tcl'
       values:
-        tcl_scripts: '${shareDir}/scripts/xc7'
-        yosys_tcl_env:
-          USE_ROI: 'FALSE'
-          TOP: '${top}'
-          OUT_JSON: '${:json}'
-          OUT_SDC: '${:sdc}'
-          PART_JSON: '${prjxray_db}/${bitstream_device}/${part_name}/part.json'
-          OUT_FASM_EXTRA: '${:fasm_extra}'
-          TECHMAP_PATH: '${shareDir}/techmaps/xc7_vpr/techmap'
-          OUT_SYNTH_V: '${:synth_v}'
-          SYNTH_JSON: '${:synth_json}'
-          OUT_EBLIF: '${:eblif}'
-          PYTHON3: '${python3}'
-          UTILS_PATH: '${shareDir}/scripts'
-          INPUT_XDC_FILES: '${:xdc}'
+        yosys_plugins: []
+        use_roi: 'FALSE'
+    split_inouts:
+      module: 'common:generic_script_wrapper'
+      params:
+        stage_name: 'split_inouts'
+        interpreter: '${python3}'
+        script: ['-m', 'f4pga.utils.split_inouts']
+        outputs:
+            synth_json:
+              mode: 'file'
+              file: '${:json[noext]}_splitted.json'
+              target: '${:json[noext]}_splitted.json'
+              meta: 'Post split-inout Yosys netlist'
+        inputs:
+          -i: '${:json}'
+          -o: '${:json[noext]}_splitted.json'
+    make_eblif:
+        module: 'common:yosys'
+        params:
+          tcl_script: '${devDir}/scripts/xc7/conv.tcl'
+        values:
+          use_lut_constants: 'FALSE'
     pack:
       module: 'common:pack'
     ioplace:

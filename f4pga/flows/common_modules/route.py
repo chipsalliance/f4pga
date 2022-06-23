@@ -45,8 +45,8 @@ class RouteModule(Module):
         yield "Saving log..."
         save_vpr_log("route.log", build_dir=build_dir)
 
-    def __init__(self, _):
-        self.name = "route"
+    def __init__(self, params, r_env, instance_name):
+        super().__init__(params, r_env, instance_name)
         self.no_of_phases = 2
         self.takes = ["eblif", "place", "sdc?"]
         self.produces = ["route"]
