@@ -121,6 +121,17 @@ struct SynthQuickLogicPass : public ScriptPass {
 
         size_t argidx;
         for (argidx = 1; argidx < args.size(); argidx++) {
+            if (args[argidx] == "-run" && argidx + 1 < args.size()) {
+                size_t pos = args[argidx + 1].find(':');
+                if (pos == std::string::npos) {
+                    run_from = args[++argidx];
+                    run_to = args[argidx];
+                } else {
+                    run_from = args[++argidx].substr(0, pos);
+                    run_to = args[argidx].substr(pos + 1);
+                }
+                continue;
+            }
             if (args[argidx] == "-top" && argidx + 1 < args.size()) {
                 top_opt = "-top " + args[++argidx];
                 continue;
@@ -221,10 +232,7 @@ struct SynthQuickLogicPass : public ScriptPass {
         std::string noDFFArgs;
         if (family == "qlf_k4n8") {
             noDFFArgs = " -nodffe -nosdff";
-        } else if (family == "qlf_k6n10f") {
-            noDFFArgs = " -nosdff";
         }
-
         if (check_label("coarse")) {
             run("check");
             run("opt -nodffe -nosdff");
@@ -355,8 +363,10 @@ struct SynthQuickLogicPass : public ScriptPass {
                 //    $_DLATCH_SRPPP_ 0");
             } else if (family == "qlf_k6n10f") {
                 run("shregmap -minlen 8 -maxlen 20");
-                run("dfflegalize -cell $_DFF_?_ 0 -cell $_DFF_???_ 0 -cell $_DFFE_????_ 0 -cell $_DFFSR_???_ 0 -cell $_DFFSRE_????_ 0 -cell "
-                    "$_DLATCHSR_PPP_ 0");
+                // FIXME: dfflegalize seems to leave $_DLATCH_[NP]_ even if it
+                // is not allowed. So we allow them and map them later to
+                // $_DLATCHSR_[NP]NN_.
+                run("dfflegalize -cell $_DFFSRE_?NNP_ 0 -cell $_SDFFE_?N?P_ 0 -cell $_DLATCHSR_?NN_ 0 -cell $_DLATCH_?_ 0");
             } else if (family == "pp3") {
                 run("dfflegalize -cell $_DFFSRE_PPPP_ 0 -cell $_DLATCH_?_ x");
                 run("techmap -map +/quicklogic/" + family + "/cells_map.v");
