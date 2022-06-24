@@ -1115,8 +1115,7 @@ AST::AstNode *UhdmAst::process_value(vpiHandle obj_h)
             // yosys is assuming that int/uint is 32 bit, so we are setting here correct size
             // NOTE: it *shouldn't* break on explicite 64 bit const values, as they *should* be handled
             // above by vpi*StrVal
-            // FIXME: Minimal int size should be resolved in UHDM, here we make sure it is at least 32
-            if (size == 64 || size < 32) {
+            if (size == 64) {
                 size = 32;
                 is_signed = true;
             }
@@ -1350,14 +1349,14 @@ void UhdmAst::move_type_to_new_typedef(AST::AstNode *current_node, AST::AstNode 
             delete type_node;
         } else {
             type_node->str = "$enum" + std::to_string(shared.next_enum_id());
-            for (auto *enum_item : type_node->children) {
-                enum_item->attributes["\\enum_base_type"] = AST::AstNode::mkconst_str(type_node->str);
-            }
             auto wire_node = new AST::AstNode(AST::AST_WIRE);
             wire_node->is_reg = true;
             wire_node->attributes["\\enum_type"] = AST::AstNode::mkconst_str(type_node->str);
             if (!type_node->children.empty() && type_node->children[0]->children.size() > 1) {
                 wire_node->children.push_back(type_node->children[0]->children[1]->clone());
+            } else {
+                // Add default range
+                wire_node->children.push_back(make_range(31, 0));
             }
             typedef_node->children.push_back(wire_node);
             current_node->children.push_back(type_node);
@@ -1839,17 +1838,6 @@ void UhdmAst::process_enum_typespec()
         switch (typespec_type) {
         case vpiLogicTypespec: {
             current_node->is_logic = true;
-            bool has_range = false;
-            visit_range(typespec_h, [&](AST::AstNode *node) {
-                has_range = true;
-                for (auto child : current_node->children) {
-                    child->children.push_back(node->clone());
-                }
-                delete node;
-            });
-            if (!has_range) // range is needed for simplify
-                for (auto child : current_node->children)
-                    child->children.push_back(make_ast_node(AST::AST_RANGE, {AST::AstNode::mkconst_int(0, true)}));
             shared.report.mark_handled(typespec_h);
             break;
         }
@@ -1861,17 +1849,6 @@ void UhdmAst::process_enum_typespec()
             break;
         }
         case vpiBitTypespec: {
-            bool has_range = false;
-            visit_range(typespec_h, [&](AST::AstNode *node) {
-                has_range = true;
-                for (auto child : current_node->children) {
-                    child->children.push_back(node->clone());
-                }
-                delete node;
-            });
-            if (!has_range) // range is needed for simplify
-                for (auto child : current_node->children)
-                    child->children.push_back(make_ast_node(AST::AST_RANGE, {AST::AstNode::mkconst_int(0, true)}));
             shared.report.mark_handled(typespec_h);
             break;
         }
@@ -1895,6 +1872,7 @@ void UhdmAst::process_enum_const()
         constant_node->filename = current_node->filename;
         constant_node->location = current_node->location;
         current_node->children.push_back(constant_node);
+        current_node->children.push_back(make_range(constant_node->range_left, constant_node->range_right, true));
     }
 }
 
