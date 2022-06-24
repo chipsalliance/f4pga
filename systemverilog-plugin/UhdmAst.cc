@@ -972,18 +972,6 @@ static void clear_current_scope()
     AST_INTERNAL::current_ast_mod = nullptr;
 }
 
-static void mark_as_unsigned(AST::AstNode *node, const UHDM::BaseClass *object)
-{
-    if (node->children.empty() || node->children.size() == 1) {
-        node->is_signed = false;
-    } else if (node->children.size() == 2) {
-        node->children[0]->is_signed = false;
-        node->children[1]->is_signed = false;
-    } else {
-        log_error("%s:%d: Unsupported expression in mark_as_unsigned!\n", object->VpiFile().c_str(), object->VpiLineNo());
-    }
-}
-
 void UhdmAst::visit_one_to_many(const std::vector<int> child_node_types, vpiHandle parent_handle, const std::function<void(AST::AstNode *)> &f)
 {
     for (auto child : child_node_types) {
@@ -2672,16 +2660,20 @@ void UhdmAst::process_operation(const UHDM::BaseClass *object)
         case vpiBitXnorOp:
             current_node->type = AST::AST_BIT_XNOR;
             break;
-        case vpiLShiftOp:
+        case vpiLShiftOp: {
             current_node->type = AST::AST_SHIFT_LEFT;
             log_assert(current_node->children.size() == 2);
-            mark_as_unsigned(current_node->children[1], object);
+            auto unsigned_node = new AST::AstNode(AST::AST_TO_UNSIGNED, current_node->children[1]->clone());
+            current_node->children[1] = unsigned_node;
             break;
-        case vpiRShiftOp:
+        }
+        case vpiRShiftOp: {
             current_node->type = AST::AST_SHIFT_RIGHT;
             log_assert(current_node->children.size() == 2);
-            mark_as_unsigned(current_node->children[1], object);
+            auto unsigned_node = new AST::AstNode(AST::AST_TO_UNSIGNED, current_node->children[1]->clone());
+            current_node->children[1] = unsigned_node;
             break;
+        }
         case vpiNotOp:
             current_node->type = AST::AST_LOGIC_NOT;
             break;
@@ -2733,16 +2725,20 @@ void UhdmAst::process_operation(const UHDM::BaseClass *object)
         case vpiModOp:
             current_node->type = AST::AST_MOD;
             break;
-        case vpiArithLShiftOp:
+        case vpiArithLShiftOp: {
             current_node->type = AST::AST_SHIFT_SLEFT;
             log_assert(current_node->children.size() == 2);
-            mark_as_unsigned(current_node->children[1], object);
+            auto unsigned_node = new AST::AstNode(AST::AST_TO_UNSIGNED, current_node->children[1]->clone());
+            current_node->children[1] = unsigned_node;
             break;
-        case vpiArithRShiftOp:
+        }
+        case vpiArithRShiftOp: {
             current_node->type = AST::AST_SHIFT_SRIGHT;
             log_assert(current_node->children.size() == 2);
-            mark_as_unsigned(current_node->children[1], object);
+            auto unsigned_node = new AST::AstNode(AST::AST_TO_UNSIGNED, current_node->children[1]->clone());
+            current_node->children[1] = unsigned_node;
             break;
+        }
         case vpiPowerOp:
             current_node->type = AST::AST_POW;
             break;
