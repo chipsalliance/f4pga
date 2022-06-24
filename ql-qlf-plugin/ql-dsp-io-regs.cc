@@ -66,7 +66,7 @@ void ql_dsp_io_regs_pass(RTLIL::Module *module)
             dsp->type = RTLIL::IdString(new_type);
 
             // Delete ports unused in given type of DSP cell
-            del_clk = (!reg_in_i && out_sel_i <= 3);
+            del_clk = (!reg_in_i && out_sel_i <= 3 && out_sel_i != 1);
 
             std::vector<std::string> ports2del;
 
