@@ -1356,8 +1356,7 @@ void UhdmAst::move_type_to_new_typedef(AST::AstNode *current_node, AST::AstNode 
                 wire_node->children.push_back(type_node->children[0]->children[1]->clone());
             } else {
                 // Add default range
-                auto range = make_range(31, 0);
-                wire_node->children.push_back(range);
+                wire_node->children.push_back(make_range(31, 0));
             }
             typedef_node->children.push_back(wire_node);
             current_node->children.push_back(type_node);
@@ -1873,10 +1872,7 @@ void UhdmAst::process_enum_const()
         constant_node->filename = current_node->filename;
         constant_node->location = current_node->location;
         current_node->children.push_back(constant_node);
-        auto left_const = AST::AstNode::mkconst_int(constant_node->range_left, true);
-        auto right_const = AST::AstNode::mkconst_int(constant_node->range_right, true);
-        auto range = make_ast_node(AST::AST_RANGE, {left_const, right_const});
-        current_node->children.push_back(range);
+        current_node->children.push_back(make_range(constant_node->range_left, constant_node->range_right, true));
     }
 }
 
