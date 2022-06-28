@@ -3427,6 +3427,16 @@ void UhdmAst::process_shortint_typespec()
     current_node->is_signed = true;
 }
 
+void UhdmAst::process_longint_typespec()
+{
+    std::vector<AST::AstNode *> packed_ranges;   // comes before wire name
+    std::vector<AST::AstNode *> unpacked_ranges; // comes after wire name
+    current_node = make_ast_node(AST::AST_WIRE);
+    packed_ranges.push_back(make_range(63, 0));
+    add_multirange_wire(current_node, packed_ranges, unpacked_ranges);
+    current_node->is_signed = true;
+}
+
 void UhdmAst::process_byte_typespec()
 {
     std::vector<AST::AstNode *> packed_ranges;   // comes before wire name
@@ -3616,6 +3626,7 @@ void UhdmAst::process_port()
         case vpiUnionVar:
         case vpiEnumVar:
         case vpiShortIntVar:
+        case vpiLongIntVar:
         case vpiIntVar:
         case vpiIntegerVar:
             break;
@@ -4097,6 +4108,9 @@ AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
         break;
     case vpiShortIntTypespec:
         process_shortint_typespec();
+        break;
+    case vpiLongIntTypespec:
+        process_longint_typespec();
         break;
     case vpiTimeTypespec:
         process_time_typespec();
