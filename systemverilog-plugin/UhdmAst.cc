@@ -1376,7 +1376,12 @@ static void add_or_replace_child(AST::AstNode *parent, AST::AstNode *child)
         if (initial_node_it != parent->children.end()) {
             AST::AstNode *initial_node = *initial_node_it;
 
-            log_assert(!(initial_node->children.empty()));
+            // simplify assumes that initial has a block under it
+            // In case we don't have one (there were no statements under the initial), let's add it
+            if (initial_node->children.empty()) {
+                initial_node->children.push_back(new AST::AstNode(AST::AST_BLOCK));
+            }
+
             log_assert(initial_node->children[0]->type == AST::AST_BLOCK);
             log_assert(!(child->children.empty()));
             log_assert(child->children[0]->type == AST::AST_BLOCK);
@@ -2471,13 +2476,18 @@ void UhdmAst::process_always()
 {
     current_node = make_ast_node(AST::AST_ALWAYS);
     visit_one_to_one({vpiStmt}, obj_h, [&](AST::AstNode *node) {
-        AST::AstNode *block = nullptr;
-        if (node && node->type != AST::AST_BLOCK) {
-            block = new AST::AstNode(AST::AST_BLOCK, node);
+        if (node) {
+            AST::AstNode *block = nullptr;
+            if (node->type != AST::AST_BLOCK) {
+                block = new AST::AstNode(AST::AST_BLOCK, node);
+            } else {
+                block = node;
+            }
+            current_node->children.push_back(block);
         } else {
-            block = node;
+            // create empty block
+            current_node->children.push_back(new AST::AstNode(AST::AST_BLOCK));
         }
-        current_node->children.push_back(block);
     });
     switch (vpi_get(vpiAlwaysType, obj_h)) {
     case vpiAlwaysComb:
@@ -2525,6 +2535,8 @@ void UhdmAst::process_initial()
                 node = block_node;
             }
             current_node->children.push_back(node);
+        } else {
+            current_node->children.push_back(make_ast_node(AST::AST_BLOCK));
         }
     });
 }
@@ -3104,7 +3116,8 @@ void UhdmAst::process_if_else()
     condition->children.push_back(constant);
     visit_one_to_one({vpiStmt}, obj_h, [&](AST::AstNode *node) {
         auto *statements = new AST::AstNode(AST::AST_BLOCK);
-        statements->children.push_back(node);
+        if (node)
+            statements->children.push_back(node);
         condition->children.push_back(statements);
     });
     current_node->children.push_back(condition);
@@ -3115,7 +3128,8 @@ void UhdmAst::process_if_else()
         condition->children.push_back(elseBlock);
         visit_one_to_one({vpiElseStmt}, obj_h, [&](AST::AstNode *node) {
             auto *statements = new AST::AstNode(AST::AST_BLOCK);
-            statements->children.push_back(node);
+            if (node)
+                statements->children.push_back(node);
             condition->children.push_back(statements);
         });
         current_node->children.push_back(condition);
@@ -3224,12 +3238,14 @@ void UhdmAst::process_case_item()
         current_node->children.push_back(new AST::AstNode(AST::AST_DEFAULT));
     }
     visit_one_to_one({vpiStmt}, obj_h, [&](AST::AstNode *node) {
-        if (node->type != AST::AST_BLOCK) {
-            auto block_node = new AST::AstNode(AST::AST_BLOCK);
-            block_node->children.push_back(node);
-            node = block_node;
+        if (node) {
+            if (node->type != AST::AST_BLOCK) {
+                auto block_node = new AST::AstNode(AST::AST_BLOCK);
+                block_node->children.push_back(node);
+                node = block_node;
+            }
+            current_node->children.push_back(node);
         }
-        current_node->children.push_back(node);
     });
 }
 
@@ -3307,22 +3323,24 @@ void UhdmAst::process_hier_path()
     current_node->str = "\\";
     AST::AstNode *top_node = nullptr;
     visit_one_to_many({vpiActual}, obj_h, [&](AST::AstNode *node) {
-        if (node->str.find('[') != std::string::npos)
-            node->str = node->str.substr(0, node->str.find('['));
-        // for first node, just set correct string and move any children
-        if (!top_node) {
-            current_node->str += node->str.substr(1);
-            current_node->children = std::move(node->children);
-            top_node = current_node;
-            delete node;
-        } else {
-            if (node->str.empty()) {
-                log_assert(!node->children.empty());
-                top_node->children.push_back(node->children[0]);
+        if (node) {
+            if (node->str.find('[') != std::string::npos)
+                node->str = node->str.substr(0, node->str.find('['));
+            // for first node, just set correct string and move any children
+            if (!top_node) {
+                current_node->str += node->str.substr(1);
+                current_node->children = std::move(node->children);
+                top_node = current_node;
+                delete node;
             } else {
-                node->type = static_cast<AST::AstNodeType>(AST::AST_DOT);
-                top_node->children.push_back(node);
-                top_node = node;
+                if (node->str.empty()) {
+                    log_assert(!node->children.empty());
+                    top_node->children.push_back(node->children[0]);
+                } else {
+                    node->type = static_cast<AST::AstNodeType>(AST::AST_DOT);
+                    top_node->children.push_back(node);
+                    top_node = node;
+                }
             }
         }
     });
@@ -3435,20 +3453,6 @@ void UhdmAst::process_sys_func_call()
 {
     current_node = make_ast_node(AST::AST_FCALL);
 
-    // skip unsupported simulation functions
-    std::string to_skip[] = {
-      "\\$value$plusargs", "\\$test$plusargs", "\\$displayb", "\\$displayh",  "\\$displayo",  "\\$strobeb",  "\\$strobeh",       "\\$strobeo",
-      "\\$writeb",         "\\$writeh",        "\\$writeo",   "\\$dumplimit", "\\$dumpflush", "\\$fdisplay", "\\$fdisplayb",     "\\$fdisplayh",
-      "\\$fdisplayo",      "\\$fmonitor",      "\\$fstrobe",  "\\$fstrobeb",  "\\$fstrobeh",  "\\$fstrobeo", "\\$fwrite",        "\\$fwriteb",
-      "\\$fwriteh",        "\\$fwriteo",       "\\$ungetc",   "\\$fgetc",     "\\$fgets",     "\\$ftell",    "\\$printtimescale"};
-
-    if (std::find(std::begin(to_skip), std::end(to_skip), current_node->str) != std::end(to_skip)) {
-        log_warning("System function %s was skipped\n", current_node->str.substr(1).c_str());
-        delete current_node;
-        current_node = nullptr;
-        return;
-    }
-
     std::string task_calls[] = {"\\$display", "\\$monitor", "\\$write", "\\$time", "\\$readmemh", "\\$readmemb", "\\$finish", "\\$stop"};
 
     if (current_node->str == "\\$signed") {
@@ -3500,16 +3504,6 @@ void UhdmAst::process_immediate_assert()
         if (n) {
             current_node->children.push_back(n);
         }
-    });
-}
-
-void UhdmAst::process_nonsynthesizable(const UHDM::BaseClass *object)
-{
-    log_warning("%s:%d: Non-synthesizable object of type '%s'\n", object->VpiFile().c_str(), object->VpiLineNo(), UHDM::VpiTypeName(obj_h).c_str());
-    current_node = make_ast_node(AST::AST_BLOCK);
-    visit_one_to_one({vpiStmt}, obj_h, [&](AST::AstNode *node) {
-        if (node)
-            current_node->children.push_back(node);
     });
 }
 
@@ -4040,6 +4034,13 @@ AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
     const unsigned object_type = vpi_get(vpiType, obj_h);
     const uhdm_handle *const handle = (const uhdm_handle *)obj_h;
     const UHDM::BaseClass *const object = (const UHDM::BaseClass *)handle->object;
+    for (auto *obj : shared.nonSynthesizableObjects) {
+        if (!object->Compare(obj)) {
+            log_warning("%s:%d: Skipping non-synthesizable object of type '%s'\n", object->VpiFile().c_str(), object->VpiLineNo(),
+                        UHDM::VpiTypeName(obj_h).c_str());
+            return nullptr;
+        }
+    }
 
     if (shared.debug_flag) {
         std::cout << indent << "Object '" << object->VpiName() << "' of type '" << UHDM::VpiTypeName(obj_h) << '\'' << std::endl;
@@ -4235,9 +4236,6 @@ AST::AstNode *UhdmAst::process_object(vpiHandle obj_handle)
         process_hier_path();
         break;
     case UHDM::uhdmimport_typespec:
-        break;
-    case vpiDelayControl:
-        process_nonsynthesizable(object);
         break;
     case vpiLogicTypespec:
         process_logic_typespec();

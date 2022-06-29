@@ -148,7 +148,6 @@ class UhdmAst
     void process_gate();
     void process_primterm();
     void simplify_parameter(AST::AstNode *parameter, AST::AstNode *module_node = nullptr);
-    void process_nonsynthesizable(const UHDM::BaseClass *object);
     void process_unsupported_stmt(const UHDM::BaseClass *object);
 
     UhdmAst(UhdmAst *p, UhdmAstShared &s, const std::string &i) : parent(p), shared(s), indent(i)

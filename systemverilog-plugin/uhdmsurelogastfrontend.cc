@@ -121,6 +121,11 @@ struct UhdmSurelogAstFrontend : public UhdmCommonFrontend {
             }
         }
 
+        UHDM::Serializer serializer;
+        UHDM::SynthSubset *synthSubset = new UHDM::SynthSubset(&serializer, this->shared.nonSynthesizableObjects, false);
+        synthSubset->listenDesigns(uhdm_design);
+        delete synthSubset;
+
         SURELOG::shutdown_compiler(compiler);
         delete clp;
         delete symbolTable;

@@ -20,6 +20,8 @@
 #include "UhdmAst.h"
 #include "frontends/ast/ast.h"
 #include "kernel/yosys.h"
+#include "uhdm/SynthSubset.h"
+#include "uhdm/VpiListener.h"
 #include <string>
 #include <vector>
 
