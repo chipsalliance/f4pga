@@ -2663,14 +2663,14 @@ void UhdmAst::process_operation(const UHDM::BaseClass *object)
         case vpiLShiftOp: {
             current_node->type = AST::AST_SHIFT_LEFT;
             log_assert(current_node->children.size() == 2);
-            auto unsigned_node = new AST::AstNode(AST::AST_TO_UNSIGNED, current_node->children[1]->clone());
+            auto unsigned_node = new AST::AstNode(AST::AST_TO_UNSIGNED, current_node->children[1]);
             current_node->children[1] = unsigned_node;
             break;
         }
         case vpiRShiftOp: {
             current_node->type = AST::AST_SHIFT_RIGHT;
             log_assert(current_node->children.size() == 2);
-            auto unsigned_node = new AST::AstNode(AST::AST_TO_UNSIGNED, current_node->children[1]->clone());
+            auto unsigned_node = new AST::AstNode(AST::AST_TO_UNSIGNED, current_node->children[1]);
             current_node->children[1] = unsigned_node;
             break;
         }
@@ -2728,14 +2728,14 @@ void UhdmAst::process_operation(const UHDM::BaseClass *object)
         case vpiArithLShiftOp: {
             current_node->type = AST::AST_SHIFT_SLEFT;
             log_assert(current_node->children.size() == 2);
-            auto unsigned_node = new AST::AstNode(AST::AST_TO_UNSIGNED, current_node->children[1]->clone());
+            auto unsigned_node = new AST::AstNode(AST::AST_TO_UNSIGNED, current_node->children[1]);
             current_node->children[1] = unsigned_node;
             break;
         }
         case vpiArithRShiftOp: {
             current_node->type = AST::AST_SHIFT_SRIGHT;
             log_assert(current_node->children.size() == 2);
-            auto unsigned_node = new AST::AstNode(AST::AST_TO_UNSIGNED, current_node->children[1]->clone());
+            auto unsigned_node = new AST::AstNode(AST::AST_TO_UNSIGNED, current_node->children[1]);
             current_node->children[1] = unsigned_node;
             break;
         }
