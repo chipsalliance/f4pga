@@ -131,11 +131,6 @@ struct UhdmSurelogAstFrontend : public UhdmCommonFrontend {
             }
         }
 
-        UHDM::Serializer serializer;
-        UHDM::SynthSubset *synthSubset = new UHDM::SynthSubset(&serializer, this->shared.nonSynthesizableObjects, false);
-        synthSubset->listenDesigns(uhdm_design);
-        delete synthSubset;
-
         SURELOG::shutdown_compiler(compiler);
         delete clp;
         delete symbolTable;
@@ -148,6 +143,17 @@ struct UhdmSurelogAstFrontend : public UhdmCommonFrontend {
         UhdmAst uhdm_ast(this->shared);
         if (this->shared.defer && !this->shared.link)
             return nullptr;
+
+        // FIXME: SynthSubset annotation is incompatible with separate compilation
+        // `-defer` turns elaboration off, so check for it
+        // Should be called 1. for normal flow 2. after finishing with `-link`
+        if (!this->shared.defer) {
+            UHDM::Serializer serializer;
+            UHDM::SynthSubset *synthSubset = new UHDM::SynthSubset(&serializer, this->shared.nonSynthesizableObjects, false);
+            synthSubset->listenDesigns(uhdm_design);
+            delete synthSubset;
+        }
+
         AST::AstNode *current_ast = uhdm_ast.visit_designs(uhdm_design);
         if (!this->report_directory.empty()) {
             this->shared.report.write(this->report_directory);
