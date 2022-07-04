@@ -121,6 +121,10 @@ void UhdmCommonFrontend::execute(std::istream *&f, std::string filename, std::ve
             unhandled_args.push_back(args[i]);
         }
     }
+    // Yosys gets confused when extra_args are passed with -link or no option
+    // It's done fully by Surelog, so skip it in this case
+    if (!this->shared.link)
+        extra_args(f, filename, args, args.size() - 1);
     // pass only unhandled args to Surelog
     // unhandled args starts with command name,
     // but Surelog expects args[0] to be program name
