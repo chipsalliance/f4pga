@@ -201,6 +201,7 @@ module QL_DSP2_MULT ( // TODO: Name subject to change
     // Port not available in architecture file
     input  wire       reset,
 
+    input  wire [2:0] feedback,
     input  wire       unsigned_a,
     input  wire       unsigned_b,
 
@@ -227,7 +228,7 @@ module QL_DSP2_MULT ( // TODO: Name subject to change
 
         .f_mode(f_mode),
 
-        .feedback(3'b0),
+        .feedback(feedback),
 
         .unsigned_a(unsigned_a),
         .unsigned_b(unsigned_b),
@@ -247,6 +248,7 @@ module QL_DSP2_MULT_REGIN ( // TODO: Name subject to change
     // Port not available in architecture file
     input  wire       reset,
 
+    input  wire [2:0] feedback,
     input  wire       unsigned_a,
     input  wire       unsigned_b,
 
@@ -271,7 +273,7 @@ module QL_DSP2_MULT_REGIN ( // TODO: Name subject to change
 
         .f_mode(f_mode),
 
-        .feedback(3'b0),
+        .feedback(feedback),
 
         .unsigned_a(unsigned_a),
         .unsigned_b(unsigned_b),
@@ -294,6 +296,7 @@ module QL_DSP2_MULT_REGOUT ( // TODO: Name subject to change
     // Port not available in architecture file
     input  wire       reset,
 
+    input  wire [2:0] feedback,
     input  wire       unsigned_a,
     input  wire       unsigned_b,
     input  wire       f_mode,
@@ -317,7 +320,7 @@ module QL_DSP2_MULT_REGOUT ( // TODO: Name subject to change
 
         .f_mode(f_mode),
 
-        .feedback(3'b0),
+        .feedback(feedback),
 
         .unsigned_a(unsigned_a),
         .unsigned_b(unsigned_b),
@@ -340,6 +343,7 @@ module QL_DSP2_MULT_REGIN_REGOUT ( // TODO: Name subject to change
     // Port not available in architecture file
     input  wire       reset,
 
+    input  wire [2:0] feedback,
     input  wire       unsigned_a,
     input  wire       unsigned_b,
     input  wire       f_mode,
@@ -363,7 +367,7 @@ module QL_DSP2_MULT_REGIN_REGOUT ( // TODO: Name subject to change
 
         .f_mode(f_mode),
 
-        .feedback(3'b0),
+        .feedback(feedback),
 
         .unsigned_a(unsigned_a),
         .unsigned_b(unsigned_b),

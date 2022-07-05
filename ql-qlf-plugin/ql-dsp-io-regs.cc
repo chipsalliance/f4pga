@@ -10,7 +10,7 @@ PRIVATE_NAMESPACE_BEGIN
 
 // ============================================================================
 
-const std::vector<std::string> ports2del_mult = {"feedback", "load_acc", "subtract", "acc_fir", "dly_b"};
+const std::vector<std::string> ports2del_mult = {"load_acc", "subtract", "acc_fir", "dly_b"};
 const std::vector<std::string> ports2del_mult_add_acc = {"acc_fir", "dly_b"};
 const std::vector<std::string> ports2del_extension = {"saturate_enable", "shift_right", "round"};
 
