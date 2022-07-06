@@ -412,7 +412,7 @@ select -assert-count 3 t:\$lut
 design -reset
 
 # =============================================================================
-# qlf_k6n10f
+# qlf_k6n10f (with synchronous S/R flip-flops)
 
 read_verilog $::env(DESIGN_TOP).v
 design -save read
@@ -715,6 +715,226 @@ select -assert-count 1 t:latchnsre
 #select -assert-count 1 t:latchns_p
 #select -assert-count 1 t:\$lut
 
+
+design -reset
+
+# =============================================================================
+# qlf_k6n10f (no synchronous S/R flip-flops)
+
+read_verilog $::env(DESIGN_TOP).v
+design -save read
+
+# DFF
+hierarchy -top my_dff
+yosys proc
+equiv_opt -assert -async2sync -map +/quicklogic/qlf_k6n10f/cells_sim.v synth_quicklogic -family qlf_k6n10f -top my_dff -nosdff
+design -load postopt
+yosys cd my_dff
+stat
+select -assert-count 1 t:dffsre
+
+# DFFN
+design -load read
+hierarchy -top my_dffn
+yosys proc
+equiv_opt -assert -async2sync -map +/quicklogic/qlf_k6n10f/cells_sim.v synth_quicklogic -family qlf_k6n10f -top my_dffn -nosdff
+design -load postopt
+yosys cd my_dffn
+stat
+select -assert-count 1 t:dffnsre
+
+
+# DFFSRE from DFFR_N
+design -load read
+hierarchy -top my_dffr_n
+yosys proc
+equiv_opt -assert -async2sync -map +/quicklogic/qlf_k6n10f/cells_sim.v synth_quicklogic -family qlf_k6n10f -top my_dffr_n -nosdff
+design -load postopt
+yosys cd my_dffr_n
+stat
+select -assert-count 1 t:dffsre
+
+# DFFSRE from DFFR_P
+design -load read
+hierarchy -top my_dffr_p
+yosys proc
+equiv_opt -assert -async2sync -map +/quicklogic/qlf_k6n10f/cells_sim.v synth_quicklogic -family qlf_k6n10f -top my_dffr_p -nosdff
+design -load postopt
+yosys cd my_dffr_p
+stat
+select -assert-count 1 t:dffsre
+select -assert-count 1 t:\$lut
+
+# DFFSRE from DFFRE_N
+design -load read
+hierarchy -top my_dffre_n
+yosys proc
+equiv_opt -assert -async2sync -map +/quicklogic/qlf_k6n10f/cells_sim.v synth_quicklogic -family qlf_k6n10f -top my_dffre_n -nosdff
+design -load postopt
+yosys cd my_dffre_n
+stat
+select -assert-count 1 t:dffsre
+
+# DFFSRE from DFFRE_P
+design -load read
+hierarchy -top my_dffre_p
+yosys proc
+equiv_opt -assert -async2sync -map +/quicklogic/qlf_k6n10f/cells_sim.v synth_quicklogic -family qlf_k6n10f -top my_dffre_p -nosdff
+design -load postopt
+yosys cd my_dffre_p
+stat
+select -assert-count 1 t:dffsre
+select -assert-count 1 t:\$lut
+
+
+# DFFSRE from DFFS_N
+design -load read
+hierarchy -top my_dffs_n
+yosys proc
+equiv_opt -assert -async2sync -map +/quicklogic/qlf_k6n10f/cells_sim.v synth_quicklogic -family qlf_k6n10f -top my_dffs_n -nosdff
+design -load postopt
+yosys cd my_dffs_n
+stat
+select -assert-count 1 t:dffsre
+
+# DFFSRE from DFFS_P
+design -load read
+hierarchy -top my_dffs_p
+yosys proc
+equiv_opt -assert -async2sync -map +/quicklogic/qlf_k6n10f/cells_sim.v synth_quicklogic -family qlf_k6n10f -top my_dffs_p -nosdff
+design -load postopt
+yosys cd my_dffs_p
+stat
+select -assert-count 1 t:dffsre
+select -assert-count 1 t:\$lut
+
+# DFFSRE from DFFSE_N
+design -load read
+hierarchy -top my_dffse_n
+yosys proc
+equiv_opt -assert -async2sync -map +/quicklogic/qlf_k6n10f/cells_sim.v synth_quicklogic -family qlf_k6n10f -top my_dffse_n -nosdff
+design -load postopt
+yosys cd my_dffse_n
+stat
+select -assert-count 1 t:dffsre
+
+# DFFSRE from DFFSE_P
+design -load read
+hierarchy -top my_dffse_p
+yosys proc
+equiv_opt -assert -async2sync -map +/quicklogic/qlf_k6n10f/cells_sim.v synth_quicklogic -family qlf_k6n10f -top my_dffse_p -nosdff
+design -load postopt
+yosys cd my_dffse_p
+stat
+select -assert-count 1 t:dffsre
+select -assert-count 1 t:\$lut
+
+
+# LATCH
+design -load read
+hierarchy -top my_latch
+yosys proc
+equiv_opt -assert -async2sync -map +/quicklogic/qlf_k6n10f/cells_sim.v synth_quicklogic -family qlf_k6n10f -top my_latch -nosdff
+design -load postopt
+yosys cd my_latch
+stat
+select -assert-count 1 t:latchsre
+
+# LATCHN
+design -load read
+hierarchy -top my_latchn
+yosys proc
+equiv_opt -assert -async2sync -map +/quicklogic/qlf_k6n10f/cells_sim.v synth_quicklogic -family qlf_k6n10f -top my_latchn -nosdff
+design -load postopt
+yosys cd my_latchn
+stat
+select -assert-count 1 t:latchnsre
+
+
+## LATCHSRE from LATCHR_N
+#design -load read
+#hierarchy -top my_latchr_n
+#yosys proc
+#equiv_opt -assert -async2sync -map +/quicklogic/qlf_k6n10f/cells_sim.v synth_quicklogic -family qlf_k6n10f -top my_latchr_n -nosdff
+#design -load postopt
+#yosys cd my_latchr_n
+#stat
+#select -assert-count 1 t:latchr_n
+#
+## LATCHSRE from LATCHR_P
+#design -load read
+#hierarchy -top my_latchr_p
+#yosys proc
+#equiv_opt -assert -async2sync -map +/quicklogic/qlf_k6n10f/cells_sim.v synth_quicklogic -family qlf_k6n10f -top my_latchr_p -nosdff
+#design -load postopt
+#yosys cd my_latchr_p
+#stat
+#select -assert-count 1 t:latchr_p
+#select -assert-count 1 t:\$lut
+#
+## LATCHSRE from LATCHS_N
+#design -load read
+#hierarchy -top my_latchs_n
+#yosys proc
+#equiv_opt -assert -async2sync -map +/quicklogic/qlf_k6n10f/cells_sim.v synth_quicklogic -family qlf_k6n10f -top my_latchs_n -nosdff
+#design -load postopt
+#yosys cd my_latchs_n
+#stat
+#select -assert-count 1 t:latchs_n
+#
+## LATCHSRE from LATCHS_P
+#design -load read
+#hierarchy -top my_latchs_p
+#yosys proc
+#equiv_opt -assert -async2sync -map +/quicklogic/qlf_k6n10f/cells_sim.v synth_quicklogic -family qlf_k6n10f -top my_latchs_p -nosdff
+#design -load postopt
+#yosys cd my_latchs_p
+#stat
+#select -assert-count 1 t:latchs_p
+#select -assert-count 1 t:\$lut
+#
+#
+## LATCHSRE from LATCHNR_N
+#design -load read
+#hierarchy -top my_latchnr_n
+#yosys proc
+#equiv_opt -assert -async2sync -map +/quicklogic/qlf_k6n10f/cells_sim.v synth_quicklogic -family qlf_k6n10f -top my_latchnr_n -nosdff
+#design -load postopt
+#yosys cd my_latchnr_n
+#stat
+#select -assert-count 1 t:latchnr_n
+#
+## LATCHSRE from LATCHNR_P
+#design -load read
+#hierarchy -top my_latchnr_p
+#yosys proc
+#equiv_opt -assert -async2sync -map +/quicklogic/qlf_k6n10f/cells_sim.v synth_quicklogic -family qlf_k6n10f -top my_latchnr_p -nosdff
+#design -load postopt
+#yosys cd my_latchnr_p
+#stat
+#select -assert-count 1 t:latchnr_p
+#select -assert-count 1 t:\$lut
+#
+## LATCHSRE from LATCHNS_N
+#design -load read
+#hierarchy -top my_latchns_n
+#yosys proc
+#equiv_opt -assert -async2sync -map +/quicklogic/qlf_k6n10f/cells_sim.v synth_quicklogic -family qlf_k6n10f -top my_latchns_n -nosdff
+#design -load postopt
+#yosys cd my_latchns_n
+#stat
+#select -assert-count 1 t:latchns_n
+#
+## LATCHSRE from LATCHNS_P
+#design -load read
+#hierarchy -top my_latchns_p
+#yosys proc
+#equiv_opt -assert -async2sync -map +/quicklogic/qlf_k6n10f/cells_sim.v synth_quicklogic -family qlf_k6n10f -top my_latchns_p -nosdff
+#design -load postopt
+#yosys cd my_latchns_p
+#stat
+#select -assert-count 1 t:latchns_p
+#select -assert-count 1 t:\$lut
 
 design -reset
 
