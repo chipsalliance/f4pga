@@ -386,6 +386,7 @@ module QL_DSP2_MULTADD (
     input  wire        reset,
 
     input  wire [ 2:0] feedback,
+    input  wire [ 5:0] acc_fir,
     input  wire        load_acc,
     input  wire        unsigned_a,
     input  wire        unsigned_b,
@@ -413,6 +414,7 @@ module QL_DSP2_MULTADD (
         .f_mode(f_mode),
 
         .feedback(feedback),
+        .acc_fir(acc_fir),
         .load_acc(load_acc),
 
         .unsigned_a(unsigned_a),
@@ -437,6 +439,7 @@ module QL_DSP2_MULTADD_REGIN (
     input  wire        reset,
 
     input  wire [ 2:0] feedback,
+    input  wire [ 5:0] acc_fir,
     input  wire        load_acc,
     input  wire        unsigned_a,
     input  wire        unsigned_b,
@@ -464,6 +467,7 @@ module QL_DSP2_MULTADD_REGIN (
         .f_mode(f_mode),
 
         .feedback(feedback),
+        .acc_fir(acc_fir),
         .load_acc(load_acc),
 
         .unsigned_a(unsigned_a),
@@ -488,6 +492,7 @@ module QL_DSP2_MULTADD_REGOUT (
     input  wire        reset,
 
     input  wire [ 2:0] feedback,
+    input  wire [ 5:0] acc_fir,
     input  wire        load_acc,
     input  wire        unsigned_a,
     input  wire        unsigned_b,
@@ -515,6 +520,7 @@ module QL_DSP2_MULTADD_REGOUT (
         .f_mode(f_mode),
 
         .feedback(feedback),
+        .acc_fir(acc_fir),
         .load_acc(load_acc),
 
         .unsigned_a(unsigned_a),
@@ -539,6 +545,7 @@ module QL_DSP2_MULTADD_REGIN_REGOUT (
     input  wire        reset,
 
     input  wire [ 2:0] feedback,
+    input  wire [ 5:0] acc_fir,
     input  wire        load_acc,
     input  wire        unsigned_a,
     input  wire        unsigned_b,
@@ -566,6 +573,7 @@ module QL_DSP2_MULTADD_REGIN_REGOUT (
         .f_mode(f_mode),
 
         .feedback(feedback),
+        .acc_fir(acc_fir),
         .load_acc(load_acc),
 
         .unsigned_a(unsigned_a),

@@ -11,7 +11,8 @@ PRIVATE_NAMESPACE_BEGIN
 // ============================================================================
 
 const std::vector<std::string> ports2del_mult = {"load_acc", "subtract", "acc_fir", "dly_b"};
-const std::vector<std::string> ports2del_mult_add_acc = {"acc_fir", "dly_b"};
+const std::vector<std::string> ports2del_mult_acc = {"acc_fir", "dly_b"};
+const std::vector<std::string> ports2del_mult_add = {"dly_b"};
 const std::vector<std::string> ports2del_extension = {"saturate_enable", "shift_right", "round"};
 
 void ql_dsp_io_regs_pass(RTLIL::Module *module)
@@ -95,10 +96,21 @@ void ql_dsp_io_regs_pass(RTLIL::Module *module)
             if (del_clk)
                 ports2del.push_back("clk");
 
-            if (out_sel_i == 0 || out_sel_i == 4) {
+            switch (out_sel_i) {
+            case 0:
+            case 4:
                 ports2del.insert(ports2del.end(), ports2del_mult.begin(), ports2del_mult.end());
-            } else {
-                ports2del.insert(ports2del.end(), ports2del_mult_add_acc.begin(), ports2del_mult_add_acc.end());
+                break;
+            case 1:
+            case 5:
+                ports2del.insert(ports2del.end(), ports2del_mult_acc.begin(), ports2del_mult_acc.end());
+                break;
+            case 2:
+            case 3:
+            case 6:
+            case 7:
+                ports2del.insert(ports2del.end(), ports2del_mult_add.begin(), ports2del_mult_add.end());
+                break;
             }
 
             // Mark for deleton additional configuration ports
