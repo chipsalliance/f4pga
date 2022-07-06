@@ -381,8 +381,6 @@ module QL_DSP2_MULTADD (
     input  wire [17:0] b,
     output wire [37:0] z,
 
-    (* clkbuf_sink *)
-    input  wire        clk,
     input  wire        reset,
 
     input  wire [ 2:0] feedback,
@@ -420,7 +418,6 @@ module QL_DSP2_MULTADD (
         .unsigned_a(unsigned_a),
         .unsigned_b(unsigned_b),
 
-        .clk(clk),
         .reset(reset),
 
         .output_select(output_select),  // unregistered output: ACCin (2, 3)
