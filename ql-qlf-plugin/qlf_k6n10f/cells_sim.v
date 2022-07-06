@@ -124,6 +124,33 @@ module frac_lut6(
 
 endmodule
 
+(* abc9_flop, lib_whitebox *)
+module dff(
+    output reg Q,
+    input wire D,
+    (* clkbuf_sink *)
+    input wire C
+);
+    initial Q <= 1'b0;
+
+    always @(posedge C)
+      Q <= D;
+
+endmodule
+
+(* abc9_flop, lib_whitebox *)
+module dffn(
+    output reg Q,
+    input wire D,
+    (* clkbuf_sink *)
+    input wire C
+);
+    initial Q <= 1'b0;
+
+    always @(negedge C)
+      Q <= D;
+
+endmodule
 
 (* abc9_flop, lib_whitebox *)
 module dffsre(

@@ -84,6 +84,11 @@ struct SynthQuickLogicPass : public ScriptPass {
         log("    -no_ff_map\n");
         log("        By default ff techmap is turned on. Specifying this switch turns it off.\n");
         log("\n");
+        log("    -nosdff\n");
+        log("        By default infer synchronous S/R flip-flops for architectures\n");
+        log("        that support them. \n");
+        log("        Specifying this switch turns it off.\n");
+        log("\n");
         log("\n");
         log("The following commands are executed by this synthesis command:\n");
         help_script();
@@ -97,6 +102,7 @@ struct SynthQuickLogicPass : public ScriptPass {
     bool abcOpt;
     bool abc9;
     bool noffmap;
+    bool nosdff;
 
     void clear_flags() override
     {
@@ -112,6 +118,7 @@ struct SynthQuickLogicPass : public ScriptPass {
         abc9 = true;
         noffmap = false;
         nodsp = false;
+        nosdff = false;
     }
 
     void execute(std::vector<std::string> args, RTLIL::Design *design) override
@@ -177,6 +184,10 @@ struct SynthQuickLogicPass : public ScriptPass {
                 noffmap = true;
                 continue;
             }
+            if (args[argidx] == "-nosdff") {
+                nosdff = true;
+                continue;
+            }
 
             break;
         }
@@ -190,6 +201,10 @@ struct SynthQuickLogicPass : public ScriptPass {
 
         if (family != "pp3") {
             abc9 = false;
+        }
+
+        if (family == "qlf_k4n8") {
+            nosdff = true;
         }
 
         if (abc9 && design->scratchpad_get_int("abc9.D", 0) == 0) {
@@ -230,9 +245,13 @@ struct SynthQuickLogicPass : public ScriptPass {
         }
 
         std::string noDFFArgs;
-        if (family == "qlf_k4n8") {
-            noDFFArgs = " -nodffe -nosdff";
+        if (nosdff) {
+            noDFFArgs += " -nosdff";
         }
+        if (family == "qlf_k4n8") {
+            noDFFArgs += " -nodffe";
+        }
+
         if (check_label("coarse")) {
             run("check");
             run("opt -nodffe -nosdff");
@@ -366,7 +385,11 @@ struct SynthQuickLogicPass : public ScriptPass {
                 // FIXME: dfflegalize seems to leave $_DLATCH_[NP]_ even if it
                 // is not allowed. So we allow them and map them later to
                 // $_DLATCHSR_[NP]NN_.
-                run("dfflegalize -cell $_DFFSRE_?NNP_ 0 -cell $_SDFFE_?N?P_ 0 -cell $_DLATCHSR_?NN_ 0 -cell $_DLATCH_?_ 0");
+                std::string legalizeArgs = " -cell $_DFFSRE_?NNP_ 0 -cell $_DLATCHSR_?NN_ 0 -cell $_DLATCH_?_ 0";
+                if (!nosdff) {
+                    legalizeArgs += " -cell $_SDFFE_?N?P_ 0";
+                }
+                run("dfflegalize" + legalizeArgs);
             } else if (family == "pp3") {
                 run("dfflegalize -cell $_DFFSRE_PPPP_ 0 -cell $_DLATCH_?_ x");
                 run("techmap -map +/quicklogic/" + family + "/cells_map.v");
