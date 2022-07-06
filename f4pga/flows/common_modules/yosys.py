@@ -285,6 +285,12 @@ class YosysModule(Module):
         dev_dir = ctx.r_env.resolve("${devDir}")
         cmd = f"tcl {dev_dir}/scripts/f4pga_exec.tcl; tcl {self.tcl_script_path}"
         with yosys_temp_files(self.yosys_meta.tempfiles) as tf:
+            extra_opts = []
+
+            log_path = getattr(ctx.outputs, f"yosys_{self.name}_log")
+            if log_path is not None:
+                extra_opts += ["-l", log_path]
+
             env = self.yosys_meta.make_env(ctx, tf)
             yosys = shutil.which("yosys")
 
@@ -293,7 +299,7 @@ class YosysModule(Module):
                     cmd = f"plugin -i {plugin}; {cmd}"
 
             yield "Running Yosys TCL script..."
-            sub(yosys, "-p", cmd, env=env)
+            sub(*([yosys, "-p", cmd] + extra_opts), env=env)
 
     def __init__(self, params, r_env: ResolutionEnv, instance_name):
         super().__init__(params, r_env, instance_name)
