@@ -63,7 +63,7 @@ void UhdmCommonFrontend::print_read_options()
     log("        Needs to be followed by read_systemverilog -link after reading\n");
     log("        all files.\n");
     log("    -link\n");
-    log("        performs actual elaboration of the files read with -defer\n");
+    log("        performs linking and elaboration of the files read with -defer\n");
     log("    -parse-only\n");
     log("        this parameter only applies to read_systemverilog command,\n");
     log("        it runs only Surelog to parse design, but doesn't load generated\n");
