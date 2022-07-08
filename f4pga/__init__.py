@@ -70,10 +70,18 @@ from f4pga.argparser import setup_argparser, get_cli_flow_config
 
 F4CACHEPATH = '.f4cache'
 
-binpath = str(Path(sys_argv[0]).resolve().parent.parent)
+install_dir = environ.get("F4PGA_INSTALL_DIR", "/usr/local")
+
 mypath = str(Path(__file__).resolve().parent)
 
-share_dir_path = str(Path(f"{environ.get('F4PGA_INSTALL_DIR', '/usr/local')}/xc7/install/share/symbiflow").resolve())
+
+bin_dir_path = environ.get('F4PGA_BIN_DIR')
+if bin_dir_path is None:
+    bin_dir_path = str(Path(sys_argv[0]).resolve().parent.parent)
+
+share_dir_path = environ.get('F4PGA_SHARE_DIR')
+if share_dir_path is None:
+    share_dir_path = str(Path(f'{install_dir}/xc7/install/share/symbiflow').resolve()) 
 
 class DependencyNotProducedException(F4PGAException):
     dep_name: str
@@ -214,7 +222,7 @@ def config_mod_runctx(stage: Stage, values: 'dict[str, ]',
                       config_paths: 'dict[str, str | list[str]]'):
     config = prepare_stage_input(stage, values,
                                  dep_paths, config_paths)
-    return ModRunCtx(share_dir_path, binpath, config)
+    return ModRunCtx(share_dir_path, bin_dir_path, config)
 
 def _process_dep_path(path: str, f4cache: F4Cache):
     f4cache.process_file(Path(path))
@@ -510,7 +518,7 @@ def setup_resolution_env():
 
     r_env = ResolutionEnv({
         'shareDir': share_dir_path,
-        'binDir': str((Path(share_dir_path) / '../../bin').resolve())
+        'binDir': bin_dir_path
     })
 
     def _noisy_warnings():
