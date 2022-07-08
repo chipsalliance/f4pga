@@ -19,7 +19,8 @@
             "sdc-in": "eos-s3/btn_counter/dummy.sdc"
         },
         "values": {
-            "part": "ql-eos-s3"
+            "part": "ql-eos-s3",
+            "part_name": "PD64"
         }
     }
 }

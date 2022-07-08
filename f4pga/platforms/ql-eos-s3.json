@@ -17,7 +17,8 @@
         "bitstream_bitheader": "common:generic_script_wrapper",
         "bitstream_binary": "common:generic_script_wrapper",
         "bitstream_jlink": "common:generic_script_wrapper",
-        "bitstream_openocd": "common:generic_script_wrapper"
+        "bitstream_openocd": "common:generic_script_wrapper",
+        "fasm2bels": "common:generic_script_wrapper"
     },
 
     "values": {
@@ -424,6 +425,47 @@
                     "#1": "${:bitstream}",
                     "#2": "${:bitstream}.bin",
                     "#3": "${:iomux_binary}"
+                }
+            }
+        },
+        "fasm2bels": {
+            "params": {
+                "stage_name": "fasm2bels",
+                "script": "symbiflow_fasm2bels",
+                "outputs": {
+                    "fasm2bels_verilog": {
+                        "mode": "file",
+                        "file": "${:bitstream}.v",
+                        "target": "${:bitstream}.v"
+                    },
+                    "fasm2bels_pcf": {
+                        "mode": "file",
+                        "file": "${:bitstream}.pcf",
+                        "target": "${:bitstream}.pcf"
+                    },
+                    "fasm2bels_qcf": {
+                        "mode": "file",
+                        "file": "${:bitstream}.qcf",
+                        "target": "${:bitstream}.qcf"
+                    },
+                    "fasm2bels_log": {
+                        "mode": "stdout",
+                        "target": "${:bitstream}.log"
+                    }
+                },
+                "inputs": {
+                    "device": "${device}",
+                    "part": "${part_name}",
+                    "pcf": "${:pcf}",
+                    "bit": "${:bitstream}",
+                    "out-verilog": "${:bitstream}.v",
+                    "out-pcf": "${:bitstream}.pcf",
+                    "out-qcf": "${:bitstream}.qcf",
+                    "$F4PGA_INSTALL_DIR": "${shareDir}/../../../../",
+                    "$FPGA_FAM": "eos-s3",
+                    "$PATH": "${shareDir}/../../../conda/envs/eos-s3/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                    "$SHARE_DIR_PATH": "${shareDir}",
+                    "$BIN_DIR_PATH": "${binDir}"
                 }
             }
         }
