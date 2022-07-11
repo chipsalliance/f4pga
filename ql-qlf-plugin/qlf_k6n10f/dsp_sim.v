@@ -232,8 +232,8 @@ module QL_DSP2_MULT ( // TODO: Name subject to change
         .unsigned_a(unsigned_a),
         .unsigned_b(unsigned_b),
 
-        .output_select(3'b0),   // unregistered output: a * b (0)
-        .register_inputs(1'b0)  // unregistered inputs
+        .output_select(output_select),      // unregistered output: a * b (0)
+        .register_inputs(register_inputs)   // unregistered inputs
     );
 endmodule
 
@@ -279,8 +279,8 @@ module QL_DSP2_MULT_REGIN ( // TODO: Name subject to change
         .clk(clk),
         .reset(reset),
 
-        .output_select(3'b0),   // unregistered output: a * b (0)
-        .register_inputs(1'b1)  // registered inputs
+        .output_select(output_select),      // unregistered output: a * b (0)
+        .register_inputs(register_inputs)   // registered inputs
     );
 endmodule
 
@@ -325,8 +325,8 @@ module QL_DSP2_MULT_REGOUT ( // TODO: Name subject to change
         .clk(clk),
         .reset(reset),
 
-        .output_select(3'b100), // registered output: a * b (4)
-        .register_inputs(1'b0)  // unregistered inputs
+        .output_select(output_select),      // registered output: a * b (4)
+        .register_inputs(register_inputs)   // unregistered inputs
     );
 endmodule
 
@@ -371,8 +371,8 @@ module QL_DSP2_MULT_REGIN_REGOUT ( // TODO: Name subject to change
         .clk(clk),
         .reset(reset),
 
-        .output_select(3'b100), // registered output: a * b (4)
-        .register_inputs(1'b1)  // registered inputs
+        .output_select(output_select),      // registered output: a * b (4)
+        .register_inputs(register_inputs)   // registered inputs
     );
 endmodule
 
@@ -420,9 +420,9 @@ module QL_DSP2_MULTADD (
 
         .reset(reset),
 
-        .output_select(output_select),  // unregistered output: ACCin (2, 3)
+        .output_select(output_select),      // unregistered output: ACCin (2, 3)
         .subtract(subtract),
-        .register_inputs(1'b0)  // unregistered inputs
+        .register_inputs(register_inputs)   // unregistered inputs
     );
 endmodule
 
@@ -473,9 +473,9 @@ module QL_DSP2_MULTADD_REGIN (
         .clk(clk),
         .reset(reset),
 
-        .output_select(output_select),  // unregistered output: ACCin (2, 3)
+        .output_select(output_select),      // unregistered output: ACCin (2, 3)
         .subtract(subtract),
-        .register_inputs(1'b1)  // registered inputs
+        .register_inputs(register_inputs)   // registered inputs
     );
 endmodule
 
@@ -526,9 +526,9 @@ module QL_DSP2_MULTADD_REGOUT (
         .clk(clk),
         .reset(reset),
 
-        .output_select(output_select),  // registered output: ACCin (6, 7)
+        .output_select(output_select),      // registered output: ACCin (6, 7)
         .subtract(subtract),
-        .register_inputs(1'b0)  // unregistered inputs
+        .register_inputs(register_inputs)   // unregistered inputs
     );
 endmodule
 
@@ -579,9 +579,9 @@ module QL_DSP2_MULTADD_REGIN_REGOUT (
         .clk(clk),
         .reset(reset),
 
-        .output_select(output_select),  // registered output: ACCin (6, 7)
+        .output_select(output_select),      // registered output: ACCin (6, 7)
         .subtract(subtract),
-        .register_inputs(1'b1)  // registered inputs
+        .register_inputs(register_inputs)   // registered inputs
     );
 endmodule
 
@@ -630,9 +630,9 @@ module QL_DSP2_MULTACC (
         .clk(clk),
         .reset(reset),
 
-        .output_select(1'b1),   // unregistered output: ACCout (1)
+        .output_select(output_select),      // unregistered output: ACCout (1)
         .subtract(subtract),
-        .register_inputs(1'b0)  // unregistered inputs
+        .register_inputs(register_inputs)   // unregistered inputs
     );
 endmodule
 
@@ -681,9 +681,9 @@ module QL_DSP2_MULTACC_REGIN (
         .clk(clk),
         .reset(reset),
 
-        .output_select(1'b1),   // unregistered output: ACCout (1)
+        .output_select(output_select),      // unregistered output: ACCout (1)
         .subtract(subtract),
-        .register_inputs(1'b1)  // registered inputs
+        .register_inputs(register_inputs)   // registered inputs
     );
 endmodule
 
@@ -732,9 +732,9 @@ module QL_DSP2_MULTACC_REGOUT (
         .clk(clk),
         .reset(reset),
 
-        .output_select(3'b101), // registered output: ACCout (5)
+        .output_select(output_select),      // registered output: ACCout (5)
         .subtract(subtract),
-        .register_inputs(1'b0)  // unregistered inputs
+        .register_inputs(register_inputs)   // unregistered inputs
     );
 endmodule
 
@@ -783,9 +783,9 @@ module QL_DSP2_MULTACC_REGIN_REGOUT (
         .clk(clk),
         .reset(reset),
 
-        .output_select(3'b101), // registered output: ACCout (5)
+        .output_select(output_select),      // registered output: ACCout (5)
         .subtract(subtract),
-        .register_inputs(1'b1)  // registered inputs
+        .register_inputs(register_inputs)   // registered inputs
     );
 endmodule
 
@@ -1325,11 +1325,11 @@ module QL_DSP3_MULT ( // TODO: Name subject to change
     localparam [19:0] COEFF_3 = MODE_BITS[79:60];
 
     localparam [0:0] F_MODE          = MODE_BITS[80];
-    localparam [2:0] OUTPUT_SELECT   = 3'b0; // unregistered output: a * b (0)
+    localparam [2:0] OUTPUT_SELECT   = MODE_BITS[83:81];    // unregistered output: a * b (0)
     localparam [0:0] SATURATE_ENABLE = MODE_BITS[84];
     localparam [5:0] SHIFT_RIGHT     = MODE_BITS[90:85];
     localparam [0:0] ROUND           = MODE_BITS[91];
-    localparam [0:0] REGISTER_INPUTS = 1'b0; // unregistered inputs
+    localparam [0:0] REGISTER_INPUTS = MODE_BITS[92];       // unregistered inputs
 
     QL_DSP3 #(
         .MODE_BITS({
@@ -1382,11 +1382,11 @@ module QL_DSP3_MULT_REGIN ( // TODO: Name subject to change
     localparam [19:0] COEFF_3 = MODE_BITS[79:60];
 
     localparam [0:0] F_MODE          = MODE_BITS[80];
-    localparam [2:0] OUTPUT_SELECT   = 3'b0; // unregistered output: a * b (0)
+    localparam [2:0] OUTPUT_SELECT   = MODE_BITS[83:81];    // unregistered output: a * b (0)
     localparam [0:0] SATURATE_ENABLE = MODE_BITS[84];
     localparam [5:0] SHIFT_RIGHT     = MODE_BITS[90:85];
     localparam [0:0] ROUND           = MODE_BITS[91];
-    localparam [0:0] REGISTER_INPUTS = 1'b1; // registered inputs
+    localparam [0:0] REGISTER_INPUTS = MODE_BITS[92];       // registered inputs
 
     QL_DSP3 #(
         .MODE_BITS({
@@ -1439,11 +1439,11 @@ module QL_DSP3_MULT_REGOUT ( // TODO: Name subject to change
     localparam [19:0] COEFF_3 = MODE_BITS[79:60];
 
     localparam [0:0] F_MODE          = MODE_BITS[80];
-    localparam [2:0] OUTPUT_SELECT   = 3'b100; // registered output: a * b (4)
+    localparam [2:0] OUTPUT_SELECT   = MODE_BITS[83:81];    // registered output: a * b (4)
     localparam [0:0] SATURATE_ENABLE = MODE_BITS[84];
     localparam [5:0] SHIFT_RIGHT     = MODE_BITS[90:85];
     localparam [0:0] ROUND           = MODE_BITS[91];
-    localparam [0:0] REGISTER_INPUTS = 1'b0; // unregistered inputs
+    localparam [0:0] REGISTER_INPUTS = MODE_BITS[92];       // unregistered inputs
 
     QL_DSP3 #(
         .MODE_BITS({
@@ -1496,11 +1496,11 @@ module QL_DSP3_MULT_REGIN_REGOUT ( // TODO: Name subject to change
     localparam [19:0] COEFF_3 = MODE_BITS[79:60];
 
     localparam [0:0] F_MODE          = MODE_BITS[80];
-    localparam [2:0] OUTPUT_SELECT   = 3'b100; // registered output: a * b (4)
+    localparam [2:0] OUTPUT_SELECT   = MODE_BITS[83:81];    // registered output: a * b (4)
     localparam [0:0] SATURATE_ENABLE = MODE_BITS[84];
     localparam [5:0] SHIFT_RIGHT     = MODE_BITS[90:85];
     localparam [0:0] ROUND           = MODE_BITS[91];
-    localparam [0:0] REGISTER_INPUTS = 1'b1; // unregistered inputs
+    localparam [0:0] REGISTER_INPUTS = MODE_BITS[92];       // unregistered inputs
 
     QL_DSP3 #(
         .MODE_BITS({
