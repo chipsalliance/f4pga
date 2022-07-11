@@ -75,11 +75,11 @@ install_dir = environ.get("F4PGA_INSTALL_DIR", "/usr/local")
 mypath = str(Path(__file__).resolve().parent)
 
 
-bin_dir_path = environ.get('F4PGA_BIN_DIR')
-if bin_dir_path is None:
-    bin_dir_path = str(Path(sys_argv[0]).resolve().parent.parent)
-
-share_dir_path = environ.get('F4PGA_SHARE_DIR')
+bin_dir_path = \
+    environ.get('F4PGA_BIN_DIR', str(Path(sys_argv[0]).resolve().parent.parent))
+share_dir_path = \
+    environ.get('F4PGA_SHARE_DIR',
+                str(Path(f'{install_dir}/xc7/install/share/symbiflow').resolve()))
 if share_dir_path is None:
     share_dir_path = str(Path(f'{install_dir}/xc7/install/share/symbiflow').resolve()) 
 
