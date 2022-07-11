@@ -391,6 +391,9 @@ module QL_DSP2_MULTADD (
 
     input  wire        f_mode,
     input  wire [ 2:0] output_select,
+    input  wire        saturate_enable,
+    input  wire [ 5:0] shift_right,
+    input  wire        round,
     input  wire        subtract,
     input  wire        register_inputs
 );
@@ -421,6 +424,9 @@ module QL_DSP2_MULTADD (
         .reset(reset),
 
         .output_select(output_select),      // unregistered output: ACCin (2, 3)
+        .saturate_enable(saturate_enable),
+        .shift_right(shift_right),
+        .round(round),
         .subtract(subtract),
         .register_inputs(register_inputs)   // unregistered inputs
     );
@@ -443,6 +449,9 @@ module QL_DSP2_MULTADD_REGIN (
 
     input  wire        f_mode,
     input  wire [ 2:0] output_select,
+    input  wire        saturate_enable,
+    input  wire [ 5:0] shift_right,
+    input  wire        round,
     input  wire        subtract,
     input  wire        register_inputs
 );
@@ -474,6 +483,9 @@ module QL_DSP2_MULTADD_REGIN (
         .reset(reset),
 
         .output_select(output_select),      // unregistered output: ACCin (2, 3)
+        .saturate_enable(saturate_enable),
+        .shift_right(shift_right),
+        .round(round),
         .subtract(subtract),
         .register_inputs(register_inputs)   // registered inputs
     );
@@ -496,6 +508,9 @@ module QL_DSP2_MULTADD_REGOUT (
 
     input  wire        f_mode,
     input  wire [ 2:0] output_select,
+    input  wire        saturate_enable,
+    input  wire [ 5:0] shift_right,
+    input  wire        round,
     input  wire        subtract,
     input  wire        register_inputs
 );
@@ -527,6 +542,9 @@ module QL_DSP2_MULTADD_REGOUT (
         .reset(reset),
 
         .output_select(output_select),      // registered output: ACCin (6, 7)
+        .saturate_enable(saturate_enable),
+        .shift_right(shift_right),
+        .round(round),
         .subtract(subtract),
         .register_inputs(register_inputs)   // unregistered inputs
     );
@@ -549,6 +567,9 @@ module QL_DSP2_MULTADD_REGIN_REGOUT (
 
     input  wire        f_mode,
     input  wire [ 2:0] output_select,
+    input  wire        saturate_enable,
+    input  wire [ 5:0] shift_right,
+    input  wire        round,
     input  wire        subtract,
     input  wire        register_inputs
 );
@@ -580,6 +601,9 @@ module QL_DSP2_MULTADD_REGIN_REGOUT (
         .reset(reset),
 
         .output_select(output_select),      // registered output: ACCin (6, 7)
+        .saturate_enable(saturate_enable),
+        .shift_right(shift_right),
+        .round(round),
         .subtract(subtract),
         .register_inputs(register_inputs)   // registered inputs
     );
@@ -601,6 +625,9 @@ module QL_DSP2_MULTACC (
 
     input  wire        f_mode,
     input  wire [ 2:0] output_select,
+    input  wire        saturate_enable,
+    input  wire [ 5:0] shift_right,
+    input  wire        round,
     input  wire        subtract,
     input  wire        register_inputs
 );
@@ -631,6 +658,9 @@ module QL_DSP2_MULTACC (
         .reset(reset),
 
         .output_select(output_select),      // unregistered output: ACCout (1)
+        .saturate_enable(saturate_enable),
+        .shift_right(shift_right),
+        .round(round),
         .subtract(subtract),
         .register_inputs(register_inputs)   // unregistered inputs
     );
@@ -652,6 +682,9 @@ module QL_DSP2_MULTACC_REGIN (
 
     input  wire        f_mode,
     input  wire [ 2:0] output_select,
+    input  wire        saturate_enable,
+    input  wire [ 5:0] shift_right,
+    input  wire        round,
     input  wire        subtract,
     input  wire        register_inputs
 );
@@ -682,6 +715,9 @@ module QL_DSP2_MULTACC_REGIN (
         .reset(reset),
 
         .output_select(output_select),      // unregistered output: ACCout (1)
+        .saturate_enable(saturate_enable),
+        .shift_right(shift_right),
+        .round(round),
         .subtract(subtract),
         .register_inputs(register_inputs)   // registered inputs
     );
@@ -703,6 +739,9 @@ module QL_DSP2_MULTACC_REGOUT (
 
     input  wire        f_mode,
     input  wire [ 2:0] output_select,
+    input  wire        saturate_enable,
+    input  wire [ 5:0] shift_right,
+    input  wire        round,
     input  wire        subtract,
     input  wire        register_inputs
 );
@@ -733,6 +772,9 @@ module QL_DSP2_MULTACC_REGOUT (
         .reset(reset),
 
         .output_select(output_select),      // registered output: ACCout (5)
+        .saturate_enable(saturate_enable),
+        .shift_right(shift_right),
+        .round(round),
         .subtract(subtract),
         .register_inputs(register_inputs)   // unregistered inputs
     );
@@ -754,6 +796,9 @@ module QL_DSP2_MULTACC_REGIN_REGOUT (
 
     input  wire        f_mode,
     input  wire [ 2:0] output_select,
+    input  wire        saturate_enable,
+    input  wire [ 5:0] shift_right,
+    input  wire        round,
     input  wire        subtract,
     input  wire        register_inputs
 );
@@ -784,6 +829,9 @@ module QL_DSP2_MULTACC_REGIN_REGOUT (
         .reset(reset),
 
         .output_select(output_select),      // registered output: ACCout (5)
+        .saturate_enable(saturate_enable),
+        .shift_right(shift_right),
+        .round(round),
         .subtract(subtract),
         .register_inputs(register_inputs)   // registered inputs
     );

@@ -100,6 +100,11 @@ void ql_dsp_io_regs_pass(RTLIL::Module *module)
             case 0:
             case 4:
                 ports2del.insert(ports2del.end(), ports2del_mult.begin(), ports2del_mult.end());
+                // Mark for deleton additional configuration ports
+                if (!use_dsp_cfg_params) {
+                    ports2del.insert(ports2del.end(), ports2del_extension.begin(), ports2del_extension.end());
+                }
+
                 break;
             case 1:
             case 5:
@@ -111,11 +116,6 @@ void ql_dsp_io_regs_pass(RTLIL::Module *module)
             case 7:
                 ports2del.insert(ports2del.end(), ports2del_mult_add.begin(), ports2del_mult_add.end());
                 break;
-            }
-
-            // Mark for deleton additional configuration ports
-            if (!use_dsp_cfg_params) {
-                ports2del.insert(ports2del.end(), ports2del_extension.begin(), ports2del_extension.end());
             }
 
             for (auto portname : ports2del) {
