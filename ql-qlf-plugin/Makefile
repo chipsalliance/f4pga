@@ -51,6 +51,7 @@ VERILOG_MODULES = $(COMMON)/cells_sim.v         \
                   $(QLF_K6N10F_DIR)/brams_final_map.v \
                   $(QLF_K6N10F_DIR)/brams.txt   \
                   $(QLF_K6N10F_DIR)/cells_sim.v \
+                  $(QLF_K6N10F_DIR)/dsp_sim.v \
                   $(QLF_K6N10F_DIR)/sram1024x18.v \
                   $(QLF_K6N10F_DIR)/TDP18K_FIFO.v \
                   $(QLF_K6N10F_DIR)/ufifo_ctl.v \

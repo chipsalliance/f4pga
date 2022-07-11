@@ -39,29 +39,29 @@ module tb();
     // Shift data change half a clock cycle
     // to make registered inputs apparent
     initial begin
-	forever begin
-        A = $random;
-        B = $random;
+        forever begin
+            A = $random;
+            B = $random;
 
-        C <= A * B;
-	#1.5;
-	end
+            C <= A * B;
+        #1.5;
+        end
     end
 
     // UUT
     wire signed [37:0] Z;
 
-    dsp_t1_sim # (
+    dsp_t1_sim_cfg_params # (
+        .REGISTER_INPUTS    (1'h1),
+        .OUTPUT_SELECT      (3'h0)
     ) uut (
-        .a_i			(A),
-        .b_i			(B),
-        .unsigned_a_i		(1'h0),
-        .unsigned_b_i		(1'h0),
-        .feedback_i		(3'h0),
-	.register_inputs_i	(1'h1),
-	.output_select_i	(3'h0),
-	.clock_i		(clk),
-        .z_o			(Z)
+        .a_i                (A),
+        .b_i                (B),
+        .unsigned_a_i       (1'h0),
+        .unsigned_b_i       (1'h0),
+        .feedback_i         (3'h0),
+        .clock_i            (clk),
+        .z_o                (Z)
     );
 
     // Error detection

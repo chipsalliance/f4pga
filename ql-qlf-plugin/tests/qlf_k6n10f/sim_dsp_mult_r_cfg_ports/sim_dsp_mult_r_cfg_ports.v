@@ -15,7 +15,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 `include "qlf_k6n10f/cells_sim.v"
-`timescale 1ns/1ps
 
 module tb();
 
@@ -37,30 +36,40 @@ module tb();
     reg signed [17:0] B;
     reg signed [37:0] C;
 
-    always @(posedge clk) begin
-        A = $random;
-        B = $random;
+    // Shift data change half a clock cycle
+    // to make registered inputs apparent
+    initial begin
+        forever begin
+            A = $random;
+            B = $random;
 
-        C <= A * B;
+            C <= A * B;
+        #1.5;
+        end
     end
 
     // UUT
     wire signed [37:0] Z;
 
-    dsp_t1_sim # (
-    ) uut (
-        .a_i            	(A),
-        .b_i            	(B),
-        .unsigned_a_i   	(1'h0),
-        .unsigned_b_i   	(1'h0),
-        .feedback_i     	(3'h0),
-	.register_inputs_i	(1'h0),
-	.output_select_i	(3'h0),
-        .z_o            	(Z)
+    dsp_t1_sim_cfg_ports uut (
+        .a_i                (A),
+        .b_i                (B),
+        .unsigned_a_i       (1'h0),
+        .unsigned_b_i       (1'h0),
+        .feedback_i         (3'h0),
+        .register_inputs_i  (1'h1),
+        .output_select_i    (3'h0),
+        .clock_i            (clk),
+        .z_o                (Z)
     );
 
     // Error detection
-    wire error = (Z !== C);
+    reg [37:0] r_C;
+    initial r_C <= 0;
+    always @(posedge clk)
+        r_C <= C;
+
+    wire error = (Z !== r_C);
 
     // Error counting
     integer error_count;
@@ -73,7 +82,7 @@ module tb();
     initial begin
         $dumpfile(`VCD_FILE);
         $dumpvars(0, tb);
-        #10000 $finish_and_return( (error_count == 0) ? 0 : -1 );
+        #100 $finish_and_return( (error_count == 0) ? 0 : -1 );
     end
 
 endmodule

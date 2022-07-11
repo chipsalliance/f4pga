@@ -89,24 +89,24 @@ module tb();
     wire signed [17:0] B = data;
     wire signed [37:0] Z;
 
-    dsp_t1_sim # (
+    dsp_t1_sim_cfg_ports # (
     ) uut (
-        .clock_i		(clk),
-        .s_reset		(rst),
-        .a_i			((!stb) ? A : 20'h0),
-        .b_i			((!stb) ? B : 18'h0),
-        .acc_fir_i		((!stb) ? acc_fir_i : 4'h0),
-        .unsigned_a_i		(1'b0),
-        .unsigned_b_i		(1'b0),
-        .feedback_i		(stb),
-        .load_acc_i		(1'b1),
-        .shift_right_i		(6'd10),
-	.register_inputs_i	(1'b0),
-	.output_select_i	(3'h1),
-	.round_i		(1'b1),
-	.saturate_enable_i	(1'b1),
-	.subtract_i		(1'b0),
-        .z_o			(Z)
+        .clock_i            (clk),
+        .s_reset            (rst),
+        .a_i                ((!stb) ? A : 20'h0),
+        .b_i                ((!stb) ? B : 18'h0),
+        .acc_fir_i          ((!stb) ? acc_fir_i : 4'h0),
+        .unsigned_a_i       (1'b0),
+        .unsigned_b_i       (1'b0),
+        .feedback_i         (stb),
+        .load_acc_i         (1'b1),
+        .shift_right_i      (6'd10),
+        .register_inputs_i  (1'b0),
+        .output_select_i    (3'h1),
+        .round_i            (1'b1),
+        .saturate_enable_i  (1'b1),
+        .subtract_i         (1'b0),
+        .z_o                (Z)
     );
 
     // Output counter

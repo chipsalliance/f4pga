@@ -73,6 +73,10 @@ struct SynthQuickLogicPass : public ScriptPass {
         log("        By default use DSP blocks in output netlist.\n");
         log("        do not use DSP blocks to implement multipliers and associated logic\n");
         log("\n");
+        log("    -use_dsp_cfg_params\n");
+        log("        By default use DSP blocks with configuration bits available at module ports.\n");
+        log("        Specifying this forces usage of DSP block with configuration bits available as module parameters\n");
+        log("\n");
         log("    -no_adder\n");
         log("        By default use adder cells in output netlist.\n");
         log("        Specifying this switch turns it off.\n");
@@ -95,7 +99,7 @@ struct SynthQuickLogicPass : public ScriptPass {
         log("\n");
     }
 
-    string top_opt, edif_file, blif_file, family, currmodule, verilog_file;
+    string top_opt, edif_file, blif_file, family, currmodule, verilog_file, use_dsp_cfg_params;
     bool nodsp;
     bool inferAdder;
     bool inferBram;
@@ -119,6 +123,7 @@ struct SynthQuickLogicPass : public ScriptPass {
         noffmap = false;
         nodsp = false;
         nosdff = false;
+        use_dsp_cfg_params = "";
     }
 
     void execute(std::vector<std::string> args, RTLIL::Design *design) override
@@ -162,6 +167,10 @@ struct SynthQuickLogicPass : public ScriptPass {
             }
             if (args[argidx] == "-no_dsp") {
                 nodsp = true;
+                continue;
+            }
+            if (args[argidx] == "-use_dsp_cfg_params") {
+                use_dsp_cfg_params = " -use_dsp_cfg_params";
                 continue;
             }
             if (args[argidx] == "-no_adder") {
@@ -223,8 +232,13 @@ struct SynthQuickLogicPass : public ScriptPass {
     void script() override
     {
         if (check_label("begin")) {
+            std::string family_path = " +/quicklogic/" + family;
             std::string readVelArgs;
-            readVelArgs = " +/quicklogic/" + family + "/cells_sim.v";
+
+            // Read simulation library
+            readVelArgs = family_path + "/cells_sim.v";
+            if (family == "qlf_k6n10f")
+                readVelArgs += family_path + "/dsp_sim.v";
 
             // Use -nomem2reg here to prevent Yosys from complaining about
             // some block ram cell models. After all the only part of the cells
@@ -295,18 +309,22 @@ struct SynthQuickLogicPass : public ScriptPass {
                 };
 
                 if (help_mode) {
-                    run("wreduce t:$mul", "                (for qlf_k6n10f if not -no_dsp)");
-                    run("ql_dsp_macc", "                   (for qlf_k6n10f if not -no_dsp)");
-                    run("techmap -map +/mul2dsp.v [...]", "(for qlf_k6n10f if not -no_dsp)");
-                    run("chtype -set $mul t:$__soft_mul", "(for qlf_k6n10f if not -no_dsp)");
+                    run("wreduce t:$mul", "                  (for qlf_k6n10f if not -no_dsp)");
+                    run("ql_dsp_macc" + use_dsp_cfg_params, "(for qlf_k6n10f if not -no_dsp)");
+                    run("techmap -map +/mul2dsp.v [...]", "  (for qlf_k6n10f if not -no_dsp)");
+                    run("chtype -set $mul t:$__soft_mul", "  (for qlf_k6n10f if not -no_dsp)");
                     run("techmap -map +/quicklogic/" + family + "/dsp_map.v", "(for qlf_k6n10f if not -no_dsp)");
+                    if (use_dsp_cfg_params == "")
+                        run("techmap -map +/quicklogic/" + family + "/dsp_map.v -D USE_DSP_CFG_PARAMS=0", "(for qlf_k6n10f if not -no_dsp)");
+                    else
+                        run("techmap -map +/quicklogic/" + family + "/dsp_map.v -D USE_DSP_CFG_PARAMS=1", "(for qlf_k6n10f if not -no_dsp)");
                     run("ql_dsp_simd                   ", "(for qlf_k6n10f if not -no_dsp)");
                     run("techmap -map +/quicklogic/" + family + "/dsp_final_map.v", "(for qlf_k6n10f if not -no_dsp)");
                     run("ql_dsp_io_regs");
                 } else if (!nodsp) {
 
                     run("wreduce t:$mul");
-                    run("ql_dsp_macc");
+                    run("ql_dsp_macc" + use_dsp_cfg_params);
 
                     for (const auto &rule : dsp_rules) {
                         run(stringf("techmap -map +/mul2dsp.v "
@@ -316,7 +334,10 @@ struct SynthQuickLogicPass : public ScriptPass {
                                     rule.a_maxwidth, rule.b_maxwidth, rule.a_minwidth, rule.b_minwidth, rule.type.c_str()));
                         run("chtype -set $mul t:$__soft_mul");
                     }
-                    run("techmap -map +/quicklogic/" + family + "/dsp_map.v");
+                    if (use_dsp_cfg_params == "")
+                        run("techmap -map +/quicklogic/" + family + "/dsp_map.v -D USE_DSP_CFG_PARAMS=0");
+                    else
+                        run("techmap -map +/quicklogic/" + family + "/dsp_map.v -D USE_DSP_CFG_PARAMS=1");
                     run("ql_dsp_simd");
                     run("techmap -map +/quicklogic/" + family + "/dsp_final_map.v");
                     run("ql_dsp_io_regs");
