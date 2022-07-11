@@ -70,6 +70,19 @@ if version is None:
 sf = "symbiflow"
 shwrappers = "f4pga.wrappers.sh.__init__"
 
+aux_files = []
+
+
+def get_aux_files(root: Path, cur_dir: Path):
+    for e in cur_dir.iterdir():
+        if e.is_file():
+            aux_files.append(str(e.relative_to(root)))
+        elif e.is_dir():
+            get_aux_files(root, e)
+
+
+get_aux_files(packagePath, packagePath / "aux")
+
 
 setuptools_setup(
     name=packagePath.name,
@@ -80,6 +93,7 @@ setuptools_setup(
     url="https://github.com/chipsalliance/f4pga",
     package_dir={"f4pga": "."},
     package_data={
+        "f4pga": aux_files,
         "f4pga.flows": ["*.yml"],
         "f4pga.wrappers.sh": [
             "xc7/*.f4pga.sh",

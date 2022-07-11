@@ -61,7 +61,7 @@ xc7a50t: &xc7
     synth:
       module: 'common:yosys'
       params:
-        tcl_script: '${devDir}/scripts/xc7/synth.tcl'
+        tcl_script: '${auxDir}/tool_data/yosys/scripts/vendor/xilinx/xc7/synth.tcl'
       values:
         yosys_plugins: []
         use_roi: 'FALSE'
@@ -83,7 +83,7 @@ xc7a50t: &xc7
     make_eblif:
         module: 'common:yosys'
         params:
-          tcl_script: '${devDir}/scripts/xc7/conv.tcl'
+          tcl_script: '${auxDir}/tool_data/yosys/scripts/vendor/xilinx/xc7/conv.tcl'
         values:
           use_lut_constants: 'FALSE'
     pack:

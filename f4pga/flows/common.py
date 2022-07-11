@@ -30,6 +30,7 @@ from f4pga.context import FPGA_FAM, F4PGA_SHARE_DIR
 
 bin_dir_path = str(Path(sys_argv[0]).resolve().parent.parent)
 share_dir_path = str(F4PGA_SHARE_DIR)
+aux_dir_path = str(Path(__file__).resolve().parent.parent / "aux")
 
 
 class F4PGAException(Exception):

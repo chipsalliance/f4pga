@@ -59,19 +59,3 @@ proc clean_processes {} {
     proc_memwr
     proc_clean
 }
-
-proc noext { varref } {
-    # Extension is striped by the f4pga python tool. This code just modifies
-    # variable refernces to inform f4pga that it should strip the extension.
-    regsub -all {\${([A-Za-z_:]*)}} $varref {${\1[noext]}} varref_noext
-    return $varref_noext
-}
-
-proc contains { l e } {
-    foreach entry [split l " "] {
-        if { $entry == $e } {
-            return true
-        }
-    }
-    return false
-}

@@ -29,6 +29,7 @@ from f4pga.context import FPGA_FAM
 from f4pga.flows.common import (
     bin_dir_path,
     share_dir_path,
+    aux_dir_path,
     F4PGAException,
     ResolutionEnv,
     fatal,
@@ -121,7 +122,7 @@ def f4pga_done():
 def setup_resolution_env():
     """Sets up a ResolutionEnv with default built-ins."""
 
-    r_env = ResolutionEnv({"shareDir": share_dir_path, "binDir": bin_dir_path})
+    r_env = ResolutionEnv({"shareDir": share_dir_path, "binDir": bin_dir_path, "auxDir": aux_dir_path})
 
     def _noisy_warnings():
         """

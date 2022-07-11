@@ -23,8 +23,11 @@ MYDIR=`dirname $MYPATH`
 
 source ${MYDIR}/../common.f4pga.sh
 
-F4PGA_EXEC_PATH=${UTILS_PATH}/f4pga_exec.tcl
-SYNTH_TCL_PATH=${UTILS_PATH}/xc7/synth.tcl
+F4PGA_AUX_PATH=`realpath ${MYDIR}/../../../aux`
+F4PGA_EXEC_TCL_PATH=${F4PGA_AUX_PATH}/tool_data/yosys/scripts/common/f4pga_exec.tcl
+F4PGA_COMMON_TCL_PATH=${F4PGA_AUX_PATH}/tool_data/yosys/scripts/common/common.tcl
+SYNTH_TCL_PATH=${F4PGA_AUX_PATH}/tool_data/yosys/scripts/vendor/xilinx/xc7/synth.tcl
+CONV_TCL_PATH=${F4PGA_AUX_PATH}/tool_data/yosys/scripts/vendor/xilinx/xc7/conv.tcl
 
 VERILOG_FILES=()
 XDC_FILES=()
@@ -104,7 +107,7 @@ fi
 # Create temporary directory for temporary files used by yosys Tcl script.
 TMP_DIR=`make_tmp_dir 16 yosys_tmp_legacy_`
 
-# Emulate inputs from f4pga
+# Emulate inputs from f4pga. See the yosys module for the context.
 export VAL_top=${TOP}
 export VAL_use_roi="FALSE"
 export VAL_part_name=$PART
@@ -133,12 +136,12 @@ LOG=${TOP}_synth.log
 
 set +e
 
-TCL="tcl ${F4PGA_EXEC_PATH}; tcl ${SYNTH_TCL_PATH}"
+CMDS="tcl ${F4PGA_EXEC_TCL_PATH}; tcl ${F4PGA_COMMON_TCL_PATH}; tcl ${SYNTH_TCL_PATH}"
 
 if [ -z "$SURELOG_CMD" ]; then
-  yosys -p "${TCL}" -l $LOG
+  yosys -p "${CMDS}" -l $LOG
 else
-  yosys -p "plugin -i uhdm; ${TCL}" -l $LOG
+  yosys -p "plugin -i uhdm; ${CMDS}" -l $LOG
 fi
 
 rm -rf $TMP_DIR
@@ -151,4 +154,4 @@ fi
 set -e
 
 python3 -m f4pga.utils.split_inouts -i ${DEP_json} -o ${DEP_synth_json}
-yosys -p "tcl ${F4PGA_EXEC_PATH}; tcl $(python3 -m f4pga.wrappers.tcl conv)"
+yosys -p "tcl ${F4PGA_EXEC_TCL_PATH}; tcl ${F4PGA_COMMON_TCL_PATH}; tcl ${CONV_TCL_PATH}"

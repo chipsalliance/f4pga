@@ -213,7 +213,7 @@ class YosysScriptMeta:
 
         self.build_tcl_f4pga_cmd = _build_tcl_f4pga_cmd
 
-    def interrogate_tcl_script(self, script_path: str):
+    def interrogate_tcl_script(self, *script_paths: str):
         """
         Run the yosys TCL script with fake implementations of yosys commands
         in order to discover its I/O.
@@ -228,7 +228,8 @@ class YosysScriptMeta:
             tcl.createcommand("f4pga", self.build_tcl_f4pga_cmd(tcl, tf))
 
             try:
-                tcl.evalfile(script_path)
+                for path in script_paths:
+                    tcl.evalfile(path)
             except tkinter.TclError as e:
                 # tkinter discards exceptions thrown by commands implemented in
                 # python. To recover those exceptions we store them early in
@@ -273,6 +274,9 @@ class YosysScriptMeta:
 
 class YosysModule(Module):
     extra_products: "list[str]"
+    yosys_meta: YosysScriptMeta
+    tcl_script_path: str
+    common_script_dir: Path
 
     def map_io(self, ctx: ModuleContext):
         mapping = {}
@@ -282,8 +286,9 @@ class YosysModule(Module):
         return mapping
 
     def execute(self, ctx: ModuleContext):
-        dev_dir = ctx.r_env.resolve("${devDir}")
-        cmd = f"tcl {dev_dir}/scripts/f4pga_exec.tcl; tcl {self.tcl_script_path}"
+        f4pga_tcl = str(self.common_script_dir / "f4pga_exec.tcl")
+        common_tcl = str(self.common_script_dir / "common.tcl")
+        cmd = f"tcl {f4pga_tcl}; tcl {common_tcl}; tcl {self.tcl_script_path}"
         with yosys_temp_files(self.yosys_meta.tempfiles) as tf:
             extra_opts = []
 
@@ -313,9 +318,10 @@ class YosysModule(Module):
         self.no_of_phases = 1
 
         self.tcl_script_path = r_env.resolve(param_require("tcl_script"))
+        self.common_script_dir = Path(r_env.values.get("auxDir")).joinpath("tool_data/yosys/scripts/common")
 
         self.yosys_meta = YosysScriptMeta(r_env)
-        self.yosys_meta.interrogate_tcl_script(self.tcl_script_path)
+        self.yosys_meta.interrogate_tcl_script(str(self.common_script_dir.joinpath("common.tcl")), self.tcl_script_path)
 
         self.takes = list(self.yosys_meta.inputs)
         self.produces = [f"yosys_{self.name}_log!"] + list(self.yosys_meta.outputs.keys())

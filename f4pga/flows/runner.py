@@ -66,18 +66,21 @@ def get_module(path: str):
     mod = import_module_from_path(path)
     preloaded_modules[path] = mod
 
-    # All F4PGA modules should expose a `ModuleClass` type/alias which is a class implementing a Module interface
+    # All F4PGA modules should expose a `ModuleClass` type/alias which is a class
+    # implementing a Module interface
     return mod.ModuleClass
 
 
 class ModRunCtx:
     share: str
     bin: str
+    aux: str
     config: "dict[str, ]"
 
-    def __init__(self, share: str, bin: str, config: "dict[str, ]"):
+    def __init__(self, share: str, bin: str, aux: str, config: "dict[str, ]"):
         self.share = share
         self.bin = bin
+        self.aux = aux
         self.config = config
 
     def make_r_env(self):
@@ -107,7 +110,7 @@ def module_io(module: Module):
 
 def module_map(module: Module, ctx: ModRunCtx):
     try:
-        mod_ctx = ModuleContext(module, ctx.config, ctx.make_r_env(), ctx.share, ctx.bin)
+        mod_ctx = ModuleContext(module, ctx.config, ctx.make_r_env(), ctx.share, ctx.bin, ctx.aux)
     except Exception as e:
         raise ModuleFailException(module.name, "map", e)
 
@@ -116,7 +119,7 @@ def module_map(module: Module, ctx: ModRunCtx):
 
 def module_exec(module: Module, ctx: ModRunCtx):
     try:
-        mod_ctx = ModuleContext(module, ctx.config, ctx.make_r_env(), ctx.share, ctx.bin)
+        mod_ctx = ModuleContext(module, ctx.config, ctx.make_r_env(), ctx.share, ctx.bin, ctx.aux)
     except Exception as e:
         raise ModuleFailException(module.name, "exec", e)
 
