@@ -24,7 +24,7 @@
     "values": {
         "device": "ql-eos-s3",
         "device_alt": "ql-eos-s3_wlcsp",
-        "pinmap": "${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_PD64.csv",
+        "pinmap": "${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_${package}.csv",
         "arch_def": "${shareDir}/arch/ql-eos-s3_wlcsp/arch.timing.xml",
         "rr_graph_lookahead_bin": "${shareDir}/arch/ql-eos-s3_wlcsp/rr_graph_ql-eos-s3_wlcsp.lookahead.bin",
         "rr_graph_real_bin": "${shareDir}/arch/ql-eos-s3_wlcsp/rr_graph_ql-eos-s3_wlcsp.rr_graph.real.bin",
@@ -78,7 +78,7 @@
                     "TECHMAP_PATH": "${shareDir}/techmaps/pp3",
                     "DEVICE_CELLS_SIM": "${shareDir}/arch/ql-eos-s3_wlcsp/cells/ram_sim.v",
                     "DEVICE_CELLS_MAP": "${shareDir}/arch/ql-eos-s3_wlcsp/cells/ram_map.v",
-                    "PINMAP_FILE": "${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_PD64.csv",
+                    "PINMAP_FILE": "${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_${package}.csv",
                     "PCF_FILE": "${:pcf}",
                     "PYTHON3": "${python3}",
                     "UTILS_PATH": "${binDir}/python"
@@ -111,7 +111,7 @@
             "values": {
                 "device": "ql-eos-s3",
                 "device_alt": "ql-eos-s3_wlcsp",
-                "pinmap": "${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_PD64.csv",
+                "pinmap": "${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_${package}.csv",
                 "arch_def": "${shareDir}/arch/ql-eos-s3_wlcsp/arch.timing.xml",
                 "rr_graph_lookahead_bin": "${shareDir}/arch/ql-eos-s3_wlcsp/rr_graph_ql-eos-s3_wlcsp.lookahead.bin",
                 "rr_graph_real_bin": "${shareDir}/arch/ql-eos-s3_wlcsp/rr_graph_ql-eos-s3_wlcsp.rr_graph.real.bin",
@@ -157,7 +157,7 @@
                     "blif": "${:eblif}",
                     "net": "${:net}",
                     "pcf": "${:pcf}",
-                    "map": "${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_PD64.csv",
+                    "map": "${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_${package}.csv",
                     "$PYTHONPATH": "${binDir}/python/"
                 }
             }
@@ -175,7 +175,7 @@
                 },
                 "inputs": {
                     "blif": "${:eblif}",
-                    "map": "${shareDir}/arch/ql-eos-s3_wlcsp/clkmap_PD64.csv",
+                    "map": "${shareDir}/arch/ql-eos-s3_wlcsp/clkmap_${package}.csv",
                     "i": "${:io_place}",
                     "$PYTHONPATH": "${binDir}/python/"
                 }
@@ -195,7 +195,7 @@
                 "inputs": {
                     "eblif": "${:eblif}",
                     "pcf": "${:pcf}",
-                    "map": "${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_PD64.csv",
+                    "map": "${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_${package}.csv",
                     "output-format": "jlink",
                     "$PYTHONPATH": "${binDir}/python/"
                 }
@@ -215,7 +215,7 @@
                 "inputs": {
                     "eblif": "${:eblif}",
                     "pcf": "${:pcf}",
-                    "map": "${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_PD64.csv",
+                    "map": "${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_${package}.csv",
                     "output-format": "openocd",
                     "$PYTHONPATH": "${binDir}/python/"
                 }
@@ -235,7 +235,7 @@
                 "inputs": {
                     "eblif": "${:eblif}",
                     "pcf": "${:pcf}",
-                    "map": "${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_PD64.csv",
+                    "map": "${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_${package}.csv",
                     "output-format": "binary",
                     "$PYTHONPATH": "${binDir}/python/"
                 }
@@ -245,7 +245,7 @@
             "values": {
                 "device": "ql-eos-s3",
                 "device_alt": "ql-eos-s3_wlcsp",
-                "pinmap": "${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_PD64.csv",
+                "pinmap": "${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_${package}.csv",
                 "arch_def": "${shareDir}/arch/ql-eos-s3_wlcsp/arch.timing.xml",
                 "rr_graph_lookahead_bin": "${shareDir}/arch/ql-eos-s3_wlcsp/rr_graph_ql-eos-s3_wlcsp.lookahead.bin",
                 "rr_graph_real_bin": "${shareDir}/arch/ql-eos-s3_wlcsp/rr_graph_ql-eos-s3_wlcsp.rr_graph.real.bin",
@@ -280,7 +280,7 @@
             "values": {
                 "device": "ql-eos-s3",
                 "device_alt": "ql-eos-s3_wlcsp",
-                "pinmap": "${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_PD64.csv",
+                "pinmap": "${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_${package}.csv",
                 "arch_def": "${shareDir}/arch/ql-eos-s3_wlcsp/arch.timing.xml",
                 "rr_graph_lookahead_bin": "${shareDir}/arch/ql-eos-s3_wlcsp/rr_graph_ql-eos-s3_wlcsp.lookahead.bin",
                 "rr_graph_real_bin": "${shareDir}/arch/ql-eos-s3_wlcsp/rr_graph_ql-eos-s3_wlcsp.rr_graph.real.bin",
@@ -455,7 +455,7 @@
                 },
                 "inputs": {
                     "device": "${device}",
-                    "part": "${part_name}",
+                    "part": "${package}",
                     "pcf": "${:pcf}",
                     "bit": "${:bitstream}",
                     "out-verilog": "${:bitstream}.v",

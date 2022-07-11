@@ -20,7 +20,7 @@
         },
         "values": {
             "part": "ql-eos-s3",
-            "part_name": "PD64"
+            "package": "PD64"
         }
     }
 }
