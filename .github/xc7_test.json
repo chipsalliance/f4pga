@@ -7,19 +7,22 @@
         "sources": [
             "counter_test/counter.v"
         ],
-        "synth_log": "synth.log",
-        "pack_log": "pack.log"
+        "yosys_synth_log": "synth.log",
+        "yosys_make_eblif_log": "make_eblif.log",
+        "pack_log": "pack.log",
+        "bitstream": "${build_dir}/${top}.bit"
     },
     "XC7A35TCSG324-1": {
         "default_target": "bitstream",
         "dependencies": {
-            "build_dir": "build",
+            "build_dir": "${build_dir}",
             "xdc": [
                 "counter_test/arty.xdc"
             ]
         },
         "values": {
-            "part": "xc7a35tcpg236-1"
+            "part": "xc7a35tcpg236-1",
+            "build_dir": "build"
         }
     }
 }
