@@ -100,3 +100,18 @@ yosys> write_edif counter.edif
 
 ```
 As a result we get a `counter.edif` file that can be further processed to get the bitstream.
+
+### Parsing multiple files
+When parsing multiple files you can either pass them together to the `read_systemverilog` command
+or read them one by one using `-defer` flag. In the latter case, you will need to call 
+`readsystemverilog -link` after processing all files to elaborate them. An example flow would
+look like below:
+```
+plugin -i systemverilog
+# Read each file separately
+read_systemverilog -defer dut.sv
+read_systemverilog -defer top.sv
+# Finish reading files, elaborate the design
+read_systemverilog -link
+# Continue Yosys flow...
+```

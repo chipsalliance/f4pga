@@ -14,9 +14,12 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-TESTS = counter break_continue
+TESTS = counter \
+		break_continue \
+		separate-compilation
 
 include $(shell pwd)/../../Makefile_test.common
 
 counter_verify = true
 break_continue_verify = $(call diff_test,break_continue,out)
+separate-compilation_verify = true

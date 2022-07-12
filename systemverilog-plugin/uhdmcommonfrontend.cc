@@ -33,7 +33,7 @@ void UhdmCommonFrontend::print_read_options()
     log("        ignore assert() statements");
     log("\n");
     log("    -debug\n");
-    log("        alias for -dump_ast1 -dump_ast2 -dump_vlog1 -dump_vlog2 -yydebug\n");
+    log("        alias for -dump_ast1 -dump_ast2 -dump_vlog1 -dump_vlog2\n");
     log("\n");
     log("    -dump_ast1\n");
     log("        dump abstract syntax tree (before simplification)\n");
@@ -53,9 +53,6 @@ void UhdmCommonFrontend::print_read_options()
     log("    -dump_rtlil\n");
     log("        dump generated RTLIL netlist\n");
     log("\n");
-    log("    -yydebug\n");
-    log("        enable parser debug output\n");
-    log("\n");
     log("    -report [directory]\n");
     log("        write a coverage report for the UHDM file\n");
     log("\n");
@@ -63,6 +60,10 @@ void UhdmCommonFrontend::print_read_options()
     log("        only read the abstract syntax tree and defer actual compilation\n");
     log("        to a later 'hierarchy' command. Useful in cases where the default\n");
     log("        parameters of modules yield invalid or not synthesizable code.\n");
+    log("        Needs to be followed by read_systemverilog -link after reading\n");
+    log("        all files.\n");
+    log("    -link\n");
+    log("        performs linking and elaboration of the files read with -defer\n");
     log("    -parse-only\n");
     log("        this parameter only applies to read_systemverilog command,\n");
     log("        it runs only Surelog to parse design, but doesn't load generated\n");
@@ -97,7 +98,7 @@ void UhdmCommonFrontend::execute(std::istream *&f, std::string filename, std::ve
         } else if (args[i] == "-noassert") {
             this->shared.no_assert = true;
         } else if (args[i] == "-defer") {
-            defer = true;
+            this->shared.defer = true;
         } else if (args[i] == "-dump_ast1") {
             dump_ast1 = true;
         } else if (args[i] == "-dump_ast2") {
@@ -110,15 +111,20 @@ void UhdmCommonFrontend::execute(std::istream *&f, std::string filename, std::ve
             no_dump_ptr = true;
         } else if (args[i] == "-dump_rtlil") {
             dump_rtlil = true;
-        } else if (args[i] == "-yydebug") {
-            this->shared.debug_flag = true;
         } else if (args[i] == "-parse-only") {
             this->shared.parse_only = true;
+        } else if (args[i] == "-link") {
+            this->shared.link = true;
+            // Surelog needs it in the command line to link correctly
+            unhandled_args.push_back(args[i]);
         } else {
             unhandled_args.push_back(args[i]);
         }
     }
-    extra_args(f, filename, args, args.size() - 1);
+    // Yosys gets confused when extra_args are passed with -link or no option
+    // It's done fully by Surelog, so skip it in this case
+    if (!this->shared.link)
+        extra_args(f, filename, args, args.size() - 1);
     // pass only unhandled args to Surelog
     // unhandled args starts with command name,
     // but Surelog expects args[0] to be program name
