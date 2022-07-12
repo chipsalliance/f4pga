@@ -166,7 +166,7 @@ jobs:
           . ./.github/scripts/activate.sh
 
           cd f4pga
-          pip install --use-feature=in-tree-build .
+          pip install .
           cd ..
 
       - name: 🚧 Test f4pga build
@@ -220,7 +220,7 @@ jobs:
           . ./.github/scripts/activate.sh
 
           cd f4pga
-          pip install --use-feature=in-tree-build .
+          pip install .
           cd ..
 
       - name: 🚦 Test Python wrappers
