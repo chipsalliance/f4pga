@@ -19,7 +19,7 @@
 set -e
 
 if [ -z $VPRPATH ]; then
-  export VPRPATH="$F4PGA_ENV_BIN"
+  export VPRPATH="$F4PGA_BIN_DIR"
   export PYTHONPATH=${VPRPATH}/python:${PYTHONPATH}
 fi
 

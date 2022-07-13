@@ -18,7 +18,7 @@
 
 set -e
 
-SHARE_DIR_PATH=${SHARE_DIR_PATH:="$F4PGA_ENV_SHARE"}
+SHARE_DIR_PATH=${SHARE_DIR_PATH:="$F4PGA_SHARE_DIR"}
 
 source $(dirname "$0")/vpr_common.f4pga.sh
 
@@ -361,7 +361,7 @@ else
   PCF_MAKE="\${current_dir}/${BUILDDIR}/${TOP}_dummy.pcf"
 fi
 
-PROCESS_SDC=$(realpath "$F4PGA_ENV_BIN"/python/process_sdc_constraints.py)
+PROCESS_SDC=$(realpath "$F4PGA_BIN_DIR"/python/process_sdc_constraints.py)
 if ! [ -z "$SDC" ]; then
   if ! [ -f "$SOURCE"/$SDC ];then
     echo "The sdc file: $SDC is missing at: $SOURCE"

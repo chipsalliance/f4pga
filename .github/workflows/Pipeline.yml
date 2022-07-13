@@ -110,8 +110,8 @@ jobs:
         run: |
           . ./.github/scripts/activate.sh
 
-          echo "F4PGA_ENV_BIN=$(f4pga-env bin)" >> "$GITHUB_ENV"
-          echo "F4PGA_ENV_SHARE=$(f4pga-env share)" >> "$GITHUB_ENV"
+          echo "F4PGA_BIN_DIR=$(f4pga-env bin)" >> "$GITHUB_ENV"
+          echo "F4PGA_SHARE_DIR=$(f4pga-env share)" >> "$GITHUB_ENV"
 
       - name: 🚧 Test make example
         run: |
