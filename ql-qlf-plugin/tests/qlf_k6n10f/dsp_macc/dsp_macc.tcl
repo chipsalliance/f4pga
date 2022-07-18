@@ -75,6 +75,6 @@ test_dsp_design "macc_simple_clr"           "_MULTACC"
 test_dsp_design "macc_simple_arst"          "_MULTACC"
 test_dsp_design "macc_simple_ena"           "_MULTACC"
 test_dsp_design "macc_simple_arst_clr_ena"  "_MULTACC"
-test_dsp_design "macc_simple_preacc"        "_MULTADD"
-test_dsp_design "macc_simple_preacc_clr"    "_MULTADD"
+test_dsp_design "macc_simple_preacc"        "_MULTACC"
+test_dsp_design "macc_simple_preacc_clr"    "_MULTACC"
 
