@@ -1,6 +1,5 @@
 #include "kernel/sigtools.h"
 #include "kernel/yosys.h"
-#include "kernel/sigtools.h"
 
 USING_YOSYS_NAMESPACE
 PRIVATE_NAMESPACE_BEGIN
@@ -23,10 +22,7 @@ struct QlDspIORegs : public Pass {
 
     // ..........................................
 
-    QlDspIORegs() : Pass(
-        "ql_dsp_io_regs",
-        "Changes types of QL_DSP2/QL_DSP3 depending on their configuration.")
-    {}
+    QlDspIORegs() : Pass("ql_dsp_io_regs", "Changes types of QL_DSP2/QL_DSP3 depending on their configuration.") {}
 
     void help() override
     {
@@ -54,20 +50,21 @@ struct QlDspIORegs : public Pass {
 
     // Returns a pair of mask and value describing constant bit connections of
     // a SigSpec
-    std::pair<uint32_t, uint32_t> get_constant_mask_value (const RTLIL::SigSpec* sigspec) {
+    std::pair<uint32_t, uint32_t> get_constant_mask_value(const RTLIL::SigSpec *sigspec)
+    {
         uint32_t mask = 0L;
         uint32_t value = 0L;
 
         auto sigbits = sigspec->bits();
-        for (ssize_t i=(sigbits.size() - 1); i >= 0; --i) {
+        for (ssize_t i = (sigbits.size() - 1); i >= 0; --i) {
             auto other = m_SigMap(sigbits[i]);
 
-            mask  <<= 1;
+            mask <<= 1;
             value <<= 1;
 
             // A known constant
             if (!other.is_wire() && other.data != RTLIL::Sx) {
-                mask  |= 0x1;
+                mask |= 0x1;
                 value |= (other.data == RTLIL::S1);
             }
         }
@@ -128,8 +125,8 @@ struct QlDspIORegs : public Pass {
                 // Check if feedback is or can be set to 0 which implies MACC
                 auto feedback_con = get_constant_mask_value(feedback);
                 bool have_macc = (feedback_con.second == 0x0);
-                //log("mask=0x%08X value=0x%08X\n", consts.first, consts.second);
-                //log_error("=== END HERE ===\n");
+                // log("mask=0x%08X value=0x%08X\n", consts.first, consts.second);
+                // log_error("=== END HERE ===\n");
 
                 // Build new type name
                 std::string new_type = cell_type;
@@ -148,8 +145,7 @@ struct QlDspIORegs : public Pass {
                     default:
                         break;
                     }
-                }
-                else {
+                } else {
                     switch (out_sel_i) {
                     case 1:
                     case 2:
@@ -164,12 +160,12 @@ struct QlDspIORegs : public Pass {
                 }
 
                 if (reg_in_i) {
-                    del_clk   = false;
+                    del_clk = false;
                     new_type += "_REGIN";
                 }
 
                 if (out_sel_i > 3) {
-                    del_clk   = false;
+                    del_clk = false;
                     new_type += "_REGOUT";
                 }
 
