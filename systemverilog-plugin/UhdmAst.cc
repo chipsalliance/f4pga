@@ -3638,7 +3638,7 @@ void UhdmAst::process_repeat()
         if (node->type != AST::AST_BLOCK) {
             node = new AST::AstNode(AST::AST_BLOCK, node);
         }
-        if (node->str == "") {
+        if (node->str.empty()) {
             node->str = loop->str; // Needed in simplify step
         }
         loop->children.push_back(node);
