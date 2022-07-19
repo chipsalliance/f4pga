@@ -32,7 +32,8 @@ TESTS = \
 	pp3_bram \
 	qlf_k6n10f/dsp_mult \
 	qlf_k6n10f/dsp_simd \
-	qlf_k6n10f/dsp_macc
+	qlf_k6n10f/dsp_macc \
+	qlf_k6n10f/dsp_madd
 #	qlf_k6n10_bram \
 
 SIM_TESTS = \
@@ -73,4 +74,5 @@ pp3_bram_verify = true
 qlf_k6n10f-dsp_mult_verify = true
 qlf_k6n10f-dsp_simd_verify = true
 qlf_k6n10f-dsp_macc_verify = true
+qlf_k6n10f-dsp_madd_verify = true
 #qlf_k6n10_bram_verify = true
