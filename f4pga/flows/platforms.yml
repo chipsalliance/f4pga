@@ -180,6 +180,41 @@ xc7a200t:
     vpr_options: *xc7-vpr_options
 
 
+ice40:
+
+  values:
+    nextpnr_options:
+      hx1k: true
+
+  stages:
+    mk_build_dir:
+      module: 'common:mkdirs'
+      params:
+        build_dir: build/${device}
+    synth:
+      module: 'common:yosys'
+      params:
+        tcl_script: "${auxDir}/tool_data/yosys/scripts/vendor/lattice/ice40/synth.tcl"
+    pnr:
+      module: 'ice40:nextpnr'
+      values:
+        placer: heap
+        router: router1
+    bitstream:
+      module: 'common:generic_script_wrapper'
+      params:
+        stage_name: bitstream
+        script: icepack
+        outputs:
+          bitstream:
+            mode: file
+            file: "${:ice_asm[noext]}.bit"
+            target: "${:ice_asm[noext]}.bit"
+        inputs:
+          "#1": "${:ice_asm}"
+          "#2": "${:ice_asm[noext]}.bit"
+
+
 ql-eos-s3:
 
   values:
