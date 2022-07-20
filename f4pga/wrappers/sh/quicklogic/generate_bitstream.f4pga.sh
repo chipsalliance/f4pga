@@ -18,7 +18,7 @@
 
 set -e
 
-SHARE_DIR_PATH=${SHARE_DIR_PATH:="$F4PGA_ENV_SHARE"}
+SHARE_DIR_PATH=${SHARE_DIR_PATH:="$F4PGA_SHARE_DIR"}
 OPTS=d:f:r:b:P:
 LONGOPTS=device:,fasm:,format:,bit:,part:
 
@@ -57,7 +57,7 @@ if [ -z $BIT ]; then
   exit 1
 fi
 
-DB_ROOT="$F4PGA_ENV_SHARE"/fasm_database/${DEVICE}
+DB_ROOT="$F4PGA_SHARE_DIR"/fasm_database/${DEVICE}
 
 # qlf
 if [[ "$DEVICE" =~ ^(qlf_k4n8.*)$ ]]; then

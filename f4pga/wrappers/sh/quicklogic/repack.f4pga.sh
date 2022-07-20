@@ -19,7 +19,7 @@
 set -e
 
 if [ -z $VPRPATH ]; then
-  export VPRPATH="$F4PGA_ENV_BIN"
+  export VPRPATH="$F4PGA_BIN_DIR"
 fi
 
 source $(dirname "$0")/vpr_common.f4pga.sh
@@ -30,9 +30,9 @@ DESIGN=${EBLIF/.eblif/}
 [ ! -z "${JSON}" ] && JSON_ARGS="--json-constraints ${JSON}" || JSON_ARGS=
 [ ! -z "${PCF_PATH}" ] && PCF_ARGS="--pcf-constraints ${PCF_PATH}" || PCF_ARGS=
 
-export PYTHONPATH=$F4PGA_ENV_BIN/python:$PYTHONPATH
+export PYTHONPATH=$F4PGA_BIN_DIR/python:$PYTHONPATH
 
-`which python3` "$F4PGA_ENV_BIN"/python/repacker/repack.py \
+`which python3` "$F4PGA_BIN_DIR"/python/repacker/repack.py \
   --vpr-arch ${ARCH_DEF} \
   --repacking-rules ${ARCH_DIR}/${DEVICE_1}.repacking_rules.json \
   $JSON_ARGS \
