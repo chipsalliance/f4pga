@@ -129,12 +129,17 @@ class ProjectFlowConfig:
         return _get_ovs_raw('values', self.flow_cfg, part, stage)
 
     def get_stage_value_overrides(self, part: str, stage: str):
+        stage_vals_ovds = {}
+
+        vals = self.flow_cfg.get('values')
+        if vals is not None:
+            stage_vals_ovds.update(vals)
         stage_cfg = self.flow_cfg[part].get(stage)
-        if stage_cfg is None:
-            return {}
-        stage_vals_ovds = stage_cfg.get('values')
-        if stage_vals_ovds is None:
-            return {}
+        if stage_cfg is not None:
+            vals = stage_cfg.get('values')
+            if vals is not None:
+                stage_vals_ovds.update(vals)
+        
         return stage_vals_ovds
 
     def get_dependency_platform_overrides(self, part: str):
