@@ -28,7 +28,7 @@ ROOT = Path(__file__).resolve().parent
 ARCHS = {"xc7": ["artix7", "artix7_100t", "artix7_200t", "zynq7", "zynq7_z020", "spartan7"], "eos-s3": ["ql-s3", "pp3"]}
 
 
-def get_script_path(arch=None):
+def get_script_path(arch=None, pnrtool="vpr"):
     if arch is None:
         arch = FPGA_FAM
     for key, val in ARCHS.items():
@@ -37,4 +37,5 @@ def get_script_path(arch=None):
             break
     if arch not in ["xc7", "eos-s3", "qlf_k4n8", "ice40"]:
         raise (Exception(f"Unsupported arch <{arch}>!"))
-    return ROOT / f"{arch}.f4pga.tcl"
+    suffix = f".{pnrtool}" if arch == "ice40" else ""
+    return ROOT / f"{arch}{suffix}.f4pga.tcl"

@@ -1,0 +1,20 @@
+{
+    "default_part": "ICE40UP5K-UWG30",
+    "values": {
+        "top": "top"
+    },
+    "dependencies": {
+        "sources": [
+            "blink.v"
+        ],
+        "synth_log": "synth.log",
+        "nextpnr_log": "nextpnr.log"
+    },
+    "ICE40UP5K-UWG30": {
+        "default_target": "bitstream",
+        "dependencies": {
+            "build_dir": "build",
+            "pcf": "../../../pcf/fomu-pvt.pcf"
+        }
+    }
+}

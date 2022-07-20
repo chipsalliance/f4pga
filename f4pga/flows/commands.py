@@ -17,6 +17,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+from sys import exit as sys_exit
 from typing import Iterable
 from pathlib import Path
 from os import environ
@@ -115,7 +116,7 @@ def f4pga_fail():
 
 def f4pga_done():
     sfprint(1, f"f4pga: {f4pga_done_str}" f"{Style.RESET_ALL + Fore.RESET}")
-    exit(0)
+    sys_exit(0 if "FAILED" not in f4pga_done_str else 1)
 
 
 def setup_resolution_env():
