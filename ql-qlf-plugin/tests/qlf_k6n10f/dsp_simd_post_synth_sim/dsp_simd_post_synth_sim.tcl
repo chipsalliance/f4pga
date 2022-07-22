@@ -24,7 +24,7 @@ opt_expr -undriven
 opt_clean
 stat
 write_verilog sim/simd_mult_explicit_ports_post_synth.v
-select -assert-count 1 t:QL_DSP2_MULT_REGIN
+select -assert-count 1 t:QL_DSP2
 
 select -clear
 design -load dsp_simd
@@ -35,4 +35,4 @@ opt_expr -undriven
 opt_clean
 stat
 write_verilog sim/simd_mult_explicit_params_post_synth.v
-select -assert-count 1 t:QL_DSP3_MULT_REGIN
+select -assert-count 1 t:QL_DSP3
