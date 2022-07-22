@@ -82,6 +82,15 @@ struct QlDspIORegs : public Pass {
             std::string cell_type = cell.second->type.str();
             if (cell_type == RTLIL::escape_id("QL_DSP2") || cell_type == RTLIL::escape_id("QL_DSP3")) {
                 auto dsp = cell.second;
+
+                // If the cell does not have the "is_inferred" attribute set
+                // then don't touch it.
+                if (!dsp->has_attribute(RTLIL::escape_id("is_inferred")) ||
+                     dsp->get_bool_attribute(RTLIL::escape_id("is_inferred")) == false)
+                {
+                    continue;
+                }
+
                 bool del_clk = true;
                 bool use_dsp_cfg_params = (cell_type == RTLIL::escape_id("QL_DSP3"));
 

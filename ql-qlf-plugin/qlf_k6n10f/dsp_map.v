@@ -34,6 +34,7 @@ module \$__QL_MUL20X18 (input [19:0] A, input [17:0] B, output [37:0] Y);
                             {{(18 - B_WIDTH){1'b0}},         B};
 
     generate if (`USE_DSP_CFG_PARAMS == 0) begin
+        (* is_inferred=1 *)
         dsp_t1_20x18x64_cfg_ports _TECHMAP_REPLACE_ (
             .a_i                (a),
             .b_i                (b),
@@ -53,6 +54,7 @@ module \$__QL_MUL20X18 (input [19:0] A, input [17:0] B, output [37:0] Y);
             .register_inputs_i  (1'b0)
         );
     end else begin
+        (* is_inferred=1 *)
         dsp_t1_20x18x64_cfg_params #(
             .OUTPUT_SELECT      (3'd0),
             .SATURATE_ENABLE    (1'b0),
@@ -98,6 +100,7 @@ module \$__QL_MUL10X9 (input [9:0] A, input [8:0] B, output [18:0] Y);
                             {{( 9 - B_WIDTH){1'b0}},         B};
 
     generate if (`USE_DSP_CFG_PARAMS == 0) begin
+        (* is_inferred=1 *)
         dsp_t1_10x9x32_cfg_ports _TECHMAP_REPLACE_ (
             .a_i                (a),
             .b_i                (b),
@@ -117,6 +120,7 @@ module \$__QL_MUL10X9 (input [9:0] A, input [8:0] B, output [18:0] Y);
             .register_inputs_i  (1'b0)
         );
     end else begin
+        (* is_inferred=1 *)
         dsp_t1_10x9x32_cfg_params #(
             .OUTPUT_SELECT      (3'd0),
             .SATURATE_ENABLE    (1'b0),
