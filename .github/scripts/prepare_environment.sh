@@ -88,14 +88,10 @@ case "$FPGA_FAM" in
 
     sed -i 's#${MYPATH}/../share#'"$(./f4pga-env share)"'#' vpr_common
     rm -vrf \
-      symbiflow_pack \
-      symbiflow_place \
-      symbiflow_route \
-      symbiflow_write_fasm \
-      symbiflow_analysis \
-      symbiflow_repack \
-      symbiflow_generate_bitstream \
-      symbiflow_generate_libfile
+      symbiflow_* \
+      vpr_common \
+      ql_symbiflow \
+      env
     echo '::endgroup::'
     ls -lah
   ;;
