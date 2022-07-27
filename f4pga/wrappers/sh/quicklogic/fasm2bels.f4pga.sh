@@ -71,7 +71,7 @@ fi
 if [[ "$DEVICE" =~ ^(ql-eos-s3|ql-pp3e)$ ]]; then
 
     VPR_DB=`readlink -f ${SHARE_DIR_PATH}/arch/${DEVICE}_wlcsp/db_phy.pickle`
-    FASM2BELS=`readlink -f ${BIN_DIR_PATH}/python/fasm2bels.py`
+    FASM2BELS=`readlink -f ${SHARE_DIR_PATH}/scripts/fasm2bels.py`
     FASM2BELS_DEVICE=${DEVICE/ql-/}
     VERILOG_FILE="${BIT}.v"
     PCF_FILE="${BIT}.v.pcf"
