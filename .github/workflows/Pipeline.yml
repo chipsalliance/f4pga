@@ -123,7 +123,12 @@ jobs:
         if: matrix.flow == 'F4PGA'
         run: |
           . ./.github/scripts/activate.sh
+
+          echo '::group::Clone f4pga-examples'
+          git clone --recurse-submodules https://github.com/chipsalliance/f4pga-examples
           cd f4pga-examples
+          echo '::endgroup::'
+
           f4pga -vv build --flow ../.github/${{ matrix.fam }}_test.json
 
       - name: '📤 Upload artifact: ${{ matrix.fam }} bitstream'
@@ -151,7 +156,11 @@ jobs:
 
           export VPRPATH=$(f4pga-env bin)
 
+          echo '::group::Clone f4pga-examples'
+          git clone --recurse-submodules https://github.com/chipsalliance/f4pga-examples
           cd f4pga-examples
+          echo '::endgroup::'
+
           cd ${{ matrix.fam }}
 
           export F4PGA_USE_DEPRECATED=true

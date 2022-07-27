@@ -23,13 +23,6 @@ sudo apt update -y
 sudo apt install -y git wget xz-utils
 echo '::endgroup::'
 
-
-echo '::group::Clone f4pga-examples'
-git clone --recurse-submodules https://github.com/chipsalliance/f4pga-examples
-cd f4pga-examples
-echo '::endgroup::'
-
-
 FPGA_FAM=${FPGA_FAM:=xc7}
 
 echo '::group::Install Miniconda3'
@@ -43,7 +36,7 @@ echo '::endgroup::'
 
 
 echo '::group::Create environment'
-conda env create -f "$FPGA_FAM"/environment.yml
+conda env create -f test/envs/"$FPGA_FAM"/environment.yml
 echo '::endgroup::'
 
 
@@ -54,21 +47,18 @@ case "$FPGA_FAM" in
     F4PGA_TIMESTAMP='20220729-181657'
     F4PGA_HASH='7833050'
     for PKG in install-xc7 xc7a50t_test; do
-      wget -qO- https://storage.googleapis.com/symbiflow-arch-defs/artifacts/prod/foss-fpga-tools/symbiflow-arch-defs/continuous/install/${F4PGA_TIMESTAMP}/symbiflow-arch-defs-${PKG}-${F4PGA_HASH}.tar.xz | tar -xJC $F4PGA_INSTALL_DIR/$FPGA_FAM/install
+      wget -qO- https://storage.googleapis.com/symbiflow-arch-defs/artifacts/prod/foss-fpga-tools/symbiflow-arch-defs/continuous/install/${F4PGA_TIMESTAMP}/symbiflow-arch-defs-${PKG}-${F4PGA_HASH}.tar.xz | tar -xJC $F4PGA_INSTALL_DIR_FAM/install
     done
   ;;
   eos-s3)
     F4PGA_TIMESTAMP='20220729-181657'
     F4PGA_HASH='7833050'
     for PKG in install-ql ql-eos-s3_wlcsp; do
-      wget -qO- https://storage.googleapis.com/symbiflow-arch-defs/artifacts/prod/foss-fpga-tools/symbiflow-arch-defs/continuous/install/${F4PGA_TIMESTAMP}/symbiflow-arch-defs-${PKG}-${F4PGA_HASH}.tar.xz | tar -xJC $F4PGA_INSTALL_DIR/$FPGA_FAM/install
+      wget -qO- https://storage.googleapis.com/symbiflow-arch-defs/artifacts/prod/foss-fpga-tools/symbiflow-arch-defs/continuous/install/${F4PGA_TIMESTAMP}/symbiflow-arch-defs-${PKG}-${F4PGA_HASH}.tar.xz | tar -xJC $F4PGA_INSTALL_DIR_FAM/install
     done
   ;;
 esac
 echo '::endgroup::'
-
-
-cd ..
 
 
 echo '::group::Add f4pga-env'
