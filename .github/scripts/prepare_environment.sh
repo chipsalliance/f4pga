@@ -51,8 +51,11 @@ echo '::group::Install arch-defs'
 case "$FPGA_FAM" in
   xc7)
     mkdir -p "$F4PGA_INSTALL_DIR_FAM"/install
-    wget -qO- https://storage.googleapis.com/symbiflow-arch-defs/artifacts/prod/foss-fpga-tools/symbiflow-arch-defs/continuous/install/535/20220128-000432/symbiflow-arch-defs-install-5fa5e715.tar.xz | tar -xJC $F4PGA_INSTALL_DIR/xc7/install
-    wget -qO- https://storage.googleapis.com/symbiflow-arch-defs/artifacts/prod/foss-fpga-tools/symbiflow-arch-defs/continuous/install/535/20220128-000432/symbiflow-arch-defs-xc7a50t_test-5fa5e715.tar.xz | tar -xJC $F4PGA_INSTALL_DIR/xc7/install
+    F4PGA_TIMESTAMP='20220714-173445'
+    F4PGA_HASH='f7afc12'
+    for PKG in install xc7a50t_test; do
+      wget -qO- https://storage.googleapis.com/symbiflow-arch-defs/artifacts/prod/foss-fpga-tools/symbiflow-arch-defs/continuous/install/${F4PGA_TIMESTAMP}/symbiflow-arch-defs-${PKG}-${F4PGA_HASH}.tar.xz | tar -xJC $F4PGA_INSTALL_DIR/xc7/install
+    done
   ;;
   eos-s3)
     wget -qO- https://storage.googleapis.com/symbiflow-arch-defs-install/quicklogic-arch-defs-qlf-fc5d8da.tar.gz | tar -xz -C $F4PGA_INSTALL_DIR_FAM
@@ -65,35 +68,24 @@ cd ..
 
 
 echo '::group::Add f4pga-env'
-
 case "$FPGA_FAM" in
   xc7) F4PGA_DIR_ROOT='install';;
   eos-s3) F4PGA_DIR_ROOT='quicklogic-arch-defs';;
 esac
-
 F4PGA_DIR_BIN="$F4PGA_INSTALL_DIR_FAM/$F4PGA_DIR_ROOT"/bin/
+mkdir -p "$F4PGA_DIR_BIN"
 cp $(dirname "$0")/../../f4pga-env "$F4PGA_DIR_BIN"
-
 echo '::endgroup::'
 
-echo '::group::🗑️ Remove the wrappers (pre-packaged from arch-defs)'
 
 cd "$F4PGA_DIR_BIN"
+ls -lah
+
 
 case "$FPGA_FAM" in
-  xc7)
-    rm -vrf \
-      env \
-      symbiflow_generate_constraints \
-      symbiflow_pack \
-      symbiflow_place \
-      symbiflow_route \
-      symbiflow_synth \
-      symbiflow_write_bitstream \
-      symbiflow_write_fasm \
-      vpr_common
-  ;;
   eos-s3)
+    echo '::group::🗑️ Remove the wrappers (pre-packaged from arch-defs)'
+
     sed -i 's#${MYPATH}/../share#'"$(./f4pga-env share)"'#' vpr_common
     rm -vrf \
       symbiflow_pack \
@@ -104,9 +96,7 @@ case "$FPGA_FAM" in
       symbiflow_repack \
       symbiflow_generate_bitstream \
       symbiflow_generate_libfile
+    echo '::endgroup::'
+    ls -lah
   ;;
 esac
-
-ls -lah
-
-echo '::endgroup::'
