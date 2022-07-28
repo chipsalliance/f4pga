@@ -135,7 +135,7 @@ export OUT_SYNTH_V=${TOP}_synth.v
 export OUT_EBLIF=${TOP}.eblif
 export OUT_FASM_EXTRA=${TOP}_fasm_extra.fasm
 export PYTHON3=$(which python3)
-export UTILS_PATH=${VPRPATH}/python/
+export UTILS_PATH=${SHARE_DIR_PATH}/scripts
 
 if [ -s $PCF ]; then
     export PCF_FILE=$PCF
