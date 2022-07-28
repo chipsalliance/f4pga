@@ -68,10 +68,9 @@ cd ..
 
 
 echo '::group::Add f4pga-env'
-case "$FPGA_FAM" in
-  xc7) F4PGA_DIR_ROOT='install';;
-  eos-s3) F4PGA_DIR_ROOT='quicklogic-arch-defs';;
-esac
+
+F4PGA_DIR_ROOT='install'
+
 F4PGA_DIR_BIN="$F4PGA_INSTALL_DIR_FAM/$F4PGA_DIR_ROOT"/bin/
 mkdir -p "$F4PGA_DIR_BIN"
 cp $(dirname "$0")/../../f4pga-env "$F4PGA_DIR_BIN"
