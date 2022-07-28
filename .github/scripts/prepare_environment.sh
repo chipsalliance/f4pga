@@ -80,18 +80,3 @@ echo '::endgroup::'
 cd "$F4PGA_DIR_BIN"
 ls -lah
 
-
-case "$FPGA_FAM" in
-  eos-s3)
-    echo '::group::🗑️ Remove the wrappers (pre-packaged from arch-defs)'
-
-    sed -i 's#${MYPATH}/../share#'"$(./f4pga-env share)"'#' vpr_common
-    rm -vrf \
-      symbiflow_* \
-      vpr_common \
-      ql_symbiflow \
-      env
-    echo '::endgroup::'
-    ls -lah
-  ;;
-esac
