@@ -17,6 +17,10 @@ The scope of Python F4PGA is threefold:
   Therefore, it's still a *pre-alpha* and the codebase, commands and flows are subject to change.
   It is strongly suggested not to rely on Python F4PGA until this note is updated/removed.
 
+.. toctree::
+
+  README
+
 References
 ==========
 
