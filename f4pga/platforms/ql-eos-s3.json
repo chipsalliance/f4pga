@@ -81,7 +81,7 @@
                     "PINMAP_FILE": "${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_${package}.csv",
                     "PCF_FILE": "${:pcf}",
                     "PYTHON3": "${python3}",
-                    "UTILS_PATH": "${binDir}/python"
+                    "UTILS_PATH": "${shareDir}/scripts"
                 }
             }
         },
@@ -89,7 +89,7 @@
             "params": {
                 "stage_name": "prepare_sdc",
                 "interpreter": "${python3}",
-                "script": "${binDir}/python/process_sdc_constraints.py",
+                "script": "${shareDir}/scripts/process_sdc_constraints.py",
                 "outputs": {
                     "sdc": {
                         "mode": "file",
@@ -103,7 +103,7 @@
                     "sdc-out": "${:eblif[noext]}.sdc",
                     "pcf": "${:pcf}",
                     "pin-map": "",
-                    "$PYTHONPATH": "${binDir}/python/"
+                    "$PYTHONPATH": "${shareDir}/scripts/"
                 }
             }
         },
@@ -146,7 +146,7 @@
             "params": {
                 "stage_name": "ioplace",
                 "interpreter": "${python3}",
-                "script": "${binDir}/python/pp3_create_ioplace.py",
+                "script": "${shareDir}/scripts/pp3_create_ioplace.py",
                 "outputs": {
                     "io_place": {
                         "mode": "stdout",
@@ -158,7 +158,7 @@
                     "net": "${:net}",
                     "pcf": "${:pcf}",
                     "map": "${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_${package}.csv",
-                    "$PYTHONPATH": "${binDir}/python/"
+                    "$PYTHONPATH": "${shareDir}/scripts/"
                 }
             }
         },
@@ -166,7 +166,7 @@
             "params": {
                 "stage_name": "place_constraints",
                 "interpreter": "${python3}",
-                "script": "${binDir}/python/pp3_create_place_constraints.py",
+                "script": "${shareDir}/scripts/pp3_create_place_constraints.py",
                 "outputs": {
                     "place_constraints": {
                         "mode": "stdout",
@@ -177,7 +177,7 @@
                     "blif": "${:eblif}",
                     "map": "${shareDir}/arch/ql-eos-s3_wlcsp/clkmap_${package}.csv",
                     "i": "${:io_place}",
-                    "$PYTHONPATH": "${binDir}/python/"
+                    "$PYTHONPATH": "${shareDir}/scripts/"
                 }
             }
         },
@@ -185,7 +185,7 @@
             "params": {
                 "stage_name": "iomux_jlink",
                 "interpreter": "${python3}",
-                "script": "${binDir}/python/pp3_eos_s3_iomux_config.py",
+                "script": "${shareDir}/scripts/pp3_eos_s3_iomux_config.py",
                 "outputs": {
                     "iomux_jlink": {
                         "mode": "stdout",
@@ -197,7 +197,7 @@
                     "pcf": "${:pcf}",
                     "map": "${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_${package}.csv",
                     "output-format": "jlink",
-                    "$PYTHONPATH": "${binDir}/python/"
+                    "$PYTHONPATH": "${shareDir}/scripts/"
                 }
             }
         },
@@ -205,7 +205,7 @@
             "params": {
                 "stage_name": "iomux_openocd",
                 "interpreter": "${python3}",
-                "script": "${binDir}/python/pp3_eos_s3_iomux_config.py",
+                "script": "${shareDir}/scripts/pp3_eos_s3_iomux_config.py",
                 "outputs": {
                     "iomux_openocd": {
                         "mode": "stdout",
@@ -217,7 +217,7 @@
                     "pcf": "${:pcf}",
                     "map": "${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_${package}.csv",
                     "output-format": "openocd",
-                    "$PYTHONPATH": "${binDir}/python/"
+                    "$PYTHONPATH": "${shareDir}/scripts/"
                 }
             }
         },
@@ -225,7 +225,7 @@
             "params": {
                 "stage_name": "iomux_binary",
                 "interpreter": "${python3}",
-                "script": "${binDir}/python/pp3_eos_s3_iomux_config.py",
+                "script": "${shareDir}/scripts/pp3_eos_s3_iomux_config.py",
                 "outputs": {
                     "iomux_binary": {
                         "mode": "stdout",
@@ -237,7 +237,7 @@
                     "pcf": "${:pcf}",
                     "map": "${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_${package}.csv",
                     "output-format": "binary",
-                    "$PYTHONPATH": "${binDir}/python/"
+                    "$PYTHONPATH": "${shareDir}/scripts/"
                 }
             }
         },
