@@ -598,6 +598,8 @@ static AST::AstNode *convert_dot(AST::AstNode *wire_node, AST::AstNode *node, AS
 static void setup_current_scope(std::unordered_map<std::string, AST::AstNode *> top_nodes, AST::AstNode *current_top_node)
 {
     for (auto it = top_nodes.begin(); it != top_nodes.end(); it++) {
+        if (!it->second)
+            continue;
         if (it->second->type == AST::AST_PACKAGE) {
             for (auto &o : it->second->children) {
                 // import only parameters
@@ -1527,7 +1529,7 @@ void UhdmAst::process_design()
         }
     }
     // Once we walked everything, unroll that as children of this node
-    for (auto pair : shared.top_nodes) {
+    for (auto &pair : shared.top_nodes) {
         if (!pair.second)
             continue;
         if (!pair.second->get_bool_attribute(UhdmAst::partial())) {
@@ -1542,7 +1544,10 @@ void UhdmAst::process_design()
             }
         } else {
             log_warning("Removing unused module: %s from the design.\n", pair.second->str.c_str());
+            // TODO: This should be properly erased from the module, but it seems that it's
+            // needed to resolve scope
             delete pair.second;
+            pair.second = nullptr;
         }
     }
 }
