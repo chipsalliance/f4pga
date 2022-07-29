@@ -49,7 +49,7 @@ if [[ "$DEVICE" =~ ^(qlf_.*)$ ]]; then
   fi
 
   PINMAP_XML=`realpath ${SHARE_DIR_PATH}/arch/${DEVICE_1}_${DEVICE_1}/${PINMAPXML}`
-  IOGEN=`realpath ${BIN_DIR_PATH}/python/qlf_k4n8_create_ioplace.py`
+  IOGEN=`realpath ${SHARE_DIR_PATH}/scripts/qlf_k4n8_create_ioplace.py`
 
   ${PYTHON3} ${IOGEN} --pcf $PCF --blif $EBLIF --pinmap_xml $PINMAP_XML --csv_file $PART --net $NET > ${IOPLACE_FILE}
 
@@ -71,8 +71,8 @@ elif [[ "$DEVICE" =~ ^(ql-.*)$ ]]; then
   PINMAP=`realpath ${SHARE_DIR_PATH}/arch/${DEVICE_1}_${DEVICE_2}/${PINMAPCSV}`
   CLKMAP=`realpath ${SHARE_DIR_PATH}/arch/${DEVICE_1}_${DEVICE_2}/${CLKMAPCSV}`
 
-  IOGEN=`realpath ${BIN_DIR_PATH}/python/pp3_create_ioplace.py`
-  PLACEGEN=`realpath ${BIN_DIR_PATH}/python/pp3_create_place_constraints.py`
+  IOGEN=`realpath ${SHARE_DIR_PATH}/scripts/pp3_create_ioplace.py`
+  PLACEGEN=`realpath ${SHARE_DIR_PATH}/scripts/pp3_create_place_constraints.py`
 
   PLACE_FILE="${PROJECT%.*}_constraints.place"
 
@@ -82,7 +82,7 @@ elif [[ "$DEVICE" =~ ^(ql-.*)$ ]]; then
   # EOS-S3 IOMUX configuration
   if [[ "$DEVICE" =~ ^(ql-eos-s3)$ ]]; then
 
-      IOMUXGEN=`realpath ${BIN_DIR_PATH}/python/pp3_eos_s3_iomux_config.py`
+      IOMUXGEN=`realpath ${SHARE_DIR_PATH}/scripts/pp3_eos_s3_iomux_config.py`
 
       IOMUX_JLINK="${PROJECT%.*}_iomux.jlink"
       IOMUX_OPENOCD="${PROJECT%.*}_iomux.openocd"

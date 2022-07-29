@@ -20,8 +20,8 @@ set -e
 
 export SHARE_DIR_PATH=${SHARE_DIR_PATH:="$F4PGA_SHARE_DIR"}
 VPRPATH=${VPRPATH:="$F4PGA_BIN_DIR"}
-SPLIT_INOUTS=`realpath ${VPRPATH}/python/split_inouts.py`
-CONVERT_OPTS=`realpath ${VPRPATH}/python/convert_compile_opts.py`
+SPLIT_INOUTS=`realpath ${SHARE_DIR_PATH}/scripts/split_inouts.py`
+CONVERT_OPTS=`realpath ${SHARE_DIR_PATH}/scripts/convert_compile_opts.py`
 
 print_usage () {
     echo "Usage: symbiflow_synth  -v|--verilog <Verilog file list>"
@@ -135,7 +135,7 @@ export OUT_SYNTH_V=${TOP}_synth.v
 export OUT_EBLIF=${TOP}.eblif
 export OUT_FASM_EXTRA=${TOP}_fasm_extra.fasm
 export PYTHON3=$(which python3)
-export UTILS_PATH=${VPRPATH}/python/
+export UTILS_PATH=${SHARE_DIR_PATH}/scripts
 
 if [ -s $PCF ]; then
     export PCF_FILE=$PCF

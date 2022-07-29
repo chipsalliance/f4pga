@@ -20,10 +20,7 @@ set -e
 
 FPGA_FAM=${FPGA_FAM:=xc7}
 
-case "$FPGA_FAM" in
-  xc7) F4PGA_DIR_ROOT='install';;
-  eos-s3) F4PGA_DIR_ROOT='quicklogic-arch-defs';;
-esac
+F4PGA_DIR_ROOT='install'
 
 export PATH="$F4PGA_INSTALL_DIR/$FPGA_FAM/$F4PGA_DIR_ROOT/bin:$PATH"
 source "$F4PGA_INSTALL_DIR/$FPGA_FAM/conda/etc/profile.d/conda.sh"

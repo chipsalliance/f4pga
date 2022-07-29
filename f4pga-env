@@ -11,7 +11,7 @@ case "$1" in
   ;;
   share)
     (
-        cd $(dirname "$0")/../share/symbiflow
+        cd $(dirname "$0")/../share/f4pga
         pwd
     )
   ;;

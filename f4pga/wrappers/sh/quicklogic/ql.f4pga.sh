@@ -361,7 +361,7 @@ else
   PCF_MAKE="\${current_dir}/${BUILDDIR}/${TOP}_dummy.pcf"
 fi
 
-PROCESS_SDC=$(realpath "$F4PGA_BIN_DIR"/python/process_sdc_constraints.py)
+PROCESS_SDC=$(realpath "$F4PGA_SHARE_DIR"/scripts/process_sdc_constraints.py)
 if ! [ -z "$SDC" ]; then
   if ! [ -f "$SOURCE"/$SDC ];then
     echo "The sdc file: $SDC is missing at: $SOURCE"

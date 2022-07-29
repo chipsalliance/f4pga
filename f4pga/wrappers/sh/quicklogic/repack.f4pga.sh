@@ -30,9 +30,9 @@ DESIGN=${EBLIF/.eblif/}
 [ ! -z "${JSON}" ] && JSON_ARGS="--json-constraints ${JSON}" || JSON_ARGS=
 [ ! -z "${PCF_PATH}" ] && PCF_ARGS="--pcf-constraints ${PCF_PATH}" || PCF_ARGS=
 
-export PYTHONPATH=$F4PGA_BIN_DIR/python:$PYTHONPATH
+export PYTHONPATH=$F4PGA_SHARE_DIR/scripts:$PYTHONPATH
 
-`which python3` "$F4PGA_BIN_DIR"/python/repacker/repack.py \
+`which python3` "$F4PGA_SHARE_DIR"/scripts/repacker/repack.py \
   --vpr-arch ${ARCH_DEF} \
   --repacking-rules ${ARCH_DIR}/${DEVICE_1}.repacking_rules.json \
   $JSON_ARGS \
