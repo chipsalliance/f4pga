@@ -263,13 +263,12 @@ struct QlDspSimdPass : public Pass {
 
                     // Handle the "is_inferred" attribute. If one of the fragments
                     // is not inferred mark the whole DSP as not inferred
-                    bool is_inferred_a = dsp_a->has_attribute(RTLIL::escape_id("is_inferred")) ?
-                        dsp_a->get_bool_attribute(RTLIL::escape_id("is_inferred")) : false;
-                    bool is_inferred_b = dsp_b->has_attribute(RTLIL::escape_id("is_inferred")) ?
-                        dsp_b->get_bool_attribute(RTLIL::escape_id("is_inferred")) : false;
+                    bool is_inferred_a =
+                      dsp_a->has_attribute(RTLIL::escape_id("is_inferred")) ? dsp_a->get_bool_attribute(RTLIL::escape_id("is_inferred")) : false;
+                    bool is_inferred_b =
+                      dsp_b->has_attribute(RTLIL::escape_id("is_inferred")) ? dsp_b->get_bool_attribute(RTLIL::escape_id("is_inferred")) : false;
 
-                    simd->set_bool_attribute(RTLIL::escape_id("is_inferred"),
-                        is_inferred_a && is_inferred_b);
+                    simd->set_bool_attribute(RTLIL::escape_id("is_inferred"), is_inferred_a && is_inferred_b);
 
                     // Mark DSP parts for removal
                     cellsToRemove.push_back(dsp_a);

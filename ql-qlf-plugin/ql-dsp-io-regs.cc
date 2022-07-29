@@ -85,9 +85,7 @@ struct QlDspIORegs : public Pass {
 
                 // If the cell does not have the "is_inferred" attribute set
                 // then don't touch it.
-                if (!dsp->has_attribute(RTLIL::escape_id("is_inferred")) ||
-                     dsp->get_bool_attribute(RTLIL::escape_id("is_inferred")) == false)
-                {
+                if (!dsp->has_attribute(RTLIL::escape_id("is_inferred")) || dsp->get_bool_attribute(RTLIL::escape_id("is_inferred")) == false) {
                     continue;
                 }
 
