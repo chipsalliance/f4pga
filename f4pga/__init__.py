@@ -79,9 +79,9 @@ bin_dir_path = \
     environ.get('F4PGA_BIN_DIR', str(Path(sys_argv[0]).resolve().parent.parent))
 share_dir_path = \
     environ.get('F4PGA_SHARE_DIR',
-                str(Path(f'{install_dir}/xc7/install/share/f4pga').resolve()))
+                str(Path(f'{install_dir}/xc7/install/share/symbiflow').resolve()))
 if share_dir_path is None:
-    share_dir_path = str(Path(f'{install_dir}/xc7/install/share/f4pga').resolve())
+    share_dir_path = str(Path(f'{install_dir}/xc7/install/share/symbiflow').resolve())
 
 class DependencyNotProducedException(F4PGAException):
     dep_name: str
