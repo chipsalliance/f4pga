@@ -13,7 +13,7 @@
     "XC7A35TCSG324-1": {
         "default_target": "bitstream",
         "dependencies": {
-            "build_dir": "build/arty_35",
+            "build_dir": "build/xc7",
             "xdc": [
                 "xc7/counter_test/arty.xdc"
             ]

@@ -115,26 +115,15 @@ jobs:
         if: matrix.flow == 'F4PGA'
         run: |
           . ./.github/scripts/activate.sh
-
           cd f4pga-examples
+          f4pga build --flow ../.github/${{ matrix.fam }}_test.json
 
-          # FIXME
-          #   Temporarily allow QL example to fail, until https://github.com/chipsalliance/f4pga/pull/577 is merged.
-          case '${{ matrix.fam }}' in
-            eos-s3)
-              f4pga build --flow ../.github/${{ matrix.fam }}_test.json | echo 'See #577'
-            ;;
-            *)
-              f4pga build --flow ../.github/${{ matrix.fam }}_test.json
-            ;;
-          esac
-
-      - name: '📤 Upload artifact: Arty 35 bitstream'
-        if: matrix.flow == 'F4PGA' && matrix.fam == 'xc7'
+      - name: '📤 Upload artifact: ${{ matrix.fam }} bitstream'
+        if: matrix.flow == 'F4PGA'
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.flow }}-arty_35-Bitstream-pyF4PGA
-          path: f4pga-examples/build/arty_35/top.bit
+          name: ${{ matrix.flow }}-${{ matrix.fam }}-Bitstream
+          path: f4pga-examples/build/${{ matrix.fam }}/top.bit
           if-no-files-found: error
 
       # SymbiFlow
@@ -163,19 +152,19 @@ jobs:
           esac
 
       - name: '📤 Upload artifact: Arty 35 bitstream'
-        if: matrix.flow == 'SymbiFLow' && matrix.fam == 'xc7'
+        if: matrix.flow == 'SymbiFlow' && matrix.fam == 'xc7'
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.flow }}-arty_35-Bitstream
-          path: f4pga-examples/xc7/counter_test/build/arty_35/top.bit
+          name: ${{ matrix.flow }}-${{ matrix.fam }}-Bitstream
+          path: f4pga-examples/${{ matrix.fam }}/counter_test/build/arty_35/top.bit
           if-no-files-found: error
 
       - name: '📤 Upload artifact: QuickLogic bitstream'
-        if: matrix.flow == 'SymbiFLow' && matrix.fam == 'eos-s3'
+        if: matrix.flow == 'SymbiFlow' && matrix.fam == 'eos-s3'
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.flow }}-eos-s3-Bitstream
-          path: f4pga-examples/eos-s3/btn_counter/build/top.bit
+          name: ${{ matrix.flow }}-${{ matrix.fam }}-Bitstream
+          path: f4pga-examples/${{ matrix.fam }}/btn_counter/build/top.bit
           if-no-files-found: error
 
 
