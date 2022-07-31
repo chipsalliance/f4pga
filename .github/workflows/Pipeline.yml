@@ -102,9 +102,7 @@ jobs:
         run: |
           . ./.github/scripts/activate.sh
 
-          cd f4pga
           pip install .
-          cd ..
 
       - name: 🚧 Test f4pga-env
         run: |
@@ -165,9 +163,7 @@ jobs:
         run: |
           . ./.github/scripts/activate.sh
 
-          cd f4pga
           pip install .
-          cd ..
 
       - name: 🚧 Test f4pga build
         run: |
@@ -219,9 +215,7 @@ jobs:
         run: |
           . ./.github/scripts/activate.sh
 
-          cd f4pga
           pip install .
-          cd ..
 
       - name: 🚦 Test Python wrappers
         run: |
