@@ -21,20 +21,21 @@
     - `f4pga build` now supports Lattice's ICE40 devices.
     - `f4pga build` now supports Lattice's ECP5 devices.
     - `f4pga build` now supports Lattice's NX devices.
-  5:
-    examples: ''
-    arch-defs: 20220729-181657@7833050
-    f4pga: ''
-    <<: &tarballs-consistent
-      tarballs:
-        xc7:
-          - symbiflow-install-xc7-*-tar-xz
-          - symbiflow-arch-defs-xc7a50t_test-*.tar.xz
-        eos-s3:
-          - symbiflow-install-ql-*-tar-xz
-          - symbiflow-ql-eos-s3_wlcsp-*-tar-xz
-    description: |
-      ``f4pga build`` now supports QuickLogic's EOS-S3 devices.
+
+5:
+  examples: 524dfb6e746b632fdeddc9d06d8a002a3c7a3118
+  arch-defs: 20220729-181657@7833050
+  f4pga: c342fc6ff1684f3dc6072713730ac9fc574ab2f3
+  <<: &tarballs-consistent
+    tarballs:
+      xc7:
+        - symbiflow-install-xc7-*-tar-xz
+        - symbiflow-arch-defs-xc7a50t_test-*.tar.xz
+      eos-s3:
+        - symbiflow-install-ql-*-tar-xz
+        - symbiflow-ql-eos-s3_wlcsp-*-tar-xz
+  description: |
+    ``f4pga build`` now supports QuickLogic's EOS-S3 devices.
 
 
 4:
