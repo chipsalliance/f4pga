@@ -317,17 +317,17 @@
                 "outputs": {
                     "bitstream": {
                         "mode": "file",
-                        "file": "bitstream-${device}.bit",
-                        "target": "${build_dir?}/bitstream-${device}.bit"
+                        "file": "${:eblif[noext]}.bit",
+                        "target": "${:eblif[noext]}.bit"
                     },
                     "bitstream_log": {
                         "mode": "stdout",
-                        "target": "${build_dir?}/bitstream-${device}.log"
+                        "target": "${:eblif[noext]}.bit.log"
                     }
                 },
                 "inputs": {
                     "#1": "${:fasm}",
-                    "#2": "bitstream-${device}.bit",
+                    "#2": "${:eblif[noext]}.bit",
                     "dev-type": "ql-eos-s3"
                 }
             },
