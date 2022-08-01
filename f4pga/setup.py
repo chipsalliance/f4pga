@@ -19,6 +19,8 @@
 
 from pathlib import Path
 from typing import List
+from shutil import which
+from subprocess import check_output
 
 from setuptools import setup as setuptools_setup
 
@@ -50,13 +52,20 @@ def get_requirements(file: Path) -> List[str]:
     return requirements
 
 
+version="0.0.0"
+git = which('git')
+if git is not None:
+    sha = check_output(['git', 'rev-parse', 'HEAD']).decode('utf8')
+    version += f'-{sha[0:8]}'
+
+
 sf = "symbiflow"
 shwrappers = "f4pga.wrappers.sh.__init__"
 
 
 setuptools_setup(
     name=packagePath.name,
-    version="0.0.0",
+    version=version,
     license="Apache-2.0",
     author="F4PGA Authors",
     description="F4PGA.",
