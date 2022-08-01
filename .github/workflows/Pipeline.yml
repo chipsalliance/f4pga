@@ -77,6 +77,14 @@ jobs:
           git push -u origin +HEAD:gh-pages
 
 
+  Install:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: 🐍 Install f4pga (pip zipfile)
+      run: pip3 install https://github.com/"$GITHUB_REPOSITORY"/archive/"$GITHUB_REF".zip#subdirectory=f4pga
+
+
   Builds:
     runs-on: ubuntu-latest
     strategy:
