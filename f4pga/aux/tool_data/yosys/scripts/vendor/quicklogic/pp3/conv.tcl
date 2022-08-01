@@ -14,22 +14,19 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-proc f4pga {action args} {
-    set name [lindex $args 0]
-    regsub {(.*)[!?]} $name {\1} name_dec
-    upvar f4pga_${name_dec} f4pgavar
+yosys -import
 
-    if { $action eq "take" || $action eq "produce" } {
-        set f4pgavar $::env(DEP_${name_dec})
-    } elseif { $action eq "value" } {
-        set f4pgavar $::env(VAL_${name_dec})
-    } elseif { $action eq "tempfile" } {
-        set f4pgavar $::env(TMP_${name_dec})
-    } elseif { $action eq "is_dry" } {
-        return FALSE
-    } else {
-        error "Unsupported f4pga subcommand `${action}`" 99
-    }
+# Clean
+opt_clean
 
-    return $f4pgavar
-}
+f4pga take     synth_json
+f4pga produce  eblif              [noext $f4pga_synth_json].eblif  -meta "Extended BLIF circuit description"
+
+read_json ${f4pga_synth_json}
+
+# Write EBLIF
+write_blif -attr -cname -param \
+    -true VCC VCC \
+    -false GND GND \
+    -undef VCC VCC \
+    $f4pga_eblif

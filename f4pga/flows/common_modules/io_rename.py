@@ -74,9 +74,9 @@ def _switchback_attrs(d: Namespace, renames: "dict[str, str]") -> SimpleNamespac
 def _switch_entries(l: "list[str]", renames: "dict[str, str]") -> "list[str]":
     newl = []
     for e in l:
-        r = renames.get(e)
+        ed, q = decompose_depname(e)
+        r = renames.get(ed)
         if r is not None:
-            _, q = decompose_depname(e)
             newl.append(with_qualifier(r, q))
         else:
             newl.append(r if r is not None else e)
@@ -105,7 +105,6 @@ class IORenameModule(Module):
         newctx.takes = _switchback_attrs(ctx.takes, self.rename_takes)
         newctx.values = _switchback_attrs(ctx.values, self.rename_values)
         newctx.outputs = _switchback_attrs(ctx.produces, self.rename_produces)
-        print(newctx.takes)
         return self.module.execute(newctx)
 
     def __init__(self, params, r_env, instance_name):
@@ -113,7 +112,7 @@ class IORenameModule(Module):
 
         mod_path = resolve_modstr(params["module"])
         module_class = get_module(mod_path)
-        module: Module = module_class(params.get("params"))
+        module: Module = module_class(params.get("params"), r_env, instance_name)
 
         self.rename_takes = _or_empty_dict(params.get("rename_takes"))
         self.rename_produces = _or_empty_dict(params.get("rename_produces"))
