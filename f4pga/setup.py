@@ -72,6 +72,10 @@ wrapper_entrypoints = [
     f"{sf}_generate_constraints = {shwrappers}:generate_constraints",
     f"{sf}_analysis = {shwrappers}:analysis",
     f"{sf}_fasm2bels = {shwrappers}:fasm2bels",
+    f"{sf}_write_binary = {shwrappers}:write_binary",
+    f"{sf}_write_bitheader = {shwrappers}:write_bitheader",
+    f"{sf}_write_jlink = {shwrappers}:write_jlink",
+    f"{sf}_write_openocd = {shwrappers}:write_openocd",
     f"ql_{sf} = {shwrappers}:ql",
     f"vpr_common = {shwrappers}:vpr_common",
 ]

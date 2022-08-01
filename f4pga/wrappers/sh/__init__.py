@@ -120,3 +120,19 @@ def ql():
 def fasm2bels():
     print("[F4PGA] Running (deprecated) fasm2bels")
     run_sh(ROOT / "quicklogic/fasm2bels.f4pga.sh")
+
+def write_bitheader():
+    print("[F4PGA] Running (deprecated) write bitheader")
+    run_sh(ROOT / "quicklogic/write_bitheader.f4pga.sh")
+
+def write_binary():
+    print("[F4PGA] Running (deprecated) write binary")
+    run_sh(ROOT / "quicklogic/write_binary.f4pga.sh")
+
+def write_jlink():
+    print("[F4PGA] Running (deprecated) write jlink")
+    run_sh(ROOT / "quicklogic/write_jlink.f4pga.sh")
+
+def write_openocd():
+    print("[F4PGA] Running (deprecated) write openocd")
+    run_sh(ROOT / "quicklogic/write_openocd.f4pga.sh")

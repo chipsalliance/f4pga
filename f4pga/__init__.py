@@ -74,14 +74,13 @@ install_dir = environ.get("F4PGA_INSTALL_DIR", "/usr/local")
 
 mypath = str(Path(__file__).resolve().parent)
 
+FPGA_FAM = environ.get('FPGA_FAM', 'xc7')
 
 bin_dir_path = \
     environ.get('F4PGA_BIN_DIR', str(Path(sys_argv[0]).resolve().parent.parent))
 share_dir_path = \
     environ.get('F4PGA_SHARE_DIR',
-                str(Path(f'{install_dir}/xc7/install/share/f4pga').resolve()))
-if share_dir_path is None:
-    share_dir_path = str(Path(f'{install_dir}/xc7/install/share/f4pga').resolve())
+                str(Path(f'{install_dir}/{FPGA_FAM}/install/share/f4pga').resolve()))
 
 class DependencyNotProducedException(F4PGAException):
     dep_name: str
@@ -532,11 +531,14 @@ def setup_resolution_env():
         """
         Generate initial values, available in configs.
         """
-        return {
-            'prjxray_db': common_sub('prjxray-config').decode().replace('\n', ''),
+        conf = {
             'python3': common_sub('which', 'python3').decode().replace('\n', ''),
             'noisyWarnings': _noisy_warnings()
         }
+        if (FPGA_FAM == 'xc7'):
+            conf['prjxray_db'] = common_sub('prjxray-config').decode().replace('\n', '')
+
+        return conf
 
     r_env.add_values(_generate_values())
     return r_env

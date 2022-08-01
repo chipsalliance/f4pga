@@ -1,1 +1,26 @@
-{}
+{
+    "default_part": "EOS3FF512-PDN64",
+    "values": {
+        "top": "top"
+    },
+    "dependencies": {
+        "sources": [
+            "eos-s3/btn_counter/btn_counter.v"
+        ],
+        "synth_log": "synth.log",
+        "pack_log": "pack.log",
+        "analysis_log": "analysis.log"
+    },
+    "EOS3FF512-PDN64": {
+        "default_target": "bitstream",
+        "dependencies": {
+            "build_dir": "build/eos-s3",
+            "pcf": "eos-s3/btn_counter/chandalar.pcf",
+            "sdc-in": "eos-s3/btn_counter/dummy.sdc"
+        },
+        "values": {
+            "part": "ql-eos-s3",
+            "package": "PD64"
+        }
+    }
+}

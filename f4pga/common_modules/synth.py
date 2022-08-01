@@ -18,6 +18,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
+from pathlib import Path
 from f4pga.common import *
 from f4pga.module import Module, ModuleContext
 
@@ -97,23 +98,22 @@ class SynthModule(Module):
         return mapping
 
     def execute(self, ctx: ModuleContext):
-        split_inouts = os.path.join(ctx.share, 'scripts/split_inouts.py')
-        synth_tcl = os.path.join(ctx.values.tcl_scripts, 'synth.tcl')
-        conv_tcl = os.path.join(ctx.values.tcl_scripts, 'conv.tcl')
-
         tcl_env = yosys_setup_tcl_env(ctx.values.yosys_tcl_env) \
             if ctx.values.yosys_tcl_env else {}
+        split_inouts = Path(tcl_env["UTILS_PATH"]) / 'split_inouts.py'
+        synth_tcl = Path(ctx.values.tcl_scripts) / 'synth.tcl'
+        conv_tcl = Path(ctx.values.tcl_scripts) / 'conv.tcl'
 
         if get_verbosity_level() >= 2:
             yield f'Synthesizing sources: {ctx.takes.sources}...'
         else:
             yield f'Synthesizing sources...'
 
-        yosys_synth(synth_tcl, tcl_env, ctx.takes.sources,
+        yosys_synth(str(synth_tcl), tcl_env, ctx.takes.sources,
                     ctx.values.read_verilog_args, ctx.outputs.synth_log)
 
         yield f'Splitting in/outs...'
-        sub('python3', split_inouts, '-i', ctx.outputs.json, '-o',
+        sub('python3', str(split_inouts), '-i', ctx.outputs.json, '-o',
             ctx.outputs.synth_json)
 
         if not os.path.isfile(ctx.produces.fasm_extra):
@@ -121,7 +121,7 @@ class SynthModule(Module):
                 f.write('')
 
         yield f'Converting...'
-        yosys_conv(conv_tcl, tcl_env, ctx.outputs.synth_json)
+        yosys_conv(str(conv_tcl), tcl_env, ctx.outputs.synth_json)
 
     def __init__(self, params):
         self.name = 'synthesize'

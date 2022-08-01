@@ -21,8 +21,8 @@ set -e
 SHARE_DIR_PATH=${SHARE_DIR_PATH:="$F4PGA_SHARE_DIR"}
 BIN_DIR_PATH=${BIN_DIR_PATH:="$F4PGA_BIN_DIR"}
 
-OPTS=d:P:p:b:
-LONGOPTS=device:,part:,pcf:,bit:,
+OPTS=d:P:p:b:v:o:q
+LONGOPTS=device:,part:,pcf:,bit:,out-verilog:,out-pcf:,out-qcf:,
 
 PARSED_OPTS=`getopt --options=${OPTS} --longoptions=${LONGOPTS} --name $0 -- "$@"`
 eval set -- "${PARSED_OPTS}"
@@ -31,6 +31,9 @@ DEVICE=""
 PART=""
 PCF=""
 BIT=""
+OUT_VERILOG=""
+OUT_PCF=""
+OUT_QCF=""
 
 while true; do
 	case "$1" in
@@ -50,6 +53,18 @@ while true; do
 			BIT=$2
 			shift 2
 			;;
+		-v|--out-verilog)
+			OUT_VERILOG=$2
+			shift 2
+			;;
+		-o|--out-pcf)
+			OUT_PCF=$2
+			shift 2
+			;;
+		-q|--out-qcf)
+			OUT_QCF=$2
+			shift 2
+			;;
 		--)
 			break
 			;;
@@ -67,27 +82,26 @@ if [ -z $BIT ]; then
 fi
 
 
-# Run fasm2bels
-if [[ "$DEVICE" =~ ^(ql-eos-s3|ql-pp3e)$ ]]; then
-
-    VPR_DB=`readlink -f ${SHARE_DIR_PATH}/arch/${DEVICE}_wlcsp/db_phy.pickle`
-    FASM2BELS=`readlink -f ${SHARE_DIR_PATH}/scripts/fasm2bels.py`
-    FASM2BELS_DEVICE=${DEVICE/ql-/}
-    VERILOG_FILE="${BIT}.v"
-    PCF_FILE="${BIT}.v.pcf"
-    QCF_FILE="${BIT}.v.qcf"
-
-    if [ ! -z "{PCF}" ]; then
-        PCF_ARGS="--input-pcf ${PCF}"
-    else
-        PCF_ARGS=""
-    fi
-
-    echo "Running fasm2bels"
-    `which python3` ${FASM2BELS} ${BIT} --phy-db ${VPR_DB} --device-name ${FASM2BELS_DEVICE} --package-name ${PART} --input-type bitstream --output-verilog ${VERILOG_FILE} ${PCF_ARGS} --output-pcf ${PCF_FILE} --output-qcf ${QCF_FILE}
-
-else
-
+# $DEVICE is not ql-eos-s3 or ql-pp3e
+if ! [[ "$DEVICE" =~ ^(ql-eos-s3|ql-pp3e)$ ]]; then
     echo "ERROR: Unsupported device '${DEVICE}' for fasm2bels"
     exit -1
 fi
+
+# Run fasm2bels
+VPR_DB=`readlink -f ${SHARE_DIR_PATH}/arch/${DEVICE}_wlcsp/db_phy.pickle`
+FASM2BELS=`readlink -f ${SHARE_DIR_PATH}/scripts/fasm2bels.py`
+FASM2BELS_DEVICE=${DEVICE/ql-/}
+
+VERILOG_FILE="${OUT_VERILOG:-$BIT.v}"
+PCF_FILE="${OUT_PCF:-$BIT.v.pcf}"
+QCF_FILE="${OUT_QCF:-$BIT.v.qcf}"
+
+if [ ! -z "{PCF}" ]; then
+    PCF_ARGS="--input-pcf ${PCF}"
+else
+    PCF_ARGS=""
+fi
+
+echo "Running fasm2bels"
+`which python3` ${FASM2BELS} ${BIT} --phy-db ${VPR_DB} --device-name ${FASM2BELS_DEVICE} --package-name ${PART} --input-type bitstream --output-verilog ${VERILOG_FILE} ${PCF_ARGS} --output-pcf ${PCF_FILE} --output-qcf ${QCF_FILE}
