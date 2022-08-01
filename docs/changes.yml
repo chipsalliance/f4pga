@@ -38,7 +38,7 @@
 
 
 4:
-  examples: antmicro/f4pga-examples@52bc71a0506cad647951a16fb214ea82934bed0a
+  examples: 52bc71a0506cad647951a16fb214ea82934bed0a
   arch-defs: 20220729-181657@7833050
   f4pga: df55ee75e4a1da978ffa5f7385bed47faf255661
   <<: *tarballs-consistent
@@ -48,7 +48,7 @@
 
 
 3:
-  examples: antmicro/f4pga-examples@d8134c926167a8092d5b392110ce2932bdae8f54
+  examples: d8134c926167a8092d5b392110ce2932bdae8f54
   arch-defs: 20220729-181657@7833050
   f4pga: 8c411eb74e4bb23d1ec243a1515b9bfb48e2cd83
   <<: *tarballs-consistent
