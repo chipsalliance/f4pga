@@ -28,6 +28,13 @@ from tabulate import tabulate
 ROOT = Path(__file__).resolve().parent
 
 #sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, str(ROOT))
+
+from changes import generate_changes_inc
+
+# -- Generate development/changes.inc ----------------------------------------------------------------------------------
+
+generate_changes_inc()
 
 # -- Generate status.inc -----------------------------------------------------------------------------------------------
 

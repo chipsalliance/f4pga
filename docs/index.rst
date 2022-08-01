@@ -10,7 +10,6 @@ The project aims to design tools that are highly extendable and multiplatform.
   :align: center
 
 
-
 .. toctree::
   :caption: About F4PGA
 
@@ -18,6 +17,24 @@ The project aims to design tools that are highly extendable and multiplatform.
   how
   status
   getting-started
+
+
+.. toctree::
+  :caption: Python utils
+  :maxdepth: 2
+
+  f4pga/index
+  f4pga/Usage
+  f4pga/modules/index
+  f4pga/DevNotes
+
+
+.. toctree::
+  :caption: Development
+
+  development/changes
+  development/building-docs
+  development/venv
 
 
 .. toctree::
@@ -34,23 +51,6 @@ The project aims to design tools that are highly extendable and multiplatform.
   :caption: Specifications
 
   FPGA Assembly (FASM) ➚ <https://fasm.readthedocs.io/en/latest/>
-
-
-.. toctree::
-  :caption: Development
-
-  contributing/building-docs
-  contributing/venv
-
-
-.. toctree::
-  :caption: Python utils
-  :maxdepth: 2
-
-  f4pga/index
-  f4pga/Usage
-  f4pga/modules/index
-  f4pga/DevNotes
 
 
 .. toctree::

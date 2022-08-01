@@ -1,0 +1,98 @@
+# Copyright (C) 2020-2022 F4PGA Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+0:
+  future-work: |
+    - Python scripts moved from f4pga-arch-defs to f4pga.
+    - TCL scripts moved from f4pa-arch-defs to f4pga.
+    - `f4pga build` now supports Lattice's ICE40 devices.
+    - `f4pga build` now supports Lattice's ECP5 devices.
+    - `f4pga build` now supports Lattice's NX devices.
+  5:
+    examples: ''
+    arch-defs: 20220729-181657@7833050
+    f4pga: ''
+    <<: &tarballs-consistent
+      tarballs:
+        xc7:
+          - symbiflow-install-xc7-*-tar-xz
+          - symbiflow-arch-defs-xc7a50t_test-*.tar.xz
+        eos-s3:
+          - symbiflow-install-ql-*-tar-xz
+          - symbiflow-ql-eos-s3_wlcsp-*-tar-xz
+    description: |
+      ``f4pga build`` now supports QuickLogic's EOS-S3 devices.
+
+
+4:
+  examples: 52bc71a0506cad647951a16fb214ea82934bed0a
+  arch-defs: 20220729-181657@7833050
+  f4pga: df55ee75e4a1da978ffa5f7385bed47faf255661
+  <<: *tarballs-consistent
+  description: |
+    The default F4PGA_SHARE_DIR is now consistent for AMD/Xilinx or QuickLogic:
+    ``F4PGA_INSTALL_DIR / FPGA_FAM / 'install/share/f4pga'``.
+
+
+3:
+  examples: d8134c926167a8092d5b392110ce2932bdae8f54
+  arch-defs: 20220729-181657@7833050
+  f4pga: 8c411eb74e4bb23d1ec243a1515b9bfb48e2cd83
+  <<: *tarballs-consistent
+  description: |
+    Architecture Definitions:
+
+    * AMD/Xilinx base package is now ``*-install-xc7-*``.
+
+    * QuickLogic now has a base package named ``*-install-ql-*``.
+
+    * Python scripts in QuickLogic packages moved from ``bin/python`` to ``share/f4pga/scripts``.
+
+    * Share paths modified:
+
+      * AND/Xilinx and QuickLogic arch-defs packages homogenized.
+
+      * ``s/symbiflow/f4pga/``
+
+
+2:
+  examples: 3e8a003cabec84f7841571a6929fe2623e702e96
+  arch-defs: 20220721-204939@38358c4
+  f4pga: 27eca4f35db3c4e04ce255ab319611774de9b9a1
+  <<: &tarballs-split
+    tarballs:
+      xc7:
+        - symbiflow-arch-defs-install-*.tar.xz
+        - symbiflow-arch-defs-xc7a50t_test-*.tar.xz
+      eos-s3:
+        - quicklogic-arch-defs-qlf-fc5d8da.tar.gz
+  description: |
+    * Environment variables were renamed and are now supported by ``f4pga build``:
+
+      * ``s/F4PGA_ENV_BIN/F4PGA_BIN_DIR/``
+
+      * ``s/F4PGA_ENV_SHARE/F4PGA_SHARE_DIR/``
+
+    * f4pga is now pinned in the requirements files of f4pga-examples.
+
+
+1:
+  examples: 6b0e7b8a75fb8715bb081cb7f24948c3aec0df31
+  arch-defs: 20220714-173445@f7afc12
+  f4pga: 39da9c9f17513ea0c3dd12be655a3684e5b77519
+  <<: *tarballs-split
+  description: |
+    First release being tracked.
