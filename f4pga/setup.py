@@ -53,34 +53,6 @@ def get_requirements(file: Path) -> List[str]:
 sf = "symbiflow"
 shwrappers = "f4pga.wrappers.sh.__init__"
 
-wrapper_entrypoints = [
-    f"{sf}_generate_constraints = {shwrappers}:generate_constraints",
-    f"{sf}_pack = {shwrappers}:pack",
-    f"{sf}_place = {shwrappers}:place",
-    f"{sf}_route = {shwrappers}:route",
-    f"{sf}_synth = {shwrappers}:synth",
-    f"{sf}_write_bitstream = {shwrappers}:write_bitstream",
-    f"{sf}_write_fasm = {shwrappers}:write_fasm",
-] if FPGA_FAM == 'xc7' else [
-    f"{sf}_synth = {shwrappers}:synth",
-    f"{sf}_pack = {shwrappers}:pack",
-    f"{sf}_repack = {shwrappers}:repack",
-    f"{sf}_place = {shwrappers}:place",
-    f"{sf}_route = {shwrappers}:route",
-    f"{sf}_write_fasm = {shwrappers}:write_fasm",
-    f"{sf}_generate_bitstream = {shwrappers}:generate_bitstream",
-    f"{sf}_generate_constraints = {shwrappers}:generate_constraints",
-    f"{sf}_analysis = {shwrappers}:analysis",
-    f"{sf}_fasm2bels = {shwrappers}:fasm2bels",
-    f"{sf}_write_binary = {shwrappers}:write_binary",
-    f"{sf}_write_bitheader = {shwrappers}:write_bitheader",
-    f"{sf}_write_jlink = {shwrappers}:write_jlink",
-    f"{sf}_write_openocd = {shwrappers}:write_openocd",
-    f"ql_{sf} = {shwrappers}:ql",
-    f"vpr_common = {shwrappers}:vpr_common",
-]
-
-
 
 setuptools_setup(
     name=packagePath.name,
@@ -104,7 +76,28 @@ setuptools_setup(
     install_requires=list(set(get_requirements(requirementsFile))),
     entry_points={
         "console_scripts": [
-            "f4pga = f4pga.__init__:main"
-        ] + wrapper_entrypoints
+            "f4pga = f4pga.__init__:main",
+            f"{sf}_generate_constraints = {shwrappers}:generate_constraints",
+            f"{sf}_pack = {shwrappers}:pack",
+            f"{sf}_place = {shwrappers}:place",
+            f"{sf}_route = {shwrappers}:route",
+            f"{sf}_synth = {shwrappers}:synth",
+            f"{sf}_write_fasm = {shwrappers}:write_fasm"
+        ] + (
+            [
+                f"{sf}_write_bitstream = {shwrappers}:write_bitstream",
+            ] if FPGA_FAM == 'xc7' else [
+                f"{sf}_analysis = {shwrappers}:analysis",
+                f"{sf}_fasm2bels = {shwrappers}:fasm2bels",
+                f"{sf}_generate_bitstream = {shwrappers}:generate_bitstream",
+                f"{sf}_repack = {shwrappers}:repack",
+                f"{sf}_write_binary = {shwrappers}:write_binary",
+                f"{sf}_write_bitheader = {shwrappers}:write_bitheader",
+                f"{sf}_write_jlink = {shwrappers}:write_jlink",
+                f"{sf}_write_openocd = {shwrappers}:write_openocd",
+                f"ql_{sf} = {shwrappers}:ql",
+                f"vpr_common = {shwrappers}:vpr_common"
+            ]
+        )
     },
 )
