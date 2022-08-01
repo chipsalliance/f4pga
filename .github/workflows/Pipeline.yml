@@ -116,7 +116,7 @@ jobs:
         run: |
           . ./.github/scripts/activate.sh
           cd f4pga-examples
-          f4pga build --flow ../.github/${{ matrix.fam }}_test.json
+          f4pga -vv build --flow ../.github/${{ matrix.fam }}_test.json
 
       - name: '📤 Upload artifact: ${{ matrix.fam }} bitstream'
         if: matrix.flow == 'F4PGA'
