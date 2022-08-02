@@ -22,6 +22,7 @@
 from sys import argv as sys_argv, stdout, stderr
 from os import environ
 from pathlib import Path
+from shutil import which
 from subprocess import check_call
 
 
@@ -45,6 +46,12 @@ def run_sh(script):
     stdout.flush()
     stderr.flush()
     check_call([str(script)]+sys_argv[1:], env=f4pga_environ)
+
+
+def run_pym(module):
+    stdout.flush()
+    stderr.flush()
+    check_call([which('python3'), '-m' , module]+sys_argv[1:], env=f4pga_environ)
 
 
 def generate_constraints():
@@ -121,18 +128,23 @@ def fasm2bels():
     print("[F4PGA] Running (deprecated) fasm2bels")
     run_sh(ROOT / "quicklogic/fasm2bels.f4pga.sh")
 
+
 def write_bitheader():
     print("[F4PGA] Running (deprecated) write bitheader")
-    run_sh(ROOT / "quicklogic/write_bitheader.f4pga.sh")
+    print("Converting bitstream to C Header")
+    run_pym('quicklogic_fasm.bitstream_to_header')
 
 def write_binary():
     print("[F4PGA] Running (deprecated) write binary")
-    run_sh(ROOT / "quicklogic/write_binary.f4pga.sh")
+    print("Converting bitstream to flashable binary format")
+    run_pym('quicklogic_fasm.bitstream_to_binary')
 
 def write_jlink():
     print("[F4PGA] Running (deprecated) write jlink")
-    run_sh(ROOT / "quicklogic/write_jlink.f4pga.sh")
+    print("Converting bitstream to JLink script")
+    run_pym('quicklogic_fasm.bitstream_to_jlink')
 
 def write_openocd():
     print("[F4PGA] Running (deprecated) write openocd")
-    run_sh(ROOT / "quicklogic/write_openocd.f4pga.sh")
+    print("Converting bitstream to OpenOCD script")
+    run_pym('quicklogic_fasm.bitstream_to_openocd')
