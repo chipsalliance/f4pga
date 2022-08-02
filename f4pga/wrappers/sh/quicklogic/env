@@ -16,10 +16,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-MYPATH=`realpath $0`
-MYPATH=`dirname ${MYPATH}`
-
 if [ -z $VPRPATH ]; then
-	export VPRPATH=$MYPATH
-	export PYTHONPATH=${VPRPATH}/python:${VPRPATH}/python/prjxray:${PYTHONPATH}
+  export VPRPATH="$F4PGA_BIN_DIR"
+  export PYTHONPATH="${VPRPATH}/python:${VPRPATH}/python/prjxray:${PYTHONPATH}"
 fi

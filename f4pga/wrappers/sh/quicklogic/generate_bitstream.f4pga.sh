@@ -18,7 +18,6 @@
 
 set -e
 
-SHARE_DIR_PATH=${SHARE_DIR_PATH:="$F4PGA_SHARE_DIR"}
 OPTS=d:f:r:b:P:
 LONGOPTS=device:,fasm:,format:,bit:,part:
 
@@ -57,16 +56,26 @@ if [ -z $BIT ]; then
   exit 1
 fi
 
-DB_ROOT="$F4PGA_SHARE_DIR"/fasm_database/${DEVICE}
-
-# qlf
 if [[ "$DEVICE" =~ ^(qlf_k4n8.*)$ ]]; then
-    QLF_FASM=`which qlf_fasm`
-    DB_ROOT=`realpath ${SHARE_DIR_PATH}//fasm_database/${DEVICE}`
-    ${QLF_FASM} --db-root ${DB_ROOT} --format ${BIT_FORMAT} --assemble $FASM $BIT
+
+  `which qlf_fasm` \
+    --db-root "${SHARE_DIR_PATH:="$F4PGA_SHARE_DIR"}/fasm_database/${DEVICE}" \
+    --format "$BIT_FORMAT" \
+    --assemble \
+    "$FASM" \
+    "$BIT"
+
 elif [[ "$DEVICE" =~ ^(ql-eos-s3|ql-pp3e)$ ]]; then
-    qlfasm --dev-type ${DEVICE} ${FASM} ${BIT}
+
+  qlfasm \
+    --dev-type \
+    "$DEVICE" \
+    "$FASM" \
+    "$BIT"
+
 else
-    echo "ERROR: Unsupported device '${DEVICE}' for bitstream generation"
-    exit -1
+
+  echo "ERROR: Unsupported device '${DEVICE}' for bitstream generation"
+  exit -1
+
 fi

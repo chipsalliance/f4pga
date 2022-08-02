@@ -18,16 +18,15 @@
 
 set -e
 
-if [ -z $VPRPATH ]; then
-  export VPRPATH="$F4PGA_BIN_DIR"
-  export PYTHONPATH=${VPRPATH}/python:${PYTHONPATH}
-fi
-
+source $(dirname "$0")/env
 source $(dirname "$0")/vpr_common.f4pga.sh
 parse_args $@
 
 export OUT_NOISY_WARNINGS=noisy_warnings-${DEVICE}_pack.log
 
-run_vpr --pack --write_block_usage block_usage.json
+run_vpr \
+  --pack \
+  --write_block_usage \
+  block_usage.json
 
 mv vpr_stdout.log pack.log

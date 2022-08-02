@@ -88,7 +88,11 @@ setuptools_setup(
     package_dir={"f4pga": "."},
     package_data={
         'f4pga': ['*.json', 'platforms/*.json'],
-        'f4pga.wrappers.sh': ['xc7/*.f4pga.sh', 'quicklogic/*.f4pga.sh']
+        'f4pga.wrappers.sh': [
+            'xc7/*.f4pga.sh',
+            'quicklogic/*.f4pga.sh',
+            'quicklogic/env'
+        ]
     },
     classifiers=[],
     python_requires='>=3.6',
