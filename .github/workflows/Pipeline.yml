@@ -141,20 +141,15 @@ jobs:
 
       # SymbiFlow
 
-      - name: 🚧 [SymbiFlow] Test f4pga-env
-        if: matrix.flow == 'SymbiFlow'
-        run: |
-          . ./.github/scripts/activate.sh
-
-          echo "F4PGA_BIN_DIR=$(f4pga-env bin)" >> "$GITHUB_ENV"
-          echo "F4PGA_SHARE_DIR=$(f4pga-env share)" >> "$GITHUB_ENV"
-
       - name: 🚧 [SymbiFlow] Test make example
         if: matrix.flow == 'SymbiFlow'
         run: |
+          . ./.github/scripts/envvars.sh
           . ./.github/scripts/activate.sh
 
-          export VPRPATH=$(f4pga-env bin)
+          export F4PGA_BIN_DIR="$F4PGA_INSTALL_DIR_FAM_ROOT"/bin/
+          export F4PGA_SHARE_DIR="$F4PGA_INSTALL_DIR_FAM_ROOT"/share/f4pga
+          export VPRPATH=$F4PGA_BIN_DIR
 
           echo '::group::Clone f4pga-examples'
           git clone --recurse-submodules https://github.com/chipsalliance/f4pga-examples
@@ -234,3 +229,42 @@ jobs:
         run: |
           PYTHONPATH=$(pwd) python3 f4pga/__init__.py
           PYTHONPATH=$(pwd) python3 f4pga/__init__.py -h
+
+
+  f4pga-env:
+    runs-on: ubuntu-latest
+    env:
+      F4PGA_INSTALL_DIR: /opt/f4pga
+      FPGA_FAM: xc7
+
+    steps:
+
+      - name: 🧰 Checkout
+        uses: actions/checkout@v3
+
+      - name: 🔧 Prepare environment
+        run: ./.github/scripts/prepare_environment.sh
+
+      - name: 🛠️ Install f4pga-env
+        run: |
+          cd ./.github/scripts
+          . ./envvars.sh
+          export PATH="${F4PGA_INSTALL_DIR_FAM_ROOT}/bin:$PATH"
+          . ./activate.sh
+
+          F4PGA_DIR_BIN="$F4PGA_INSTALL_DIR_FAM_ROOT"/bin/
+          mkdir -p "$F4PGA_DIR_BIN"
+          cp f4pga-env "$F4PGA_DIR_BIN"
+
+          cd "$F4PGA_DIR_BIN"
+          ls -lah
+
+      - name: 🚧 Test f4pga-env
+        run: |
+          . ./.github/scripts/activate.sh
+
+          echo "F4PGA_BIN_DIR=$(f4pga-env bin)" >> "$GITHUB_ENV"
+          echo "F4PGA_SHARE_DIR=$(f4pga-env share)" >> "$GITHUB_ENV"
+
+      - name: 🚧 env
+        run: env
