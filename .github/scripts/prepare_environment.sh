@@ -35,11 +35,6 @@ source "$F4PGA_INSTALL_DIR_FAM"/conda/etc/profile.d/conda.sh
 echo '::endgroup::'
 
 
-echo '::group::Create environment'
-conda env create -f test/envs/"$FPGA_FAM"/environment.yml
-echo '::endgroup::'
-
-
 echo '::group::Install arch-defs'
 mkdir -p "$F4PGA_INSTALL_DIR_FAM"/install
 case "$FPGA_FAM" in
@@ -58,6 +53,11 @@ case "$FPGA_FAM" in
     done
   ;;
 esac
+echo '::endgroup::'
+
+
+echo '::group::Create environment'
+conda env create -f $F4PGA_INSTALL_DIR_FAM/install/"$FPGA_FAM"_env/"$FPGA_FAM"_environment.yml
 echo '::endgroup::'
 
 

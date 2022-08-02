@@ -1,4 +1,0 @@
-python-constraint
-serial
-git+https://github.com/QuickLogic-Corp/quicklogic-fasm@607849ec0bdef8740be33dbaa49d15a3d400f809
-#https://github.com/chipsalliance/f4pga/archive/main.zip#subdirectory=f4pga
