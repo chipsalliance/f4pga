@@ -39,15 +39,15 @@ echo '::group::Install arch-defs'
 mkdir -p "$F4PGA_INSTALL_DIR_FAM"/install
 case "$FPGA_FAM" in
   xc7)
-    F4PGA_TIMESTAMP='20220729-181657'
-    F4PGA_HASH='7833050'
+    F4PGA_TIMESTAMP='20220802-192547'
+    F4PGA_HASH='b120b1f'
     for PKG in install-xc7 xc7a50t_test; do
       wget -qO- https://storage.googleapis.com/symbiflow-arch-defs/artifacts/prod/foss-fpga-tools/symbiflow-arch-defs/continuous/install/${F4PGA_TIMESTAMP}/symbiflow-arch-defs-${PKG}-${F4PGA_HASH}.tar.xz | tar -xJC $F4PGA_INSTALL_DIR_FAM/install
     done
   ;;
   eos-s3)
-    F4PGA_TIMESTAMP='20220729-181657'
-    F4PGA_HASH='7833050'
+    F4PGA_TIMESTAMP='20220802-192547'
+    F4PGA_HASH='b120b1f'
     for PKG in install-ql ql-eos-s3_wlcsp; do
       wget -qO- https://storage.googleapis.com/symbiflow-arch-defs/artifacts/prod/foss-fpga-tools/symbiflow-arch-defs/continuous/install/${F4PGA_TIMESTAMP}/symbiflow-arch-defs-${PKG}-${F4PGA_HASH}.tar.xz | tar -xJC $F4PGA_INSTALL_DIR_FAM/install
     done
