@@ -20,7 +20,7 @@
 from pathlib import Path
 from typing import List
 from shutil import which
-from subprocess import check_output
+from subprocess import run
 
 from setuptools import setup as setuptools_setup
 
@@ -52,12 +52,17 @@ def get_requirements(file: Path) -> List[str]:
     return requirements
 
 
-version="0.0.0"
+semver = "0.0.0"
+version = None
+
 git = which('git')
 if git is not None:
-    sha = check_output(['git', 'rev-parse', 'HEAD']).decode('utf8')
-    version += f'-{sha[0:8]}'
+    proc = run(['git', 'rev-parse', 'HEAD'], capture_output=True)
+    if proc.returncode == 0:
+        version = f'{semver}-{proc.stdout.decode("utf8")[0:8]}'
 
+if version is None:
+    version = semver
 
 sf = "symbiflow"
 shwrappers = "f4pga.wrappers.sh.__init__"
