@@ -314,7 +314,7 @@ struct SynthQuickLogicPass : public ScriptPass {
                     run("techmap -map +/mul2dsp.v [...]", "  (for qlf_k6n10f if not -no_dsp)");
                     run("chtype -set $mul t:$__soft_mul", "  (for qlf_k6n10f if not -no_dsp)");
                     run("techmap -map +/quicklogic/" + family + "/dsp_map.v", "(for qlf_k6n10f if not -no_dsp)");
-                    if (use_dsp_cfg_params == "")
+                    if (use_dsp_cfg_params.empty())
                         run("techmap -map +/quicklogic/" + family + "/dsp_map.v -D USE_DSP_CFG_PARAMS=0", "(for qlf_k6n10f if not -no_dsp)");
                     else
                         run("techmap -map +/quicklogic/" + family + "/dsp_map.v -D USE_DSP_CFG_PARAMS=1", "(for qlf_k6n10f if not -no_dsp)");
@@ -334,7 +334,7 @@ struct SynthQuickLogicPass : public ScriptPass {
                                     rule.a_maxwidth, rule.b_maxwidth, rule.a_minwidth, rule.b_minwidth, rule.type.c_str()));
                         run("chtype -set $mul t:$__soft_mul");
                     }
-                    if (use_dsp_cfg_params == "")
+                    if (use_dsp_cfg_params.empty())
                         run("techmap -map +/quicklogic/" + family + "/dsp_map.v -D USE_DSP_CFG_PARAMS=0");
                     else
                         run("techmap -map +/quicklogic/" + family + "/dsp_map.v -D USE_DSP_CFG_PARAMS=1");
