@@ -36,72 +36,54 @@ OUT_PCF=""
 OUT_QCF=""
 
 while true; do
-	case "$1" in
-		-d|--device)
-			DEVICE=$2
-			shift 2
-			;;
-		-P|--part)
-			PART=$2
-			shift 2
-			;;
-		-p|--pcf)
-			PCF=$2
-			shift 2
-			;;
-		-b|--bit)
-			BIT=$2
-			shift 2
-			;;
-		-v|--out-verilog)
-			OUT_VERILOG=$2
-			shift 2
-			;;
-		-o|--out-pcf)
-			OUT_PCF=$2
-			shift 2
-			;;
-		-q|--out-qcf)
-			OUT_QCF=$2
-			shift 2
-			;;
-		--)
-			break
-			;;
-	esac
+  case "$1" in
+    -d|--device)      DEVICE=$2; shift 2 ;;
+    -P|--part)        PART=$2;   shift 2 ;;
+    -p|--pcf)         PCF=$2;    shift 2 ;;
+    -b|--bit)         BIT=$2;    shift 2 ;;
+    -v|--out-verilog) OUT_VERILOG=$2; shift 2 ;;
+    -o|--out-pcf)     OUT_PCF=$2;     shift 2 ;;
+    -q|--out-qcf)     OUT_QCF=$2;     shift 2 ;;
+    --) break ;;
+  esac
 done
 
 if [ -z $DEVICE ]; then
-    echo "Please provide device name"
-	exit 1
+  echo "Please provide device name"
+  exit 1
 fi
 
 if [ -z $BIT ]; then
-	echo "Please provide an input bistream file name"
-	exit 1
+  echo "Please provide an input bistream file name"
+  exit 1
 fi
 
+if ! [[ "$DEVICE" =~ ^(ql-eos-s3|ql-pp3e)$ ]]; then
+  echo "ERROR: Unsupported device '${DEVICE}' for fasm2bels"
+  exit -1
+fi
 
 # $DEVICE is not ql-eos-s3 or ql-pp3e
 if ! [[ "$DEVICE" =~ ^(ql-eos-s3|ql-pp3e)$ ]]; then
-    echo "ERROR: Unsupported device '${DEVICE}' for fasm2bels"
-    exit -1
+  echo "ERROR: Unsupported device '${DEVICE}' for fasm2bels"
+  exit -1
 fi
 
-# Run fasm2bels
-VPR_DB=`readlink -f ${SHARE_DIR_PATH}/arch/${DEVICE}_wlcsp/db_phy.pickle`
-FASM2BELS=`readlink -f ${SHARE_DIR_PATH}/scripts/fasm2bels.py`
-FASM2BELS_DEVICE=${DEVICE/ql-/}
-
-VERILOG_FILE="${OUT_VERILOG:-$BIT.v}"
-PCF_FILE="${OUT_PCF:-$BIT.v.pcf}"
-QCF_FILE="${OUT_QCF:-$BIT.v.qcf}"
-
 if [ ! -z "{PCF}" ]; then
-    PCF_ARGS="--input-pcf ${PCF}"
+  PCF_ARGS="--input-pcf ${PCF}"
 else
-    PCF_ARGS=""
+  PCF_ARGS=""
 fi
 
 echo "Running fasm2bels"
-`which python3` ${FASM2BELS} ${BIT} --phy-db ${VPR_DB} --device-name ${FASM2BELS_DEVICE} --package-name ${PART} --input-type bitstream --output-verilog ${VERILOG_FILE} ${PCF_ARGS} --output-pcf ${PCF_FILE} --output-qcf ${QCF_FILE}
+
+echo "Running fasm2bels"
+`which python3` "`readlink -f ${SHARE_DIR_PATH}/scripts/fasm2bels.py`" "${BIT}" \
+  --phy-db "`readlink -f ${SHARE_DIR_PATH}/arch/${DEVICE}_wlcsp/db_phy.pickle`" \
+  --device-name "${DEVICE/ql-/}" \
+  --package-name "$PART" \
+  --input-type bitstream \
+  --output-verilog "${OUT_VERILOG:-$BIT.v}" \
+  ${PCF_ARGS} \
+  --output-pcf "${OUT_PCF:-$BIT.v.pcf}" \
+  --output-qcf "${OUT_QCF:-$BIT.v.qcf}"

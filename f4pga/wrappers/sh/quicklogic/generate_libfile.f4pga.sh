@@ -35,9 +35,9 @@ ARCH_DIR="$F4PGA_SHARE_DIR"/arch/${DEVICE_1}_${DEVICE_1}
 PINMAP_XML=${ARCH_DIR}/${PINMAPXML}
 
 `which python3` "$F4PGA_SHARE_DIR"/scripts/create_lib.py \
-  -n ${DEV}_0P72_SSM40 \
+  -n "${DEV}_0P72_SSM40" \
   -m fpga_top \
-  -c $PART \
-  -x ${ARCH_DIR}/lib/${INTERFACEXML} \
-  -l ${DEV}_0P72_SSM40.lib \
-  -t ${ARCH_DIR}/lib
+  -c "$PART" \
+  -x "${ARCH_DIR}/lib/${INTERFACEXML}" \
+  -l "${DEV}_0P72_SSM40.lib" \
+  -t "${ARCH_DIR}/lib"
