@@ -18,5 +18,5 @@
 
 if [ -z $VPRPATH ]; then
   export VPRPATH="$F4PGA_BIN_DIR"
-  export PYTHONPATH="${VPRPATH}/python:${VPRPATH}/python/prjxray:${PYTHONPATH}"
+  export PYTHONPATH="${VPRPATH}/python:${PYTHONPATH}"
 fi
