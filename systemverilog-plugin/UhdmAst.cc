@@ -937,6 +937,7 @@ static void simplify(AST::AstNode *current_node, AST::AstNode *parent_node)
         }
         break;
     case AST::AST_STRUCT:
+    case AST::AST_UNION:
         simplify_struct(current_node, 0, parent_node);
         // instance rather than just a type in a typedef or outer struct?
         if (!current_node->str.empty() && current_node->str[0] == '\\') {
