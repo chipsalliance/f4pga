@@ -18,69 +18,63 @@
 
 set -e
 
+
 echo '::group::Install dependencies'
+
 sudo apt update -y
 sudo apt install -y git wget xz-utils
+
 echo '::endgroup::'
 
 
-echo '::group::Clone f4pga-examples'
-git clone --recurse-submodules https://github.com/chipsalliance/f4pga-examples
-cd f4pga-examples
+echo '::group::Environment variables'
+
+FPGA_FAM="${FPGA_FAM:=xc7}"
+F4PGA_INSTALL_DIR="${F4PGA_INSTALL_DIR:=/opt/f4pga}"
+F4PGA_INSTALL_DIR_FAM="${F4PGA_INSTALL_DIR}/${FPGA_FAM}"
+
+echo "FPGA_FAM: $FPGA_FAM"
+echo "F4PGA_INSTALL_DIR: $F4PGA_INSTALL_DIR"
+echo "F4PGA_INSTALL_DIR_FAM: $F4PGA_INSTALL_DIR_FAM"
+
 echo '::endgroup::'
 
-
-FPGA_FAM=${FPGA_FAM:=xc7}
 
 echo '::group::Install Miniconda3'
+
 wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O conda_installer.sh
 
-F4PGA_INSTALL_DIR_FAM="$F4PGA_INSTALL_DIR/$FPGA_FAM"
+bash conda_installer.sh -u -b -p "${F4PGA_INSTALL_DIR_FAM}"/conda
+source "${F4PGA_INSTALL_DIR_FAM}"/conda/etc/profile.d/conda.sh
 
-bash conda_installer.sh -u -b -p "$F4PGA_INSTALL_DIR_FAM"/conda
-source "$F4PGA_INSTALL_DIR_FAM"/conda/etc/profile.d/conda.sh
-echo '::endgroup::'
-
-
-echo '::group::Create environment'
-conda env create -f "$FPGA_FAM"/environment.yml
 echo '::endgroup::'
 
 
 echo '::group::Install arch-defs'
-mkdir -p "$F4PGA_INSTALL_DIR_FAM"/install
+
+mkdir -p "$F4PGA_INSTALL_DIR_FAM"
+
+F4PGA_TIMESTAMP='20220803-160711'
+F4PGA_HASH='df6d9e5'
+
 case "$FPGA_FAM" in
-  xc7)
-    F4PGA_TIMESTAMP='20220729-181657'
-    F4PGA_HASH='7833050'
-    for PKG in install-xc7 xc7a50t_test; do
-      wget -qO- https://storage.googleapis.com/symbiflow-arch-defs/artifacts/prod/foss-fpga-tools/symbiflow-arch-defs/continuous/install/${F4PGA_TIMESTAMP}/symbiflow-arch-defs-${PKG}-${F4PGA_HASH}.tar.xz | tar -xJC $F4PGA_INSTALL_DIR/$FPGA_FAM/install
-    done
-  ;;
-  eos-s3)
-    F4PGA_TIMESTAMP='20220729-181657'
-    F4PGA_HASH='7833050'
-    for PKG in install-ql ql-eos-s3_wlcsp; do
-      wget -qO- https://storage.googleapis.com/symbiflow-arch-defs/artifacts/prod/foss-fpga-tools/symbiflow-arch-defs/continuous/install/${F4PGA_TIMESTAMP}/symbiflow-arch-defs-${PKG}-${F4PGA_HASH}.tar.xz | tar -xJC $F4PGA_INSTALL_DIR/$FPGA_FAM/install
-    done
-  ;;
+  xc7)    PACKAGES='install-xc7 xc7a50t_test';;
+  eos-s3) PACKAGES='install-ql ql-eos-s3_wlcsp';;
+  *)
+    echo "Unknowd FPGA_FAM <${FPGA_FAM}>!"
+    exit 1
 esac
+
+for PKG in $PACKAGES; do
+  wget -qO- https://storage.googleapis.com/symbiflow-arch-defs/artifacts/prod/foss-fpga-tools/symbiflow-arch-defs/continuous/install/${F4PGA_TIMESTAMP}/symbiflow-arch-defs-${PKG}-${F4PGA_HASH}.tar.xz \
+    | tar -xJC $F4PGA_INSTALL_DIR_FAM
+done
+
 echo '::endgroup::'
 
 
-cd ..
+echo '::group::Create environment'
 
+conda env create -f $F4PGA_INSTALL_DIR_FAM/"$FPGA_FAM"_env/"$FPGA_FAM"_environment.yml
 
-echo '::group::Add f4pga-env'
-
-F4PGA_DIR_ROOT='install'
-
-F4PGA_DIR_BIN="$F4PGA_INSTALL_DIR_FAM/$F4PGA_DIR_ROOT"/bin/
-mkdir -p "$F4PGA_DIR_BIN"
-cp $(dirname "$0")/../../f4pga-env "$F4PGA_DIR_BIN"
 echo '::endgroup::'
-
-
-cd "$F4PGA_DIR_BIN"
-ls -lah
-
