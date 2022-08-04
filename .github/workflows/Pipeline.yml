@@ -147,8 +147,8 @@ jobs:
           . ./.github/scripts/envvars.sh
           . ./.github/scripts/activate.sh
 
-          export F4PGA_BIN_DIR="$F4PGA_INSTALL_DIR_FAM_ROOT"/bin/
-          export F4PGA_SHARE_DIR="$F4PGA_INSTALL_DIR_FAM_ROOT"/share/f4pga
+          export F4PGA_BIN_DIR="$F4PGA_INSTALL_DIR_FAM"/bin/
+          export F4PGA_SHARE_DIR="$F4PGA_INSTALL_DIR_FAM"/share/f4pga
           export VPRPATH=$F4PGA_BIN_DIR
 
           echo '::group::Clone f4pga-examples'
