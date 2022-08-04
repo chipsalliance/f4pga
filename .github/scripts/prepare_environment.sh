@@ -29,7 +29,13 @@ echo '::endgroup::'
 
 echo '::group::Environment variables'
 
-source $(dirname "$0")/envvars.sh
+FPGA_FAM="${FPGA_FAM:=xc7}"
+F4PGA_INSTALL_DIR="${F4PGA_INSTALL_DIR:=/opt/f4pga}"
+F4PGA_INSTALL_DIR_FAM="${F4PGA_INSTALL_DIR}/${FPGA_FAM}"
+
+echo "FPGA_FAM: $FPGA_FAM"
+echo "F4PGA_INSTALL_DIR: $F4PGA_INSTALL_DIR"
+echo "F4PGA_INSTALL_DIR_FAM: $F4PGA_INSTALL_DIR_FAM"
 
 echo '::endgroup::'
 
