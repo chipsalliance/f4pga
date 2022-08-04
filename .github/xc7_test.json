@@ -5,7 +5,7 @@
     },
     "dependencies": {
         "sources": [
-            "xc7/counter_test/counter.v"
+            "counter_test/counter.v"
         ],
         "synth_log": "synth.log",
         "pack_log": "pack.log"
@@ -13,9 +13,9 @@
     "XC7A35TCSG324-1": {
         "default_target": "bitstream",
         "dependencies": {
-            "build_dir": "build/xc7",
+            "build_dir": "build",
             "xdc": [
-                "xc7/counter_test/arty.xdc"
+                "counter_test/arty.xdc"
             ]
         },
         "values": {

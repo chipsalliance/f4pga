@@ -18,8 +18,6 @@
 
 set -e
 
-source $(dirname "$0")/env
-
 export SHARE_DIR_PATH=${SHARE_DIR_PATH:="$F4PGA_SHARE_DIR"}
 SPLIT_INOUTS=`realpath ${SHARE_DIR_PATH}/scripts/split_inouts.py`
 CONVERT_OPTS=`realpath ${SHARE_DIR_PATH}/scripts/convert_compile_opts.py`

@@ -18,7 +18,6 @@
 
 set -e
 
-source $(dirname "$0")/env
 source $(dirname "$0")/vpr_common.f4pga.sh
 parse_args $@
 

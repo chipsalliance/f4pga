@@ -19,7 +19,6 @@
 set -e
 
 SHARE_DIR_PATH=${SHARE_DIR_PATH:="$F4PGA_SHARE_DIR"}
-BIN_DIR_PATH=${BIN_DIR_PATH:="$F4PGA_BIN_DIR"}
 
 OPTS=d:P:p:b:v:o:q
 LONGOPTS=device:,part:,pcf:,bit:,out-verilog:,out-pcf:,out-qcf:,

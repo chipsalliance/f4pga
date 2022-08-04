@@ -36,7 +36,8 @@
     description: |
       - Tarballs from f4pga-arch-defs now include usable environment and requirements files which allow bootstraping
       minimal Conda environments.
-      - The default share path does not include subdir 'install' by default.
+      - The default F4PGA_SHARE_DIR path does not include subdir 'install' by default.
+      - F4PGA_BIN_DIR and VPRPATH are not used anymore.
 
 5:
   examples: 524dfb6e746b632fdeddc9d06d8a002a3c7a3118

@@ -112,10 +112,12 @@ jobs:
       - name: 🐍 Install f4pga (pip)
         run: |
           . ./.github/scripts/activate.sh
-
           cd f4pga
           pip install .
           cd ..
+
+      - name: 🛠️ Clone f4pga-examples
+        run: git clone --recurse-submodules https://github.com/chipsalliance/f4pga-examples
 
       # F4PGA
 
@@ -123,20 +125,15 @@ jobs:
         if: matrix.flow == 'F4PGA'
         run: |
           . ./.github/scripts/activate.sh
-
-          echo '::group::Clone f4pga-examples'
-          git clone --recurse-submodules https://github.com/chipsalliance/f4pga-examples
-          cd f4pga-examples
-          echo '::endgroup::'
-
-          f4pga -vv build --flow ../.github/${{ matrix.fam }}_test.json
+          cd f4pga-examples/${{ matrix.fam }}
+          f4pga -vv build --flow ../../.github/${{ matrix.fam }}_test.json
 
       - name: '📤 Upload artifact: ${{ matrix.fam }} bitstream'
         if: matrix.flow == 'F4PGA'
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.flow }}-${{ matrix.fam }}-Bitstream
-          path: f4pga-examples/build/${{ matrix.fam }}/top.bit
+          path: f4pga-examples/${{ matrix.fam }}/build/top.bit
           if-no-files-found: error
 
       # SymbiFlow
@@ -145,20 +142,8 @@ jobs:
         if: matrix.flow == 'SymbiFlow'
         run: |
           . ./.github/scripts/activate.sh
-
-          export F4PGA_BIN_DIR="${F4PGA_INSTALL_DIR}/${FPGA_FAM}"/bin/
-          export F4PGA_SHARE_DIR="${F4PGA_INSTALL_DIR}/${FPGA_FAM}"/share/f4pga
-          export VPRPATH=$F4PGA_BIN_DIR
-
-          echo '::group::Clone f4pga-examples'
-          git clone --recurse-submodules https://github.com/chipsalliance/f4pga-examples
-          cd f4pga-examples
-          echo '::endgroup::'
-
-          cd ${{ matrix.fam }}
-
+          cd f4pga-examples/${{ matrix.fam }}
           export F4PGA_USE_DEPRECATED=true
-
           case '${{ matrix.fam }}' in
             xc7) TARGET="arty_35" make -C counter_test;;
             eos-s3) make -C btn_counter;;
@@ -199,7 +184,6 @@ jobs:
       - name: 🐍 Install f4pga (pip)
         run: |
           . ./.github/scripts/activate.sh
-
           cd f4pga
           pip install .
           cd ..
@@ -207,7 +191,6 @@ jobs:
       - name: 🚦 Test Python wrappers
         run: |
           . ./.github/scripts/activate.sh
-
           pip3 install -r ./test/requirements.txt
           pytest --verbose --capture=no -rA --color=yes test/
 

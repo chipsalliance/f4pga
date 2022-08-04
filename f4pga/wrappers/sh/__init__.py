@@ -38,8 +38,7 @@ if F4PGA_INSTALL_DIR is None:
     raise(Exception("Required environment variable F4PGA_INSTALL_DIR is undefined!"))
 F4PGA_INSTALL_DIR_PATH = Path(F4PGA_INSTALL_DIR)
 
-f4pga_environ['F4PGA_BIN_DIR'] = f4pga_environ.get('F4PGA_BIN_DIR', str(F4PGA_INSTALL_DIR_PATH / FPGA_FAM / 'conda/bin'))
-f4pga_environ['F4PGA_SHARE_DIR'] = f4pga_environ.get('F4PGA_SHARE_DIR', str(F4PGA_INSTALL_DIR_PATH / FPGA_FAM / 'install/share/f4pga'))
+f4pga_environ['F4PGA_SHARE_DIR'] = f4pga_environ.get('F4PGA_SHARE_DIR', str(F4PGA_INSTALL_DIR_PATH / FPGA_FAM / 'share/f4pga'))
 
 
 def run_sh(script):
