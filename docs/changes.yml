@@ -21,23 +21,28 @@
     - `f4pga build` now supports Lattice's ICE40 devices.
     - `f4pga build` now supports Lattice's ECP5 devices.
     - `f4pga build` now supports Lattice's NX devices.
-  6:
-    examples: '?'
-    arch-defs: 20220803-160711@df6d9e5
-    f4pga: '?'
-    <<: &tarballs-consistent
-      tarballs:
-        xc7:
-          - symbiflow-install-xc7-*-tar-xz
-          - symbiflow-arch-defs-xc7a50t_test-*.tar.xz
-        eos-s3:
-          - symbiflow-install-ql-*-tar-xz
-          - symbiflow-ql-eos-s3_wlcsp-*-tar-xz
-    description: |
-      - Tarballs from f4pga-arch-defs now include usable environment and requirements files which allow bootstraping
-      minimal Conda environments.
-      - The default F4PGA_SHARE_DIR path does not include subdir 'install' by default.
-      - F4PGA_BIN_DIR and VPRPATH are not used anymore.
+
+
+6:
+  examples: 78b5e8f2845985be0c63631324adc33756de642d
+  arch-defs: 20220803-160711@df6d9e5
+  f4pga: e9a520a17a00cfd268f8ee549340aaa297b63da5
+  <<: &tarballs-consistent
+    tarballs:
+      xc7:
+        - symbiflow-install-xc7-*-tar-xz
+        - symbiflow-arch-defs-xc7a50t_test-*.tar.xz
+      eos-s3:
+        - symbiflow-install-ql-*-tar-xz
+        - symbiflow-ql-eos-s3_wlcsp-*-tar-xz
+  description: |
+    * Tarballs from f4pga-arch-defs now include usable environment and requirements files which allow bootstraping
+    minimal Conda environments.
+
+    * The default F4PGA_SHARE_DIR path does not include subdir 'install' by default.
+
+    * F4PGA_BIN_DIR and VPRPATH are not used anymore.
+
 
 5:
   examples: 524dfb6e746b632fdeddc9d06d8a002a3c7a3118
