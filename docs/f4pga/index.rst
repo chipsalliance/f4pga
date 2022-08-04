@@ -1,3 +1,5 @@
+.. _pyF4PGA:
+
 Overview
 ########
 

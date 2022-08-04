@@ -27,6 +27,7 @@ The project aims to design tools that are highly extendable and multiplatform.
   f4pga/Usage
   f4pga/modules/index
   f4pga/DevNotes
+  f4pga/Deprecated
 
 
 .. toctree::

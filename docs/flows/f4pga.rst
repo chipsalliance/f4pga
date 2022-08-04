@@ -8,6 +8,8 @@ In the F4PGA toolchain synthesis is made with the use of Yosys, that is able to 
 convert HDL to netlist description.
 The result of these steps is written to a file in ``.eblif`` format.
 
+.. _Flows:F4PGA:Yosys:
+
 Yosys
 =====
 
