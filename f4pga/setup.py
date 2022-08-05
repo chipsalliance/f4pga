@@ -83,7 +83,8 @@ setuptools_setup(
     packages=[
         "f4pga",
         "f4pga.common_modules",
-        "f4pga.wrappers.sh"
+        "f4pga.wrappers.sh",
+        "f4pga.wrappers.tcl"
     ],
     package_dir={"f4pga": "."},
     package_data={
@@ -93,6 +94,12 @@ setuptools_setup(
         'f4pga.wrappers.sh': [
             'xc7/*.f4pga.sh',
             'quicklogic/*.f4pga.sh'
+        ],
+        'f4pga.wrappers.tcl': [
+            'xc7/*.f4pga.tcl',
+            'eos-s3/*.f4pga.tcl',
+            'qlf_k4n8/*.f4pga.tcl',
+            'ice40/*.f4pga.tcl',
         ]
     },
     classifiers=[],

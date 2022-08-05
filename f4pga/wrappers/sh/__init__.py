@@ -25,6 +25,7 @@ from pathlib import Path
 from shutil import which
 from subprocess import check_call
 
+from f4pga import FPGA_FAM
 
 python3 = which('python3')
 
@@ -32,9 +33,7 @@ f4pga_environ = environ.copy()
 
 ROOT = Path(__file__).resolve().parent
 
-FPGA_FAM = f4pga_environ.get('FPGA_FAM', 'xc7')
-isQuickLogic = FPGA_FAM == 'eos-s3'
-
+isQuickLogic = FPGA_FAM != 'xc7'
 SH_SUBDIR = 'quicklogic' if isQuickLogic else FPGA_FAM
 
 F4PGA_INSTALL_DIR = f4pga_environ.get('F4PGA_INSTALL_DIR')
@@ -433,6 +432,7 @@ while true; do
 done
 if [ -z $DEVICE ]; then echo "Please provide device name"; exit 1; fi
 if [ -z $FASM ]; then echo "Please provide an input FASM file name"; exit 1; fi
+if [ ! -f "$FASM" ]; then echo "File <$FASM> does not exist!"; exit 1; fi
 if [ -z $BIT ]; then echo "Please provide an output bistream file name"; exit 1; fi
 """ + f"""
 if [[ "$DEVICE" =~ ^(qlf_k4n8.*)$ ]]; then
