@@ -109,6 +109,8 @@ def module_io(module: Module):
     }
 
 
+_deep_resolve = deep(lambda p: str(Path(p).resolve()), allow_none=True)
+
 def module_map(module: Module, ctx: ModRunCtx):
     try:
         mod_ctx = ModuleContext(
@@ -121,7 +123,7 @@ def module_map(module: Module, ctx: ModRunCtx):
     except Exception as e:
         raise ModuleFailException(module.name, 'map', e)
 
-    return deep(lambda p: str(Path(p).resolve()))(vars(mod_ctx.outputs))
+    return _deep_resolve(vars(mod_ctx.outputs))
 
 
 def module_exec(module: Module, ctx: ModRunCtx):

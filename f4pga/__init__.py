@@ -327,8 +327,9 @@ class Flow:
 
         outputs = module_map(provider.module, modrunctx)
         for output_paths in outputs.values():
-            if req_exists(output_paths) and self.f4cache:
-                _cache_deps(output_paths, self.f4cache)
+            if output_paths is not None:
+                if req_exists(output_paths) and self.f4cache:
+                    _cache_deps(output_paths, self.f4cache)
 
         stages_checked.add(provider.name)
         self.dep_paths.update(outputs)
@@ -434,11 +435,11 @@ class Flow:
             self.run_stages.discard(provider.name)
 
             for product in provider.produces:
-                exists = req_exists(paths)
-                if (product.spec == 'req') and not exists:
+                if (product.spec == 'req') and not req_exists(paths):
                     raise DependencyNotProducedException(dep, provider.name)
-                if exists and self.f4cache:
-                    _cache_deps(self.dep_paths[product.name], self.f4cache)
+                prod_paths = self.dep_paths[product.name]
+                if (prod_paths is not None) and req_exists(paths) and self.f4cache:
+                    _cache_deps(prod_paths, self.f4cache)
 
         return True
 

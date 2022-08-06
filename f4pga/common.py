@@ -94,17 +94,20 @@ def resolve_modstr(modstr: str):
     return str(Path(col_path) / module_filename)
 
 
-def deep(fun):
+def deep(fun, allow_none=False):
     """
     Create a recursive string transform function for 'str | list | dict', i.e a dependency.
     """
     def d(paths, *args, **kwargs):
+        nonlocal allow_none
         if type(paths) is str:
             return fun(paths, *args, **kwargs)
         elif type(paths) is list:
             return [d(p, *args, **kwargs) for p in paths];
         elif type(paths) is dict:
             return dict([(k, d(p, *args, **kwargs)) for k, p in paths.items()])
+        elif allow_none and (paths is None):
+            return paths
         else:
             raise RuntimeError(f'paths is of type {type(paths)}')
     return d
