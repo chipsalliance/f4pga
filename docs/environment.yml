@@ -15,12 +15,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name: f4pga-docs
+
 channels:
-  - symbiflow
   - conda-forge
-  - defaults
+
 dependencies:
-  - cmake
   - pygobject
   - pip
   - pip:
