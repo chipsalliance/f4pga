@@ -70,7 +70,7 @@ class Flow:
         self.dep_paths = {
             n: p
             for n, p in cfg.get_dependency_overrides().items()
-            if p_req_exists(p)  # and not p_dep_differ(p, f4cache)
+            if (p is not None) and p_req_exists(p)  # and not p_dep_differ(p, f4cache)
         }
         if f4cache is not None:
             for dep in self.dep_paths.values():

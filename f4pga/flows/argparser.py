@@ -116,6 +116,10 @@ def _parse_depval(depvalstr: str):
     return d
 
 
+def _null_generator():
+    return (item for item in [])
+
+
 def _unescaped_matches(regexp: str, s: str, escape_chr="\\"):
     """
     Find all occurences of a pattern in a string that contains escape sequences.
@@ -128,16 +132,22 @@ def _unescaped_matches(regexp: str, s: str, escape_chr="\\"):
     # unescaped characters, but to map the results back to the string containing the
     # escape sequences, we need to track the offsets by which the characters were
     # shifted.
+
+    # TODO: This doesn't handle self-escape case
     offsets = []
     offset = 0
     for sl in s.split(escape_chr):
-        if len(sl) <= 1:
-            continue
-        noescape = sl[(1 if offset != 0 else 0) :]
+        noescape = sl[(1 if offset != 0 else 0) :] if len(sl) > 1 else ""
         for _ in noescape:
             offsets.append(offset)
         offset += 2
         noescapes += noescape
+
+    if len(offsets) == 0:
+        return _null_generator()
+
+    last_offset = offsets[-1]
+    offsets.append(last_offset)
 
     iter = re_finditer(regexp, noescapes)
 
@@ -188,7 +198,7 @@ def _parse_cli_value(s: str):
     """
 
     if len(s) == 0:
-        return ""
+        return None
 
     # List
     if s[0] == "[":
