@@ -60,15 +60,17 @@ class Stage:
     meta: 'dict[str, str]'     #   Stage's metadata extracted from module's
                                # output.
 
-    def __init__(self, name: str, modstr: str, mod_opts: 'dict[str, ] | None'):
-        if mod_opts is None:
-            mod_opts = {}
+    def __init__(self, name: str, stage_def: 'dict[str, ]'):
+        if stage_def is None:
+            stage_def = {}
+        
+        modstr = stage_def['module']
 
         module_path = resolve_modstr(modstr)
         ModuleClass = get_module(module_path)
-        self.module = ModuleClass(mod_opts.get('params'))
+        self.module = ModuleClass(stage_def.get('params'))
 
-        values = mod_opts.get('values')
+        values = stage_def.get('values')
         if values is not None:
             self.value_overrides = values
         else:

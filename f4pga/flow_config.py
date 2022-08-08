@@ -82,13 +82,9 @@ class FlowDefinition:
             self.r_env.add_values(global_vals)
 
         stages_d = flow_def['stages']
-        modopts_d = flow_def.get('stage_options')
-        if modopts_d is None:
-            modopts_d = {}
 
-        for stage_name, modstr in stages_d.items():
-            opts = modopts_d.get(stage_name)
-            self.stages[stage_name] = Stage(stage_name, modstr, opts)
+        for stage_name, stage_def in stages_d.items():
+            self.stages[stage_name] = Stage(stage_name, stage_def)
 
     def stage_names(self):
         return self.stages.keys()
