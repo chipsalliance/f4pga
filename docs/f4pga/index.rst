@@ -17,9 +17,24 @@ The scope of Python F4PGA is threefold:
   Therefore, it's still a *pre-alpha* and the codebase, commands and flows are subject to change.
   It is strongly suggested not to rely on Python F4PGA until this note is updated/removed.
 
-.. toctree::
+This is the current in-development FPGA-oriented build system that's provided with f4pga.
 
-  README
+This package aims to provide a unified front-end for executing *verilog-to-bitstream* and
+other flows for various FPGA platforms. It's meant as a future replacement of
+``symbiflow_*`` shell scripts.
+
+It contains *EDA* tool wrappers that provide meta-data about the tools, utilities
+related to tracking files and inspection of data used within the flows, scripts used by
+tools within flows, a dependency resolution algorithm and flow templates for various devices.
+
+The basic usage requires creation of a ``flow.json`` file describing the FPGA-oriented project.
+You can take
+:gh:`one from the f4pga-examples repository <chipsalliance/f4pga-examples/blob/main/xc7/counter_test/flow.json>`
+as a reference. Alternatively there's a way to configure a flow with command-line parameters only.
+
+Once you have your flow created, run ``f4pga build -f flow.json`` to build a default target.
+
+To learn more about the package and its usage, visit :doc:`Usage`.
 
 References
 ==========

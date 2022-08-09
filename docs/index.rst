@@ -59,10 +59,12 @@ Table of Contents
 
 
 .. toctree::
-  :caption: Python utils
+  :caption: f4pga Python utils
   :maxdepth: 2
 
   f4pga/index
+  f4pga/Status
+  f4pga/Contributing
   f4pga/Usage
   f4pga/modules/index
   f4pga/DevNotes
