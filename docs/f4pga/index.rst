@@ -9,7 +9,10 @@ The scope of Python F4PGA is threefold:
 
 * Provide a fine-grained *pythonic* interface to the tools and utilities available as either command-line interfaces
   (CLIs) or application proggraming interfaces (APIs) (either web or through shared libraries).
-* Provide a CLI entrypoint covering the whole flows for end-users to produce bitstreams from HDL and/or software sources.
+
+* Provide a unified CLI front-end covering the whole flows for end-users to produce bitstreams from HDL and/or software sources.
+  It's meant as a future replacement of the deprecated ``symbiflow_*`` shell scripts.
+
 * Provide a CLI entrypoint for developers contributing to bitstream documentation and testing (continuous integration).
 
 .. ATTENTION::
@@ -17,32 +20,14 @@ The scope of Python F4PGA is threefold:
   Therefore, it's still a *pre-alpha* and the codebase, commands and flows are subject to change.
   It is strongly suggested not to rely on Python F4PGA until this note is updated/removed.
 
-This is the current in-development FPGA-oriented build system that's provided with f4pga.
-
-This package aims to provide a unified front-end for executing *verilog-to-bitstream* and
-other flows for various FPGA platforms. It's meant as a future replacement of
-``symbiflow_*`` shell scripts.
-
-It contains *EDA* tool wrappers that provide meta-data about the tools, utilities
-related to tracking files and inspection of data used within the flows, scripts used by
-tools within flows, a dependency resolution algorithm and flow templates for various devices.
+``f4pga`` contains *EDA* tool wrappers that provide meta-data about the tools, utilities related to tracking files and
+inspection of data used within the flows, scripts used by tools within flows, a dependency resolution algorithm and flow
+templates for various devices.
 
 The basic usage requires creation of a ``flow.json`` file describing the FPGA-oriented project.
-You can take
-:gh:`one from the f4pga-examples repository <chipsalliance/f4pga-examples/blob/main/xc7/counter_test/flow.json>`
-as a reference. Alternatively there's a way to configure a flow with command-line parameters only.
+See, for instance, example :gh:`xc7/counter_test/flow.json ➚ <chipsalliance/f4pga-examples/blob/main/xc7/counter_test/flow.json>`.
+Alternatively the flow can be configured through CLI arguments only.
 
-Once you have your flow created, run ``f4pga build -f flow.json`` to build a default target.
+With a given flow configuration, run ``f4pga build -f flow.json`` builds the default target.
 
-To learn more about the package and its usage, visit :doc:`Usage`.
-
-References
-==========
-
-* :gh:`chipsalliance/fpga-tool-perf#390@issuecomment-1023487178 <chipsalliance/fpga-tool-perf/pull/390#issuecomment-1023487178>`
-* :ghsharp:`2225`
-* :ghsharp:`2371`
-* :ghsharp:`2455`
-* `F4PGA GSoC 2022 project ideas: Generalization of wrapper scripts for installed F4PGA toolchain and making them OS agnostic <https://github.com/f4pga/ideas/blob/master/gsoc-2022-ideas.md#generalization-of-wrapper-scripts-for-installed-f4pga-toolchain-and-making-them-OS-agnostic>`__
-* :gh:`FuseSoc <olofk/fusesoc>` | :gh:`Edalize <olofk/edalize>`
-* `Electronic Design Automation Abstraction (EDA²) <https://edaa-org.github.io/>`__
+See :doc:`Usage` to learn more about ``f4pga``.

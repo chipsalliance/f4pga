@@ -1,52 +1,51 @@
 Package capability status
 #########################
 
-* Architecture support:
+* Supports incremental builds.
 
-    * Xilinx XC7 (**available** in main branch)
+* Supports multiple configurations for a single project.
 
-        * Synthesis tool: yosys
+* Provides a Python interface to ``F4PGA``, however there's no official API at the moment.
 
-        * PnR tool: VPR
+Architectures and flows
+=======================
 
-        * bitstream generation: yes (xcfasm)
+Xilinx XC7
+----------
 
-        * used in f4pga-examples: :gh:`yes <chipsalliance/f4pga-examples/blob/main/xc7/counter_test/flow.json>`
+* Synthesis tool: yosys
+* PnR tool: VPR
+* bitstream generation: yes (xcfasm)
+* used in f4pga-examples: :gh:`yes <chipsalliance/f4pga-examples/blob/main/xc7/counter_test/flow.json>`
 
-    * Quicklogic EOS-S3 (yosys+VPR flow) (**WIP**, see :ghsharp:`577`)
+Quicklogic EOS-S3
+-----------------
 
-        * Synthesis tool: yosys
+* Synthesis tool: yosys
+* PnR tool: VPR
+* bitstream generation: yes (qlfasm)
+* analysis: ?
+* used in f4pga-examples: no
 
-        * PnR tool: VPR
+Lattice ICE40
+-------------
 
-        * bitstream generation: yes (qlfasm)
+.. IMPORTANT::
+   **WIP** :ghsharp:`585`
 
-        * analysis: ?
+* Synthesis tool: yosys
+* PnR tool: nextpnr
+* bitstream generation: yes (icepack)
+* used in f4pga-examples: no
 
-        * used in f4pga-examples: no
+Quicklogic k4n8
+---------------
 
-    * Lattice ICE40 (yosys+nextpnr flow) (**WIP**, see :ghsharp:`585`)
+* Synthesis tool: yosys
+* PnR tool: VPR
+* bitstream generation: yes (qlf_fasm)
+* used in f4pga-examples: no
 
-        * Synthesis tool: yosys
-
-        * PnR tool: nextpnr
-
-        * bitstream generation: yes (icepack)
-
-        * used in f4pga-examples: no
-
-    * Quicklogic k4n8 (Unverified, not officially supported. Might work after some tinkering.)
-
-        * Synthesis tool: yosys
-
-        * PnR tool: VPR
-
-        * bitstream generation: yes (qlf_fasm)
-
-        * used in f4pga-examples: no
-
-* Incremental builds support
-
-* Support for multiple configurations for a single project
-
-* Can be used as a python interface to _F4PGA_, however there's no official _API_ at the moment.
+.. NOTE::
+  Unverified, not officially supported.
+  Might work after some tinkering.
