@@ -50,65 +50,55 @@ fi
 
 function parse_args {
 
-     eval set -- "$(
-       getopt \
-         --options=d:e:p:n:P:s: \
-         --longoptions=device:,eblif:,pcf:,net:,part:,sdc: \
-         --name $0 -- "$@"
-     )"
-
-     DEVICE=''
-     DEVICE_NAME=''
-     PART=''
-     EBLIF=''
-     PCF=''
-     NET=''
-     SDC=''
-     ADDITIONAL_VPR_OPTIONS=''
-
-     while true; do
-          case "$1" in
-               -d|--device) DEVICE=$2; shift 2 ;;
-               -e|--eblif)  EBLIF=$2;  shift 2 ;;
-               -p|--pcf)    PCF=$2;    shift 2 ;;
-               -n|--net)    NET=$2;    shift 2 ;;
-               -P|--part)   PART=$2;   shift 2 ;;
-               -s|--sdc)    SDC=$2;    shift 2 ;;
-               --) shift; ADDITIONAL_VPR_OPTIONS="$@"; break ;;
-          esac
-     done
+   eval set -- "$(
+     getopt \
+       --options=d:e:p:n:P:s: \
+       --longoptions=device:,eblif:,pcf:,net:,part:,sdc: \
+       --name $0 -- "$@"
+   )"
+   DEVICE=''
+   DEVICE_NAME=''
+   PART=''
+   EBLIF=''
+   PCF=''
+   NET=''
+   SDC=''
+   ADDITIONAL_VPR_OPTIONS=''
+   while true; do
+     case "$1" in
+       -d|--device) DEVICE=$2; shift 2 ;;
+       -e|--eblif)  EBLIF=$2;  shift 2 ;;
+       -p|--pcf)    PCF=$2;    shift 2 ;;
+       -n|--net)    NET=$2;    shift 2 ;;
+       -P|--part)   PART=$2;   shift 2 ;;
+       -s|--sdc)    SDC=$2;    shift 2 ;;
+       --) shift; ADDITIONAL_VPR_OPTIONS="$@"; break ;;
+     esac
+   done
 
   if [ -z $DEVICE ] && [ -n $PART ]; then
     # Try to find device name. Accept only when exactly one is found
     PART_DIRS=(${SHARE_DIR_PATH}/arch/*/${PART})
-    if [ ${#PART_DIRS[@]} -eq 1 ]; then
-      DEVICE=$(basename $(dirname "${PART_DIRS[0]}"))
-    fi
+    if [ ${#PART_DIRS[@]} -eq 1 ]; then DEVICE=$(basename $(dirname "${PART_DIRS[0]}")); fi
   fi
-  if [ -z $DEVICE ]; then
-    echo "Please provide device name"
-    exit 1
-  fi
+  if [ -z $DEVICE ]; then echo "Please provide device name"; exit 1; fi
+  if [ -z $EBLIF ]; then echo "Please provide blif file name"; exit 1; fi
 
-  if [ -z $EBLIF ]; then
-    echo "Please provide blif file name"
-    exit 1
-  fi
-
-  export DEVICE=$DEVICE
-  export EBLIF=$EBLIF
-  export PCF=$PCF
-  export NET=$NET
-  export SDC=$SDC
+  export DEVICE="$DEVICE"
+  export EBLIF="$EBLIF"
+  export PCF="$PCF"
+  export NET="$NET"
+  export SDC="$SDC"
   export VPR_OPTIONS="$VPR_OPTIONS $ADDITIONAL_VPR_OPTIONS"
 
   export ARCH_DIR=`realpath ${SHARE_DIR_PATH}/arch/$DEVICE`
-  export ARCH_DEF=${ARCH_DIR}/arch.timing.xml
-  export LOOKAHEAD=${ARCH_DIR}/rr_graph_${DEVICE}.lookahead.bin
-  export RR_GRAPH=${ARCH_DIR}/rr_graph_${DEVICE}.rr_graph.real.bin
-  export RR_GRAPH_XML=${ARCH_DIR}/rr_graph_${DEVICE}.rr_graph.real.xml
-  export PLACE_DELAY=${ARCH_DIR}/rr_graph_${DEVICE}.place_delay.bin
-  export DEVICE_NAME=`echo $DEVICE | sed -n 's/_/-/p'`
+  export ARCH_DEF="${ARCH_DIR}"/arch.timing.xml
+  ARCH_RR_PREFIX="${ARCH_DIR}/rr_graph_${DEVICE}"
+  export LOOKAHEAD="${ARCH_RR_PREFIX}".lookahead.bin
+  export RR_GRAPH="${ARCH_RR_PREFIX}".rr_graph.real.bin
+  export RR_GRAPH_XML="${ARCH_RR_PREFIX}".rr_graph.real.xml
+  export PLACE_DELAY="${ARCH_RR_PREFIX}".place_delay.bin
+  export DEVICE_NAME=`echo "$DEVICE" | sed -n 's/_/-/p'`
 }
 
 function run_vpr {
@@ -120,15 +110,15 @@ function run_vpr {
     SDC_OPTIONS="--sdc_file $SDC"
   fi
 
-  vpr ${ARCH_DEF} \
-    ${EBLIF} \
-    --device ${DEVICE_NAME} \
-    ${VPR_OPTIONS} \
-    --read_rr_graph ${RR_GRAPH} \
-    --read_router_lookahead ${LOOKAHEAD} \
-    --read_placement_delay_lookup ${PLACE_DELAY} \
-    ${SDC_OPTIONS} \
+  vpr "$ARCH_DEF" \
+    "$EBLIF" \
+    --device "$DEVICE_NAME" \
+    $VPR_OPTIONS \
+    --read_rr_graph "$RR_GRAPH" \
+    --read_router_lookahead "$LOOKAHEAD" \
+    --read_placement_delay_lookup "$PLACE_DELAY" \
+    $SDC_OPTIONS \
     $@
 
-   return $?
+  return $?
 }

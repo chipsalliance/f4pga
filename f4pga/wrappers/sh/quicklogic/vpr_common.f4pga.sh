@@ -30,24 +30,22 @@ fi
 
 function parse_args {
 
-  OPTS=d:f:e:p:n:P:j:s:t:c:
-  LONGOPTS=device:,eblif:,pcf:,net:,part:,json:,sdc:,top:,corner:
-
-  PARSED_OPTS=`getopt --options=${OPTS} --longoptions=${LONGOPTS} --name $0 -- $@`
-  eval set -- ${PARSED_OPTS}
-
+  eval set -- $(
+    getopt \
+      --options=d:f:e:p:n:P:j:s:t:c: \
+      --longoptions=device:,eblif:,pcf:,net:,part:,json:,sdc:,top:,corner: \
+      --name $0 -- $@
+  )
   DEVICE=""
   FAMILY=""
-  DEVICE_NAME=""
-  PART=""
   EBLIF=""
   PCF=""
   NET=""
-  SDC=""
+  PART=""
   JSON=""
+  SDC=""
   TOP="top"
   CORNER=""
-
   while true; do
     case "$1" in
       -d|--device) DEVICE=$2; shift 2 ;;
@@ -63,55 +61,19 @@ function parse_args {
       --) break ;;
     esac
   done
+  if [ -z $DEVICE ]; then echo "Please provide device name"; exit 1; fi
+  if [ -z $FAMILY ]; then echo "Please provide device family name"; exit 1; fi
+  if [ -z $EBLIF ]; then echo "Please provide blif file name"; exit 1; fi
 
-  if [ -z $DEVICE ]; then
-    echo "Please provide device name"
-    exit 1
-  fi
-
-  if [ -z $FAMILY ]; then
-    echo "Please provide device family name"
-    exit 1
-  fi
-
-  if [ -z $EBLIF ]; then
-    echo "Please provide blif file name"
-    exit 1
-  fi
-
-  export DEVICE=$DEVICE
-  export FAMILY=$FAMILY
-  export EBLIF=$EBLIF
-  export PCF=$PCF
-  export NET=$NET
-  export SDC=$SDC
-  export JSON=$JSON
-  export CORNER=$CORNER
-  if [[ "$DEVICE" == "qlf_k4n8_qlf_k4n8" ]]; then
-    DEVICE_1="qlf_k4n8-qlf_k4n8_umc22_${CORNER}"
-    DEVICE_2=${DEVICE_1}
-  elif [[ "$DEVICE" == "qlf_k6n10_qlf_k6n10" ]];then
-    DEVICE_1="qlf_k6n10-qlf_k6n10_gf12"
-    DEVICE_2=${DEVICE_1}
-  else
-    DEVICE_1=${DEVICE}
-    DEVICE_2="wlcsp"
-  fi
-  export TOP=$TOP
-
-  export ARCH_DIR=`realpath ${SHARE_DIR_PATH}/arch/${DEVICE_1}_${DEVICE_2}`
-  export ARCH_DEF=${ARCH_DIR}/arch_${DEVICE_1}_${DEVICE_2}.xml
-
-  # qlf* devices use different naming scheme than pp3* ones.
-  export RR_GRAPH=${ARCH_DIR}/${DEVICE_1}.rr_graph.bin
-  if [ ! -f ${RR_GRAPH} ]; then
-    export RR_GRAPH=${ARCH_DIR}/rr_graph_${DEVICE_1}_${DEVICE_2}.rr_graph.real.bin
-  fi
-
-  export PLACE_DELAY=${ARCH_DIR}/rr_graph_${DEVICE_1}_${DEVICE_2}.place_delay.bin
-  export ROUTE_DELAY=${ARCH_DIR}/rr_graph_${DEVICE_1}_${DEVICE_2}.lookahead.bin
-
-  export DEVICE_NAME=${DEVICE_1}
+  export DEVICE="$DEVICE"
+  export FAMILY="$FAMILY"
+  export EBLIF="$EBLIF"
+  export PCF="$PCF"
+  export NET="$NET"
+  export JSON="$JSON"
+  export SDC="$SDC"
+  export TOP="$TOP"
+  export CORNER="$CORNER"
 
   if [[ "$DEVICE" == "qlf_k4n8_qlf_k4n8" ]]; then
     VPR_OPTIONS="$VPR_OPTIONS
@@ -141,6 +103,30 @@ function parse_args {
     --pack_high_fanout_threshold PB-LOGIC:18
     --suppress_warnings ${OUT_NOISY_WARNINGS},sum_pin_class:check_unbuffered_edges:load_rr_indexed_data_T_values:check_rr_node:trans_per_R:check_route:set_rr_graph_tool_comment"
   fi
+
+  if [[ "$DEVICE" == "qlf_k4n8_qlf_k4n8" ]]; then
+    DEVICE_1="qlf_k4n8-qlf_k4n8_umc22_${CORNER}"
+    DEVICE_2="$DEVICE_1"
+  elif [[ "$DEVICE" == "qlf_k6n10_qlf_k6n10" ]];then
+    DEVICE_1="qlf_k6n10-qlf_k6n10_gf12"
+    DEVICE_2="$DEVICE_1"
+  else
+    DEVICE_1="$DEVICE"
+    DEVICE_2="wlcsp"
+  fi
+
+  DEVICE_ARCH="${DEVICE_1}_${DEVICE_2}"
+  export ARCH_DIR=`realpath ${SHARE_DIR_PATH}/arch/${DEVICE_ARCH}`
+  export ARCH_DEF="${ARCH_DIR}/arch_${DEVICE_ARCH}".xml
+  ARCH_RR_PREFIX="${ARCH_DIR}/rr_graph_${DEVICE_ARCH}"
+  # qlf* devices use different naming scheme than pp3* ones.
+  export RR_GRAPH="${ARCH_DIR}/${DEVICE_1}".rr_graph.bin
+  if [ ! -f "${RR_GRAPH}" ]; then
+    export RR_GRAPH="${ARCH_RR_PREFIX}".rr_graph.real.bin
+  fi
+  export PLACE_DELAY="${ARCH_RR_PREFIX}".place_delay.bin
+  export ROUTE_DELAY="${ARCH_RR_PREFIX}".lookahead.bin
+  export DEVICE_NAME="$DEVICE_1"
 }
 
 function run_vpr {
@@ -151,14 +137,14 @@ function run_vpr {
      SDC_OPTIONS="--sdc_file $SDC"
   fi
 
-  "`which vpr`" ${ARCH_DEF} \
+  "`which vpr`" "$ARCH_DEF" \
     ${EBLIF} \
-    --read_rr_graph ${RR_GRAPH} \
-    --device ${DEVICE_NAME} \
-    ${VPR_OPTIONS} \
-    --read_router_lookahead ${ROUTE_DELAY} \
-    --read_placement_delay_lookup ${PLACE_DELAY} \
-    ${SDC_OPTIONS} \
+    --read_rr_graph "$RR_GRAPH" \
+    --device "$DEVICE_NAME" \
+    $VPR_OPTIONS \
+    --read_router_lookahead "$ROUTE_DELAY" \
+    --read_placement_delay_lookup "$PLACE_DELAY" \
+    $SDC_OPTIONS \
     $@
 
   return $?
