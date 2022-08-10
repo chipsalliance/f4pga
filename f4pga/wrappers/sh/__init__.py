@@ -106,7 +106,17 @@ def write_fasm():
 
 def write_xml_rr_graph():
     print("[F4PGA] Running (deprecated) write xlm rr graph")
-    run_sh(ROOT / SH_SUBDIR / "write_xml_rr_graph.f4pga.sh")
+    check_call(f"""
+set -e
+source {ROOT / SH_SUBDIR}/vpr_common.f4pga.sh
+parse_args {' '.join(sys_argv[1:])}
+export OUT_NOISY_WARNINGS=noisy_warnings-${{DEVICE}}_place.log
+vpr ${{ARCH_DEF}} \
+  ${{EBLIF}} \
+  --read_rr_graph ${{RR_GRAPH}} \
+  --write_rr_graph ${{RR_GRAPH_XML}} \
+  --pack
+""", env=f4pga_environ, shell=True, executable='/bin/bash')
 
 
 def vpr_common():
