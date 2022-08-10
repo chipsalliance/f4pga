@@ -43,22 +43,26 @@ f4pga_environ['F4PGA_SHARE_DIR'] = f4pga_environ.get('F4PGA_SHARE_DIR', str(F4PG
 
 # Helper functions
 
-def run_sh_script(script):
+
+def p_run_sh_script(script):
     stdout.flush()
     stderr.flush()
     check_call([str(script)]+sys_argv[1:], env=f4pga_environ)
 
-def run_bash_cmds(cmds):
+
+def p_run_bash_cmds(cmds):
     stdout.flush()
     stderr.flush()
     check_call(cmds, env=f4pga_environ, shell=True, executable='/bin/bash')
 
-def run_pym(module):
+
+def p_run_pym(module):
     stdout.flush()
     stderr.flush()
     check_call([which('python3'), '-m' , module]+sys_argv[1:], env=f4pga_environ)
 
-def vpr_common_cmds(log_suffix = None):
+
+def p_vpr_common_cmds(log_suffix = None):
     return f"""
 set -e
 source {ROOT / SH_SUBDIR}/vpr_common.f4pga.sh
@@ -68,16 +72,75 @@ export OUT_NOISY_WARNINGS=noisy_warnings-${{DEVICE}}_{log_suffix}.log
 """ if log_suffix is not None else '')
 
 
+def p_args_str2list(args):
+    return [arg for arg in args.strip().split() if arg != '']
+
+
+def p_vpr_run():
+    print("[F4PGA] Running (deprecated) vpr run")
+
+    arg_arch_def = f4pga_environ.get('ARCH_DEF')
+    if arg_arch_def is None:
+        raise(Exception('[F4PGA] vpr run: envvar ARCH_DEF cannot be unset/empty!'))
+
+    arg_eblif = f4pga_environ.get('EBLIF')
+    if arg_eblif is None:
+        raise(Exception('[F4PGA] vpr run: envvar EBLIF cannot be unset/empty!'))
+
+    arg_vpr_options = f4pga_environ.get('VPR_OPTIONS')
+    if arg_vpr_options is None:
+        raise(Exception('[F4PGA] vpr run: envvar VPR_OPTIONS cannot be unset/empty!'))
+
+    arg_device_name = f4pga_environ.get('DEVICE_NAME')
+    if arg_device_name is None:
+        raise(Exception('[F4PGA] vpr run: envvar DEVICE_NAME cannot be unset/empty!'))
+
+    arg_rr_graph = f4pga_environ.get('RR_GRAPH')
+    if arg_rr_graph is None:
+        raise(Exception('[F4PGA] vpr run: envvar RR_GRAPH cannot be unset/empty!'))
+
+    arg_lookahead = f4pga_environ.get('LOOKAHEAD')
+    if arg_lookahead is None:
+        raise(Exception('[F4PGA] vpr run: envvar LOOKAHEAD cannot be unset/empty!'))
+
+    arg_place_delay = f4pga_environ.get('PLACE_DELAY')
+    if arg_place_delay is None:
+        raise(Exception('[F4PGA] vpr run: envvar PLACE_DELAY cannot be unset/empty!'))
+
+    sdc = f4pga_environ.get('SDC')
+
+    check_call(
+        [
+            which('vpr'),
+            arg_arch_def,
+            arg_eblif
+        ] + p_args_str2list(arg_vpr_options) + [
+            '--device',
+            arg_device_name,
+            '--read_rr_graph',
+            arg_rr_graph,
+            '--read_router_lookahead',
+            arg_lookahead,
+            '--read_placement_delay_lookup',
+            arg_place_delay
+        ] + (
+            ['--sdc_file', sdc] if sdc is not None else []
+        ) + sys_argv[1:],
+        env=f4pga_environ
+    )
+
+
 # Entrypoints
+
 
 def generate_constraints():
     print("[F4PGA] Running (deprecated) generate constraints")
     if isQuickLogic:
-        run_sh_script(ROOT / SH_SUBDIR / "generate_constraints.f4pga.sh")
+        p_run_sh_script(ROOT / SH_SUBDIR / "generate_constraints.f4pga.sh")
     else:
         (eblif, net, part, device, arch_def) = sys_argv[1:6]
         pcf_opts = f"PCF_OPTS='--pcf {sys_argv[6]}'" if len(sys_argv) > 6 else ''
-        run_bash_cmds(f"""
+        p_run_bash_cmds(f"""
 set -e
 EBLIF='{eblif}'
 NET='{net}'
@@ -111,7 +174,7 @@ python3 "${SHARE_DIR_PATH}"/scripts/prjxray_create_place_constraints.py \
 def pack():
     print("[F4PGA] Running (deprecated) pack")
     extra_args = ['--write_block_usage', 'block_usage.json'] if isQuickLogic else []
-    run_bash_cmds(vpr_common_cmds('pack')+f"python3 -m f4pga.wrappers.sh.vpr_run --pack {' '.join(extra_args)}")
+    p_run_bash_cmds(p_vpr_common_cmds('pack')+f"python3 -m f4pga.wrappers.sh.vpr_run --pack {' '.join(extra_args)}")
     Path('vpr_stdout.log').rename('pack.log')
 
 
@@ -143,25 +206,25 @@ symbiflow_generate_constraints $EBLIF $NET $PART $DEVICE $ARCH_DEF $PCF
 VPR_PLACE_FILE='constraints.place'
 """
     place_cmds += 'python3 -m f4pga.wrappers.sh.vpr_run --fix_clusters "${VPR_PLACE_FILE}" --place'
-    run_bash_cmds(vpr_common_cmds('place')+place_cmds)
+    p_run_bash_cmds(p_vpr_common_cmds('place')+place_cmds)
     Path('vpr_stdout.log').rename('place.log')
 
 
 def route():
     print("[F4PGA] Running (deprecated) route")
     extra_args = ['--write_timing_summary', 'timing_summary.json'] if isQuickLogic else []
-    run_bash_cmds(vpr_common_cmds('pack')+f"python3 -m f4pga.wrappers.sh.vpr_run --route {' '.join(extra_args)}")
+    p_run_bash_cmds(p_vpr_common_cmds('pack')+f"python3 -m f4pga.wrappers.sh.vpr_run --route {' '.join(extra_args)}")
     Path('vpr_stdout.log').rename('route.log')
 
 
 def synth():
     print("[F4PGA] Running (deprecated) synth")
-    run_sh_script(ROOT / SH_SUBDIR / "synth.f4pga.sh")
+    p_run_sh_script(ROOT / SH_SUBDIR / "synth.f4pga.sh")
 
 
 def write_fasm(genfasm_extra_args = None):
     print("[F4PGA] Running (deprecated) write fasm")
-    run_bash_cmds(vpr_common_cmds('fasm')+"""
+    p_run_bash_cmds(p_vpr_common_cmds('fasm')+"""
 TOP="${EBLIF%.*}"
 FASM_EXTRA="${TOP}_fasm_extra.fasm"
 """ + f"""
@@ -182,30 +245,15 @@ fi
 
 def vpr_common():
     print("[F4PGA] Running (deprecated) vpr common")
-    run_sh_script(ROOT / SH_SUBDIR / "vpr_common.f4pga.sh")
-
-
-def vpr_run():
-    print("[F4PGA] Running (deprecated) vpr run")
-    run_bash_cmds(f"""
-  set -e
-  SDC_OPTIONS=""
-  if [ ! -z $SDC ]; then SDC_OPTIONS="--sdc_file $SDC"; fi
-  '{which('vpr')}' "$ARCH_DEF" "$EBLIF" \
-    --device "$DEVICE_NAME" \
-    $VPR_OPTIONS \
-    --read_rr_graph "$RR_GRAPH" \
-    --read_router_lookahead "$LOOKAHEAD" \
-    --read_placement_delay_lookup "$PLACE_DELAY" \
-    $SDC_OPTIONS \
-""" + f"{' '.join(sys_argv[1:])}")
+    p_run_sh_script(ROOT / SH_SUBDIR / "vpr_common.f4pga.sh")
 
 
 # Xilinx only
 
+
 def write_bitstream():
     print("[F4PGA] Running (deprecated) write bitstream")
-    run_bash_cmds("""
+    p_run_bash_cmds("""
 set -e
 echo "Writing bitstream ..."
 FRM2BIT=""
@@ -258,9 +306,10 @@ xcfasm \
 
 # QuickLogic only
 
+
 def analysis():
     print("[F4PGA] Running (deprecated) analysis")
-    run_bash_cmds(vpr_common_cmds('analysis')+"""
+    p_run_bash_cmds(p_vpr_common_cmds('analysis')+"""
 python3 -m f4pga.wrappers.sh.vpr_run \
   --analysis \
   --gen_post_synthesis_netlist on \
@@ -274,7 +323,7 @@ python3 -m f4pga.wrappers.sh.vpr_run \
 
 def repack():
     print("[F4PGA] Running (deprecated) repack")
-    run_bash_cmds(vpr_common_cmds()+"""
+    p_run_bash_cmds(p_vpr_common_cmds()+"""
 DESIGN=${EBLIF/.eblif/}
 [ ! -z "${JSON}" ] && JSON_ARGS="--json-constraints ${JSON}" || JSON_ARGS=
 [ ! -z "${PCF_PATH}" ] && PCF_ARGS="--pcf-constraints ${PCF_PATH}" || PCF_ARGS=
@@ -298,7 +347,7 @@ PYTHONPATH=$F4PGA_SHARE_DIR/scripts:$PYTHONPATH \
 
 def generate_bitstream():
     print("[F4PGA] Running (deprecated) generate_bitstream")
-    run_bash_cmds(f"""
+    p_run_bash_cmds(f"""
 set -e
 eval set -- "$(
   getopt \
@@ -349,7 +398,7 @@ fi
 def generate_libfile():
     print("[F4PGA] Running (deprecated) generate_libfile")
     (part, device, corner) = sys_argv[1:4]
-    run_bash_cmds(f"""
+    p_run_bash_cmds(f"""
 set -e
 if [[ '{device}' =~ ^(qlf_k4n8_qlf_k4n8)$ ]];then
   DEVICE_1="qlf_k4n8-qlf_k4n8_umc22_{corner}"
@@ -375,12 +424,12 @@ PINMAP_XML=${ARCH_DIR}/${PINMAPXML}
 
 def ql():
     print("[F4PGA] Running (deprecated) ql")
-    run_sh_script(ROOT / "quicklogic/ql.f4pga.sh")
+    p_run_sh_script(ROOT / "quicklogic/ql.f4pga.sh")
 
 
 def fasm2bels():
     print("[F4PGA] Running (deprecated) fasm2bels")
-    run_bash_cmds("""
+    p_run_bash_cmds("""
 set -e
 SHARE_DIR_PATH=${{SHARE_DIR_PATH:="$F4PGA_SHARE_DIR"}}
 """ + f"""
@@ -432,19 +481,19 @@ echo "Running fasm2bels"
 def write_bitheader():
     print("[F4PGA] Running (deprecated) write bitheader")
     print("Converting bitstream to C Header")
-    run_pym('quicklogic_fasm.bitstream_to_header')
+    p_run_pym('quicklogic_fasm.bitstream_to_header')
 
 def write_binary():
     print("[F4PGA] Running (deprecated) write binary")
     print("Converting bitstream to flashable binary format")
-    run_pym('quicklogic_fasm.bitstream_to_binary')
+    p_run_pym('quicklogic_fasm.bitstream_to_binary')
 
 def write_jlink():
     print("[F4PGA] Running (deprecated) write jlink")
     print("Converting bitstream to JLink script")
-    run_pym('quicklogic_fasm.bitstream_to_jlink')
+    p_run_pym('quicklogic_fasm.bitstream_to_jlink')
 
 def write_openocd():
     print("[F4PGA] Running (deprecated) write openocd")
     print("Converting bitstream to OpenOCD script")
-    run_pym('quicklogic_fasm.bitstream_to_openocd')
+    p_run_pym('quicklogic_fasm.bitstream_to_openocd')
