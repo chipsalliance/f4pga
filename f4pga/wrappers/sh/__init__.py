@@ -161,20 +161,20 @@ def synth():
 
 def write_fasm(genfasm_extra_args = None):
     print("[F4PGA] Running (deprecated) write fasm")
-    run_bash_cmds(vpr_common_cmds('fasm')+f"""
-TOP="${{EBLIF%.*}}"
-FASM_EXTRA="${{TOP}}_fasm_extra.fasm"
-
+    run_bash_cmds(vpr_common_cmds('fasm')+"""
+TOP="${EBLIF%.*}"
+FASM_EXTRA="${TOP}_fasm_extra.fasm"
+""" + f"""
 '{which('genfasm')}' \
   ${{ARCH_DEF}} ${{EBLIF}} --device ${{DEVICE_NAME}} \
   ${{VPR_OPTIONS}} \
   --read_rr_graph ${{RR_GRAPH}} {' '.join(genfasm_extra_args) if genfasm_extra_args is not None else ''}
-
+""" + """
 echo "FASM extra: $FASM_EXTRA"
 if [ -f $FASM_EXTRA ]; then
   echo "writing final fasm"
-  cat ${{TOP}}.fasm $FASM_EXTRA > tmp.fasm
-  mv tmp.fasm ${{TOP}}.fasm
+  cat ${TOP}.fasm $FASM_EXTRA > tmp.fasm
+  mv tmp.fasm ${TOP}.fasm
 fi
 """)
     Path('vpr_stdout.log').rename('fasm.log')
@@ -189,17 +189,19 @@ def vpr_common():
 
 def write_bitstream():
     print("[F4PGA] Running (deprecated) write bitstream")
-    run_bash_cmds(f"""
+    run_bash_cmds("""
 set -e
 echo "Writing bitstream ..."
 FRM2BIT=""
-if [ ! -z ${{FRAMES2BIT}} ]; then FRM2BIT="--frm2bit ${{FRAMES2BIT}}"; fi
+if [ ! -z ${FRAMES2BIT} ]; then FRM2BIT="--frm2bit ${FRAMES2BIT}"; fi
+""" + f"""
 eval set -- $(
   getopt \
     --options=d:f:b:p: \
     --longoptions=device:,fasm:,bit:,part: \
     --name $0 -- {' '.join(sys_argv[1:])}
 )
+""" + """
 DEVICE=""
 FASM=""
 BIT=""
@@ -213,28 +215,28 @@ while true; do
     --) break ;;
   esac
 done
-DATABASE_DIR=${{DATABASE_DIR:=$(prjxray-config)}}
+DATABASE_DIR=${DATABASE_DIR:=$(prjxray-config)}
 if [ -z $DEVICE ]; then
   # Try to find device name. Accept only when exactly one is found
-  PART_DIRS=(${{DATABASE_DIR}}/*/${{PART}})
-  if [ ${{#PART_DIRS[@]}} -eq 1 ]; then
-    DEVICE=$(basename $(dirname "${{PART_DIRS[0]}}"))
+  PART_DIRS=(${DATABASE_DIR}/*/${PART})
+  if [ ${#PART_DIRS[@]} -eq 1 ]; then
+    DEVICE=$(basename $(dirname "${PART_DIRS[0]}"))
   else
     echo "Please provide device name"
     exit 1
   fi
 fi
-DBROOT=`realpath ${{DATABASE_DIR}}/${{DEVICE}}`
+DBROOT=`realpath ${DATABASE_DIR}/${DEVICE}`
 if [ -z $FASM ]; then echo "Please provide fasm file name"; exit 1; fi
 if [ -z $BIT ]; then echo "Please provide bit file name"; exit 1; fi
 xcfasm \
-  --db-root ${{DBROOT}} \
-  --part ${{PART}} \
-  --part_file ${{DBROOT}}/${{PART}}/part.yaml \
+  --db-root ${DBROOT} \
+  --part ${PART} \
+  --part_file ${DBROOT}/${PART}/part.yaml \
   --sparse \
   --emit_pudc_b_pullup \
-  --fn_in ${{FASM}} \
-  --bit_out ${{BIT}} ${{FRM2BIT}}
+  --fn_in ${FASM} \
+  --bit_out ${BIT} ${FRM2BIT}
 """)
 
 
@@ -242,7 +244,7 @@ xcfasm \
 
 def analysis():
     print("[F4PGA] Running (deprecated) analysis")
-    run_bash_cmds(vpr_common_cmds('analysis')+f"""
+    run_bash_cmds(vpr_common_cmds('analysis')+"""
 run_vpr \
   --analysis \
   --gen_post_synthesis_netlist on \
@@ -256,10 +258,11 @@ run_vpr \
 
 def repack():
     print("[F4PGA] Running (deprecated) repack")
-    run_bash_cmds(vpr_common_cmds()+f"""
-DESIGN=${{EBLIF/.eblif/}}
-[ ! -z "${{JSON}}" ] && JSON_ARGS="--json-constraints ${{JSON}}" || JSON_ARGS=
-[ ! -z "${{PCF_PATH}}" ] && PCF_ARGS="--pcf-constraints ${{PCF_PATH}}" || PCF_ARGS=
+    run_bash_cmds(vpr_common_cmds()+"""
+DESIGN=${EBLIF/.eblif/}
+[ ! -z "${JSON}" ] && JSON_ARGS="--json-constraints ${JSON}" || JSON_ARGS=
+[ ! -z "${PCF_PATH}" ] && PCF_ARGS="--pcf-constraints ${PCF_PATH}" || PCF_ARGS=
+""" + f"""
 PYTHONPATH=$F4PGA_SHARE_DIR/scripts:$PYTHONPATH \
   '{which('python3')}' "$F4PGA_SHARE_DIR"/scripts/repacker/repack.py \
     --vpr-arch ${{ARCH_DEF}} \
@@ -287,6 +290,7 @@ eval set -- "$(
     --longoptions=device:,fasm:,format:,bit:,part: \
     --name $0 -- {' '.join(sys_argv[1:])}
 )"
+""" + """
 DEVICE=""
 FASM=""
 BIT_FORMAT="4byte"
@@ -305,6 +309,7 @@ done
 if [ -z $DEVICE ]; then echo "Please provide device name"; exit 1; fi
 if [ -z $FASM ]; then echo "Please provide an input FASM file name"; exit 1; fi
 if [ -z $BIT ]; then echo "Please provide an output bistream file name"; exit 1; fi
+""" + f"""
 if [[ "$DEVICE" =~ ^(qlf_k4n8.*)$ ]]; then
   '{which('qlf_fasm')}' \
     --db-root "${{SHARE_DIR_PATH:="$F4PGA_SHARE_DIR"}}/fasm_database/${{DEVICE}}" \
@@ -338,8 +343,10 @@ if [[ '{device}' =~ ^(qlf_k4n8_qlf_k4n8)$ ]];then
 else
   DEVICE_1={device}
 fi
-ARCH_DIR="$F4PGA_SHARE_DIR"/arch/${{DEVICE_1}}_${{DEVICE_1}}
-PINMAP_XML=${{ARCH_DIR}}/${{PINMAPXML}}
+""" + """
+ARCH_DIR="$F4PGA_SHARE_DIR"/arch/${DEVICE_1}_${DEVICE_1}
+PINMAP_XML=${ARCH_DIR}/${PINMAPXML}
+""" + f"""
 '{which('python3')}' "$F4PGA_SHARE_DIR"/scripts/create_lib.py \
   -n "${{DEV}}_0P72_SSM40" \
   -m fpga_top \
@@ -357,15 +364,17 @@ def ql():
 
 def fasm2bels():
     print("[F4PGA] Running (deprecated) fasm2bels")
-    run_bash_cmds(f"""
+    run_bash_cmds("""
 set -e
 SHARE_DIR_PATH=${{SHARE_DIR_PATH:="$F4PGA_SHARE_DIR"}}
+""" + f"""
 eval set -- "$(
   getopt \
     --options=d:P:p:b:v:o:q \
     --longoptions=device:,part:,pcf:,bit:,out-verilog:,out-pcf:,out-qcf:, \
     --name $0 -- {' '.join(sys_argv[1:])}
 )"
+""" + """
 DEVICE=""
 PART=""
 PCF=""
@@ -388,9 +397,10 @@ done
 if [ -z $DEVICE ]; then echo "Please provide device name"; exit 1; fi
 if [ -z $BIT ]; then echo "Please provide an input bistream file name"; exit 1; fi
 # $DEVICE is not ql-eos-s3 or ql-pp3e
-if ! [[ "$DEVICE" =~ ^(ql-eos-s3|ql-pp3e)$ ]]; then echo "ERROR: Unsupported device '${{DEVICE}}' for fasm2bels"; exit -1; fi
-if [ -z "{{PCF}}" ]; then PCF_ARGS=""; else PCF_ARGS="--input-pcf ${{PCF}}"; fi
+if ! [[ "$DEVICE" =~ ^(ql-eos-s3|ql-pp3e)$ ]]; then echo "ERROR: Unsupported device '${DEVICE}' for fasm2bels"; exit -1; fi
+if [ -z "{PCF}" ]; then PCF_ARGS=""; else PCF_ARGS="--input-pcf ${PCF}"; fi
 echo "Running fasm2bels"
+""" + f"""
 '{which('python3')}' "`readlink -f ${{SHARE_DIR_PATH}}/scripts/fasm2bels.py`" "${{BIT}}" \
   --phy-db "`readlink -f ${{SHARE_DIR_PATH}}/arch/${{DEVICE}}_wlcsp/db_phy.pickle`" \
   --device-name "${{DEVICE/ql-/}}" \
