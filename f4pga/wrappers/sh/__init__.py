@@ -118,9 +118,8 @@ if [ -f $FASM_EXTRA ]; then
   cat ${{TOP}}.fasm $FASM_EXTRA > tmp.fasm
   mv tmp.fasm ${{TOP}}.fasm
 fi
-
-mv vpr_stdout.log fasm.log
 """)
+    Path('vpr_stdout.log').rename('fasm.log')
 
 
 def write_xml_rr_graph():
