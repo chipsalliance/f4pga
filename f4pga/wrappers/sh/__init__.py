@@ -58,13 +58,14 @@ def run_pym(module):
     stderr.flush()
     check_call([which('python3'), '-m' , module]+sys_argv[1:], env=f4pga_environ)
 
-def vpr_common_cmds(log_suffix):
+def vpr_common_cmds(log_suffix = None):
     return f"""
 set -e
 source {ROOT / SH_SUBDIR}/vpr_common.f4pga.sh
 parse_args {' '.join(sys_argv[1:])}
+""" + (f"""
 export OUT_NOISY_WARNINGS=noisy_warnings-${{DEVICE}}_{log_suffix}.log
-"""
+""" if log_suffix is not None else '')
 
 
 # Entrypoints
@@ -156,7 +157,25 @@ run_vpr \
 
 def repack():
     print("[F4PGA] Running (deprecated) repack")
-    run_sh_script(ROOT / "quicklogic/repack.f4pga.sh")
+    run_bash_cmds(vpr_common_cmds()+f"""
+DESIGN=${{EBLIF/.eblif/}}
+[ ! -z "${{JSON}}" ] && JSON_ARGS="--json-constraints ${{JSON}}" || JSON_ARGS=
+[ ! -z "${{PCF_PATH}}" ] && PCF_ARGS="--pcf-constraints ${{PCF_PATH}}" || PCF_ARGS=
+PYTHONPATH=$F4PGA_SHARE_DIR/scripts:$PYTHONPATH \
+  '{which('python3')}' "$F4PGA_SHARE_DIR"/scripts/repacker/repack.py \
+    --vpr-arch ${{ARCH_DEF}} \
+    --repacking-rules ${{ARCH_DIR}}/${{DEVICE_1}}.repacking_rules.json \
+    $JSON_ARGS \
+    $PCF_ARGS \
+    --eblif-in ${{DESIGN}}.eblif \
+    --net-in ${{DESIGN}}.net \
+    --place-in ${{DESIGN}}.place \
+    --eblif-out ${{DESIGN}}.repacked.eblif \
+    --net-out ${{DESIGN}}.repacked.net \
+    --place-out ${{DESIGN}}.repacked.place \
+    --absorb_buffer_luts on \
+    > repack.log 2>&1
+""")
 
 
 def generate_bitstream():
@@ -188,7 +207,7 @@ if [ -z $DEVICE ]; then echo "Please provide device name"; exit 1; fi
 if [ -z $FASM ]; then echo "Please provide an input FASM file name"; exit 1; fi
 if [ -z $BIT ]; then echo "Please provide an output bistream file name"; exit 1; fi
 if [[ "$DEVICE" =~ ^(qlf_k4n8.*)$ ]]; then
-  `which qlf_fasm` \
+  '{which('qlf_fasm')}' \
     --db-root "${{SHARE_DIR_PATH:="$F4PGA_SHARE_DIR"}}/fasm_database/${{DEVICE}}" \
     --format "$BIT_FORMAT" \
     --assemble \
@@ -273,7 +292,7 @@ if [ -z $BIT ]; then echo "Please provide an input bistream file name"; exit 1; 
 if ! [[ "$DEVICE" =~ ^(ql-eos-s3|ql-pp3e)$ ]]; then echo "ERROR: Unsupported device '${{DEVICE}}' for fasm2bels"; exit -1; fi
 if [ -z "{{PCF}}" ]; then PCF_ARGS=""; else PCF_ARGS="--input-pcf ${{PCF}}"; fi
 echo "Running fasm2bels"
-`which python3` "`readlink -f ${{SHARE_DIR_PATH}}/scripts/fasm2bels.py`" "${{BIT}}" \
+'{which('python3')}' "`readlink -f ${{SHARE_DIR_PATH}}/scripts/fasm2bels.py`" "${{BIT}}" \
   --phy-db "`readlink -f ${{SHARE_DIR_PATH}}/arch/${{DEVICE}}_wlcsp/db_phy.pickle`" \
   --device-name "${{DEVICE/ql-/}}" \
   --package-name "$PART" \
