@@ -145,15 +145,3 @@ function run_genfasm {
 
      return $?
 }
-
-function run_vpr_xml_rr_graph {
-     set -e
-
-     vpr ${ARCH_DEF} \
-          ${EBLIF} \
-          --read_rr_graph ${RR_GRAPH}
-          --write_rr_graph ${RR_GRAPH_XML}
-          $@
-
-     return $?
-}

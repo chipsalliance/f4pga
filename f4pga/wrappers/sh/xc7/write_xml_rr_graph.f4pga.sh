@@ -23,4 +23,8 @@ parse_args "$@"
 
 OUT_NOISY_WARNINGS=noisy_warnings-${DEVICE}_place.log
 
-run_vpr_xml_rr_graph --pack
+vpr ${ARCH_DEF} \
+  ${EBLIF} \
+  --read_rr_graph ${RR_GRAPH} \
+  --write_rr_graph ${RR_GRAPH_XML} \
+  --pack
