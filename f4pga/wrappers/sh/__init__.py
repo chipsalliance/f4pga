@@ -101,7 +101,31 @@ def genfasm(extra_args):
 
 def write_fasm():
     print("[F4PGA] Running (deprecated) write fasm")
-    run_sh(ROOT / SH_SUBDIR / "write_fasm.f4pga.sh")
+    check_call(f"""
+set -e
+source {ROOT / SH_SUBDIR}/vpr_common.f4pga.sh
+parse_args {' '.join(sys_argv[1:])}
+export OUT_NOISY_WARNINGS=noisy_warnings-${{DEVICE}}_fasm.log
+
+TOP="${{EBLIF%.*}}"
+FASM_EXTRA="${{TOP}}_fasm_extra.fasm"
+
+ARCH_DEF="$ARCH_DEF" \
+EBLIF="$EBLIF" \
+DEVICE_NAME="$DEVICE_NAME" \
+VPR_OPTIONS="$VPR_OPTIONS" \
+RR_GRAPH="$RR_GRAPH" \
+  python3 -m f4pga.wrappers.sh.genfasm
+
+echo "FASM extra: $FASM_EXTRA"
+if [ -f $FASM_EXTRA ]; then
+  echo "writing final fasm"
+  cat ${{TOP}}.fasm $FASM_EXTRA > tmp.fasm
+  mv tmp.fasm ${{TOP}}.fasm
+fi
+
+mv vpr_stdout.log fasm.log
+""", env=f4pga_environ, shell=True, executable='/bin/bash')
 
 
 def write_xml_rr_graph():
