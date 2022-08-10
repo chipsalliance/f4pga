@@ -19,33 +19,33 @@
 SHARE_DIR_PATH=${SHARE_DIR_PATH:="$F4PGA_SHARE_DIR"}
 
 if [ -z $VPR_OPTIONS ]; then
-     echo "Using default VPR options."
-     VPR_OPTIONS="
-       --max_router_iterations 500
-       --routing_failure_predictor off
-       --router_high_fanout_threshold -1
-       --constant_net_method route
-       --route_chan_width 500
-       --router_heap bucket
-       --clock_modeling route
-       --place_delta_delay_matrix_calculation_method dijkstra
-       --place_delay_model delta
-       --router_lookahead extended_map
-       --check_route quick
-       --strict_checks off
-       --allow_dangling_combinational_nodes on
-       --disable_errors check_unbuffered_edges:check_route
-       --congested_routing_iteration_threshold 0.8
-       --incremental_reroute_delay_ripup off
-       --base_cost_type delay_normalized_length_bounded
-       --bb_factor 10
-       --acc_fac 0.7
-       --astar_fac 1.8
-       --initial_pres_fac 2.828
-       --pres_fac_mult 1.2
-       --check_rr_graph off
-       --suppress_warnings ${OUT_NOISY_WARNINGS},sum_pin_class:check_unbuffered_edges:load_rr_indexed_data_T_values:check_rr_node:trans_per_R:check_route:set_rr_graph_tool_comment:calculate_average_switch
-     "
+  echo "Using default VPR options."
+  VPR_OPTIONS="
+    --max_router_iterations 500
+    --routing_failure_predictor off
+    --router_high_fanout_threshold -1
+    --constant_net_method route
+    --route_chan_width 500
+    --router_heap bucket
+    --clock_modeling route
+    --place_delta_delay_matrix_calculation_method dijkstra
+    --place_delay_model delta
+    --router_lookahead extended_map
+    --check_route quick
+    --strict_checks off
+    --allow_dangling_combinational_nodes on
+    --disable_errors check_unbuffered_edges:check_route
+    --congested_routing_iteration_threshold 0.8
+    --incremental_reroute_delay_ripup off
+    --base_cost_type delay_normalized_length_bounded
+    --bb_factor 10
+    --acc_fac 0.7
+    --astar_fac 1.8
+    --initial_pres_fac 2.828
+    --pres_fac_mult 1.2
+    --check_rr_graph off
+    --suppress_warnings ${OUT_NOISY_WARNINGS},sum_pin_class:check_unbuffered_edges:load_rr_indexed_data_T_values:check_rr_node:trans_per_R:check_route:set_rr_graph_tool_comment:calculate_average_switch
+  "
 fi
 
 function parse_args {
@@ -78,57 +78,57 @@ function parse_args {
           esac
      done
 
-     if [ -z $DEVICE ] && [ -n $PART ]; then
-          # Try to find device name. Accept only when exactly one is found
-          PART_DIRS=(${SHARE_DIR_PATH}/arch/*/${PART})
-          if [ ${#PART_DIRS[@]} -eq 1 ]; then
-               DEVICE=$(basename $(dirname "${PART_DIRS[0]}"))
-          fi
-     fi
-     if [ -z $DEVICE ]; then
-          echo "Please provide device name"
-          exit 1
-     fi
+  if [ -z $DEVICE ] && [ -n $PART ]; then
+    # Try to find device name. Accept only when exactly one is found
+    PART_DIRS=(${SHARE_DIR_PATH}/arch/*/${PART})
+    if [ ${#PART_DIRS[@]} -eq 1 ]; then
+      DEVICE=$(basename $(dirname "${PART_DIRS[0]}"))
+    fi
+  fi
+  if [ -z $DEVICE ]; then
+    echo "Please provide device name"
+    exit 1
+  fi
 
-     if [ -z $EBLIF ]; then
-          echo "Please provide blif file name"
-          exit 1
-     fi
+  if [ -z $EBLIF ]; then
+    echo "Please provide blif file name"
+    exit 1
+  fi
 
-     export DEVICE=$DEVICE
-     export EBLIF=$EBLIF
-     export PCF=$PCF
-     export NET=$NET
-     export SDC=$SDC
-     export VPR_OPTIONS="$VPR_OPTIONS $ADDITIONAL_VPR_OPTIONS"
+  export DEVICE=$DEVICE
+  export EBLIF=$EBLIF
+  export PCF=$PCF
+  export NET=$NET
+  export SDC=$SDC
+  export VPR_OPTIONS="$VPR_OPTIONS $ADDITIONAL_VPR_OPTIONS"
 
-     export ARCH_DIR=`realpath ${SHARE_DIR_PATH}/arch/$DEVICE`
-     export ARCH_DEF=${ARCH_DIR}/arch.timing.xml
-     export LOOKAHEAD=${ARCH_DIR}/rr_graph_${DEVICE}.lookahead.bin
-     export RR_GRAPH=${ARCH_DIR}/rr_graph_${DEVICE}.rr_graph.real.bin
-     export RR_GRAPH_XML=${ARCH_DIR}/rr_graph_${DEVICE}.rr_graph.real.xml
-     export PLACE_DELAY=${ARCH_DIR}/rr_graph_${DEVICE}.place_delay.bin
-     export DEVICE_NAME=`echo $DEVICE | sed -n 's/_/-/p'`
+  export ARCH_DIR=`realpath ${SHARE_DIR_PATH}/arch/$DEVICE`
+  export ARCH_DEF=${ARCH_DIR}/arch.timing.xml
+  export LOOKAHEAD=${ARCH_DIR}/rr_graph_${DEVICE}.lookahead.bin
+  export RR_GRAPH=${ARCH_DIR}/rr_graph_${DEVICE}.rr_graph.real.bin
+  export RR_GRAPH_XML=${ARCH_DIR}/rr_graph_${DEVICE}.rr_graph.real.xml
+  export PLACE_DELAY=${ARCH_DIR}/rr_graph_${DEVICE}.place_delay.bin
+  export DEVICE_NAME=`echo $DEVICE | sed -n 's/_/-/p'`
 }
 
 function run_vpr {
-     set -e
+  set -e
 
-     SDC_OPTIONS=""
-     if [ ! -z $SDC ]
-     then
-          SDC_OPTIONS="--sdc_file $SDC"
-     fi
+  SDC_OPTIONS=""
+  if [ ! -z $SDC ]
+  then
+    SDC_OPTIONS="--sdc_file $SDC"
+  fi
 
-     vpr ${ARCH_DEF} \
-         ${EBLIF} \
-         --device ${DEVICE_NAME} \
-         ${VPR_OPTIONS} \
-         --read_rr_graph ${RR_GRAPH} \
-         --read_router_lookahead ${LOOKAHEAD} \
-         --read_placement_delay_lookup ${PLACE_DELAY} \
-         ${SDC_OPTIONS} \
-         $@
+  vpr ${ARCH_DEF} \
+    ${EBLIF} \
+    --device ${DEVICE_NAME} \
+    ${VPR_OPTIONS} \
+    --read_rr_graph ${RR_GRAPH} \
+    --read_router_lookahead ${LOOKAHEAD} \
+    --read_placement_delay_lookup ${PLACE_DELAY} \
+    ${SDC_OPTIONS} \
+    $@
 
-     return $?
+   return $?
 }
