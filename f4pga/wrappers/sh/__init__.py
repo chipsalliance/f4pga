@@ -89,7 +89,9 @@ def place():
 
 def route():
     print("[F4PGA] Running (deprecated) route")
-    run_sh_script(ROOT / SH_SUBDIR / "route.f4pga.sh")
+    extra_args = ['--write_timing_summary', 'timing_summary.json'] if isQuickLogic else []
+    run_bash_cmds(vpr_common_cmds('pack')+f"run_vpr --route {' '.join(extra_args)}")
+    Path('vpr_stdout.log').rename('route.log')
 
 
 def synth():
