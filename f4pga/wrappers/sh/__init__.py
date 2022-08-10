@@ -60,7 +60,15 @@ def generate_constraints():
 
 def pack():
     print("[F4PGA] Running (deprecated) pack")
-    run_sh(ROOT / SH_SUBDIR / "pack.f4pga.sh")
+    extra_args = ['--write_block_usage', 'block_usage.json'] if isQuickLogic else []
+    check_call(f"""
+set -e
+source {ROOT / SH_SUBDIR}/vpr_common.f4pga.sh
+parse_args {' '.join(sys_argv[1:])}
+export OUT_NOISY_WARNINGS=noisy_warnings-${{DEVICE}}_pack.log
+run_vpr --pack {' '.join(extra_args)}
+mv vpr_stdout.log pack.log
+""", env=f4pga_environ, shell=True, executable='/bin/bash')
 
 
 def place():
