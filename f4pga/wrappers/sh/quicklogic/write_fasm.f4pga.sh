@@ -31,7 +31,7 @@ EBLIF="$EBLIF" \
 DEVICE_NAME="$DEVICE_NAME" \
 VPR_OPTIONS="$VPR_OPTIONS" \
 RR_GRAPH="$RR_GRAPH" \
-  $(dirname "$0")/../genfasm.f4pga.sh
+  python3 -m f4pga.wrappers.sh.genfasm
 
 echo "FASM extra: $FASM_EXTRA"
 if [ -f $FASM_EXTRA ]; then

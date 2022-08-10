@@ -91,6 +91,14 @@ def write_bitstream():
     run_sh(ROOT / SH_SUBDIR / "write_bitstream.f4pga.sh")
 
 
+def genfasm(extra_args):
+    check_call(f"""
+'{which('genfasm')}' ${{ARCH_DEF}} \
+  ${{EBLIF}} --device ${{DEVICE_NAME}} ${{VPR_OPTIONS}} --read_rr_graph ${{RR_GRAPH}} \
+  {' '.join(extra_args)}
+""", env=f4pga_environ, shell=True, executable='/bin/bash')
+
+
 def write_fasm():
     print("[F4PGA] Running (deprecated) write fasm")
     run_sh(ROOT / SH_SUBDIR / "write_fasm.f4pga.sh")
