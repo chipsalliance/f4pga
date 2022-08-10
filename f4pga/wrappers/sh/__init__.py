@@ -84,7 +84,34 @@ def pack():
 
 def place():
     print("[F4PGA] Running (deprecated) place")
-    run_sh_script(ROOT / SH_SUBDIR / "place.f4pga.sh")
+    place_cmds = """
+if [ -z $NET ]; then echo "Please provide net file name"; exit 1; fi
+"""
+    if isQuickLogic:
+        place_cmds += """
+if [ -z $PCF ]; then echo "Please provide pcf file name"; exit 1; fi
+PROJECT=$(basename -- "$EBLIF")
+PROJECT="${PROJECT%.*}"
+VPR_PLACE_FILE="${PROJECT}_constraints.place"
+if [ -s $PCF ]; then
+  echo "Generating constraints ..."
+  symbiflow_generate_constraints $PCF $EBLIF $NET $PART $DEVICE $ARCH_DEF $CORNER
+  if [ ! -f ${VPR_PLACE_FILE} ]; then VPR_PLACE_FILE="${PROJECT}_io.place"; fi
+else
+  # Make a dummy empty constraint file
+  touch ${VPR_PLACE_FILE}
+fi
+"""
+    else:
+        place_cmds += """
+PCF=${PCF:=}
+echo "Generating constrains ..."
+symbiflow_generate_constraints $EBLIF $NET $PART $DEVICE $ARCH_DEF $PCF
+VPR_PLACE_FILE='constraints.place'
+"""
+    place_cmds += 'run_vpr --fix_clusters "${VPR_PLACE_FILE}" --place'
+    run_bash_cmds(vpr_common_cmds('place')+place_cmds)
+    Path('vpr_stdout.log').rename('place.log')
 
 
 def route():
