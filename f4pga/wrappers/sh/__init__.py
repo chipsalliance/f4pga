@@ -120,17 +120,6 @@ fi
     Path('vpr_stdout.log').rename('fasm.log')
 
 
-def write_xml_rr_graph():
-    print("[F4PGA] Running (deprecated) write xlm rr graph")
-    run_bash_cmds(vpr_common_cmds('place')+f"""
-vpr ${{ARCH_DEF}} \
-  ${{EBLIF}} \
-  --read_rr_graph ${{RR_GRAPH}} \
-  --write_rr_graph ${{RR_GRAPH_XML}} \
-  --pack
-""")
-
-
 def vpr_common():
     print("[F4PGA] Running (deprecated) vpr common")
     run_sh_script(ROOT / SH_SUBDIR / "vpr_common.f4pga.sh")
