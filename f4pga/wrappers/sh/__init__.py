@@ -101,26 +101,16 @@ def write_bitstream():
     run_sh_script(ROOT / SH_SUBDIR / "write_bitstream.f4pga.sh")
 
 
-def genfasm(extra_args):
-    run_bash_cmds(f"""
-'{which('genfasm')}' ${{ARCH_DEF}} \
-  ${{EBLIF}} --device ${{DEVICE_NAME}} ${{VPR_OPTIONS}} --read_rr_graph ${{RR_GRAPH}} \
-  {' '.join(extra_args)}
-""")
-
-
-def write_fasm():
+def write_fasm(genfasm_extra_args = None):
     print("[F4PGA] Running (deprecated) write fasm")
     run_bash_cmds(vpr_common_cmds('fasm')+f"""
 TOP="${{EBLIF%.*}}"
 FASM_EXTRA="${{TOP}}_fasm_extra.fasm"
 
-ARCH_DEF="$ARCH_DEF" \
-EBLIF="$EBLIF" \
-DEVICE_NAME="$DEVICE_NAME" \
-VPR_OPTIONS="$VPR_OPTIONS" \
-RR_GRAPH="$RR_GRAPH" \
-  python3 -m f4pga.wrappers.sh.genfasm
+'{which('genfasm')}' \
+  ${{ARCH_DEF}} ${{EBLIF}} --device ${{DEVICE_NAME}} \
+  ${{VPR_OPTIONS}} \
+  --read_rr_graph ${{RR_GRAPH}} {' '.join(genfasm_extra_args) if genfasm_extra_args is not None else ''}
 
 echo "FASM extra: $FASM_EXTRA"
 if [ -f $FASM_EXTRA ]; then
