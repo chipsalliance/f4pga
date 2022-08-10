@@ -161,7 +161,50 @@ def repack():
 
 def generate_bitstream():
     print("[F4PGA] Running (deprecated) generate_bitstream")
-    run_sh_script(ROOT / "quicklogic/generate_bitstream.f4pga.sh")
+    run_bash_cmds(f"""
+set -e
+eval set -- "$(
+  getopt \
+    --options=d:f:r:b:P: \
+    --longoptions=device:,fasm:,format:,bit:,part: \
+    --name $0 -- {' '.join(sys_argv[1:])}
+)"
+DEVICE=""
+FASM=""
+BIT_FORMAT="4byte"
+BIT=""
+PART=""
+while true; do
+  case "$1" in
+    -d|--device) DEVICE=$2;     shift 2;;
+    -f|--fasm)   FASM=$2;       shift 2;;
+    -r|--format) BIT_FORMAT=$2; shift 2;;
+    -b|--bit)    BIT=$2;        shift 2;;
+    -P|--part)   PART=$2;       shift 2;;
+    --) break;;
+  esac
+done
+if [ -z $DEVICE ]; then echo "Please provide device name"; exit 1; fi
+if [ -z $FASM ]; then echo "Please provide an input FASM file name"; exit 1; fi
+if [ -z $BIT ]; then echo "Please provide an output bistream file name"; exit 1; fi
+if [[ "$DEVICE" =~ ^(qlf_k4n8.*)$ ]]; then
+  `which qlf_fasm` \
+    --db-root "${{SHARE_DIR_PATH:="$F4PGA_SHARE_DIR"}}/fasm_database/${{DEVICE}}" \
+    --format "$BIT_FORMAT" \
+    --assemble \
+    "$FASM" \
+    "$BIT"
+elif [[ "$DEVICE" =~ ^(ql-eos-s3|ql-pp3e)$ ]]; then
+  qlfasm \
+    --dev-type \
+    "$DEVICE" \
+    "$FASM" \
+    "$BIT"
+else
+  echo "ERROR: Unsupported device '${{DEVICE}}' for bitstream generation"
+  exit -1
+fi
+""")
 
 
 def generate_libfile():
