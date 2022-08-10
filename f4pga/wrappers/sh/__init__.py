@@ -41,6 +41,8 @@ F4PGA_INSTALL_DIR_PATH = Path(F4PGA_INSTALL_DIR)
 f4pga_environ['F4PGA_SHARE_DIR'] = f4pga_environ.get('F4PGA_SHARE_DIR', str(F4PGA_INSTALL_DIR_PATH / FPGA_FAM / 'share/f4pga'))
 
 
+# Helper functions
+
 def run_sh_script(script):
     stdout.flush()
     stderr.flush()
@@ -56,6 +58,16 @@ def run_pym(module):
     stderr.flush()
     check_call([which('python3'), '-m' , module]+sys_argv[1:], env=f4pga_environ)
 
+def vpr_common_cmds(log_suffix):
+    return f"""
+set -e
+source {ROOT / SH_SUBDIR}/vpr_common.f4pga.sh
+parse_args {' '.join(sys_argv[1:])}
+export OUT_NOISY_WARNINGS=noisy_warnings-${{DEVICE}}_{log_suffix}.log
+"""
+
+
+# Entrypoints
 
 def generate_constraints():
     print("[F4PGA] Running (deprecated) generate constraints")
@@ -65,11 +77,7 @@ def generate_constraints():
 def pack():
     print("[F4PGA] Running (deprecated) pack")
     extra_args = ['--write_block_usage', 'block_usage.json'] if isQuickLogic else []
-    run_bash_cmds(f"""
-set -e
-source {ROOT / SH_SUBDIR}/vpr_common.f4pga.sh
-parse_args {' '.join(sys_argv[1:])}
-export OUT_NOISY_WARNINGS=noisy_warnings-${{DEVICE}}_pack.log
+    run_bash_cmds(vpr_common_cmds('pack')+f"""
 run_vpr --pack {' '.join(extra_args)}
 mv vpr_stdout.log pack.log
 """)
@@ -105,12 +113,7 @@ def genfasm(extra_args):
 
 def write_fasm():
     print("[F4PGA] Running (deprecated) write fasm")
-    run_bash_cmds(f"""
-set -e
-source {ROOT / SH_SUBDIR}/vpr_common.f4pga.sh
-parse_args {' '.join(sys_argv[1:])}
-export OUT_NOISY_WARNINGS=noisy_warnings-${{DEVICE}}_fasm.log
-
+    run_bash_cmds(vpr_common_cmds('fasm')+f"""
 TOP="${{EBLIF%.*}}"
 FASM_EXTRA="${{TOP}}_fasm_extra.fasm"
 
@@ -134,11 +137,7 @@ mv vpr_stdout.log fasm.log
 
 def write_xml_rr_graph():
     print("[F4PGA] Running (deprecated) write xlm rr graph")
-    run_bash_cmds(f"""
-set -e
-source {ROOT / SH_SUBDIR}/vpr_common.f4pga.sh
-parse_args {' '.join(sys_argv[1:])}
-export OUT_NOISY_WARNINGS=noisy_warnings-${{DEVICE}}_place.log
+    run_bash_cmds(vpr_common_cmds('place')+f"""
 vpr ${{ARCH_DEF}} \
   ${{EBLIF}} \
   --read_rr_graph ${{RR_GRAPH}} \
