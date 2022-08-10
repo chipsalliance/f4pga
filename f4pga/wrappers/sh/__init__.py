@@ -72,7 +72,40 @@ export OUT_NOISY_WARNINGS=noisy_warnings-${{DEVICE}}_{log_suffix}.log
 
 def generate_constraints():
     print("[F4PGA] Running (deprecated) generate constraints")
-    run_sh_script(ROOT / SH_SUBDIR / "generate_constraints.f4pga.sh")
+    if isQuickLogic:
+        run_sh_script(ROOT / SH_SUBDIR / "generate_constraints.f4pga.sh")
+    else:
+        (eblif, net, part, device, arch_def) = sys_argv[1:6]
+        pcf_opts = f"PCF_OPTS='--pcf {sys_argv[6]}'" if len(sys_argv) > 6 else ''
+        run_bash_cmds(f"""
+set -e
+EBLIF='{eblif}'
+NET='{net}'
+PART='{part}'
+DEVICE='{device}'
+ARCH_DEF='{arch_def}'
+{pcf_opts}
+""" + """
+SHARE_DIR_PATH=${SHARE_DIR_PATH:="$F4PGA_SHARE_DIR"}
+PROJECT=$(basename -- "$EBLIF")
+IOPLACE_FILE="${PROJECT%.*}.ioplace"
+
+python3 "${SHARE_DIR_PATH}"/scripts/prjxray_create_ioplace.py \
+  --blif "$EBLIF" \
+  --map "${SHARE_DIR_PATH}/arch/${DEVICE}/${PART}/pinmap.csv" \
+  --net "$NET" $PCF_OPTS \
+  > "${IOPLACE_FILE}"
+
+python3 "${SHARE_DIR_PATH}"/scripts/prjxray_create_place_constraints.py \
+  --net "$NET" \
+  --arch "${ARCH_DEF}" \
+  --blif "$EBLIF" \
+  --vpr_grid_map "${SHARE_DIR_PATH}/arch/${DEVICE}/vpr_grid_map.csv" \
+  --input "${IOPLACE_FILE}" \
+  --db_root "${DATABASE_DIR:=$(prjxray-config)}" \
+  --part "$PART" \
+  > constraints.place
+""")
 
 
 def pack():
