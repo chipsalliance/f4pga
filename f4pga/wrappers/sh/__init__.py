@@ -77,10 +77,8 @@ def generate_constraints():
 def pack():
     print("[F4PGA] Running (deprecated) pack")
     extra_args = ['--write_block_usage', 'block_usage.json'] if isQuickLogic else []
-    run_bash_cmds(vpr_common_cmds('pack')+f"""
-run_vpr --pack {' '.join(extra_args)}
-mv vpr_stdout.log pack.log
-""")
+    run_bash_cmds(vpr_common_cmds('pack')+f"run_vpr --pack {' '.join(extra_args)}")
+    Path('vpr_stdout.log').rename('pack.log')
 
 
 def place():
