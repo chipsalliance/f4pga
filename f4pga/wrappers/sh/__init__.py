@@ -41,11 +41,15 @@ F4PGA_INSTALL_DIR_PATH = Path(F4PGA_INSTALL_DIR)
 f4pga_environ['F4PGA_SHARE_DIR'] = f4pga_environ.get('F4PGA_SHARE_DIR', str(F4PGA_INSTALL_DIR_PATH / FPGA_FAM / 'share/f4pga'))
 
 
-def run_sh(script):
+def run_sh_script(script):
     stdout.flush()
     stderr.flush()
     check_call([str(script)]+sys_argv[1:], env=f4pga_environ)
 
+def run_bash_cmds(cmds):
+    stdout.flush()
+    stderr.flush()
+    check_call(cmds, env=f4pga_environ, shell=True, executable='/bin/bash')
 
 def run_pym(module):
     stdout.flush()
@@ -55,53 +59,53 @@ def run_pym(module):
 
 def generate_constraints():
     print("[F4PGA] Running (deprecated) generate constraints")
-    run_sh(ROOT / SH_SUBDIR / "generate_constraints.f4pga.sh")
+    run_sh_script(ROOT / SH_SUBDIR / "generate_constraints.f4pga.sh")
 
 
 def pack():
     print("[F4PGA] Running (deprecated) pack")
     extra_args = ['--write_block_usage', 'block_usage.json'] if isQuickLogic else []
-    check_call(f"""
+    run_bash_cmds(f"""
 set -e
 source {ROOT / SH_SUBDIR}/vpr_common.f4pga.sh
 parse_args {' '.join(sys_argv[1:])}
 export OUT_NOISY_WARNINGS=noisy_warnings-${{DEVICE}}_pack.log
 run_vpr --pack {' '.join(extra_args)}
 mv vpr_stdout.log pack.log
-""", env=f4pga_environ, shell=True, executable='/bin/bash')
+""")
 
 
 def place():
     print("[F4PGA] Running (deprecated) place")
-    run_sh(ROOT / SH_SUBDIR / "place.f4pga.sh")
+    run_sh_script(ROOT / SH_SUBDIR / "place.f4pga.sh")
 
 
 def route():
     print("[F4PGA] Running (deprecated) route")
-    run_sh(ROOT / SH_SUBDIR / "route.f4pga.sh")
+    run_sh_script(ROOT / SH_SUBDIR / "route.f4pga.sh")
 
 
 def synth():
     print("[F4PGA] Running (deprecated) synth")
-    run_sh(ROOT / SH_SUBDIR / "synth.f4pga.sh")
+    run_sh_script(ROOT / SH_SUBDIR / "synth.f4pga.sh")
 
 
 def write_bitstream():
     print("[F4PGA] Running (deprecated) write bitstream")
-    run_sh(ROOT / SH_SUBDIR / "write_bitstream.f4pga.sh")
+    run_sh_script(ROOT / SH_SUBDIR / "write_bitstream.f4pga.sh")
 
 
 def genfasm(extra_args):
-    check_call(f"""
+    run_bash_cmds(f"""
 '{which('genfasm')}' ${{ARCH_DEF}} \
   ${{EBLIF}} --device ${{DEVICE_NAME}} ${{VPR_OPTIONS}} --read_rr_graph ${{RR_GRAPH}} \
   {' '.join(extra_args)}
-""", env=f4pga_environ, shell=True, executable='/bin/bash')
+""")
 
 
 def write_fasm():
     print("[F4PGA] Running (deprecated) write fasm")
-    check_call(f"""
+    run_bash_cmds(f"""
 set -e
 source {ROOT / SH_SUBDIR}/vpr_common.f4pga.sh
 parse_args {' '.join(sys_argv[1:])}
@@ -125,12 +129,12 @@ if [ -f $FASM_EXTRA ]; then
 fi
 
 mv vpr_stdout.log fasm.log
-""", env=f4pga_environ, shell=True, executable='/bin/bash')
+""")
 
 
 def write_xml_rr_graph():
     print("[F4PGA] Running (deprecated) write xlm rr graph")
-    check_call(f"""
+    run_bash_cmds(f"""
 set -e
 source {ROOT / SH_SUBDIR}/vpr_common.f4pga.sh
 parse_args {' '.join(sys_argv[1:])}
@@ -140,42 +144,42 @@ vpr ${{ARCH_DEF}} \
   --read_rr_graph ${{RR_GRAPH}} \
   --write_rr_graph ${{RR_GRAPH_XML}} \
   --pack
-""", env=f4pga_environ, shell=True, executable='/bin/bash')
+""")
 
 
 def vpr_common():
     print("[F4PGA] Running (deprecated) vpr common")
-    run_sh(ROOT / SH_SUBDIR / "vpr_common.f4pga.sh")
+    run_sh_script(ROOT / SH_SUBDIR / "vpr_common.f4pga.sh")
 
 
 def analysis():
     print("[F4PGA] Running (deprecated) analysis")
-    run_sh(ROOT / "quicklogic/analysis.f4pga.sh")
+    run_sh_script(ROOT / "quicklogic/analysis.f4pga.sh")
 
 
 def repack():
     print("[F4PGA] Running (deprecated) repack")
-    run_sh(ROOT / "quicklogic/repack.f4pga.sh")
+    run_sh_script(ROOT / "quicklogic/repack.f4pga.sh")
 
 
 def generate_bitstream():
     print("[F4PGA] Running (deprecated) generate_bitstream")
-    run_sh(ROOT / "quicklogic/generate_bitstream.f4pga.sh")
+    run_sh_script(ROOT / "quicklogic/generate_bitstream.f4pga.sh")
 
 
 def generate_libfile():
     print("[F4PGA] Running (deprecated) generate_libfile")
-    run_sh(ROOT / "quicklogic/generate_libfile.f4pga.sh")
+    run_sh_script(ROOT / "quicklogic/generate_libfile.f4pga.sh")
 
 
 def ql():
     print("[F4PGA] Running (deprecated) ql")
-    run_sh(ROOT / "quicklogic/ql.f4pga.sh")
+    run_sh_script(ROOT / "quicklogic/ql.f4pga.sh")
 
 
 def fasm2bels():
     print("[F4PGA] Running (deprecated) fasm2bels")
-    run_sh(ROOT / "quicklogic/fasm2bels.f4pga.sh")
+    run_sh_script(ROOT / "quicklogic/fasm2bels.f4pga.sh")
 
 
 def write_bitheader():
