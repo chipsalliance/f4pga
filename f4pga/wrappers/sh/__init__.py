@@ -138,9 +138,20 @@ def vpr_common():
     run_sh_script(ROOT / SH_SUBDIR / "vpr_common.f4pga.sh")
 
 
+# QuickLogic only
+
 def analysis():
     print("[F4PGA] Running (deprecated) analysis")
-    run_sh_script(ROOT / "quicklogic/analysis.f4pga.sh")
+    run_bash_cmds(vpr_common_cmds('analysis')+f"""
+run_vpr \
+  --analysis \
+  --gen_post_synthesis_netlist on \
+  --gen_post_implementation_merged_netlist on \
+  --post_synth_netlist_unconn_inputs nets \
+  --post_synth_netlist_unconn_outputs nets \
+  --verify_file_digests off
+""")
+    Path('vpr_stdout.log').rename('analysis.log')
 
 
 def repack():
