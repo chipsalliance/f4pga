@@ -239,7 +239,50 @@ def ql():
 
 def fasm2bels():
     print("[F4PGA] Running (deprecated) fasm2bels")
-    run_sh_script(ROOT / "quicklogic/fasm2bels.f4pga.sh")
+    run_bash_cmds(f"""
+set -e
+SHARE_DIR_PATH=${{SHARE_DIR_PATH:="$F4PGA_SHARE_DIR"}}
+eval set -- "$(
+  getopt \
+    --options=d:P:p:b:v:o:q \
+    --longoptions=device:,part:,pcf:,bit:,out-verilog:,out-pcf:,out-qcf:, \
+    --name $0 -- {' '.join(sys_argv[1:])}
+)"
+DEVICE=""
+PART=""
+PCF=""
+BIT=""
+OUT_VERILOG=""
+OUT_PCF=""
+OUT_QCF=""
+while true; do
+  case "$1" in
+    -d|--device)      DEVICE=$2; shift 2 ;;
+    -P|--part)        PART=$2;   shift 2 ;;
+    -p|--pcf)         PCF=$2;    shift 2 ;;
+    -b|--bit)         BIT=$2;    shift 2 ;;
+    -v|--out-verilog) OUT_VERILOG=$2; shift 2 ;;
+    -o|--out-pcf)     OUT_PCF=$2;     shift 2 ;;
+    -q|--out-qcf)     OUT_QCF=$2;     shift 2 ;;
+    --) break ;;
+  esac
+done
+if [ -z $DEVICE ]; then echo "Please provide device name"; exit 1; fi
+if [ -z $BIT ]; then echo "Please provide an input bistream file name"; exit 1; fi
+# $DEVICE is not ql-eos-s3 or ql-pp3e
+if ! [[ "$DEVICE" =~ ^(ql-eos-s3|ql-pp3e)$ ]]; then echo "ERROR: Unsupported device '${{DEVICE}}' for fasm2bels"; exit -1; fi
+if [ -z "{{PCF}}" ]; then PCF_ARGS=""; else PCF_ARGS="--input-pcf ${{PCF}}"; fi
+echo "Running fasm2bels"
+`which python3` "`readlink -f ${{SHARE_DIR_PATH}}/scripts/fasm2bels.py`" "${{BIT}}" \
+  --phy-db "`readlink -f ${{SHARE_DIR_PATH}}/arch/${{DEVICE}}_wlcsp/db_phy.pickle`" \
+  --device-name "${{DEVICE/ql-/}}" \
+  --package-name "$PART" \
+  --input-type bitstream \
+  --output-verilog "${{OUT_VERILOG:-$BIT.v}}" \
+  ${{PCF_ARGS}} \
+  --output-pcf "${{OUT_PCF:-$BIT.v.pcf}}" \
+  --output-qcf "${{OUT_QCF:-$BIT.v.qcf}}"
+""")
 
 
 def write_bitheader():
