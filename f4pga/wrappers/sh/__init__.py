@@ -111,7 +111,7 @@ python3 "${SHARE_DIR_PATH}"/scripts/prjxray_create_place_constraints.py \
 def pack():
     print("[F4PGA] Running (deprecated) pack")
     extra_args = ['--write_block_usage', 'block_usage.json'] if isQuickLogic else []
-    run_bash_cmds(vpr_common_cmds('pack')+f"run_vpr --pack {' '.join(extra_args)}")
+    run_bash_cmds(vpr_common_cmds('pack')+f"python3 -m f4pga.wrappers.sh.vpr_run --pack {' '.join(extra_args)}")
     Path('vpr_stdout.log').rename('pack.log')
 
 
@@ -142,7 +142,7 @@ echo "Generating constrains ..."
 symbiflow_generate_constraints $EBLIF $NET $PART $DEVICE $ARCH_DEF $PCF
 VPR_PLACE_FILE='constraints.place'
 """
-    place_cmds += 'run_vpr --fix_clusters "${VPR_PLACE_FILE}" --place'
+    place_cmds += 'python3 -m f4pga.wrappers.sh.vpr_run --fix_clusters "${VPR_PLACE_FILE}" --place'
     run_bash_cmds(vpr_common_cmds('place')+place_cmds)
     Path('vpr_stdout.log').rename('place.log')
 
@@ -150,7 +150,7 @@ VPR_PLACE_FILE='constraints.place'
 def route():
     print("[F4PGA] Running (deprecated) route")
     extra_args = ['--write_timing_summary', 'timing_summary.json'] if isQuickLogic else []
-    run_bash_cmds(vpr_common_cmds('pack')+f"run_vpr --route {' '.join(extra_args)}")
+    run_bash_cmds(vpr_common_cmds('pack')+f"python3 -m f4pga.wrappers.sh.vpr_run --route {' '.join(extra_args)}")
     Path('vpr_stdout.log').rename('route.log')
 
 
@@ -183,6 +183,22 @@ fi
 def vpr_common():
     print("[F4PGA] Running (deprecated) vpr common")
     run_sh_script(ROOT / SH_SUBDIR / "vpr_common.f4pga.sh")
+
+
+def vpr_run():
+    print("[F4PGA] Running (deprecated) vpr run")
+    run_bash_cmds(f"""
+  set -e
+  SDC_OPTIONS=""
+  if [ ! -z $SDC ]; then SDC_OPTIONS="--sdc_file $SDC"; fi
+  '{which('vpr')}' "$ARCH_DEF" "$EBLIF" \
+    --device "$DEVICE_NAME" \
+    $VPR_OPTIONS \
+    --read_rr_graph "$RR_GRAPH" \
+    --read_router_lookahead "$LOOKAHEAD" \
+    --read_placement_delay_lookup "$PLACE_DELAY" \
+    $SDC_OPTIONS \
+""" + f"{' '.join(sys_argv[1:])}")
 
 
 # Xilinx only
@@ -245,7 +261,7 @@ xcfasm \
 def analysis():
     print("[F4PGA] Running (deprecated) analysis")
     run_bash_cmds(vpr_common_cmds('analysis')+"""
-run_vpr \
+python3 -m f4pga.wrappers.sh.vpr_run \
   --analysis \
   --gen_post_synthesis_netlist on \
   --gen_post_implementation_merged_netlist on \

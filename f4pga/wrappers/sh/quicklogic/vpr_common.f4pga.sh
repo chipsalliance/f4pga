@@ -104,6 +104,8 @@ function parse_args {
     --suppress_warnings ${OUT_NOISY_WARNINGS},sum_pin_class:check_unbuffered_edges:load_rr_indexed_data_T_values:check_rr_node:trans_per_R:check_route:set_rr_graph_tool_comment"
   fi
 
+  export VPR_OPTIONS="$VPR_OPTIONS"
+
   if [[ "$DEVICE" == "qlf_k4n8_qlf_k4n8" ]]; then
     DEVICE_1="qlf_k4n8-qlf_k4n8_umc22_${CORNER}"
     DEVICE_2="$DEVICE_1"
@@ -125,27 +127,6 @@ function parse_args {
     export RR_GRAPH="${ARCH_RR_PREFIX}".rr_graph.real.bin
   fi
   export PLACE_DELAY="${ARCH_RR_PREFIX}".place_delay.bin
-  export ROUTE_DELAY="${ARCH_RR_PREFIX}".lookahead.bin
+  export LOOKAHEAD="${ARCH_RR_PREFIX}".lookahead.bin
   export DEVICE_NAME="$DEVICE_1"
-}
-
-function run_vpr {
-  set -e
-
-  SDC_OPTIONS=""
-  if [ ! -z $SDC ]; then
-     SDC_OPTIONS="--sdc_file $SDC"
-  fi
-
-  "`which vpr`" "$ARCH_DEF" \
-    ${EBLIF} \
-    --read_rr_graph "$RR_GRAPH" \
-    --device "$DEVICE_NAME" \
-    $VPR_OPTIONS \
-    --read_router_lookahead "$ROUTE_DELAY" \
-    --read_placement_delay_lookup "$PLACE_DELAY" \
-    $SDC_OPTIONS \
-    $@
-
-  return $?
 }

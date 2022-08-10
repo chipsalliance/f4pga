@@ -94,31 +94,9 @@ function parse_args {
   export ARCH_DIR=`realpath ${SHARE_DIR_PATH}/arch/$DEVICE`
   export ARCH_DEF="${ARCH_DIR}"/arch.timing.xml
   ARCH_RR_PREFIX="${ARCH_DIR}/rr_graph_${DEVICE}"
-  export LOOKAHEAD="${ARCH_RR_PREFIX}".lookahead.bin
   export RR_GRAPH="${ARCH_RR_PREFIX}".rr_graph.real.bin
   export RR_GRAPH_XML="${ARCH_RR_PREFIX}".rr_graph.real.xml
   export PLACE_DELAY="${ARCH_RR_PREFIX}".place_delay.bin
+  export LOOKAHEAD="${ARCH_RR_PREFIX}".lookahead.bin
   export DEVICE_NAME=`echo "$DEVICE" | sed -n 's/_/-/p'`
-}
-
-function run_vpr {
-  set -e
-
-  SDC_OPTIONS=""
-  if [ ! -z $SDC ]
-  then
-    SDC_OPTIONS="--sdc_file $SDC"
-  fi
-
-  vpr "$ARCH_DEF" \
-    "$EBLIF" \
-    --device "$DEVICE_NAME" \
-    $VPR_OPTIONS \
-    --read_rr_graph "$RR_GRAPH" \
-    --read_router_lookahead "$LOOKAHEAD" \
-    --read_placement_delay_lookup "$PLACE_DELAY" \
-    $SDC_OPTIONS \
-    $@
-
-  return $?
 }
