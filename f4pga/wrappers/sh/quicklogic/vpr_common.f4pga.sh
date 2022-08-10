@@ -163,16 +163,3 @@ function run_vpr {
 
   return $?
 }
-
-function run_genfasm {
-  set -e
-
-  "`which genfasm`" ${ARCH_DEF} \
-    ${EBLIF} \
-    --device ${DEVICE_NAME} \
-    ${VPR_OPTIONS} \
-    --read_rr_graph ${RR_GRAPH} \
-    $@
-
-  return $?
-}

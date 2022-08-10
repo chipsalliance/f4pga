@@ -26,7 +26,12 @@ FASM_EXTRA="${TOP}_fasm_extra.fasm"
 
 export OUT_NOISY_WARNINGS=noisy_warnings-${DEVICE}_fasm.log
 
-run_genfasm
+ARCH_DEF="$ARCH_DEF" \
+EBLIF="$EBLIF" \
+DEVICE_NAME="$DEVICE_NAME" \
+VPR_OPTIONS="$VPR_OPTIONS" \
+RR_GRAPH="$RR_GRAPH" \
+  $(dirname "$0")/../genfasm.f4pga.sh
 
 echo "FASM extra: $FASM_EXTRA"
 if [ -f $FASM_EXTRA ]; then

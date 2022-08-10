@@ -92,6 +92,7 @@ setuptools_setup(
             'platforms/*.json'
         ],
         'f4pga.wrappers.sh': [
+            '*.f4pga.sh',
             'xc7/*.f4pga.sh',
             'quicklogic/*.f4pga.sh'
         ]
