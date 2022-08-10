@@ -99,11 +99,6 @@ def synth():
     run_sh_script(ROOT / SH_SUBDIR / "synth.f4pga.sh")
 
 
-def write_bitstream():
-    print("[F4PGA] Running (deprecated) write bitstream")
-    run_sh_script(ROOT / SH_SUBDIR / "write_bitstream.f4pga.sh")
-
-
 def write_fasm(genfasm_extra_args = None):
     print("[F4PGA] Running (deprecated) write fasm")
     run_bash_cmds(vpr_common_cmds('fasm')+f"""
@@ -139,6 +134,59 @@ vpr ${{ARCH_DEF}} \
 def vpr_common():
     print("[F4PGA] Running (deprecated) vpr common")
     run_sh_script(ROOT / SH_SUBDIR / "vpr_common.f4pga.sh")
+
+
+# Xilinx only
+
+def write_bitstream():
+    print("[F4PGA] Running (deprecated) write bitstream")
+    run_bash_cmds(f"""
+set -e
+echo "Writing bitstream ..."
+FRM2BIT=""
+if [ ! -z ${{FRAMES2BIT}} ]; then FRM2BIT="--frm2bit ${{FRAMES2BIT}}"; fi
+eval set -- $(
+  getopt \
+    --options=d:f:b:p: \
+    --longoptions=device:,fasm:,bit:,part: \
+    --name $0 -- {' '.join(sys_argv[1:])}
+)
+DEVICE=""
+FASM=""
+BIT=""
+PART=xc7a35tcpg236-1
+while true; do
+  case "$1" in
+    -d|--device) DEVICE=$2; shift 2; ;;
+    -p|--part)   PART=$2;   shift 2; ;;
+    -f|--fasm)   FASM=$2;   shift 2; ;;
+    -b|--bit)    BIT=$2;    shift 2; ;;
+    --) break ;;
+  esac
+done
+DATABASE_DIR=${{DATABASE_DIR:=$(prjxray-config)}}
+if [ -z $DEVICE ]; then
+  # Try to find device name. Accept only when exactly one is found
+  PART_DIRS=(${{DATABASE_DIR}}/*/${{PART}})
+  if [ ${{#PART_DIRS[@]}} -eq 1 ]; then
+    DEVICE=$(basename $(dirname "${{PART_DIRS[0]}}"))
+  else
+    echo "Please provide device name"
+    exit 1
+  fi
+fi
+DBROOT=`realpath ${{DATABASE_DIR}}/${{DEVICE}}`
+if [ -z $FASM ]; then echo "Please provide fasm file name"; exit 1; fi
+if [ -z $BIT ]; then echo "Please provide bit file name"; exit 1; fi
+xcfasm \
+  --db-root ${{DBROOT}} \
+  --part ${{PART}} \
+  --part_file ${{DBROOT}}/${{PART}}/part.yaml \
+  --sparse \
+  --emit_pudc_b_pullup \
+  --fn_in ${{FASM}} \
+  --bit_out ${{BIT}} ${{FRM2BIT}}
+""")
 
 
 # QuickLogic only
