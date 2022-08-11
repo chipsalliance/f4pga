@@ -118,7 +118,7 @@ if [ ${#VERILOG_FILES[@]} -eq 0 ]; then
   exit 1
 fi
 
-DATABASE_DIR=${DATABASE_DIR:=$(prjxray-config)}
+DATABASE_DIR=${DATABASE_DIR:-$(prjxray-config)}
 
 export TOP=${TOP}
 export USE_ROI="FALSE"
@@ -130,7 +130,7 @@ export OUT_SYNTH_V=${TOP}_synth.v
 export OUT_EBLIF=${TOP}.eblif
 export PART_JSON=`realpath ${DATABASE_DIR}/$DEVICE/$PART/part.json`
 export OUT_FASM_EXTRA=${TOP}_fasm_extra.fasm
-export PYTHON3=${PYTHON3:=$(which python3)}
+export PYTHON3=${PYTHON3:-$(which python3)}
 
 LOG=${TOP}_synth.log
 

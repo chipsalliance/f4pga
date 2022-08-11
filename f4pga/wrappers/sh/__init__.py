@@ -234,7 +234,7 @@ python3 '{share_dir}'/scripts/prjxray_create_place_constraints.py \
   --part '{part}' \
   --vpr_grid_map '{share_dir}/arch/{device}/vpr_grid_map.csv' \
   --input '{ioplace_file}' \
-  --db_root "${{DATABASE_DIR:=$(prjxray-config)}}" \
+  --db_root "${{DATABASE_DIR:-$(prjxray-config)}}" \
   > constraints.place
 """)
 
@@ -268,7 +268,6 @@ fi
 """
     else:
         place_cmds += """
-PCF=${PCF:=}
 echo "Generating constrains ..."
 python3 -m f4pga.wrappers.sh.generate_constraints $EBLIF $NET $PART $DEVICE $ARCH_DEF $PCF
 VPR_PLACE_FILE='constraints.place'
@@ -292,20 +291,17 @@ def synth():
 
 def write_fasm(genfasm_extra_args = None):
     print("[F4PGA] Running (deprecated) write fasm")
-    p_run_bash_cmds(p_vpr_common_cmds('fasm')+"""
-TOP="${EBLIF%.*}"
-FASM_EXTRA="${TOP}_fasm_extra.fasm"
-""" + f"""
+    p_run_bash_cmds(p_vpr_common_cmds('fasm')+f"""
 '{which('genfasm')}' \
   ${{ARCH_DEF}} ${{EBLIF}} --device ${{DEVICE_NAME}} \
   ${{VPR_OPTIONS}} \
   --read_rr_graph ${{RR_GRAPH}} {' '.join(genfasm_extra_args) if genfasm_extra_args is not None else ''}
 """ + """
-echo "FASM extra: $FASM_EXTRA"
+TOP="${EBLIF%.*}"
+FASM_EXTRA="${TOP}_fasm_extra.fasm"
 if [ -f $FASM_EXTRA ]; then
-  echo "writing final fasm"
-  cat ${TOP}.fasm $FASM_EXTRA > tmp.fasm
-  mv tmp.fasm ${TOP}.fasm
+  echo "writing final fasm (extra: $FASM_EXTRA)"
+  cat $FASM_EXTRA >> ${TOP}.fasm
 fi
 """)
     Path('vpr_stdout.log').rename('fasm.log')
@@ -347,7 +343,7 @@ while true; do
     --) break ;;
   esac
 done
-DATABASE_DIR=${DATABASE_DIR:=$(prjxray-config)}
+DATABASE_DIR=${DATABASE_DIR:-$(prjxray-config)}
 if [ -z $DEVICE ]; then
   # Try to find device name. Accept only when exactly one is found
   PART_DIRS=(${DATABASE_DIR}/*/${PART})
@@ -445,7 +441,7 @@ if [ -z $BIT ]; then echo "Please provide an output bistream file name"; exit 1;
 """ + f"""
 if [[ "$DEVICE" =~ ^(qlf_k4n8.*)$ ]]; then
   '{which('qlf_fasm')}' \
-    --db-root "${{SHARE_DIR_PATH:="$F4PGA_SHARE_DIR"}}/fasm_database/${{DEVICE}}" \
+    --db-root "${{F4PGA_SHARE_DIR}}/fasm_database/${{DEVICE}}" \
     --format "$BIT_FORMAT" \
     --assemble \
     "$FASM" \
@@ -477,7 +473,7 @@ else
   DEVICE_1={device}
 fi
 """ + """
-ARCH_DIR="$F4PGA_SHARE_DIR"/arch/${DEVICE_1}_${DEVICE_1}
+ARCH_DIR="${F4PGA_SHARE_DIR}/arch/${DEVICE_1}_${DEVICE_1}"
 PINMAP_XML=${ARCH_DIR}/${PINMAPXML}
 """ + f"""
 '{python3}' "$F4PGA_SHARE_DIR"/scripts/create_lib.py \
@@ -497,10 +493,8 @@ def ql():
 
 def fasm2bels():
     print("[F4PGA] Running (deprecated) fasm2bels")
-    p_run_bash_cmds("""
+    p_run_bash_cmds(f"""
 set -e
-SHARE_DIR_PATH=${{SHARE_DIR_PATH:="$F4PGA_SHARE_DIR"}}
-""" + f"""
 eval set -- "$(
   getopt \
     --options=d:P:p:b:v:o:q \
@@ -534,8 +528,8 @@ if ! [[ "$DEVICE" =~ ^(ql-eos-s3|ql-pp3e)$ ]]; then echo "ERROR: Unsupported dev
 if [ -z "{PCF}" ]; then PCF_ARGS=""; else PCF_ARGS="--input-pcf ${PCF}"; fi
 echo "Running fasm2bels"
 """ + f"""
-'{python3}' "`readlink -f ${{SHARE_DIR_PATH}}/scripts/fasm2bels.py`" "${{BIT}}" \
-  --phy-db "`readlink -f ${{SHARE_DIR_PATH}}/arch/${{DEVICE}}_wlcsp/db_phy.pickle`" \
+'{python3}' "${{F4PGA_SHARE_DIR}}"/scripts/fasm2bels.py "${{BIT}}" \
+  --phy-db "${{F4PGA_SHARE_DIR}}/arch/${{DEVICE}}_wlcsp/db_phy.pickle" \
   --device-name "${{DEVICE/ql-/}}" \
   --package-name "$PART" \
   --input-type bitstream \
