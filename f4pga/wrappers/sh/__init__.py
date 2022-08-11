@@ -26,11 +26,15 @@ from shutil import which
 from subprocess import check_call
 
 
+python3 = which('python3')
+
 f4pga_environ = environ.copy()
 
 ROOT = Path(__file__).resolve().parent
+
 FPGA_FAM = f4pga_environ.get('FPGA_FAM', 'xc7')
 isQuickLogic = FPGA_FAM == 'eos-s3'
+
 SH_SUBDIR = 'quicklogic' if isQuickLogic else FPGA_FAM
 
 F4PGA_INSTALL_DIR = f4pga_environ.get('F4PGA_INSTALL_DIR')
@@ -59,7 +63,7 @@ def p_run_bash_cmds(cmds):
 def p_run_pym(module):
     stdout.flush()
     stderr.flush()
-    check_call([which('python3'), '-m' , module]+sys_argv[1:], env=f4pga_environ)
+    check_call([python3, '-m' , module]+sys_argv[1:], env=f4pga_environ)
 
 
 def p_vpr_common_cmds(log_suffix = None):
@@ -136,7 +140,81 @@ def p_vpr_run():
 def generate_constraints():
     print("[F4PGA] Running (deprecated) generate constraints")
     if isQuickLogic:
-        p_run_sh_script(ROOT / SH_SUBDIR / "generate_constraints.f4pga.sh")
+        (pcf, eblif, net, part, device, arch_def, corner) = sys_argv[1:8]
+        place_file_prefix = Path(eblif).stem
+        share_dir = Path(f4pga_environ['F4PGA_SHARE_DIR'])
+        scripts_dir = share_dir / 'scripts'
+        archs_dir = share_dir / 'arch'
+        p_run_bash_cmds(f"""
+set -e
+
+if [[ '{device}' =~ ^(qlf_.*)$ ]]; then
+
+  if [[ '{device}' =~ ^(qlf_k4n8_qlf_k4n8)$ ]];then
+    DEVICE_PATH='qlf_k4n8-qlf_k4n8_umc22_{corner}'
+    PINMAPXML="pinmap_qlf_k4n8_umc22.xml"
+  elif [[ '{device}' =~ ^(qlf_k6n10_qlf_k6n10)$ ]];then
+    DEVICE_PATH="qlf_k6n10-qlf_k6n10_gf12"
+    PINMAPXML="pinmap_qlf_k6n10_gf12.xml"
+  else
+    echo "ERROR: Unknown qlf device '{device}'"
+    exit -1
+  fi
+
+  '{python3}' '{scripts_dir}/qlf_k4n8_create_ioplace.py' \
+    --pcf '{pcf}' \
+    --blif '{eblif}' \
+    --pinmap_xml '{archs_dir}'/"${{DEVICE_PATH}}_${{DEVICE_PATH}}/${{PINMAPXML}}" \
+    --csv_file '{part}' \
+    --net '{net}' \
+    > '{place_file_prefix}_io.place'
+
+elif [[ '{device}' =~ ^(ql-.*)$ ]]; then
+
+  if ! [[ '{part}' =~ ^(PU64|WR42|PD64|WD30)$ ]]; then
+    PINMAPCSV="pinmap_PD64.csv"
+    CLKMAPCSV="clkmap_PD64.csv"
+  else
+    PINMAPCSV='pinmap_{part}.csv'
+    CLKMAPCSV='clkmap_{part}.csv'
+  fi
+
+  echo "PINMAP FILE : $PINMAPCSV"
+  echo "CLKMAP FILE : $CLKMAPCSV"
+
+  DEVICE_PATH='{device}_wlcsp'
+  PINMAP='{archs_dir}'/"${{DEVICE_PATH}}/${{PINMAPCSV}}"
+
+  '{python3}' '{scripts_dir}/pp3_create_ioplace.py' \
+    --pcf '{pcf}' \
+    --blif '{eblif}' \
+    --map "$PINMAP" \
+    --net '{net}' \
+    > '{place_file_prefix}_io.place'
+
+  '{python3}' '{scripts_dir}/pp3_create_place_constraints.py' \
+    --blif '{eblif}' \
+    --map '{archs_dir}'/"${{DEVICE_PATH}}/${{CLKMAPCSV}}" \
+    -i '{place_file_prefix}_io.place' \
+    > '{place_file_prefix}_constraints.place'
+
+  # EOS-S3 IOMUX configuration
+  if [[ '{device}' =~ ^(ql-eos-s3)$ ]]; then
+""" + '\n'.join([f"""
+    '{python3}' '{scripts_dir}/pp3_eos_s3_iomux_config.py' \
+      --eblif '{eblif}' \
+      --pcf '{pcf}' \
+      --map "$PINMAP" \
+      --output-format={fmt[0]} \
+      > '{place_file_prefix}_iomux.{fmt[1]}'
+""" for fmt in [['jlink', 'jlink'], ['openocd', 'openocd'], ['binary', 'bin']]]) + f"""
+  fi
+
+else
+  echo "FIXME: Unsupported device '{device}'"
+  exit -1
+fi
+""")
     else:
         (eblif, net, part, device, arch_def) = sys_argv[1:6]
         pcf_opts = f"'--pcf' '{sys_argv[6]}'" if len(sys_argv) > 6 else ''
@@ -319,7 +397,7 @@ DESIGN=${EBLIF/.eblif/}
 [ ! -z "${PCF_PATH}" ] && PCF_ARGS="--pcf-constraints ${PCF_PATH}" || PCF_ARGS=
 """ + f"""
 PYTHONPATH=$F4PGA_SHARE_DIR/scripts:$PYTHONPATH \
-  '{which('python3')}' "$F4PGA_SHARE_DIR"/scripts/repacker/repack.py \
+  '{python3}' "$F4PGA_SHARE_DIR"/scripts/repacker/repack.py \
     --vpr-arch ${{ARCH_DEF}} \
     --repacking-rules ${{ARCH_DIR}}/${{DEVICE_1}}.repacking_rules.json \
     $JSON_ARGS \
@@ -402,7 +480,7 @@ fi
 ARCH_DIR="$F4PGA_SHARE_DIR"/arch/${DEVICE_1}_${DEVICE_1}
 PINMAP_XML=${ARCH_DIR}/${PINMAPXML}
 """ + f"""
-'{which('python3')}' "$F4PGA_SHARE_DIR"/scripts/create_lib.py \
+'{python3}' "$F4PGA_SHARE_DIR"/scripts/create_lib.py \
   -n "${{DEV}}_0P72_SSM40" \
   -m fpga_top \
   -c '{part}' \
@@ -456,7 +534,7 @@ if ! [[ "$DEVICE" =~ ^(ql-eos-s3|ql-pp3e)$ ]]; then echo "ERROR: Unsupported dev
 if [ -z "{PCF}" ]; then PCF_ARGS=""; else PCF_ARGS="--input-pcf ${PCF}"; fi
 echo "Running fasm2bels"
 """ + f"""
-'{which('python3')}' "`readlink -f ${{SHARE_DIR_PATH}}/scripts/fasm2bels.py`" "${{BIT}}" \
+'{python3}' "`readlink -f ${{SHARE_DIR_PATH}}/scripts/fasm2bels.py`" "${{BIT}}" \
   --phy-db "`readlink -f ${{SHARE_DIR_PATH}}/arch/${{DEVICE}}_wlcsp/db_phy.pickle`" \
   --device-name "${{DEVICE/ql-/}}" \
   --package-name "$PART" \
