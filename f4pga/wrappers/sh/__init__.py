@@ -139,34 +139,24 @@ def generate_constraints():
         p_run_sh_script(ROOT / SH_SUBDIR / "generate_constraints.f4pga.sh")
     else:
         (eblif, net, part, device, arch_def) = sys_argv[1:6]
-        pcf_opts = f"PCF_OPTS='--pcf {sys_argv[6]}'" if len(sys_argv) > 6 else ''
+        pcf_opts = f"'--pcf' '{sys_argv[6]}'" if len(sys_argv) > 6 else ''
+        ioplace_file = f'{Path(eblif).stem}.ioplace'
+        share_dir = f4pga_environ['F4PGA_SHARE_DIR']
         p_run_bash_cmds(f"""
 set -e
-EBLIF='{eblif}'
-NET='{net}'
-PART='{part}'
-DEVICE='{device}'
-ARCH_DEF='{arch_def}'
-{pcf_opts}
-""" + """
-SHARE_DIR_PATH=${SHARE_DIR_PATH:="$F4PGA_SHARE_DIR"}
-PROJECT=$(basename -- "$EBLIF")
-IOPLACE_FILE="${PROJECT%.*}.ioplace"
-
-python3 "${SHARE_DIR_PATH}"/scripts/prjxray_create_ioplace.py \
-  --blif "$EBLIF" \
-  --map "${SHARE_DIR_PATH}/arch/${DEVICE}/${PART}/pinmap.csv" \
-  --net "$NET" $PCF_OPTS \
-  > "${IOPLACE_FILE}"
-
-python3 "${SHARE_DIR_PATH}"/scripts/prjxray_create_place_constraints.py \
-  --net "$NET" \
-  --arch "${ARCH_DEF}" \
-  --blif "$EBLIF" \
-  --vpr_grid_map "${SHARE_DIR_PATH}/arch/${DEVICE}/vpr_grid_map.csv" \
-  --input "${IOPLACE_FILE}" \
-  --db_root "${DATABASE_DIR:=$(prjxray-config)}" \
-  --part "$PART" \
+python3 '{share_dir}/scripts/prjxray_create_ioplace.py' \
+  --blif '{eblif}' \
+  --net '{net}' {pcf_opts} \
+  --map '{share_dir}/arch/{device}/{part}/pinmap.csv' \
+  > '{ioplace_file}'
+python3 '{share_dir}'/scripts/prjxray_create_place_constraints.py \
+  --blif '{eblif}' \
+  --net '{net}' \
+  --arch '{arch_def}' \
+  --part '{part}' \
+  --vpr_grid_map '{share_dir}/arch/{device}/vpr_grid_map.csv' \
+  --input '{ioplace_file}' \
+  --db_root "${{DATABASE_DIR:=$(prjxray-config)}}" \
   > constraints.place
 """)
 
@@ -191,7 +181,7 @@ PROJECT="${PROJECT%.*}"
 VPR_PLACE_FILE="${PROJECT}_constraints.place"
 if [ -s $PCF ]; then
   echo "Generating constraints ..."
-  symbiflow_generate_constraints $PCF $EBLIF $NET $PART $DEVICE $ARCH_DEF $CORNER
+  python3 -m f4pga.wrappers.sh.generate_constraints $PCF $EBLIF $NET $PART $DEVICE $ARCH_DEF $CORNER
   if [ ! -f ${VPR_PLACE_FILE} ]; then VPR_PLACE_FILE="${PROJECT}_io.place"; fi
 else
   # Make a dummy empty constraint file
@@ -202,7 +192,7 @@ fi
         place_cmds += """
 PCF=${PCF:=}
 echo "Generating constrains ..."
-symbiflow_generate_constraints $EBLIF $NET $PART $DEVICE $ARCH_DEF $PCF
+python3 -m f4pga.wrappers.sh.generate_constraints $EBLIF $NET $PART $DEVICE $ARCH_DEF $PCF
 VPR_PLACE_FILE='constraints.place'
 """
     place_cmds += 'python3 -m f4pga.wrappers.sh.vpr_run --fix_clusters "${VPR_PLACE_FILE}" --place'
