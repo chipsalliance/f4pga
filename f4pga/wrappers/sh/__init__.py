@@ -307,11 +307,6 @@ fi
     Path('vpr_stdout.log').rename('fasm.log')
 
 
-def vpr_common():
-    print("[F4PGA] Running (deprecated) vpr common")
-    p_run_sh_script(ROOT / SH_SUBDIR / "vpr_common.f4pga.sh")
-
-
 # Xilinx only
 
 

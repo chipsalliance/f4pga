@@ -120,7 +120,6 @@ setuptools_setup(
                 f"{sf}_write_jlink = {shwrappers}:write_jlink",
                 f"{sf}_write_openocd = {shwrappers}:write_openocd",
                 f"ql_{sf} = {shwrappers}:ql",
-                f"vpr_common = {shwrappers}:vpr_common"
             ]
         )
     },
