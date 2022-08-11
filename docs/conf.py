@@ -171,8 +171,11 @@ man_pages = [
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
+    "examples": ("https://f4pga-examples.readthedocs.io/en/latest/", None),
     "arch-defs": ("https://f4pga.readthedocs.io/projects/arch-defs/en/latest/", None),
+    "conda-eda": ("https://hdl.github.io/conda-eda/", None),
     "constraints": ("https://hdl.github.io/constraints/", None),
+    "containers": ("https://hdl.github.io/containers/", None),
     "fasm": ("https://fasm.readthedocs.io/en/latest/", None),
     "interchange": ("https://fpga-interchange-schema.readthedocs.io/", None),
     "openfpgaloader": ("https://trabucayre.github.io/openFPGALoader/", None),
@@ -189,5 +192,5 @@ extlinks = {
    'ghsharp':   ('https://github.com/chipsalliance/f4pga/issues/%s', '#'),
    'ghissue':   ('https://github.com/chipsalliance/f4pga/issues/%s', 'issue #'),
    'ghpull':    ('https://github.com/chipsalliance/f4pga/pull/%s', 'pull request #'),
-   'ghsrc':     ('https://github.com/chipsalliance/f4pga/blob/master/%s', '')
+   'ghsrc':     ('https://github.com/chipsalliance/f4pga/blob/main/%s', '')
 }

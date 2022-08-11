@@ -107,11 +107,11 @@ jobs:
         uses: actions/checkout@v3
 
       - name: 🔧 Prepare environment
-        run: ./.github/scripts/prepare_environment.sh
+        run: ./scripts/prepare_environment.sh
 
       - name: 🐍 Install f4pga (pip)
         run: |
-          . ./.github/scripts/activate.sh
+          . ./scripts/activate.sh
           cd f4pga
           pip install .
           cd ..
@@ -124,7 +124,7 @@ jobs:
       - name: 🚧 [F4PGA] Test f4pga build
         if: matrix.flow == 'F4PGA'
         run: |
-          . ./.github/scripts/activate.sh
+          . ./scripts/activate.sh
           cd f4pga-examples/${{ matrix.fam }}
           f4pga -vv build --flow ../../.github/${{ matrix.fam }}_test.json
 
@@ -141,7 +141,7 @@ jobs:
       - name: 🚧 [SymbiFlow] Test make example
         if: matrix.flow == 'SymbiFlow'
         run: |
-          . ./.github/scripts/activate.sh
+          . ./scripts/activate.sh
           cd f4pga-examples/${{ matrix.fam }}
           export F4PGA_USE_DEPRECATED=true
           case '${{ matrix.fam }}' in
@@ -179,18 +179,18 @@ jobs:
         uses: actions/checkout@v3
 
       - name: 🔧 Prepare environment
-        run: ./.github/scripts/prepare_environment.sh
+        run: ./scripts/prepare_environment.sh
 
       - name: 🐍 Install f4pga (pip)
         run: |
-          . ./.github/scripts/activate.sh
+          . ./scripts/activate.sh
           cd f4pga
           pip install .
           cd ..
 
       - name: 🚦 Test Python wrappers
         run: |
-          . ./.github/scripts/activate.sh
+          . ./scripts/activate.sh
           pip3 install -r ./test/requirements.txt
           pytest --verbose --capture=no -rA --color=yes test/
 

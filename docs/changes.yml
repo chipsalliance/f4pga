@@ -37,7 +37,7 @@
         - symbiflow-ql-eos-s3_wlcsp-*-tar-xz
   description: |
     * Tarballs from f4pga-arch-defs now include usable environment and requirements files which allow bootstraping
-    minimal Conda environments.
+      minimal Conda environments.
 
     * The default F4PGA_SHARE_DIR path does not include subdir 'install' by default.
 
