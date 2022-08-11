@@ -16,8 +16,6 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-SHARE_DIR_PATH=${SHARE_DIR_PATH:-"$F4PGA_SHARE_DIR"}
-
 if [ -z $VPR_OPTIONS ]; then
   echo "Using default VPR options."
   VPR_OPTIONS="
@@ -118,7 +116,7 @@ function parse_args {
   fi
 
   DEVICE_ARCH="${DEVICE_1}_${DEVICE_2}"
-  export ARCH_DIR=`realpath ${SHARE_DIR_PATH}/arch/${DEVICE_ARCH}`
+  export ARCH_DIR="${F4PGA_SHARE_DIR}/arch/${DEVICE_ARCH}"
   export ARCH_DEF="${ARCH_DIR}/arch_${DEVICE_ARCH}".xml
   ARCH_RR_PREFIX="${ARCH_DIR}/rr_graph_${DEVICE_ARCH}"
   # qlf* devices use different naming scheme than pp3* ones.

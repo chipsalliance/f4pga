@@ -18,10 +18,9 @@
 
 set -e
 
-export SHARE_DIR_PATH="$F4PGA_SHARE_DIR"
-export TECHMAP_PATH=${SHARE_DIR_PATH}/techmaps/xc7_vpr/techmap
+export TECHMAP_PATH="${F4PGA_SHARE_DIR}"/techmaps/xc7_vpr/techmap
 
-export UTILS_PATH=${SHARE_DIR_PATH}/scripts
+export UTILS_PATH="${F4PGA_SHARE_DIR}"/scripts
 SYNTH_TCL_PATH=${UTILS_PATH}/xc7/synth.tcl
 
 VERILOG_FILES=()

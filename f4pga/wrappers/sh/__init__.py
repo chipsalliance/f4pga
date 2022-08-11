@@ -70,7 +70,7 @@ def p_vpr_common_cmds(log_suffix = None):
     return f"""
 set -e
 source {ROOT / SH_SUBDIR}/vpr_common.f4pga.sh
-parse_args {' '.join(sys_argv[1:])}
+parse_args {' '.join([f"'{arg}'" for arg in sys_argv[1:]])}
 """ + (f"""
 export OUT_NOISY_WARNINGS=noisy_warnings-${{DEVICE}}_{log_suffix}.log
 """ if log_suffix is not None else '')
@@ -112,6 +112,8 @@ def p_vpr_run():
         raise(Exception('[F4PGA] vpr run: envvar PLACE_DELAY cannot be unset/empty!'))
 
     sdc = f4pga_environ.get('SDC')
+    if sdc == '':
+        sdc = None
 
     check_call(
         [

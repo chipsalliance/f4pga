@@ -18,8 +18,6 @@
 
 set -e
 
-SHARE_DIR_PATH=${SHARE_DIR_PATH:-"$F4PGA_SHARE_DIR"}
-
 source $(dirname "$0")/vpr_common.f4pga.sh
 
 VERSION="v2.0.1"
@@ -196,10 +194,8 @@ if [[ $1 == "-compile" || $1 == "-post_verilog" ]]; then
   fi
 fi
 
-if [ ! -z "$SOURCE" ]; then
-  if [ ! -d $SOURCE/$BUILDDIR ]; then
-    mkdir -p $SOURCE/$BUILDDIR
-  fi
+if [ ! -z "$SOURCE" ] && [ ! -d $SOURCE/$BUILDDIR ]; then
+  mkdir -p $SOURCE/$BUILDDIR
 fi
 
 if [ ! -z "$OUT" ]; then
@@ -302,7 +298,7 @@ else
   PCF_MAKE="\${current_dir}/${BUILDDIR}/${TOP}_dummy.pcf"
 fi
 
-PROCESS_SDC=$(realpath "$F4PGA_SHARE_DIR"/scripts/process_sdc_constraints.py)
+PROCESS_SDC="$F4PGA_SHARE_DIR"/scripts/process_sdc_constraints.py
 if ! [ -z "$SDC" ]; then
   if ! [ -f "$SOURCE"/$SDC ];then
     echo "The sdc file: $SDC is missing at: $SOURCE"

@@ -18,9 +18,8 @@
 
 set -e
 
-export SHARE_DIR_PATH=${SHARE_DIR_PATH:-"$F4PGA_SHARE_DIR"}
-SPLIT_INOUTS=`realpath ${SHARE_DIR_PATH}/scripts/split_inouts.py`
-CONVERT_OPTS=`realpath ${SHARE_DIR_PATH}/scripts/convert_compile_opts.py`
+SPLIT_INOUTS="${F4PGA_SHARE_DIR}"/scripts/split_inouts.py
+CONVERT_OPTS="${F4PGA_SHARE_DIR}"/scripts/convert_compile_opts.py
 
 print_usage () {
     echo "Usage: symbiflow_synth  -v|--verilog <Verilog file list>"
@@ -122,10 +121,10 @@ fi
 
 PINMAPCSV="pinmap_${PART}.csv"
 
-export TECHMAP_PATH="${SHARE_DIR_PATH}/techmaps/${FAMILY}"
+export TECHMAP_PATH="${F4PGA_SHARE_DIR}/techmaps/${FAMILY}"
 
-SYNTH_TCL_PATH="${SHARE_DIR_PATH}/scripts/${FAMILY}/synth.tcl"
-CONV_TCL_PATH="${SHARE_DIR_PATH}/scripts/${FAMILY}/conv.tcl"
+SYNTH_TCL_PATH="${F4PGA_SHARE_DIR}/scripts/${FAMILY}/synth.tcl"
+CONV_TCL_PATH="${F4PGA_SHARE_DIR}/scripts/${FAMILY}/conv.tcl"
 
 export USE_ROI="FALSE"
 export OUT_JSON=$TOP.json
@@ -134,7 +133,7 @@ export OUT_SYNTH_V=${TOP}_synth.v
 export OUT_EBLIF=${TOP}.eblif
 export OUT_FASM_EXTRA=${TOP}_fasm_extra.fasm
 export PYTHON3=$(which python3)
-export UTILS_PATH=${SHARE_DIR_PATH}/scripts
+export UTILS_PATH="${F4PGA_SHARE_DIR}"/scripts
 
 if [ -s $PCF ]; then
     export PCF_FILE=$PCF
@@ -142,7 +141,7 @@ else
     export PCF_FILE=""
 fi
 
-DEVICE_PATH="${SHARE_DIR_PATH}/arch/${DEVICE}_${DEVICE}"
+DEVICE_PATH="${F4PGA_SHARE_DIR}/arch/${DEVICE}_${DEVICE}"
 export PINMAP_FILE=${DEVICE_PATH}/${PINMAPCSV}
 if [ -d "${DEVICE_PATH}/cells" ]; then
   export DEVICE_CELLS_SIM=`find ${DEVICE_PATH}/cells -name "*_sim.v"`
@@ -151,7 +150,7 @@ else
   # pp3 family has different directory naming scheme
   # the are named as ${DEVICE}_${PACKAGE}
   # ${PACKAGE} is not known because it is not passed down in add_binary_toolchain_test
-  DEVICE_PATH=$(find $(realpath ${SHARE_DIR_PATH}/arch/) -type d -name "${DEVICE}*")
+  DEVICE_PATH=$(find "${F4PGA_SHARE_DIR}"/arch/ -type d -name "${DEVICE}*")
   export PINMAP_FILE=${DEVICE_PATH}/${PINMAPCSV}
   if [ -d "${DEVICE_PATH}/cells" ]; then
     export DEVICE_CELLS_SIM=`find ${DEVICE_PATH}/cells -name "*_sim.v"`
