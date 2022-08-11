@@ -147,16 +147,14 @@ echo "$VERILOG_FILES" >${SOURCE}/v_list
 
 ## Validate the verlog source files
 if [ ${#VERILOG_FILES[@]} -eq 0 ]; then
-  if [[ $1 != "-h" || $1 != "--help" ]];then
-    echo "Please provide at least one Verilog file"
-    exit 1
-  fi
-else
-  echo "verilog files: $VERILOG_FILES"
-  echo $VERILOG_FILES >${SOURCE}/v_list
-  sed '/^$/d' $SOURCE/v_list > $SOURCE/f_list_temp
-  VERILOG_FILES=`cat $SOURCE/f_list_temp`
+  echo "Please provide at least one Verilog file"
+  exit 1
 fi
+
+echo "verilog files: $VERILOG_FILES"
+echo $VERILOG_FILES >${SOURCE}/v_list
+sed '/^$/d' $SOURCE/v_list > $SOURCE/f_list_temp
+VERILOG_FILES=`cat $SOURCE/f_list_temp`
 
 
 if [[ $1 == "-compile" || $1 == "-post_verilog" ]]; then
