@@ -107,7 +107,7 @@ else
   fi
 fi
 
-yosys_cmds=`echo ${EXTRA_ARGS[*]} | python3 -m f4pga.utils.quicklogic.convert_compile_opts`
+yosys_cmds=`echo ${EXTRA_ARGS[*]} | f4pga utils convert_compile_opts`
 if [ ! -z "${yosys_cmds}" ]; then yosys_cmds="${yosys_cmds//$'\n'/'; '}; "; fi
 
 yosys_read_cmds=''

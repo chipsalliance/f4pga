@@ -82,6 +82,9 @@ setuptools_setup(
     url="https://github.com/chipsalliance/f4pga",
     package_dir={"f4pga": "."},
     package_data={
+        "f4pga": [
+            "fpga_map.json",
+        ],
         "f4pga.flows": [
             "*.yml",
         ],

@@ -74,6 +74,7 @@ class ModuleContext:
 
     share: str  #  Absolute path to F4PGA's share directory
     bin: str  #  Absolute path to F4PGA's bin directory
+    aux: str  #  Absolute path to F4PGA's aux directory
     takes: SimpleNamespace  #  Maps symbolic dependency names to relative paths.
     produces: SimpleNamespace  #  Contains mappings for explicitely specified dependencies.
     #  Useful mostly for checking for on-demand optional outputs (such as logs) with
@@ -101,7 +102,7 @@ class ModuleContext:
             setattr(obj, name, self.r_env.resolve(value))
 
     # `config` should be a dictionary given as modules input.
-    def __init__(self, module: Module, config: "dict[str, ]", r_env: ResolutionEnv, share: str, bin: str):
+    def __init__(self, module: Module, config: "dict[str, ]", r_env: ResolutionEnv, share: str, bin: str, aux: str):
         self.module_name = module.name
         self.takes = SimpleNamespace()
         self.produces = SimpleNamespace()
@@ -110,6 +111,7 @@ class ModuleContext:
         self.r_env = r_env
         self.share = share
         self.bin = bin
+        self.aux = aux
 
         self._getreqmaybe(self.takes, module.takes, config["takes"])
         self._getreqmaybe(self.values, module.values, config["values"])

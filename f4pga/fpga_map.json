@@ -1,0 +1,12 @@
+{
+	"xc7": {
+		"manufacturer": "xilinx"
+	},
+	"eos-s3": {
+		"manufacturer": "quicklogic",
+		"architecture": "pp3"
+	},
+	"qlf_k4n8": {
+		"manufacturer": "quicklogic"
+	}
+}
