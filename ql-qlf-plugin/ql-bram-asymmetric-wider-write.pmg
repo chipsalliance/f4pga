@@ -1,0 +1,65 @@
+pattern ql_bram_asymmetric_wider_write
+
+state <SigSpec> mem_rd_data
+state <SigSpec> mem_rd_addr
+state <SigSpec> mem_wr_data
+state <SigSpec> mem_wr_addr
+state <SigSpec> mem_wr_en
+state <SigSpec> rd_data_shift_y
+state <SigSpec> rd_data_ff_q
+state <SigSpec> rd_data_ff_en
+state <SigSpec> rd_data_ff_clk
+state <SigSpec> wr_addr_ff_d
+state <SigSpec> wr_en_mux_s
+state <SigSpec> rd_addr_and_a
+state <SigSpec> rd_addr_and_b
+
+match mem
+    select mem->type == ($mem_v2)
+    // 2 because it is a primary output connected to one cell (rq port or $shiftx cell)
+    select nusers(port(mem, \RD_DATA)) == 2
+    set mem_rd_data port(mem, \RD_DATA)
+    set mem_rd_addr port(mem, \RD_ADDR)
+    set mem_wr_data port(mem, \WR_DATA)
+    set mem_wr_addr port(mem, \WR_ADDR)
+    set mem_wr_en port(mem, \WR_EN)
+endmatch
+
+match rd_data_shift
+    select rd_data_shift->type.in($shiftx)
+    index <SigSpec> port(rd_data_shift, \A) === mem_rd_data
+    set rd_data_shift_y port(rd_data_shift, \Y)
+endmatch
+
+match rd_data_ff
+    select rd_data_ff->type.in($dffe)
+    select nusers(port(rd_data_ff, \D)) == 2
+    index <SigSpec> port(rd_data_ff, \D) === rd_data_shift_y
+    set rd_data_ff_q port(rd_data_ff, \Q)
+    set rd_data_ff_en port(rd_data_ff, \EN)
+    set rd_data_ff_clk port(rd_data_ff, \CLK)
+endmatch
+
+match wr_addr_ff
+    select wr_addr_ff->type.in($dff)
+    select nusers(port(wr_addr_ff, \Q)) == 2
+    index <SigSpec> port(wr_addr_ff, \Q) === mem_wr_addr
+    set wr_addr_ff_d port(wr_addr_ff, \D)
+    optional
+endmatch
+
+match wr_en_mux
+    select wr_en_mux->type.in($mux)
+    index <SigSpec> port(wr_en_mux, \Y) === mem_wr_en[0]
+    set wr_en_mux_s port(wr_en_mux, \S)
+endmatch
+
+match rd_addr_and
+    select rd_addr_and->type.in($and)
+    set rd_addr_and_a port(rd_addr_and, \A)
+    set rd_addr_and_b port(rd_addr_and, \B)
+endmatch
+
+code
+    accept;
+endcode

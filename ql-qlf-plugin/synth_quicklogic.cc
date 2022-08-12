@@ -354,13 +354,17 @@ struct SynthQuickLogicPass : public ScriptPass {
             run("opt_clean");
         }
 
+        if (family == "qlf_k6n10f") {
+            run("ql_bram_asymmetric");
+        }
+
         if (check_label("map_bram", "(skip if -no_bram)") && (family == "qlf_k6n10" || family == "qlf_k6n10f" || family == "pp3") && inferBram) {
             run("memory_bram -rules +/quicklogic/" + family + "/brams.txt");
             if (family == "pp3") {
                 run("pp3_braminit");
             }
             run("ql_bram_split                   ", "(for qlf_k6n10f if not -no_bram)");
-            run("techmap -map +/quicklogic/" + family + "/brams_map.v");
+            run("techmap -autoproc -map +/quicklogic/" + family + "/brams_map.v");
             if (family == "qlf_k6n10f") {
                 run("techmap -map +/quicklogic/" + family + "/brams_final_map.v");
             }

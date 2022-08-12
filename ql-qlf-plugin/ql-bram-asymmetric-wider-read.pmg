@@ -1,0 +1,66 @@
+pattern ql_bram_asymmetric_wider_read
+
+state <SigSpec> mem_wr_data
+state <SigSpec> mem_wr_en
+state <SigSpec> mem_wr_addr
+state <SigSpec> mem_rd_data
+state <SigSpec> mem_rd_addr
+state <SigSpec> mux_ab
+state <SigSpec> mux_s
+state <SigSpec> mux_ba
+state <SigSpec> mux_input
+state <SigSpec> wr_data_shift_a
+state <SigSpec> wr_data_shift_b
+state <SigSpec> wr_en_and_a
+state <SigSpec> wr_en_and_b
+state <SigSpec> wr_en_and_y
+state <SigSpec> wr_en_shift_a
+state <SigSpec> wr_en_shift_b
+state <SigSpec> wr_en_shift_y
+
+match mem
+    select mem->type == ($mem_v2)
+    // 2 because it is a primary output connected to one cell (rq port or $shiftx cell)
+    select nusers(port(mem, \WR_DATA)) == 2
+    set mem_wr_data port(mem, \WR_DATA)
+    set mem_wr_en port(mem, \WR_EN)
+    set mem_wr_addr port(mem, \WR_ADDR)
+    set mem_rd_data port(mem, \RD_DATA)
+    set mem_rd_addr port(mem, \RD_ADDR)
+endmatch
+
+match wr_en_and
+    select wr_en_and->type == ($and)
+    set wr_en_and_a port(wr_en_and, \A)
+    set wr_en_and_b port(wr_en_and, \B)
+    set wr_en_and_y port(wr_en_and, \Y)
+endmatch
+
+match wr_en_shift
+    select wr_en_shift->type.in($shl)
+    set wr_en_shift_a port(wr_en_shift, \A)
+    set wr_en_shift_b port(wr_en_shift, \B)
+    set wr_en_shift_y port(wr_en_shift, \Y)
+endmatch
+
+match mux
+    select mux->type == ($mux)
+    choice <IdString> AB {\A, \B}
+    define <IdString> BA (AB == \A ? \B : \A)
+    index <SigSpec> port(mux, \Y) === mem_wr_en
+    index <SigSpec> port(mux, AB) === wr_en_shift_y
+    set mux_ab port(mux, AB)
+    set mux_s port(mux, \S)
+    set mux_ba port(mux, BA)
+endmatch
+
+match wr_data_shift
+    select wr_data_shift->type.in($shl)
+    index <SigSpec> port(wr_data_shift, \Y) === mem_wr_data
+    set wr_data_shift_a port(wr_data_shift, \A)
+    set wr_data_shift_b port(wr_data_shift, \B)
+endmatch
+
+code
+    accept;
+endcode
