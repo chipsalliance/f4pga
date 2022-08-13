@@ -16,6 +16,46 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+eval set -- "$(
+  getopt \
+    --options=d:e:p:n:P:s: \
+    --longoptions=device:,eblif:,pcf:,net:,part:,sdc: \
+    --name $0 -- "$@"
+)"
+DEVICE=''
+DEVICE_NAME=''
+PART=''
+EBLIF=''
+PCF=''
+NET=''
+SDC=''
+ADDITIONAL_VPR_OPTIONS=''
+while true; do
+  case "$1" in
+    -d|--device) DEVICE=$2; shift 2 ;;
+    -e|--eblif)  EBLIF=$2;  shift 2 ;;
+    -p|--pcf)    PCF=$2;    shift 2 ;;
+    -n|--net)    NET=$2;    shift 2 ;;
+    -P|--part)   PART=$2;   shift 2 ;;
+    -s|--sdc)    SDC=$2;    shift 2 ;;
+    --) shift; ADDITIONAL_VPR_OPTIONS="$@"; break ;;
+  esac
+done
+
+if [ -z "$DEVICE" ] && [ -n "$PART" ]; then
+  # Try to find device name. Accept only when exactly one is found
+  PART_DIRS=(${F4PGA_SHARE_DIR}/arch/*/${PART})
+  if [ ${#PART_DIRS[@]} -eq 1 ]; then DEVICE=$(basename $(dirname "${PART_DIRS[0]}")); fi
+fi
+if [ -z "$DEVICE" ]; then echo "Please provide device name"; exit 1; fi
+if [ -z "$EBLIF" ]; then echo "Please provide blif file name"; exit 1; fi
+
+export DEVICE="$DEVICE"
+export EBLIF="$EBLIF"
+export PCF="$PCF"
+export NET="$NET"
+export SDC="$SDC"
+
 if [ -z "$VPR_OPTIONS" ]; then
   echo "Using default VPR options."
   VPR_OPTIONS="
@@ -46,55 +86,13 @@ if [ -z "$VPR_OPTIONS" ]; then
   "
 fi
 
-function parse_args {
+export VPR_OPTIONS="$VPR_OPTIONS $ADDITIONAL_VPR_OPTIONS"
 
-   eval set -- "$(
-     getopt \
-       --options=d:e:p:n:P:s: \
-       --longoptions=device:,eblif:,pcf:,net:,part:,sdc: \
-       --name $0 -- "$@"
-   )"
-   DEVICE=''
-   DEVICE_NAME=''
-   PART=''
-   EBLIF=''
-   PCF=''
-   NET=''
-   SDC=''
-   ADDITIONAL_VPR_OPTIONS=''
-   while true; do
-     case "$1" in
-       -d|--device) DEVICE=$2; shift 2 ;;
-       -e|--eblif)  EBLIF=$2;  shift 2 ;;
-       -p|--pcf)    PCF=$2;    shift 2 ;;
-       -n|--net)    NET=$2;    shift 2 ;;
-       -P|--part)   PART=$2;   shift 2 ;;
-       -s|--sdc)    SDC=$2;    shift 2 ;;
-       --) shift; ADDITIONAL_VPR_OPTIONS="$@"; break ;;
-     esac
-   done
-
-  if [ -z "$DEVICE" ] && [ -n "$PART" ]; then
-    # Try to find device name. Accept only when exactly one is found
-    PART_DIRS=(${F4PGA_SHARE_DIR}/arch/*/${PART})
-    if [ ${#PART_DIRS[@]} -eq 1 ]; then DEVICE=$(basename $(dirname "${PART_DIRS[0]}")); fi
-  fi
-  if [ -z "$DEVICE" ]; then echo "Please provide device name"; exit 1; fi
-  if [ -z "$EBLIF" ]; then echo "Please provide blif file name"; exit 1; fi
-
-  export DEVICE="$DEVICE"
-  export EBLIF="$EBLIF"
-  export PCF="$PCF"
-  export NET="$NET"
-  export SDC="$SDC"
-  export VPR_OPTIONS="$VPR_OPTIONS $ADDITIONAL_VPR_OPTIONS"
-
-  export ARCH_DIR="${F4PGA_SHARE_DIR}/arch/$DEVICE"
-  export ARCH_DEF="${ARCH_DIR}"/arch.timing.xml
-  ARCH_RR_PREFIX="${ARCH_DIR}/rr_graph_${DEVICE}"
-  export RR_GRAPH="${ARCH_RR_PREFIX}".rr_graph.real.bin
-  export RR_GRAPH_XML="${ARCH_RR_PREFIX}".rr_graph.real.xml
-  export PLACE_DELAY="${ARCH_RR_PREFIX}".place_delay.bin
-  export LOOKAHEAD="${ARCH_RR_PREFIX}".lookahead.bin
-  export DEVICE_NAME=`echo "$DEVICE" | sed -n 's/_/-/p'`
-}
+export ARCH_DIR="${F4PGA_SHARE_DIR}/arch/$DEVICE"
+export ARCH_DEF="${ARCH_DIR}"/arch.timing.xml
+ARCH_RR_PREFIX="${ARCH_DIR}/rr_graph_${DEVICE}"
+export RR_GRAPH="${ARCH_RR_PREFIX}".rr_graph.real.bin
+export RR_GRAPH_XML="${ARCH_RR_PREFIX}".rr_graph.real.xml
+export PLACE_DELAY="${ARCH_RR_PREFIX}".place_delay.bin
+export LOOKAHEAD="${ARCH_RR_PREFIX}".lookahead.bin
+export DEVICE_NAME=`echo "$DEVICE" | sed -n 's/_/-/p'`

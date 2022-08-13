@@ -18,8 +18,6 @@
 
 set -e
 
-source $(dirname "$0")/vpr_common.f4pga.sh
-
 VERSION="v2.0.1"
 
 if [ ! -n $1 ]; then

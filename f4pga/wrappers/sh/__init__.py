@@ -69,8 +69,7 @@ def p_run_pym(module):
 def p_vpr_common_cmds(log_suffix = None):
     return f"""
 set -e
-source {ROOT / SH_SUBDIR}/vpr_common.f4pga.sh
-parse_args {' '.join([f"'{arg}'" for arg in sys_argv[1:]])}
+source {ROOT / SH_SUBDIR}/vpr_common.f4pga.sh {' '.join([f"'{arg}'" for arg in sys_argv[1:]])}
 """ + (f"""
 export OUT_NOISY_WARNINGS=noisy_warnings-${{DEVICE}}_{log_suffix}.log
 """ if log_suffix is not None else '')

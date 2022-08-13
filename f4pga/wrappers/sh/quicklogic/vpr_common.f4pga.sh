@@ -16,6 +16,51 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+eval set -- $(
+  getopt \
+    --options=d:f:e:p:n:P:j:s:t:c: \
+    --longoptions=device:,eblif:,pcf:,net:,part:,json:,sdc:,top:,corner: \
+    --name $0 -- $@
+)
+DEVICE=""
+FAMILY=""
+EBLIF=""
+PCF=""
+NET=""
+PART=""
+JSON=""
+SDC=""
+TOP="top"
+CORNER=""
+while true; do
+  case "$1" in
+    -d|--device) DEVICE=$2; shift 2 ;;
+    -f|--family) FAMILY=$2; shift 2 ;;
+    -e|--eblif)  EBLIF=$2;  shift 2 ;;
+    -p|--pcf)    PCF=$2;    shift 2 ;;
+    -n|--net)    NET=$2;    shift 2 ;;
+    -P|--part)   PART=$2;   shift 2 ;;
+    -j|--json)   JSON=$2;   shift 2 ;;
+    -s|--sdc)    SDC=$2;    shift 2 ;;
+    -t|--top)    TOP=$2;    shift 2 ;;
+    -c|--corner) CORNER=$2; shift 2 ;;
+    --) break ;;
+  esac
+done
+if [ -z $DEVICE ]; then echo "Please provide device name"; exit 1; fi
+if [ -z $FAMILY ]; then echo "Please provide device family name"; exit 1; fi
+if [ -z $EBLIF ]; then echo "Please provide blif file name"; exit 1; fi
+
+export DEVICE="$DEVICE"
+export FAMILY="$FAMILY"
+export EBLIF="$EBLIF"
+export PCF="$PCF"
+export NET="$NET"
+export JSON="$JSON"
+export SDC="$SDC"
+export TOP="$TOP"
+export CORNER="$CORNER"
+
 if [ -z $VPR_OPTIONS ]; then
   echo "Using default VPR options."
   VPR_OPTIONS="
@@ -26,105 +71,56 @@ if [ -z $VPR_OPTIONS ]; then
   "
 fi
 
-function parse_args {
+VPR_OPTIONS="$VPR_OPTIONS
+  --place_delay_model delta_override
+  --router_lookahead extended_map
+  --allow_dangling_combinational_nodes on"
 
-  eval set -- $(
-    getopt \
-      --options=d:f:e:p:n:P:j:s:t:c: \
-      --longoptions=device:,eblif:,pcf:,net:,part:,json:,sdc:,top:,corner: \
-      --name $0 -- $@
-  )
-  DEVICE=""
-  FAMILY=""
-  EBLIF=""
-  PCF=""
-  NET=""
-  PART=""
-  JSON=""
-  SDC=""
-  TOP="top"
-  CORNER=""
-  while true; do
-    case "$1" in
-      -d|--device) DEVICE=$2; shift 2 ;;
-      -f|--family) FAMILY=$2; shift 2 ;;
-      -e|--eblif)  EBLIF=$2;  shift 2 ;;
-      -p|--pcf)    PCF=$2;    shift 2 ;;
-      -n|--net)    NET=$2;    shift 2 ;;
-      -P|--part)   PART=$2;   shift 2 ;;
-      -j|--json)   JSON=$2;   shift 2 ;;
-      -s|--sdc)    SDC=$2;    shift 2 ;;
-      -t|--top)    TOP=$2;    shift 2 ;;
-      -c|--corner) CORNER=$2; shift 2 ;;
-      --) break ;;
-    esac
-  done
-  if [ -z $DEVICE ]; then echo "Please provide device name"; exit 1; fi
-  if [ -z $FAMILY ]; then echo "Please provide device family name"; exit 1; fi
-  if [ -z $EBLIF ]; then echo "Please provide blif file name"; exit 1; fi
+if [[ "$DEVICE" == "qlf_k4n8_qlf_k4n8" ]]; then
+  VPR_OPTIONS="$VPR_OPTIONS
+  --route_chan_width 10
+  --clock_modeling ideal
+  --place_delta_delay_matrix_calculation_method dijkstra
+  --absorb_buffer_luts off"
+else
+  VPR_OPTIONS="$VPR_OPTIONS
+  --route_chan_width 100
+  --clock_modeling route
+  --check_route quick
+  --strict_checks off
+  --disable_errors check_unbuffered_edges:check_route
+  --congested_routing_iteration_threshold 0.8
+  --incremental_reroute_delay_ripup off
+  --base_cost_type delay_normalized_length_bounded
+  --bb_factor 10
+  --initial_pres_fac 4.0
+  --check_rr_graph off
+  --pack_high_fanout_threshold PB-LOGIC:18
+  --suppress_warnings ${OUT_NOISY_WARNINGS},sum_pin_class:check_unbuffered_edges:load_rr_indexed_data_T_values:check_rr_node:trans_per_R:check_route:set_rr_graph_tool_comment"
+fi
 
-  export DEVICE="$DEVICE"
-  export FAMILY="$FAMILY"
-  export EBLIF="$EBLIF"
-  export PCF="$PCF"
-  export NET="$NET"
-  export JSON="$JSON"
-  export SDC="$SDC"
-  export TOP="$TOP"
-  export CORNER="$CORNER"
+export VPR_OPTIONS="$VPR_OPTIONS"
 
-  if [[ "$DEVICE" == "qlf_k4n8_qlf_k4n8" ]]; then
-    VPR_OPTIONS="$VPR_OPTIONS
-    --route_chan_width 10
-    --clock_modeling ideal
-    --place_delta_delay_matrix_calculation_method dijkstra
-    --place_delay_model delta_override
-    --router_lookahead extended_map
-    --allow_dangling_combinational_nodes on
-    --absorb_buffer_luts off"
-  else
-    VPR_OPTIONS="$VPR_OPTIONS
-    --route_chan_width 100
-    --clock_modeling route
-    --place_delay_model delta_override
-    --router_lookahead extended_map
-    --check_route quick
-    --strict_checks off
-    --allow_dangling_combinational_nodes on
-    --disable_errors check_unbuffered_edges:check_route
-    --congested_routing_iteration_threshold 0.8
-    --incremental_reroute_delay_ripup off
-    --base_cost_type delay_normalized_length_bounded
-    --bb_factor 10
-    --initial_pres_fac 4.0
-    --check_rr_graph off
-    --pack_high_fanout_threshold PB-LOGIC:18
-    --suppress_warnings ${OUT_NOISY_WARNINGS},sum_pin_class:check_unbuffered_edges:load_rr_indexed_data_T_values:check_rr_node:trans_per_R:check_route:set_rr_graph_tool_comment"
-  fi
+if [[ "$DEVICE" == "qlf_k4n8_qlf_k4n8" ]]; then
+  DEVICE_1="qlf_k4n8-qlf_k4n8_umc22_${CORNER}"
+  DEVICE_2="$DEVICE_1"
+elif [[ "$DEVICE" == "qlf_k6n10_qlf_k6n10" ]];then
+  DEVICE_1="qlf_k6n10-qlf_k6n10_gf12"
+  DEVICE_2="$DEVICE_1"
+else
+  DEVICE_1="$DEVICE"
+  DEVICE_2="wlcsp"
+fi
 
-  export VPR_OPTIONS="$VPR_OPTIONS"
-
-  if [[ "$DEVICE" == "qlf_k4n8_qlf_k4n8" ]]; then
-    DEVICE_1="qlf_k4n8-qlf_k4n8_umc22_${CORNER}"
-    DEVICE_2="$DEVICE_1"
-  elif [[ "$DEVICE" == "qlf_k6n10_qlf_k6n10" ]];then
-    DEVICE_1="qlf_k6n10-qlf_k6n10_gf12"
-    DEVICE_2="$DEVICE_1"
-  else
-    DEVICE_1="$DEVICE"
-    DEVICE_2="wlcsp"
-  fi
-
-  DEVICE_ARCH="${DEVICE_1}_${DEVICE_2}"
-  export ARCH_DIR="${F4PGA_SHARE_DIR}/arch/${DEVICE_ARCH}"
-  export ARCH_DEF="${ARCH_DIR}/arch_${DEVICE_ARCH}".xml
-  ARCH_RR_PREFIX="${ARCH_DIR}/rr_graph_${DEVICE_ARCH}"
-  # qlf* devices use different naming scheme than pp3* ones.
-  export RR_GRAPH="${ARCH_DIR}/${DEVICE_1}".rr_graph.bin
-  if [ ! -f "${RR_GRAPH}" ]; then
-    export RR_GRAPH="${ARCH_RR_PREFIX}".rr_graph.real.bin
-  fi
-  export PLACE_DELAY="${ARCH_RR_PREFIX}".place_delay.bin
-  export LOOKAHEAD="${ARCH_RR_PREFIX}".lookahead.bin
-  export DEVICE_NAME="$DEVICE_1"
-}
+DEVICE_ARCH="${DEVICE_1}_${DEVICE_2}"
+export ARCH_DIR="${F4PGA_SHARE_DIR}/arch/${DEVICE_ARCH}"
+export ARCH_DEF="${ARCH_DIR}/arch_${DEVICE_ARCH}".xml
+ARCH_RR_PREFIX="${ARCH_DIR}/rr_graph_${DEVICE_ARCH}"
+# qlf* devices use different naming scheme than pp3* ones.
+export RR_GRAPH="${ARCH_DIR}/${DEVICE_1}".rr_graph.bin
+if [ ! -f "${RR_GRAPH}" ]; then
+  export RR_GRAPH="${ARCH_RR_PREFIX}".rr_graph.real.bin
+fi
+export PLACE_DELAY="${ARCH_RR_PREFIX}".place_delay.bin
+export LOOKAHEAD="${ARCH_RR_PREFIX}".lookahead.bin
+export DEVICE_NAME="$DEVICE_1"
