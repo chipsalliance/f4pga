@@ -50,54 +50,31 @@ fi
 
 function parse_args {
 
-     OPTS=d:e:p:n:P:s:a:
-     LONGOPTS=device:,eblif:,pcf:,net:,part:,sdc:,additional_vpr_options:
+     eval set -- "$(
+       getopt \
+         --options=d:e:p:n:P:s: \
+         --longoptions=device:,eblif:,pcf:,net:,part:,sdc: \
+         --name $0 -- "$@"
+     )"
 
-     PARSED_OPTS=`getopt --options=${OPTS} --longoptions=${LONGOPTS} --name $0 -- "$@"`
-     eval set -- "${PARSED_OPTS}"
-
-     DEVICE=""
-     DEVICE_NAME=""
-     PART=""
-     EBLIF=""
-     PCF=""
-     NET=""
-     SDC=""
-     ADDITIONAL_VPR_OPTIONS=""
+     DEVICE=''
+     DEVICE_NAME=''
+     PART=''
+     EBLIF=''
+     PCF=''
+     NET=''
+     SDC=''
+     ADDITIONAL_VPR_OPTIONS=''
 
      while true; do
           case "$1" in
-               -d|--device)
-                    DEVICE=$2
-                    shift 2
-                    ;;
-               -e|--eblif)
-                    EBLIF=$2
-                    shift 2
-                    ;;
-               -p|--pcf)
-                    PCF=$2
-                    shift 2
-                    ;;
-               -n|--net)
-                    NET=$2
-                    shift 2
-                    ;;
-               -P|--part)
-                    PART=$2
-                    shift 2
-                    ;;
-               -s|--sdc)
-                    SDC=$2
-                    shift 2
-                    ;;
-               -a|--additional_vpr_options)
-                    ADDITIONAL_VPR_OPTIONS="$2"
-                    shift 2
-		    ;;
-               --)
-                    break
-                    ;;
+               -d|--device) DEVICE=$2; shift 2 ;;
+               -e|--eblif)  EBLIF=$2;  shift 2 ;;
+               -p|--pcf)    PCF=$2;    shift 2 ;;
+               -n|--net)    NET=$2;    shift 2 ;;
+               -P|--part)   PART=$2;   shift 2 ;;
+               -s|--sdc)    SDC=$2;    shift 2 ;;
+               --) shift; ADDITIONAL_VPR_OPTIONS="$@"; break ;;
           esac
      done
 
