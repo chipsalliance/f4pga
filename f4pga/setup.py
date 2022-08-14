@@ -102,7 +102,6 @@ setuptools_setup(
     entry_points={
         "console_scripts": [
             "f4pga = f4pga.__init__:main",
-            f"{sf}_generate_constraints = {shwrappers}:generate_constraints",
             f"{sf}_pack = {shwrappers}:pack",
             f"{sf}_place = {shwrappers}:place",
             f"{sf}_route = {shwrappers}:route",
@@ -121,7 +120,6 @@ setuptools_setup(
                 f"{sf}_write_jlink = {shwrappers}:write_jlink",
                 f"{sf}_write_openocd = {shwrappers}:write_openocd",
                 f"ql_{sf} = {shwrappers}:ql",
-                f"vpr_common = {shwrappers}:vpr_common"
             ]
         )
     },

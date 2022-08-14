@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2020-2022 F4PGA Authors.
 #
@@ -16,13 +17,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-set -e
+from f4pga.wrappers.sh import generate_constraints
 
-source $(dirname "$0")/vpr_common.f4pga.sh
-parse_args "$@"
-
-export OUT_NOISY_WARNINGS=noisy_warnings-${DEVICE}_pack.log
-
-run_vpr --route
-
-mv vpr_stdout.log route.log
+if __name__ == '__main__':
+    generate_constraints()

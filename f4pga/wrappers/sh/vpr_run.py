@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2020-2022 F4PGA Authors.
 #
@@ -16,11 +17,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-set -e
+from f4pga.wrappers.sh import p_vpr_run
 
-source $(dirname "$0")/vpr_common.f4pga.sh
-parse_args "$@"
-
-OUT_NOISY_WARNINGS=noisy_warnings-${DEVICE}_place.log
-
-run_vpr_xml_rr_graph --pack
+if __name__ == '__main__':
+    p_vpr_run()

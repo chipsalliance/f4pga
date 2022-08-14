@@ -18,10 +18,6 @@
 
 set -e
 
-SHARE_DIR_PATH=${SHARE_DIR_PATH:="$F4PGA_SHARE_DIR"}
-
-source $(dirname "$0")/vpr_common.f4pga.sh
-
 VERSION="v2.0.1"
 
 if [ ! -n $1 ]; then
@@ -88,62 +84,25 @@ for arg in $@; do
   -h|--help) exit 0 ;;
   *)
     case $OPT in
-      src)
-        SOURCE=$arg
-        OPT=""
-      ;;
-      top)
-        TOP=$arg
-        OPT=""
-      ;;
-      vlog)
-        VERILOG_FILES+="$arg "
-      ;;
-      dev)
-        DEVICE=$arg
-        OPT=""
-      ;;
-      pcf)
-        PCF=$arg
-        OPT=""
-      ;;
-      part)
-        PART=$arg
-        OPT=""
-      ;;
-      json)
-        JSON=$arg
-        OPT=""
-      ;;
-      sdc)
-        SDC=$arg
-        OPT=""
-      ;;
+      src)             SOURCE=$arg;          OPT="" ;;
+      top)             TOP=$arg;             OPT="" ;;
+      dev)             DEVICE=$arg;          OPT="" ;;
+      pcf)             PCF=$arg;             OPT="" ;;
+      part)            PART=$arg;            OPT="" ;;
+      json)            JSON=$arg;            OPT="" ;;
+      sdc)             SDC=$arg;             OPT="" ;;
+      pnr_corner)      PNR_CORNER=$arg;      OPT="" ;;
+      analysis_corner) ANALYSIS_CORNER=$arg; OPT="" ;;
+      build_dir)       BUILDDIR=$arg         OPT="" ;;
       route)
         ROUTE_FLAG0="$arg"
         ROUTE_FLAG0="${ROUTE_FLAG0,,}"
         OPT=""
       ;;
-      pnr_corner)
-        PNR_CORNER=$arg
-        OPT=""
-      ;;
-      analysis_corner)
-        ANALYSIS_CORNER=$arg
-        OPT=""
-      ;;
-      dump)
-        OUT+="$arg "
-      ;;
-      compile_xtra)
-      ;;
-      options_file)
-        COMPILE_EXTRA_ARGS+=("-f \"`realpath $arg`\" ")
-      ;;
-      build_dir)
-        BUILDDIR=$arg
-        OPT=""
-      ;;
+      vlog) VERILOG_FILES+="$arg " ;;
+      dump) OUT+="$arg " ;;
+      compile_xtra) ;;
+      options_file) COMPILE_EXTRA_ARGS+=("-f \"`realpath $arg`\" ") ;;
       *)
         echo "Refer help for more details: ql_symbiflow -h "
         exit 1
@@ -157,68 +116,44 @@ for arg in $@; do
 done
 
 case ${DEVICE} in
-  qlf_k4n8)
-    DEVICE="${DEVICE}_${DEVICE}"
-    FAMILY="qlf_k4n8"
-    DEVICE_CHECK="VALID"
-    USE_PINMAP=1
-  ;;
-  qlf_k6n10)
-    DEVICE="${DEVICE}_${DEVICE}"
-    FAMILY="qlf_k6n10"
-    DEVICE_CHECK="VALID"
-    USE_PINMAP=1
-  ;;
-  ql-eos-s3)
-    DEVICE="${DEVICE}"
-    FAMILY="pp3"
-    DEVICE_CHECK="VALID"
-    USE_PINMAP=0
-  ;;
-  *)
-    echo "Unsupported device '${DEVICE}'"
-    exit 1
-  ;;
+  qlf_k4n8)  DEVICE="${DEVICE}_${DEVICE}"; FAMILY="qlf_k4n8";  DEVICE_CHECK="VALID"; USE_PINMAP=1 ;;
+  qlf_k6n10) DEVICE="${DEVICE}_${DEVICE}"; FAMILY="qlf_k6n10"; DEVICE_CHECK="VALID"; USE_PINMAP=1 ;;
+  ql-eos-s3) DEVICE="${DEVICE}";           FAMILY="pp3";       DEVICE_CHECK="VALID"; USE_PINMAP=0 ;;
+  *) echo "Unsupported device '${DEVICE}'"; exit 1 ;;
 esac
 
-## Check if the source directory exists
 if [[ $1 == "-h" || $1 == "--help" ]];then
   exit 1
-else
-  if [ -z "$SOURCE" ];then
-    SOURCE=$PWD
-  elif [ $SOURCE == "." ];then
-    SOURCE=$PWD
-  elif [ ! -d "$SOURCE" ];then
-    echo "Directory path $SOURCE DOES NOT exists. Please add absolute path"
-    exit 1
-  fi
-
-  if [[ $1 == "-h"  ||  $1 == "--help" ]];then
-    exit 0
-  else
-    if [ -f $SOURCE/v_list_tmp ];then
-      rm -f $SOURCE/v_list_tmp
-    fi
-    if [ "$VERILOG_FILES" == "*.v" ];then
-      VERILOG_FILES=`cd ${SOURCE};ls *.v`
-    fi
-    echo "$VERILOG_FILES" >${SOURCE}/v_list
-  fi
-
-  ## Validate the verlog source files
-  if [ ${#VERILOG_FILES[@]} -eq 0 ]; then
-    if [[ $1 != "-h" || $1 != "--help" ]];then
-      echo "Please provide at least one Verilog file"
-      exit 1
-    fi
-  else
-    echo "verilog files: $VERILOG_FILES"
-    echo $VERILOG_FILES >${SOURCE}/v_list
-    sed '/^$/d' $SOURCE/v_list > $SOURCE/f_list_temp
-    VERILOG_FILES=`cat $SOURCE/f_list_temp`
-  fi
 fi
+
+## Check if the source directory exists
+SOURCE=${SOURCE:-$PWD}
+if [ $SOURCE == "." ];then
+  SOURCE=$PWD
+elif [ ! -d "$SOURCE" ];then
+  echo "Directory path $SOURCE DOES NOT exists. Please add absolute path"
+  exit 1
+fi
+
+if [ -f $SOURCE/v_list_tmp ];then
+  rm -f $SOURCE/v_list_tmp
+fi
+if [ "$VERILOG_FILES" == "*.v" ];then
+  VERILOG_FILES=`cd ${SOURCE};ls *.v`
+fi
+echo "$VERILOG_FILES" >${SOURCE}/v_list
+
+## Validate the verlog source files
+if [ ${#VERILOG_FILES[@]} -eq 0 ]; then
+  echo "Please provide at least one Verilog file"
+  exit 1
+fi
+
+echo "verilog files: $VERILOG_FILES"
+echo $VERILOG_FILES >${SOURCE}/v_list
+sed '/^$/d' $SOURCE/v_list > $SOURCE/f_list_temp
+VERILOG_FILES=`cat $SOURCE/f_list_temp`
+
 
 if [[ $1 == "-compile" || $1 == "-post_verilog" ]]; then
   if [ -z "$DEVICE" ]; then
@@ -255,10 +190,8 @@ if [[ $1 == "-compile" || $1 == "-post_verilog" ]]; then
   fi
 fi
 
-if [ ! -z "$SOURCE" ]; then
-  if [ ! -d $SOURCE/$BUILDDIR ]; then
-    mkdir -p $SOURCE/$BUILDDIR
-  fi
+if [ ! -z "$SOURCE" ] && [ ! -d $SOURCE/$BUILDDIR ]; then
+  mkdir -p $SOURCE/$BUILDDIR
 fi
 
 if [ ! -z "$OUT" ]; then
@@ -344,9 +277,9 @@ elif [[ -f $PCF ]];then
 fi
 
 if [[ $USE_PINMAP -ne 0 ]]; then
-    export PART=${CSV_PATH}
+  export PART=${CSV_PATH}
 else
-    export PART=${PART}
+  export PART=${PART}
 fi
 export JSON=${JSON_PATH}
 export PCF_PATH=${PCF_PATH}
@@ -361,7 +294,7 @@ else
   PCF_MAKE="\${current_dir}/${BUILDDIR}/${TOP}_dummy.pcf"
 fi
 
-PROCESS_SDC=$(realpath "$F4PGA_SHARE_DIR"/scripts/process_sdc_constraints.py)
+PROCESS_SDC="$F4PGA_SHARE_DIR"/scripts/process_sdc_constraints.py
 if ! [ -z "$SDC" ]; then
   if ! [ -f "$SOURCE"/$SDC ];then
     echo "The sdc file: $SDC is missing at: $SOURCE"

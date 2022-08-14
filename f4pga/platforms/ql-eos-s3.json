@@ -464,7 +464,6 @@
                     "$F4PGA_INSTALL_DIR": "${shareDir}/../../../../",
                     "$FPGA_FAM": "eos-s3",
                     "$PATH": "${shareDir}/../../../conda/envs/eos-s3/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-                    "$SHARE_DIR_PATH": "${shareDir}",
                     "$BIN_DIR_PATH": "${binDir}"
                 }
             }

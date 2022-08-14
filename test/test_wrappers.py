@@ -32,8 +32,6 @@ wrappers = [
     'symbiflow_synth',
     'symbiflow_write_bitstream',
     'symbiflow_write_fasm',
-    'symbiflow_write_xml_rr_graph',
-    'vpr_common',
     'symbiflow_analysis',
     'symbiflow_repack',
     'symbiflow_generate_bitstream',

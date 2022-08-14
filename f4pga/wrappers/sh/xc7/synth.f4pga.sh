@@ -18,10 +18,9 @@
 
 set -e
 
-export SHARE_DIR_PATH="$F4PGA_SHARE_DIR"
-export TECHMAP_PATH=${SHARE_DIR_PATH}/techmaps/xc7_vpr/techmap
+export TECHMAP_PATH="${F4PGA_SHARE_DIR}"/techmaps/xc7_vpr/techmap
 
-export UTILS_PATH=${SHARE_DIR_PATH}/scripts
+export UTILS_PATH="${F4PGA_SHARE_DIR}"/scripts
 SYNTH_TCL_PATH=${UTILS_PATH}/xc7/synth.tcl
 
 VERILOG_FILES=()
@@ -118,7 +117,7 @@ if [ ${#VERILOG_FILES[@]} -eq 0 ]; then
   exit 1
 fi
 
-DATABASE_DIR=${DATABASE_DIR:=$(prjxray-config)}
+DATABASE_DIR=${DATABASE_DIR:-$(prjxray-config)}
 
 export TOP=${TOP}
 export USE_ROI="FALSE"
@@ -130,7 +129,7 @@ export OUT_SYNTH_V=${TOP}_synth.v
 export OUT_EBLIF=${TOP}.eblif
 export PART_JSON=`realpath ${DATABASE_DIR}/$DEVICE/$PART/part.json`
 export OUT_FASM_EXTRA=${TOP}_fasm_extra.fasm
-export PYTHON3=${PYTHON3:=$(which python3)}
+export PYTHON3=${PYTHON3:-$(which python3)}
 
 LOG=${TOP}_synth.log
 
