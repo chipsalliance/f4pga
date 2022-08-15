@@ -57,7 +57,6 @@ Accepted module parameters:
 # TODO: `environment` input kind
 
 from pathlib import Path
-from shutil import move as sh_mv
 from re import match as re_match, finditer as re_finditer
 
 from f4pga.common import decompose_depname, deep, get_verbosity_level, sub
@@ -183,7 +182,7 @@ class GenericScriptWrapperModule(Module):
             file = ctx.r_env.resolve(file, final=True)
             target = ctx.r_env.resolve(target, final=True)
             if target != file:
-                sh_mv(file, target)
+                Path(file).rename(target)
 
     def _init_outputs(self, output_defs: 'dict[str, dict[str, str]]'):
         self.stdout_target = None
