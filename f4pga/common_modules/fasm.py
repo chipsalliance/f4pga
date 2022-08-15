@@ -18,9 +18,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from pathlib import Path
-from shutil import move as sh_mv
 
-from f4pga.common import vpr_specific_values, VprArgs, get_verbosity_level, sub
+from f4pga.common import vpr_specific_values, VprArgs, get_verbosity_level, sub as common_sub
 from f4pga.module import Module, ModuleContext
 
 
@@ -58,11 +57,11 @@ class FasmModule(Module):
         else:
             yield 'Generating FASM...'
 
-        sub(*s, cwd=build_dir)
+        common_sub(*s, cwd=build_dir)
 
-        default_fasm_output_name = f'{(Path(build_dir)/ctx.values.top)!s}.fasm'
-        if default_fasm_output_name != ctx.outputs.fasm:
-            sh_mv(default_fasm_output_name, ctx.outputs.fasm)
+        default_fasm_output_name = Path(build_dir)/ f'{ctx.values.top}.fasm'
+        if str(default_fasm_output_name) != ctx.outputs.fasm:
+            default_fasm_output_name.rename(ctx.outputs.fasm)
 
         if ctx.takes.fasm_extra:
             yield 'Appending extra FASM...'
