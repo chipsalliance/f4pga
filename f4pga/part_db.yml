@@ -1,0 +1,47 @@
+# Copyright (C) 2022 F4PGA Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+xc7a50t:
+  - XC7A50TCSG324-1
+  - XC7A35TCSG324-1
+  - XC7A35TCPG236-1
+
+xc7a100t:
+  - XC7A100TCSG324-1
+  - XC7A100TFGG484-2
+
+xc7a200t:
+  - XC7A200TSBG484-1
+
+xc7z010t:
+  - XC7C010CLG400-1
+
+ql-eos-s3:
+  - EOS3FF512-PDN64
+  - EOS3FF512-WRN42
+  - EOS3FLF512-PDN64
+  - EOS3FLF512-WRN42
+  - EOS3CF512-PDN64
+  - EOS3CF512-WRN42
+  - EOS3CLF512-PDN64
+  - EOS3CLF512-WRN42
+
+ql-k4n8_slow:
+  - K4N8
+  - K4N8_SLOW
+
+ql-k4n8_fast:
+  - K4N8_FAST
