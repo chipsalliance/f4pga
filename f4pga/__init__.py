@@ -570,7 +570,10 @@ def get_platform_name_for_part(part_name: str):
     differ only in a type of package they use.
     """
     with (Path(mypath) / 'part_db.json').open('r') as rfptr:
-        return json_load(rfptr).get(part_name.upper())
+        for key, val in json_load(rfptr).items():
+            if part_name.upper() in val:
+                return key
+        raise(Exception(f"Unknown part name <{part_name}>!"))
 
 def make_flow_config(project_flow_cfg: ProjectFlowConfig, part_name: str) -> FlowConfig:
     """ Create `FlowConfig` from given project flow configuration and part name """

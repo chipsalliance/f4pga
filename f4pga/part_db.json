@@ -1,23 +1,34 @@
 {
-    "XC7A50TCSG324-1": "xc7a50t",
-    "XC7A35TCSG324-1": "xc7a50t",
-    "XC7A35TCPG236-1": "xc7a50t",
-    "XC7A100TCSG324-1": "xc7a100t",
-    "XC7A100TFGG484-2": "xc7a100t",
-    "XC7A200TSBG484-1": "xc7a200t",
-
-    "XC7C010CLG400-1": "xc7z010t",
-
-    "EOS3FF512-PDN64": "ql-eos-s3",
-    "EOS3FF512-WRN42": "ql-eos-s3",
-    "EOS3FLF512-PDN64": "ql-eos-s3",
-    "EOS3FLF512-WRN42": "ql-eos-s3",
-    "EOS3CF512-PDN64": "ql-eos-s3",
-    "EOS3CF512-WRN42": "ql-eos-s3",
-    "EOS3CLF512-PDN64": "ql-eos-s3",
-    "EOS3CLF512-WRN42": "ql-eos-s3",
-
-    "K4N8": "ql-k4n8_slow",
-    "K4N8_SLOW": "ql-k4n8_slow",
-    "K4N8_FAST": "ql-k4n8_fast"
+    "xc7a50t": [
+        "XC7A50TCSG324-1",
+        "XC7A35TCSG324-1",
+        "XC7A35TCPG236-1"
+    ],
+    "xc7a100t": [
+        "XC7A100TCSG324-1",
+        "XC7A100TFGG484-2"
+    ],
+    "xc7a200t": [
+        "XC7A200TSBG484-1"
+    ],
+    "xc7z010t": [
+        "XC7C010CLG400-1"
+    ],
+    "ql-eos-s3": [
+        "EOS3FF512-PDN64",
+        "EOS3FF512-WRN42",
+        "EOS3FLF512-PDN64",
+        "EOS3FLF512-WRN42",
+        "EOS3CF512-PDN64",
+        "EOS3CF512-WRN42",
+        "EOS3CLF512-PDN64",
+        "EOS3CLF512-WRN42"
+    ],
+    "ql-k4n8_slow": [
+        "K4N8",
+        "K4N8_SLOW"
+    ],
+    "ql-k4n8_fast": [
+        "K4N8_FAST"
+    ]
 }
