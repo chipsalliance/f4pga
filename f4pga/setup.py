@@ -89,7 +89,7 @@ setuptools_setup(
     package_data={
         'f4pga': [
             '*.yml',
-            'platforms/*.json'
+            'platforms/*.yml'
         ],
         'f4pga.wrappers.sh': [
             'xc7/*.f4pga.sh',

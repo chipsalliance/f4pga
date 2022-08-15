@@ -42,7 +42,6 @@ from argparse import Namespace
 from sys import argv as sys_argv
 from os import environ
 from yaml import load as yaml_load, Loader as yaml_loader
-from json import load as json_load
 from typing import Iterable
 from colorama import Fore, Style
 
@@ -620,7 +619,7 @@ def make_flow_config(project_flow_cfg: ProjectFlowConfig, part_name: str) -> Flo
 
     scan_modules(str(ROOT))
 
-    platform_path = ROOT / f'platforms/{platform}.json'
+    platform_path = ROOT / f'platforms/{platform}.yml'
     if not platform_path.exists():
         raise F4PGAException(
             message=f'The platform flow definition file {platform_path} for the platform ' \
@@ -629,7 +628,7 @@ def make_flow_config(project_flow_cfg: ProjectFlowConfig, part_name: str) -> Flo
     with platform_path.open('r') as rfptr:
         flow_cfg = FlowConfig(
             project_flow_cfg,
-            FlowDefinition(json_load(rfptr), r_env),
+            FlowDefinition(yaml_load(rfptr, yaml_loader), r_env),
             part_name
         )
 
