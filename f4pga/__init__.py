@@ -41,7 +41,7 @@ from pathlib import Path
 from argparse import Namespace
 from sys import argv as sys_argv
 from os import environ
-from json import load as json_load, loads as json_loads
+from json import load as json_load
 from typing import Iterable
 from colorama import Fore, Style
 
@@ -72,7 +72,7 @@ F4CACHEPATH = '.f4cache'
 
 install_dir = environ.get("F4PGA_INSTALL_DIR", "/usr/local")
 
-mypath = str(Path(__file__).resolve().parent)
+ROOT = Path(__file__).resolve().parent
 
 FPGA_FAM = environ.get('FPGA_FAM', 'xc7')
 
@@ -80,6 +80,7 @@ bin_dir_path = str(Path(sys_argv[0]).resolve().parent.parent)
 share_dir_path = \
     environ.get('F4PGA_SHARE_DIR',
                 str(Path(f'{install_dir}/{FPGA_FAM}/share/f4pga').resolve()))
+
 
 class DependencyNotProducedException(F4PGAException):
     dep_name: str
@@ -91,8 +92,10 @@ class DependencyNotProducedException(F4PGAException):
         self.message = f'Stage `{self.provider}` did not produce promised ' \
                        f'dependency `{self.dep_name}`'
 
+
 def dep_value_str(dep: str):
     return ':' + dep
+
 
 def platform_stages(platform_flow, r_env):
     """ Iterates over all stages available in a given flow. """
@@ -101,6 +104,7 @@ def platform_stages(platform_flow, r_env):
     for stage_name, modulestr in platform_flow['stages'].items():
         mod_opts = stage_options.get(stage_name) if stage_options else None
         yield Stage(stage_name, modulestr, mod_opts, r_env)
+
 
 def req_exists(r):
     """ Checks whether a dependency exists on a drive. """
@@ -114,6 +118,7 @@ def req_exists(r):
         raise Exception(f'Requirements can be currently checked only for single '
                         f'paths, or path lists (reason: {r})')
     return True
+
 
 def map_outputs_to_stages(stages: 'list[Stage]'):
     """
@@ -133,17 +138,21 @@ def map_outputs_to_stages(stages: 'list[Stage]'):
                                  'provider at most.')
     return os_map
 
+
 def filter_existing_deps(deps: 'dict[str, ]', f4cache):
     return [(n, p) for n, p in deps.items() \
             if req_exists(p)] # and not dep_differ(p, f4cache)]
+
 
 def get_stage_values_override(og_values: dict, stage: Stage):
     values = og_values.copy()
     values.update(stage.value_ovds)
     return values
 
+
 def prepare_stage_io_input(stage: Stage):
     return { 'params': stage.params } if stage.params is not None else {}
+
 
 def prepare_stage_input(stage: Stage, values: dict, dep_paths: 'dict[str, ]',
                         config_paths: 'dict[str, ]'):
@@ -168,6 +177,7 @@ def prepare_stage_input(stage: Stage, values: dict, dep_paths: 'dict[str, ]',
 
     return stage_mod_cfg
 
+
 def update_dep_statuses(paths, consumer: str, f4cache: F4Cache):
     if type(paths) is str:
         return f4cache.update(Path(paths), consumer)
@@ -178,6 +188,7 @@ def update_dep_statuses(paths, consumer: str, f4cache: F4Cache):
         for _, p in paths.items():
             return update_dep_statuses(p, consumer, f4cache)
     fatal(-1, 'WRONG PATHS TYPE')
+
 
 def dep_differ(paths, consumer: str, f4cache: F4Cache):
     """
@@ -195,6 +206,8 @@ def dep_differ(paths, consumer: str, f4cache: F4Cache):
         return True in [dep_differ(p, consumer, f4cache) \
                         for _, p in paths.items()]
     return False
+
+
 def dep_will_differ(target: str, paths, consumer: str,
                     os_map: 'dict[str, Stage]', run_stages: 'set[str]',
                     f4cache: F4Cache):
@@ -209,11 +222,13 @@ def dep_will_differ(target: str, paths, consumer: str,
                dep_differ(paths, consumer, f4cache)
     return dep_differ(paths, consumer, f4cache)
 
+
 def _print_unreachable_stage_message(provider: Stage, take: str):
     sfprint(0, '    Stage '
               f'`{Style.BRIGHT + provider.name + Style.RESET_ALL}` is '
                'unreachable due to unmet dependency '
               f'`{Style.BRIGHT + take.name + Style.RESET_ALL}`')
+
 
 def config_mod_runctx(stage: Stage, values: 'dict[str, ]',
                       dep_paths: 'dict[str, str | list[str]]',
@@ -221,6 +236,7 @@ def config_mod_runctx(stage: Stage, values: 'dict[str, ]',
     config = prepare_stage_input(stage, values,
                                  dep_paths, config_paths)
     return ModRunCtx(share_dir_path, bin_dir_path, config)
+
 
 def _process_dep_path(path: str, f4cache: F4Cache):
     f4cache.process_file(Path(path))
@@ -452,6 +468,7 @@ class Flow:
         sfprint(0, f'Target {Style.BRIGHT + self.target + Style.RESET_ALL} '
                    f'-> {self.dep_paths[self.target]}')
 
+
 def display_dep_info(stages: 'Iterable[Stage]'):
     sfprint(0, 'Platform dependencies/targets:')
     longest_out_name_len = 0
@@ -485,10 +502,11 @@ def display_dep_info(stages: 'Iterable[Stage]'):
             sfprint(0, f'    {Style.BRIGHT + out.name + Style.RESET_ALL}:'
                        f'{indent}{pdesc}{nl_indentstr}{pgen}')
 
+
 def display_stage_info(stage: Stage):
     if stage is None:
         sfprint(0, f'Stage  does not exist')
-        sfbuild_fail()
+        f4pga_fail()
         return
 
     sfprint(0, f'Stage `{Style.BRIGHT}{stage.name}{Style.RESET_ALL}`:')
@@ -500,17 +518,20 @@ def display_stage_info(stage: Stage):
 
     sfprint(0, f'    {mod_info}')
 
-sfbuild_done_str = Style.BRIGHT + Fore.GREEN + 'DONE'
-sfbuild_silent = 0
 
-def sfbuild_fail():
-    global sfbuild_done_str
-    sfbuild_done_str = Style.BRIGHT + Fore.RED + 'FAILED'
+f4pga_done_str = Style.BRIGHT + Fore.GREEN + 'DONE'
 
-def sfbuild_done():
-    sfprint(1, f'f4pga: {sfbuild_done_str}'
+
+def f4pga_fail():
+    global f4pga_done_str
+    f4pga_done_str = Style.BRIGHT + Fore.RED + 'FAILED'
+
+
+def f4pga_done():
+    sfprint(1, f'f4pga: {f4pga_done_str}'
                f'{Style.RESET_ALL + Fore.RESET}')
     exit(0)
+
 
 def setup_resolution_env():
     """ Sets up a ResolutionEnv with default built-ins. """
@@ -543,6 +564,7 @@ def setup_resolution_env():
     r_env.add_values(_generate_values())
     return r_env
 
+
 def open_project_flow_config(path: str) -> ProjectFlowConfig:
     try:
         flow_cfg = open_project_flow_cfg(path)
@@ -550,11 +572,12 @@ def open_project_flow_config(path: str) -> ProjectFlowConfig:
         fatal(-1, 'The provided flow configuration file does not exist')
     return flow_cfg
 
+
 def verify_part_stage_params(flow_cfg: FlowConfig,
                              part: 'str | None' = None):
     if part:
         platform_name = get_platform_name_for_part(part)
-        if not verify_platform_name(platform_name, mypath):
+        if not verify_platform_name(platform_name, str(ROOT)):
             sfprint(0, f'Platform `{part}`` is unsupported.')
             return False
         if part not in flow_cfg.part():
@@ -563,17 +586,19 @@ def verify_part_stage_params(flow_cfg: FlowConfig,
 
     return True
 
+
 def get_platform_name_for_part(part_name: str):
     """
     Gets a name that identifies the platform setup required for a specific chip.
     The reason for such distinction is that plenty of chips with different names
     differ only in a type of package they use.
     """
-    with (Path(mypath) / 'part_db.json').open('r') as rfptr:
+    with (ROOT / 'part_db.json').open('r') as rfptr:
         for key, val in json_load(rfptr).items():
             if part_name.upper() in val:
                 return key
-        raise(Exception(f"Unknown part name <{part_name}>!"))
+        raise Exception(f"Unknown part name <{part_name}>!")
+
 
 def make_flow_config(project_flow_cfg: ProjectFlowConfig, part_name: str) -> FlowConfig:
     """ Create `FlowConfig` from given project flow configuration and part name """
@@ -592,22 +617,20 @@ def make_flow_config(project_flow_cfg: ProjectFlowConfig, part_name: str) -> Flo
     r_env = setup_resolution_env()
     r_env.add_values({'part_name': part_name.lower()})
 
-    scan_modules(mypath)
+    scan_modules(str(ROOT))
 
-    platform_path = str(Path(mypath) / f'platforms/{platform}.json')
-    platform_def = None
-    try:
-        with open(platform_path) as platform_file:
-            platform_def = platform_file.read()
-    except FileNotFoundError as _:
+    platform_path = ROOT / f'platforms/{platform}.json'
+    if not platform_path.exists():
         raise F4PGAException(
             message=f'The platform flow definition file {platform_path} for the platform ' \
                     f'{platform} cannot be found.'
         )
-
-    flow_definition_dict = json_loads(platform_def)
-    flow_def = FlowDefinition(flow_definition_dict, r_env)
-    flow_cfg = FlowConfig(project_flow_cfg, flow_def, part_name)
+    with platform_path.open('r') as rfptr:
+        flow_cfg = FlowConfig(
+            project_flow_cfg,
+            FlowDefinition(json_load(rfptr), r_env),
+            part_name
+        )
 
     if len(flow_cfg.stages) == 0:
         raise F4PGAException(message = 'Platform flow does not define any stage')
@@ -638,11 +661,11 @@ def cmd_build(args: Namespace):
 
     if args.info:
         display_dep_info(flow_cfg.stages.values())
-        sfbuild_done()
+        f4pga_done()
 
     if args.stageinfo:
         display_stage_info(flow_cfg.stages.get(args.stageinfo[0]))
-        sfbuild_done()
+        f4pga_done()
 
     target = args.target
     if target is None:
@@ -663,7 +686,7 @@ def cmd_build(args: Namespace):
     sfprint(dep_print_verbosity, '')
 
     if args.pretend:
-        sfbuild_done()
+        f4pga_done()
 
     try:
         flow.execute()
@@ -671,10 +694,11 @@ def cmd_build(args: Namespace):
         raise e
     except Exception as e:
         sfprint(0, f'{e}')
-        sfbuild_fail()
+        f4pga_fail()
 
     if flow.f4cache:
         flow.f4cache.save()
+
 
 def cmd_show_dependencies(args: Namespace):
     """ `showd` command implementation """
@@ -682,7 +706,7 @@ def cmd_show_dependencies(args: Namespace):
     flow_cfg = open_project_flow_config(args.flow)
 
     if not verify_part_stage_params(flow_cfg, args.part):
-        sfbuild_fail()
+        f4pga_fail()
         return
 
     platform_overrides: 'set | None' = None
@@ -711,6 +735,7 @@ def cmd_show_dependencies(args: Namespace):
 
     set_verbosity_level(-1)
 
+
 def main():
     parser = setup_argparser()
     args = parser.parse_args()
@@ -719,14 +744,15 @@ def main():
 
     if args.command == 'build':
         cmd_build(args)
-        sfbuild_done()
+        f4pga_done()
 
     if args.command == 'showd':
         cmd_show_dependencies(args)
-        sfbuild_done()
+        f4pga_done()
 
     sfprint(0, 'Please use a command.\nUse `--help` flag to learn more.')
-    sfbuild_done()
+    f4pga_done()
+
 
 if __name__ == '__main__':
     main()
