@@ -18,8 +18,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from pathlib import Path
-import os
-from shutil import move as sh_mv
 from re import match as re_match
 
 from f4pga.common import vpr_specific_values, vpr as common_vpr, VprArgs, save_vpr_log
@@ -50,10 +48,10 @@ class PlaceModule(Module):
 
     def execute(self, ctx: ModuleContext):
         place_constraints, dummy = place_constraints_file(ctx)
-        place_constraints = os.path.realpath(place_constraints)
+        place_constraints = Path(place_constraints).resolve()
         if dummy:
-            with open(place_constraints, 'wb') as f:
-                f.write(b'')
+            with place_constraints.open('wb') as wfptr:
+                wfptr.write(b'')
 
         build_dir = Path(ctx.takes.eblif).parent
 
@@ -78,8 +76,7 @@ class PlaceModule(Module):
         # modules may produce some temporary files with names that differ from
         # the ones in flow configuration.
         if ctx.is_output_explicit('place'):
-            output_file = default_output_name(place_constraints)
-            sh_mv(output_file, ctx.outputs.place)
+            Path(default_output_name(str(place_constraints))).rename(ctx.outputs.place)
 
         yield 'Saving log...'
         save_vpr_log('place.log', build_dir=str(build_dir))
