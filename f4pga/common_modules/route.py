@@ -18,20 +18,19 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from pathlib import Path
-from shutil import move as sh_mv
 
 from f4pga.common import vpr_specific_values, vpr as common_vpr, VprArgs, options_dict_to_list, save_vpr_log
 from f4pga.module import Module, ModuleContext
 
 
 def route_place_file(ctx: ModuleContext):
-    return str(Path(ctx.takes.eblif).with_suffix('.route'))
+    return Path(ctx.takes.eblif).with_suffix('.route')
 
 
 class RouteModule(Module):
     def map_io(self, ctx: ModuleContext):
         return {
-            'route': route_place_file(ctx)
+            'route': str(route_place_file(ctx))
         }
 
     def execute(self, ctx: ModuleContext):
@@ -52,7 +51,7 @@ class RouteModule(Module):
         )
 
         if ctx.is_output_explicit('route'):
-            sh_mv(route_place_file(ctx), ctx.outputs.route)
+            route_place_file(ctx).rename(ctx.outputs.route)
 
         yield 'Saving log...'
         save_vpr_log('route.log', build_dir=str(build_dir))
