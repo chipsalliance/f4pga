@@ -15,7 +15,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-xc7a50t:
+xc7a50t: &xc7
 
   values:
     device: xc7a50t_test
@@ -26,7 +26,7 @@ xc7a50t:
     rr_graph_real_bin: '${shareDir}/arch/xc7a50t_test/rr_graph_xc7a50t_test.rr_graph.real.bin'
     vpr_place_delay: '${shareDir}/arch/xc7a50t_test/rr_graph_xc7a50t_test.place_delay.bin'
     vpr_grid_layout_name: xc7a50t-test
-    vpr_options:
+    vpr_options: &xc7-vpr_options
       max_router_iterations: 500
       routing_failure_predictor: 'off'
       router_high_fanout_threshold: -1
@@ -150,6 +150,8 @@ xc7a50t:
 
 xc7a100t:
 
+  <<: *xc7
+
   values:
     device: xc7a100t_test
     bitstream_device: artix7
@@ -159,129 +161,12 @@ xc7a100t:
     rr_graph_real_bin: '${shareDir}/arch/xc7a100t_test/rr_graph_xc7a100t_test.rr_graph.real.bin'
     vpr_place_delay: '${shareDir}/arch/xc7a100t_test/rr_graph_xc7a100t_test.place_delay.bin'
     vpr_grid_layout_name: xc7a100t-test
-    vpr_options:
-      max_router_iterations: 500
-      routing_failure_predictor: 'off'
-      router_high_fanout_threshold: -1
-      constant_net_method: route
-      route_chan_width: 500
-      router_heap: bucket
-      clock_modeling: route
-      place_delta_delay_matrix_calculation_method: dijkstra
-      place_delay_model: delta
-      router_lookahead: extended_map
-      check_route: quick
-      strict_checks: 'off'
-      allow_dangling_combinational_nodes: 'on'
-      disable_errors: 'check_unbuffered_edges:check_route'
-      congested_routing_iteration_threshold: '0.8'
-      incremental_reroute_delay_ripup: 'off'
-      base_cost_type: delay_normalized_length_bounded
-      bb_factor: 10
-      acc_fac: '0.7'
-      astar_fac: '1.8'
-      initial_pres_fac: '2.828'
-      pres_fac_mult: '1.2'
-      check_rr_graph: 'off'
-      suppress_warnings: >-
-        ${noisyWarnings},sum_pin_class:check_unbuffered_edges:load_rr_indexed_data_T_values:check_rr_node:trans_per_R:check_route:set_rr_graph_tool_comment:calculate_average_switch
-
-  stages:
-    mk_build_dir:
-      module: 'common:mkdirs'
-      params:
-        build_dir: 'build/${device}'
-    synth:
-      module: 'common:synth'
-      params:
-        takes:
-          - xdc?
-        produces:
-          - sdc
-          - synth_v
-        prod_meta:
-          sdc: Standard Design Constraints file for X7 series.
-      values:
-        tcl_scripts: '${shareDir}/scripts/xc7'
-        yosys_tcl_env:
-          USE_ROI: 'FALSE'
-          TOP: '${top}'
-          OUT_JSON: '${:json}'
-          OUT_SDC: '${:sdc}'
-          PART_JSON: '${prjxray_db}/${bitstream_device}/${part_name}/part.json'
-          OUT_FASM_EXTRA: '${:fasm_extra}'
-          TECHMAP_PATH: '${shareDir}/techmaps/xc7_vpr/techmap'
-          OUT_SYNTH_V: '${:synth_v}'
-          SYNTH_JSON: '${:synth_json}'
-          OUT_EBLIF: '${:eblif}'
-          PYTHON3: '${python3}'
-          UTILS_PATH: '${shareDir}/scripts'
-          INPUT_XDC_FILES: '${:xdc}'
-    pack:
-      module: 'common:pack'
-    ioplace:
-      module: 'common:generic_script_wrapper'
-      params:
-        stage_name: ioplace
-        interpreter: '${python3}'
-        script: '${shareDir}/scripts/prjxray_create_ioplace.py'
-        outputs:
-          io_place:
-            mode: stdout
-            target: '${:net[noext]}.ioplace'
-        inputs:
-          blif: '${:eblif}'
-          map: '${shareDir}/arch/${device}/${part_name}/pinmap.csv'
-          net: '${:net}'
-          pcf: '${:pcf?}'
-          $PYTHONPATH: '${binDir}/python/'
-    place_constraints:
-      module: 'common:generic_script_wrapper'
-      params:
-        stage_name: place_constraints
-        interpreter: '${python3}'
-        script: '${shareDir}/scripts/prjxray_create_place_constraints.py'
-        outputs:
-          place_constraints:
-            mode: stdout
-            target: '${:net[noext]}.preplace'
-        inputs:
-          net: '${:net}'
-          arch: '${shareDir}/arch/${device}/arch.timing.xml'
-          blif: '${:eblif}'
-          input: '${:io_place}'
-          db_root: '${prjxray_db}'
-          part: '${part_name}'
-          vpr_grid_map: '${shareDir}/arch/${device}/vpr_grid_map.csv'
-          $PYTHONPATH: '${binDir}/python/'
-    place:
-      module: 'common:place'
-    route:
-      module: 'common:route'
-    fasm:
-      module: 'common:fasm'
-    bitstream:
-      module: 'common:generic_script_wrapper'
-      params:
-        stage_name: bitstream
-        script: xcfasm
-        outputs:
-          bitstream:
-            mode: file
-            file: '${:fasm[noext]}.bit'
-            target: '${:fasm[noext]}.bit'
-        inputs:
-          db-root: '${prjxray_db}/${bitstream_device}'
-          part: '${part_name}'
-          part_file: '${prjxray_db}/${bitstream_device}/${part_name}/part.yaml'
-          sparse: true
-          emit_pudc_b_pullup: true
-          fn_in: '${:fasm}'
-          frm2bit: xc7frames2bit
-          bit_out: '${:fasm[noext]}.bit'
+    vpr_options: *xc7-vpr_options
 
 
 xc7a200t:
+
+  <<: *xc7
 
   values:
     device: xc7a200t_test
@@ -292,126 +177,7 @@ xc7a200t:
     rr_graph_real_bin: '${shareDir}/arch/xc7a200t_test/rr_graph_xc7a200t_test.rr_graph.real.bin'
     vpr_place_delay: '${shareDir}/arch/xc7a200t_test/rr_graph_xc7a200t_test.place_delay.bin'
     vpr_grid_layout_name: xc7a200t-test
-    vpr_options:
-      max_router_iterations: 500
-      routing_failure_predictor: 'off'
-      router_high_fanout_threshold: -1
-      constant_net_method: route
-      route_chan_width: 500
-      router_heap: bucket
-      clock_modeling: route
-      place_delta_delay_matrix_calculation_method: dijkstra
-      place_delay_model: delta
-      router_lookahead: extended_map
-      check_route: quick
-      strict_checks: 'off'
-      allow_dangling_combinational_nodes: 'on'
-      disable_errors: 'check_unbuffered_edges:check_route'
-      congested_routing_iteration_threshold: '0.8'
-      incremental_reroute_delay_ripup: 'off'
-      base_cost_type: delay_normalized_length_bounded
-      bb_factor: 10
-      acc_fac: '0.7'
-      astar_fac: '1.8'
-      initial_pres_fac: '2.828'
-      pres_fac_mult: '1.2'
-      check_rr_graph: 'off'
-      suppress_warnings: >-
-        ${noisyWarnings},sum_pin_class:check_unbuffered_edges:load_rr_indexed_data_T_values:check_rr_node:trans_per_R:check_route:set_rr_graph_tool_comment:calculate_average_switch
-
-  stages:
-    mk_build_dir:
-      module: 'common:mkdirs'
-      params:
-        build_dir: 'build/${device}'
-    synth:
-      module: 'common:synth'
-      params:
-        takes:
-          - xdc?
-        produces:
-          - sdc
-          - synth_v
-        prod_meta:
-          sdc: Standard Design Constraints file for X7 series.
-      values:
-        tcl_scripts: '${shareDir}/scripts/xc7'
-        yosys_tcl_env:
-          USE_ROI: 'FALSE'
-          TOP: '${top}'
-          OUT_JSON: '${:json}'
-          OUT_SDC: '${:sdc}'
-          PART_JSON: '${prjxray_db}/${bitstream_device}/${part_name}/part.json'
-          OUT_FASM_EXTRA: '${:fasm_extra}'
-          TECHMAP_PATH: '${shareDir}/techmaps/xc7_vpr/techmap'
-          OUT_SYNTH_V: '${:synth_v}'
-          SYNTH_JSON: '${:synth_json}'
-          OUT_EBLIF: '${:eblif}'
-          PYTHON3: '${python3}'
-          UTILS_PATH: '${shareDir}/scripts'
-          INPUT_XDC_FILES: '${:xdc}'
-    pack:
-      module: 'common:pack'
-    ioplace:
-      module: 'common:generic_script_wrapper'
-      params:
-        stage_name: ioplace
-        interpreter: '${python3}'
-        script: '${shareDir}/scripts/prjxray_create_ioplace.py'
-        outputs:
-          io_place:
-            mode: stdout
-            target: '${:net[noext]}.ioplace'
-        inputs:
-          blif: '${:eblif}'
-          map: '${shareDir}/arch/${device}/${part_name}/pinmap.csv'
-          net: '${:net}'
-          pcf: '${:pcf?}'
-          $PYTHONPATH: '${binDir}/python/'
-    place_constraints:
-      module: 'common:generic_script_wrapper'
-      params:
-        stage_name: place_constraints
-        interpreter: '${python3}'
-        script: '${shareDir}/scripts/prjxray_create_place_constraints.py'
-        outputs:
-          place_constraints:
-            mode: stdout
-            target: '${:net[noext]}.preplace'
-        inputs:
-          net: '${:net}'
-          arch: '${shareDir}/arch/${device}/arch.timing.xml'
-          blif: '${:eblif}'
-          input: '${:io_place}'
-          db_root: '${prjxray_db}'
-          part: '${part_name}'
-          vpr_grid_map: '${shareDir}/arch/${device}/vpr_grid_map.csv'
-          $PYTHONPATH: '${binDir}/python/'
-    place:
-      module: 'common:place'
-    route:
-      module: 'common:route'
-    fasm:
-      module: 'common:fasm'
-    bitstream:
-      module: 'common:generic_script_wrapper'
-      params:
-        stage_name: bitstream
-        script: xcfasm
-        outputs:
-          bitstream:
-            mode: file
-            file: '${:fasm[noext]}.bit'
-            target: '${:fasm[noext]}.bit'
-        inputs:
-          db-root: '${prjxray_db}/${bitstream_device}'
-          part: '${part_name}'
-          part_file: '${prjxray_db}/${bitstream_device}/${part_name}/part.yaml'
-          sparse: true
-          emit_pudc_b_pullup: true
-          fn_in: '${:fasm}'
-          frm2bit: xc7frames2bit
-          bit_out: '${:fasm[noext]}.bit'
+    vpr_options: *xc7-vpr_options
 
 
 ql-eos-s3:
@@ -811,7 +577,7 @@ ql-eos-s3:
           $BIN_DIR_PATH: '${binDir}'
 
 
-ql-k4n8_fast:
+ql-k4n8_fast: &ql-k4n8
 
   values:
     device: qlf_k4n8_umc22
@@ -824,7 +590,7 @@ ql-k4n8_fast:
     vpr_grid_layout_name: qlf_k4n8-qlf_k4n8_umc22_fast
     arch_def: >-
       ${shareDir}/arch/qlf_k4n8-qlf_k4n8_umc22_fast_qlf_k4n8-qlf_k4n8_umc22_fast/arch_qlf_k4n8-qlf_k4n8_umc22_fast_qlf_k4n8-qlf_k4n8_umc22_fast.xml
-    vpr_options:
+    vpr_options: &ql-k4n8-vpr_options
       max_router_iterations: 500
       routing_failure_predictor: 'off'
       router_high_fanout_threshold: -1
@@ -837,7 +603,7 @@ ql-k4n8_fast:
       allow_dangling_combinational_nodes: 'on'
       absorb_buffer_luts: 'off'
 
-  stages:
+  stages: &ql-k4n8-stages
     mk_build_dir:
       module: 'common:mkdirs'
       params:
@@ -878,7 +644,7 @@ ql-k4n8_fast:
           csv_file: >-
             ${shareDir}/arch/qlf_k4n8-qlf_k4n8_umc22_fast_qlf_k4n8-qlf_k4n8_umc22_fast/pinmap_qlf_k4n8_umc22.csv
           $PYTHONPATH: '${binDir}/python/'
-    repack:
+    repack: &ql-k4n8-stages-repack
       module: 'common:generic_script_wrapper'
       params:
         stage_name: repack
@@ -954,6 +720,8 @@ ql-k4n8_fast:
 
 ql-k4n8_slow:
 
+  <<: *ql-k4n8
+
   values:
     device: qlf_k4n8_umc22
     rr_graph_lookahead_bin: >-
@@ -965,41 +733,10 @@ ql-k4n8_slow:
     vpr_grid_layout_name: qlf_k4n8-qlf_k4n8_umc22_slow
     arch_def: >-
       ${shareDir}/arch/qlf_k4n8-qlf_k4n8_umc22_slow_qlf_k4n8-qlf_k4n8_umc22_slow/arch_qlf_k4n8-qlf_k4n8_umc22_slow_qlf_k4n8-qlf_k4n8_umc22_slow.xml
-    vpr_options:
-      max_router_iterations: 500
-      routing_failure_predictor: 'off'
-      router_high_fanout_threshold: -1
-      constant_net_method: route
-      route_chan_width: 100
-      clock_modeling: ideal
-      place_delta_delay_matrix_calculation_method: dijkstra
-      place_delay_model: delta_override
-      router_lookahead: extended_map
-      allow_dangling_combinational_nodes: 'on'
-      absorb_buffer_luts: 'off'
+    vpr_options: *ql-k4n8-vpr_options
 
   stages:
-    mk_build_dir:
-      module: 'common:mkdirs'
-      params:
-        build_dir: 'build/${device}'
-    synth:
-      module: 'common:synth'
-      params:
-        produces:
-          - synth_v
-      values:
-        tcl_scripts: '${shareDir}/scripts/qlf_k4n8'
-        read_verilog_args: []
-        yosys_tcl_env:
-          TOP: '${top}'
-          OUT_JSON: '${:json}'
-          TECHMAP_PATH: '${shareDir}/techmaps/qlf_k4n8'
-          OUT_SYNTH_V: '${:synth_v}'
-          OUT_EBLIF: '${:eblif}'
-          PYTHON3: '${python3}'
-    pack:
-      module: 'common:pack'
+    <<: *ql-k4n8-stages
     ioplace:
       module: 'common:generic_script_wrapper'
       params:
@@ -1020,74 +757,7 @@ ql-k4n8_slow:
             ${shareDir}/arch/qlf_k4n8-qlf_k4n8_umc22_slow_qlf_k4n8-qlf_k4n8_umc22_slow/pinmap_qlf_k4n8_umc22.csv
           $PYTHONPATH: '${binDir}/python/'
     repack:
-      module: 'common:generic_script_wrapper'
-      params:
-        stage_name: repack
-        interpreter: '${python3}'
-        script: '${binDir}/python/repacker/repack.py'
-        outputs:
-          eblif_repacked:
-            mode: file
-            file: '${:eblif[noext]}_repacked.eblif'
-            target: '${:eblif[noext]}_repacked.eblif'
-          place_repacked:
-            mode: file
-            file: '${:place[noext]}_repacked.place'
-            target: '${:place[noext]}_repacked.place'
-          net_repacked:
-            mode: file
-            file: '${:net[noext]}_repacked.net'
-            target: '${:net[noext]}_repacked.net'
-          repack_log:
-            mode: stdout
-            target: '${top}.repack.log'
-        inputs:
-          eblif-in: '${:eblif}'
-          net-in: '${:net}'
-          place-in: '${:place}'
-          eblif-out: '${:eblif[noext]}_repacked.eblif'
-          place-out: '${:place[noext]}_repacked.place'
-          net-out: '${:net[noext]}_repacked.net'
-          absorb_buffer_luts: 'on'
-          vpr-arch: '${arch_def}'
-          repacking-rules: '${repacking_rules}'
-          json-constraints: '${json_constraints?}'
-          pcf-constraints: '${pcf?}'
-          $PYTHONPATH: '${binDir}/python/'
+      <<: *ql-k4n8-stages-repack
       values:
         repacking_rules: >-
           ${shareDir}/arch/qlf_k4n8-qlf_k4n8_umc22_slow_qlf_k4n8-qlf_k4n8_umc22_slow/qlf_k4n8-qlf_k4n8_umc22_slow.repacking_rules.json
-    place:
-      module: 'common:place'
-    route:
-      module: 'common:io_rename'
-      params:
-        module: 'common:route'
-        rename_takes:
-          eblif: eblif_repacked
-          place: place_repacked
-          net: net_repacked
-    fasm:
-      module: 'common:io_rename'
-      params:
-        module: 'common:fasm'
-        rename_takes:
-          eblif: eblif_repacked
-          place: place_repacked
-          net: net_repacked
-    bitstream:
-      module: 'common:generic_script_wrapper'
-      params:
-        stage_name: bitstream
-        script: qlf_fasm
-        outputs:
-          bitstream:
-            mode: file
-            file: '${:fasm[noext]}.bit'
-            target: '${:fasm[noext]}.bit'
-        inputs:
-          '#1': '${:fasm}'
-          '#2': '${:fasm[noext]}.bit'
-          db-root: '${shareDir}/fasm_database/qlf_k4n8'
-          format: 4byte
-          assemble: true
