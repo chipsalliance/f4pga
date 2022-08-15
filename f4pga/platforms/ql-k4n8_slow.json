@@ -1,16 +1,4 @@
 {
-    "stages": {
-        "mk_build_dir": "common:mkdirs",
-        "synth": "common:synth",
-        "pack": "common:pack",
-        "ioplace": "common:generic_script_wrapper",
-        "place": "common:place",
-        "repack": "common:generic_script_wrapper",
-        "route": "common:io_rename",
-        "fasm": "common:io_rename",
-        "bitstream": "common:generic_script_wrapper"
-    },
-
     "values": {
         "device": "qlf_k4n8_umc22",
         "rr_graph_lookahead_bin": "${shareDir}/arch/qlf_k4n8-qlf_k4n8_umc22_slow_qlf_k4n8-qlf_k4n8_umc22_slow/rr_graph_qlf_k4n8-qlf_k4n8_umc22_slow_qlf_k4n8-qlf_k4n8_umc22_slow.lookahead.bin",
@@ -33,13 +21,16 @@
         }
     },
 
-    "stage_options": {
+    "stages": {
         "mk_build_dir": {
+            "module": "common:mkdirs",
             "params": {
                 "build_dir": "build/${device}"
             }
         },
+
         "synth": {
+            "common": "synth",
             "params": {
                 "produces": [ "synth_v" ]
             },
@@ -56,7 +47,13 @@
                 }
             }
         },
+
+        "pack": {
+            "module": "common:pack"
+        },
+
         "ioplace": {
+            "module": "common:generic_script_wrapper",
             "params": {
                 "stage_name": "ioplace",
                 "interpreter": "${python3}",
@@ -77,10 +74,9 @@
                 }
             }
         },
+
         "repack": {
-            "values": {
-                "repacking_rules": "${shareDir}/arch/qlf_k4n8-qlf_k4n8_umc22_slow_qlf_k4n8-qlf_k4n8_umc22_slow/qlf_k4n8-qlf_k4n8_umc22_slow.repacking_rules.json"
-            },
+            "module": "common:generic_script_wrapper",
             "params": {
                 "stage_name": "repack",
                 "interpreter": "${python3}",
@@ -120,9 +116,18 @@
                     "pcf-constraints": "${pcf?}",
                     "$PYTHONPATH": "${binDir}/python/"
                 }
+            },
+            "values": {
+                "repacking_rules": "${shareDir}/arch/qlf_k4n8-qlf_k4n8_umc22_slow_qlf_k4n8-qlf_k4n8_umc22_slow/qlf_k4n8-qlf_k4n8_umc22_slow.repacking_rules.json"
             }
         },
+
+        "place": {
+            "module": "common:place"
+        },
+
         "route": {
+            "module": "common:io_rename",
             "params": {
                 "module": "common:route",
                 "rename_takes": {
@@ -132,7 +137,9 @@
                 }
             }
         },
+
         "fasm": {
+            "module": "common:io_rename",
             "params": {
                 "module": "common:fasm",
                 "rename_takes": {
@@ -142,7 +149,9 @@
                 }
             }
         },
+
         "bitstream": {
+            "module": "common:generic_script_wrapper",
             "params": {
                 "stage_name": "bitstream",
                 "script": "qlf_fasm",

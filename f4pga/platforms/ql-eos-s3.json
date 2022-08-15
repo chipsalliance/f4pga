@@ -1,26 +1,4 @@
 {
-    "stages": {
-        "mk_build_dir": "common:mkdirs",
-        "synth": "common:synth",
-        "prepare_sdc": "common:generic_script_wrapper",
-        "pack": "common:pack",
-        "ioplace": "common:generic_script_wrapper",
-        "place_constraints": "common:generic_script_wrapper",
-        "iomux_jlink": "common:generic_script_wrapper",
-        "iomux_openocd": "common:generic_script_wrapper",
-        "iomux_binary": "common:generic_script_wrapper",
-        "place": "common:place",
-        "route": "common:route",
-        "analysis": "common:analysis",
-        "fasm": "common:fasm",
-        "bitstream": "common:generic_script_wrapper",
-        "bitstream_bitheader": "common:generic_script_wrapper",
-        "bitstream_binary": "common:generic_script_wrapper",
-        "bitstream_jlink": "common:generic_script_wrapper",
-        "bitstream_openocd": "common:generic_script_wrapper",
-        "fasm2bels": "common:generic_script_wrapper"
-    },
-
     "values": {
         "device": "ql-eos-s3",
         "device_alt": "ql-eos-s3_wlcsp",
@@ -54,13 +32,16 @@
         }
     },
 
-    "stage_options": {
+    "stages": {
         "mk_build_dir": {
+            "module": "common:mkdirs",
             "params": {
                 "build_dir": "build/${device}"
             }
         },
+
         "synth": {
+            "module": "common:synth",
             "params": {
                 "takes": [ "pcf?" ],
                 "produces": [
@@ -85,7 +66,9 @@
                 }
             }
         },
+
         "prepare_sdc": {
+            "module": "common:generic_script_wrapper",
             "params": {
                 "stage_name": "prepare_sdc",
                 "interpreter": "${python3}",
@@ -107,7 +90,9 @@
                 }
             }
         },
+
         "pack": {
+            "module": "common:pack",
             "values": {
                 "device": "ql-eos-s3",
                 "device_alt": "ql-eos-s3_wlcsp",
@@ -142,7 +127,9 @@
                 }
             }
         },
+
         "ioplace": {
+            "module": "common:generic_script_wrapper",
             "params": {
                 "stage_name": "ioplace",
                 "interpreter": "${python3}",
@@ -162,7 +149,9 @@
                 }
             }
         },
+
         "place_constraints": {
+            "module": "common:generic_script_wrapper",
             "params": {
                 "stage_name": "place_constraints",
                 "interpreter": "${python3}",
@@ -181,7 +170,13 @@
                 }
             }
         },
+
+        "place": {
+            "module": "common:place"
+        },
+
         "iomux_jlink": {
+            "module": "common:generic_script_wrapper",
             "params": {
                 "stage_name": "iomux_jlink",
                 "interpreter": "${python3}",
@@ -201,7 +196,9 @@
                 }
             }
         },
+
         "iomux_openocd": {
+            "module": "common:generic_script_wrapper",
             "params": {
                 "stage_name": "iomux_openocd",
                 "interpreter": "${python3}",
@@ -221,7 +218,9 @@
                 }
             }
         },
+
         "iomux_binary": {
+            "module": "common:generic_script_wrapper",
             "params": {
                 "stage_name": "iomux_binary",
                 "interpreter": "${python3}",
@@ -241,7 +240,9 @@
                 }
             }
         },
+
         "route": {
+            "module": "common:route",
             "values": {
                 "device": "ql-eos-s3",
                 "device_alt": "ql-eos-s3_wlcsp",
@@ -276,7 +277,9 @@
                 }
             }
         },
+
         "analysis": {
+            "module": "common:analysis",
             "values": {
                 "device": "ql-eos-s3",
                 "device_alt": "ql-eos-s3_wlcsp",
@@ -315,7 +318,13 @@
                 }
             }
         },
+
+        "fasm": {
+            "module": "common:fasm"
+        },
+
         "bitstream": {
+            "module": "common:generic_script_wrapper",
             "params": {
                 "stage_name": "bitstream",
                 "script": "qlfasm",
@@ -340,7 +349,9 @@
                 "build_dir": "."
             }
         },
+
         "bitstream_bitheader": {
+            "module": "common:generic_script_wrapper",
             "params": {
                 "stage_name": "bitstream_bitheader",
                 "script": "symbiflow_write_bitheader",
@@ -362,7 +373,9 @@
                 }
             }
         },
+        
         "bitstream_jlink": {
+            "module": "common:generic_script_wrapper",
             "params": {
                 "stage_name": "bitstream_jlink",
                 "script": "symbiflow_write_jlink",
@@ -384,7 +397,9 @@
                 }
             }
         },
+
         "bitstream_openocd": {
+            "module": "common:generic_script_wrapper",
             "params": {
                 "stage_name": "bitstream_openocd",
                 "script": "symbiflow_write_openocd",
@@ -406,7 +421,9 @@
                 }
             }
         },
+
         "bitstream_binary": {
+            "module": "common:generic_script_wrapper",
             "params": {
                 "stage_name": "bitstream_binary",
                 "script": "symbiflow_write_binary",
@@ -428,7 +445,9 @@
                 }
             }
         },
+
         "fasm2bels": {
+            "module": "common:generic_script_wrapper",
             "params": {
                 "stage_name": "fasm2bels",
                 "script": "symbiflow_fasm2bels",
