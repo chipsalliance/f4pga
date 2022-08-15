@@ -21,7 +21,7 @@ from pathlib import Path
 from os import remove as os_remove
 from shutil import move as sh_mv
 
-from f4pga.common import *
+from f4pga.common import vpr_specific_values, noisy_warnings, vpr as common_vpr, VprArgs
 from f4pga.module import Module, ModuleContext
 
 
@@ -44,7 +44,7 @@ class PackModule(Module):
         build_dir = Path(ctx.outputs.net).parent
 
         yield 'Packing with VPR...'
-        vpr(
+        common_vpr(
             'pack',
             VprArgs(
                 ctx.share,

@@ -19,7 +19,8 @@
 
 import os
 from pathlib import Path
-from f4pga.common import *
+
+from f4pga.common import decompose_depname, get_verbosity_level, sub as common_sub
 from f4pga.module import Module, ModuleContext
 
 
@@ -57,14 +58,14 @@ def yosys_synth(tcl, tcl_env, verilog_files=[], read_verilog_args=None, log=None
         verilog_files = []
 
     # Execute YOSYS command
-    return sub(*(['yosys', '-p', tcl] + optional + verilog_files), env=env)
+    return common_sub(*(['yosys', '-p', tcl] + optional + verilog_files), env=env)
 
 
 def yosys_conv(tcl, tcl_env, synth_json):
     # Set up environment for TCL weirdness
     env = os.environ.copy()
     env.update(tcl_env)
-    return sub('yosys', '-p', f'read_json {synth_json}; tcl {tcl}', env=env)
+    return common_sub('yosys', '-p', f'read_json {synth_json}; tcl {tcl}', env=env)
 
 
 class SynthModule(Module):
@@ -113,7 +114,7 @@ class SynthModule(Module):
                     ctx.values.read_verilog_args, ctx.outputs.synth_log)
 
         yield f'Splitting in/outs...'
-        sub('python3', str(split_inouts), '-i', ctx.outputs.json, '-o',
+        common_sub('python3', str(split_inouts), '-i', ctx.outputs.json, '-o',
             ctx.outputs.synth_json)
 
         if not os.path.isfile(ctx.produces.fasm_extra):

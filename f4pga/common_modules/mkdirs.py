@@ -26,6 +26,7 @@ the dependency algorithm to lazily create the directories if they become necessa
 """
 
 from pathlib import Path
+
 from f4pga.module import Module, ModuleContext
 
 
@@ -48,5 +49,6 @@ class MkDirsModule(Module):
         self.produces = list(params.keys()) if params else []
         self.values = []
         self.deps_to_produce = params
+
 
 ModuleClass = MkDirsModule

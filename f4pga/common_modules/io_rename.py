@@ -40,7 +40,6 @@ Accepted module parameters:
 
 """
 
-from f4pga.common import *
 from f4pga.module import Module, ModuleContext
 from f4pga.module_runner import get_module
 

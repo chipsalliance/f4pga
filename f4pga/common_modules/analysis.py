@@ -20,7 +20,7 @@
 from pathlib import Path
 from shutil import move as sh_mv
 
-from f4pga.common import *
+from f4pga.common import vpr_specific_values, vpr as common_vpr, VprArgs
 from f4pga.module import Module, ModuleContext
 
 
@@ -42,12 +42,10 @@ class analysisModule(Module):
     def execute(self, ctx: ModuleContext):
         build_dir = str(Path(ctx.takes.eblif).parent)
 
-        vpr_options = []
-        if ctx.values.vpr_options:
-            vpr_options = options_dict_to_list(ctx.values.vpr_options)
+        vpr_options = options_dict_to_list(ctx.values.vpr_options) if ctx.values.vpr_options else []
 
         yield 'Analysis with VPR...'
-        vpr(
+        common_vpr(
             'analysis',
             VprArgs(
                 ctx.share,

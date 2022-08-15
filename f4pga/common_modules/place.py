@@ -21,35 +21,32 @@ from pathlib import Path
 import os
 from shutil import move as sh_mv
 from re import match as re_match
-from f4pga.common import *
+
+from f4pga.common import vpr_specific_values, vpr as common_vpr, VprArgs, save_vpr_log
 from f4pga.module import Module, ModuleContext
 
 
 def default_output_name(place_constraints):
-    p = place_constraints
     m = re_match('(.*)\\.[^.]*$', place_constraints)
     if m:
         return m.groups()[0] + '.place'
-    return f'{p}.place'
+    return f'{place_constraints}.place'
 
 
 def place_constraints_file(ctx: ModuleContext):
-    p = ctx.takes.place_constraints
-    if p:
-        return p, False
-    p = ctx.takes.io_place
-    if p:
-        return p, False
+    if ctx.takes.place_constraints:
+        return ctx.takes.place_constraints, False
+    if ctx.takes.io_place:
+        return ctx.takes.io_place, False
     return f'{Path(ctx.takes.eblif).stem}.place', True
 
 
 class PlaceModule(Module):
     def map_io(self, ctx: ModuleContext):
-        mapping = {}
         p, _ = place_constraints_file(ctx)
-
-        mapping['place'] = default_output_name(p)
-        return mapping
+        return {
+            'place': default_output_name(p)
+        }
 
     def execute(self, ctx: ModuleContext):
         place_constraints, dummy = place_constraints_file(ctx)
@@ -58,14 +55,20 @@ class PlaceModule(Module):
             with open(place_constraints, 'wb') as f:
                 f.write(b'')
 
-        build_dir = str(Path(ctx.takes.eblif).parent)
-
-        vpr_options = ['--fix_clusters', place_constraints]
+        build_dir = Path(ctx.takes.eblif).parent
 
         yield 'Running VPR...'
-        vprargs = VprArgs(ctx.share, ctx.takes.eblif, ctx.values,
-                          sdc_file=ctx.takes.sdc, vpr_extra_opts=vpr_options)
-        vpr('place', vprargs, cwd=build_dir)
+        common_vpr(
+            'place',
+            VprArgs(
+                ctx.share,
+                ctx.takes.eblif,
+                ctx.values,
+                sdc_file=ctx.takes.sdc,
+                vpr_extra_opts=['--fix_clusters', place_constraints]
+            ),
+            cwd=str(build_dir)
+        )
 
         # VPR names output on its own. If user requested another name, the
         # output file should be moved.
@@ -79,7 +82,7 @@ class PlaceModule(Module):
             sh_mv(output_file, ctx.outputs.place)
 
         yield 'Saving log...'
-        save_vpr_log('place.log', build_dir=build_dir)
+        save_vpr_log('place.log', build_dir=str(build_dir))
 
     def __init__(self, _):
         self.name = 'place'
