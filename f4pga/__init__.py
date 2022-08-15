@@ -619,18 +619,16 @@ def make_flow_config(project_flow_cfg: ProjectFlowConfig, part_name: str) -> Flo
 
     scan_modules(str(ROOT))
 
-    platform_path = ROOT / f'platforms/{platform}.yml'
-    if not platform_path.exists():
-        raise F4PGAException(
-            message=f'The platform flow definition file {platform_path} for the platform ' \
-                    f'{platform} cannot be found.'
-        )
-    with platform_path.open('r') as rfptr:
-        flow_cfg = FlowConfig(
-            project_flow_cfg,
-            FlowDefinition(yaml_load(rfptr, yaml_loader), r_env),
-            part_name
-        )
+    with (ROOT / 'platforms.yml').open('r') as rfptr:
+        platforms = yaml_load(rfptr, yaml_loader)
+    if platform not in platforms:
+        raise F4PGAException(message=f'Flow definition for platform <{platform}> cannot be found!')
+
+    flow_cfg = FlowConfig(
+        project_flow_cfg,
+        FlowDefinition(platforms[platform], r_env),
+        part_name
+    )
 
     if len(flow_cfg.stages) == 0:
         raise F4PGAException(message = 'Platform flow does not define any stage')
