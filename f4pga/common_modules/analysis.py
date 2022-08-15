@@ -18,7 +18,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from pathlib import Path
-from shutil import move as sh_mv
 
 from f4pga.common import vpr_specific_values, vpr as common_vpr, VprArgs
 from f4pga.module import Module, ModuleContext
@@ -57,10 +56,10 @@ class analysisModule(Module):
         )
 
         if ctx.is_output_explicit('merged_post_implementation_v'):
-            sh_mv(analysis_merged_post_implementation_file(ctx), ctx.outputs.merged_post_implementation_v)
+            Path(analysis_merged_post_implementation_file(ctx)).rename(ctx.outputs.merged_post_implementation_v)
 
         if ctx.is_output_explicit('post_implementation_v'):
-            sh_mv(analysis_post_implementation_file(ctx), ctx.outputs.post_implementation_v)
+            Path(analysis_post_implementation_file(ctx)).rename(ctx.outputs.post_implementation_v)
 
         yield 'Saving log...'
         save_vpr_log('analysis.log', build_dir=build_dir)
