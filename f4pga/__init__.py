@@ -41,6 +41,7 @@ from pathlib import Path
 from argparse import Namespace
 from sys import argv as sys_argv
 from os import environ
+from yaml import load as yaml_load, Loader as yaml_loader
 from json import load as json_load
 from typing import Iterable
 from colorama import Fore, Style
@@ -593,8 +594,8 @@ def get_platform_name_for_part(part_name: str):
     The reason for such distinction is that plenty of chips with different names
     differ only in a type of package they use.
     """
-    with (ROOT / 'part_db.json').open('r') as rfptr:
-        for key, val in json_load(rfptr).items():
+    with (ROOT / 'part_db.yml').open('r') as rfptr:
+        for key, val in yaml_load(rfptr, yaml_loader).items():
             if part_name.upper() in val:
                 return key
         raise Exception(f"Unknown part name <{part_name}>!")
