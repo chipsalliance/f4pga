@@ -47,14 +47,14 @@ class RouteModule(Module):
                 ctx.values,
                 sdc_file=ctx.takes.sdc
             ),
-            cwd=str(build_dir)
+            cwd=build_dir
         )
 
         if ctx.is_output_explicit('route'):
             route_place_file(ctx).rename(ctx.outputs.route)
 
         yield 'Saving log...'
-        save_vpr_log('route.log', build_dir=str(build_dir))
+        save_vpr_log('route.log', build_dir=build_dir)
 
     def __init__(self, _):
         self.name = 'route'

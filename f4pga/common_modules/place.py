@@ -65,7 +65,7 @@ class PlaceModule(Module):
                 sdc_file=ctx.takes.sdc,
                 vpr_extra_opts=['--fix_clusters', place_constraints]
             ),
-            cwd=str(build_dir)
+            cwd=build_dir
         )
 
         # VPR names output on its own. If user requested another name, the
@@ -79,7 +79,7 @@ class PlaceModule(Module):
             Path(default_output_name(str(place_constraints))).rename(ctx.outputs.place)
 
         yield 'Saving log...'
-        save_vpr_log('place.log', build_dir=str(build_dir))
+        save_vpr_log('place.log', build_dir=build_dir)
 
     def __init__(self, _):
         self.name = 'place'

@@ -50,7 +50,7 @@ class PackModule(Module):
                 ctx.values,
                 sdc_file=ctx.takes.sdc
             ),
-            cwd=str(build_dir)
+            cwd=build_dir
         )
 
         og_log = build_dir / 'vpr_stdout.log'

@@ -39,7 +39,7 @@ class analysisModule(Module):
         }
 
     def execute(self, ctx: ModuleContext):
-        build_dir = str(Path(ctx.takes.eblif).parent)
+        build_dir = Path(ctx.takes.eblif).parent
 
         vpr_options = options_dict_to_list(ctx.values.vpr_options) if ctx.values.vpr_options else []
 

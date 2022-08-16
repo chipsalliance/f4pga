@@ -28,13 +28,13 @@ from re import match as re_match, finditer as re_finditer
 class F4PGAException(Exception):
     def __init__(self, message = 'unknown exception'):
         self.message = message
-    
+
     def __repr__(self):
         return f'F4PGAException(message = \'{self.message}\')'
-    
+
     def __str__(self):
         return self.message
-        
+
 
 def decompose_depname(name: str):
     spec = 'req'
@@ -188,7 +188,7 @@ def vpr(mode: str, vprargs: VprArgs, cwd=None):
         '--read_rr_graph', vprargs.rr_graph,
         '--read_router_lookahead', vprargs.lookahead,
         '--read_placement_delay_lookup', vprargs.place_delay
-    ] + modeargs + vprargs.optional), cwd=cwd)
+    ] + modeargs + vprargs.optional), cwd=str(cwd))
 
 
 
