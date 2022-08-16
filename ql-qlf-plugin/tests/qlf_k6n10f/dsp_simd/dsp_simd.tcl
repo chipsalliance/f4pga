@@ -48,7 +48,6 @@ proc test_dsp_cfg_ports {top expected_cell_suffix cells2match} {
     design -load postopt
     yosys cd ${top}
     select -assert-count ${cells2match} t:QL_DSP2${expected_cell_suffix}
-    select -assert-count 0 t:QL_DSP2
     select -assert-count 0 t:dsp_t1_10x9x32_cfg_ports
     select -assert-count 0 t:dsp_t1_20x18x64_cfg_ports
 
@@ -71,7 +70,6 @@ proc test_dsp_cfg_params {top expected_cell_suffix cells2match} {
     design -load postopt
     yosys cd ${TOP}
     select -assert-count ${cells2match} t:QL_DSP3${expected_cell_suffix}
-    select -assert-count 0 t:QL_DSP3
     select -assert-count 0 t:dsp_t1_10x9x32_cfg_params
     select -assert-count 0 t:dsp_t1_20x18x64_cfg_params
 
@@ -87,18 +85,15 @@ proc test_dsp_cfg_params {top expected_cell_suffix cells2match} {
 #           of the inference, eg. _MULT, _MACC_REGIN, MADD_REGIN_REGOUT
 proc test_dsp_cfg_conflict {top expected_cell_suffix} {
     set TOP ${top}
-    set USE_DSP_CFG_PARAMS 1
+    set USE_DSP_CFG_PARAMS 0
     design -load read
     hierarchy -top $TOP
     check_equiv ${TOP} ${USE_DSP_CFG_PARAMS}
     design -load postopt
     yosys cd ${TOP}
-    select -assert-count 1 t:QL_DSP2${expected_cell_suffix}
-    select -assert-count 1 t:QL_DSP3${expected_cell_suffix}
-    select -assert-count 0 t:QL_DSP2
+    select -assert-count 2 t:QL_DSP2${expected_cell_suffix}
     select -assert-count 0 t:dsp_t1_10x9x32_cfg_ports
     select -assert-count 0 t:dsp_t1_20x18x64_cfg_ports
-    select -assert-count 0 t:QL_DSP3
     select -assert-count 0 t:dsp_t1_10x9x32_cfg_params
     select -assert-count 0 t:dsp_t1_20x18x64_cfg_params
 
@@ -111,12 +106,12 @@ yosys -import  ;# ingest plugin commands
 read_verilog dsp_simd.v
 design -save read
 
-test_dsp_cfg_ports      "simd_mult_explicit_ports"      "_MULT_REGIN"   1
-test_dsp_cfg_params     "simd_mult_explicit_params"     "_MULT_REGIN"   1
-test_dsp_cfg_ports      "simd_mult_inferred"            "_MULT"         1
-test_dsp_cfg_params     "simd_mult_inferred"            "_MULT"         1
-test_dsp_cfg_ports      "simd_mult_odd_ports"           "_MULT_REGIN"   2
-test_dsp_cfg_params     "simd_mult_odd_params"          "_MULT_REGIN"   2
-test_dsp_cfg_ports      "simd_mult_conflict_ports"      "_MULT_REGIN"   2
-test_dsp_cfg_conflict   "simd_mult_conflict_config"     "_MULT_REGIN"
+test_dsp_cfg_ports      "simd_mult_explicit_ports"      ""       1
+test_dsp_cfg_params     "simd_mult_explicit_params"     ""       1
+test_dsp_cfg_ports      "simd_mult_inferred"            "_MULT"  1
+test_dsp_cfg_params     "simd_mult_inferred"            "_MULT"  1
+test_dsp_cfg_ports      "simd_mult_odd_ports"           ""       2
+test_dsp_cfg_params     "simd_mult_odd_params"          ""       2
+test_dsp_cfg_ports      "simd_mult_conflict_ports"      ""       2
+test_dsp_cfg_conflict   "simd_mult_conflict_config"     ""
 

@@ -23,8 +23,12 @@ module madd_simple_ports (
 
     // There is no support for autmoatic inference of multiply+add hence the
     // DSP cell needs to be instanced manually.
+    //
+    // To test the type change the "is_inferred" attribute is set here
+    // explicitily to mimic possible inference
 
     // B * coeff[C] + A
+    (* is_inferred=1 *)
     dsp_t1_10x9x32_cfg_ports # (
         .COEFF_0            (10'h011),
         .COEFF_1            (10'h022),
@@ -62,8 +66,12 @@ module madd_simple_params (
 
     // There is no support for autmoatic inference of multiply+add hence the
     // DSP cell needs to be instanced manually.
+    //
+    // To test the type change the "is_inferred" attribute is set here
+    // explicitily to mimic possible inference
 
     // B * coeff[C] + A
+    (* is_inferred=1 *)
     dsp_t1_10x9x32_cfg_params # (
         .COEFF_0            (10'h011),
         .COEFF_1            (10'h022),
