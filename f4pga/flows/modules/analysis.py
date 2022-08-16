@@ -41,10 +41,18 @@ class analysisModule(Module):
     def execute(self, ctx: ModuleContext):
         build_dir = Path(ctx.takes.eblif).parent
 
-        vpr_options = options_dict_to_list(ctx.values.vpr_options) if ctx.values.vpr_options else []
-
         yield "Analysis with VPR..."
-        common_vpr("analysis", VprArgs(ctx.share, ctx.takes.eblif, ctx.values, sdc_file=ctx.takes.sdc), cwd=build_dir)
+        common_vpr(
+            "analysis",
+            VprArgs(
+                ctx.share,
+                ctx.takes.eblif,
+                ctx.values,
+                sdc_file=ctx.takes.sdc,
+                vpr_extra_opts=options_dict_to_list(ctx.values.vpr_options) if ctx.values.vpr_options else None,
+            ),
+            cwd=build_dir,
+        )
 
         if ctx.is_output_explicit("merged_post_implementation_v"):
             Path(analysis_merged_post_implementation_file(ctx)).rename(ctx.outputs.merged_post_implementation_v)
