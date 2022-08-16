@@ -48,13 +48,13 @@ from colorama import Fore, Style
 from f4pga.common import (
     F4PGAException,
     ResolutionEnv,
+    deep,
     fatal,
     scan_modules,
     set_verbosity_level,
     sfprint,
     sub as common_sub
 )
-from f4pga.module import *
 from f4pga.cache import F4Cache
 from f4pga.flow_config import (
     ProjectFlowConfig,
@@ -63,7 +63,7 @@ from f4pga.flow_config import (
     open_project_flow_cfg,
     verify_platform_name
 )
-from f4pga.module_runner import *
+from f4pga.module_runner import ModRunCtx, module_map, module_exec
 from f4pga.module_inspector import get_module_info
 from f4pga.stage import Stage
 from f4pga.argparser import setup_argparser, get_cli_flow_config

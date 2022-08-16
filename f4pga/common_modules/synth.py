@@ -17,9 +17,10 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import os
+from os import environ
 from pathlib import Path
-from f4pga.common import *
+
+from f4pga.common import decompose_depname, get_verbosity_level, sub as common_sub
 from f4pga.module import Module, ModuleContext
 
 
@@ -43,7 +44,7 @@ def yosys_synth(tcl, tcl_env, verilog_files=[], read_verilog_args=None, log=None
     optional = []
     if log:
         optional += ['-l', log]
-    env = os.environ.copy()
+    env = environ.copy()
     env.update(tcl_env)
 
     tcl = f'tcl {tcl}'
@@ -57,14 +58,14 @@ def yosys_synth(tcl, tcl_env, verilog_files=[], read_verilog_args=None, log=None
         verilog_files = []
 
     # Execute YOSYS command
-    return sub(*(['yosys', '-p', tcl] + optional + verilog_files), env=env)
+    return common_sub(*(['yosys', '-p', tcl] + optional + verilog_files), env=env)
 
 
 def yosys_conv(tcl, tcl_env, synth_json):
     # Set up environment for TCL weirdness
-    env = os.environ.copy()
+    env = environ.copy()
     env.update(tcl_env)
-    return sub('yosys', '-p', f'read_json {synth_json}; tcl {tcl}', env=env)
+    return common_sub('yosys', '-p', f'read_json {synth_json}; tcl {tcl}', env=env)
 
 
 class SynthModule(Module):
@@ -75,13 +76,13 @@ class SynthModule(Module):
 
         top = ctx.values.top
         if ctx.takes.build_dir:
-            top = os.path.join(ctx.takes.build_dir, top)
+            top = str(Path(ctx.takes.build_dir) / top)
         mapping['eblif'] = top + '.eblif'
         mapping['fasm_extra'] = top + '_fasm_extra.fasm'
         mapping['json'] = top + '.json'
         mapping['synth_json'] = top + '_io.json'
 
-        b_path = os.path.dirname(top)
+        b_path = Path(top).parent.name
 
         for extra in self.extra_products:
             name, spec = decompose_depname(extra)
@@ -91,9 +92,7 @@ class SynthModule(Module):
                     f'(?) specifier. Product causing this error: `{extra}`.'
                 )
             elif spec == 'req':
-                mapping[name] = \
-                    os.path.join(b_path,
-                                 ctx.values.device + '_' + name + '.' + name)
+                mapping[name] = str(Path(b_path) / f'{ctx.values.device}_{name}.{name}')
 
         return mapping
 
@@ -113,12 +112,12 @@ class SynthModule(Module):
                     ctx.values.read_verilog_args, ctx.outputs.synth_log)
 
         yield f'Splitting in/outs...'
-        sub('python3', str(split_inouts), '-i', ctx.outputs.json, '-o',
+        common_sub('python3', str(split_inouts), '-i', ctx.outputs.json, '-o',
             ctx.outputs.synth_json)
 
-        if not os.path.isfile(ctx.produces.fasm_extra):
-            with open(ctx.produces.fasm_extra, 'w') as f:
-                f.write('')
+        if not Path(ctx.produces.fasm_extra).is_file():
+            with Path(ctx.produces.fasm_extra).open('w') as wfptr:
+                wfptr.write('')
 
         yield f'Converting...'
         yosys_conv(str(conv_tcl), tcl_env, ctx.outputs.synth_json)

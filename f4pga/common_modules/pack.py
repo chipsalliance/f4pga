@@ -18,10 +18,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from pathlib import Path
-from os import remove as os_remove
-from shutil import move as sh_mv
 
-from f4pga.common import *
+from f4pga.common import vpr_specific_values, noisy_warnings, vpr as common_vpr, VprArgs
 from f4pga.module import Module, ModuleContext
 
 
@@ -44,7 +42,7 @@ class PackModule(Module):
         build_dir = Path(ctx.outputs.net).parent
 
         yield 'Packing with VPR...'
-        vpr(
+        common_vpr(
             'pack',
             VprArgs(
                 ctx.share,
@@ -55,19 +53,19 @@ class PackModule(Module):
             cwd=str(build_dir)
         )
 
-        og_log = str(build_dir / 'vpr_stdout.log')
+        og_log = build_dir / 'vpr_stdout.log'
 
         yield 'Moving/deleting files...'
         if ctx.outputs.pack_log:
-            sh_mv(og_log, ctx.outputs.pack_log)
+            og_log.rename(ctx.outputs.pack_log)
         else:
-            os_remove(og_log)
+            og_log.unlink()
 
         if ctx.outputs.timing_rpt:
-            sh_mv(str(build_dir / DEFAULT_TIMING_RPT), ctx.outputs.timing_rpt)
+            (build_dir / DEFAULT_TIMING_RPT).rename(ctx.outputs.timing_rpt)
 
         if ctx.outputs.util_rpt:
-            sh_mv(str(build_dir / DEFAULT_UTIL_RPT), ctx.outputs.util_rpt)
+            (build_dir / DEFAULT_UTIL_RPT).rename(ctx.outputs.util_rpt)
 
     def __init__(self, _):
         self.name = 'pack'

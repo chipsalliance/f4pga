@@ -18,7 +18,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from pathlib import Path
-from f4pga.common import *
+from f4pga.common import sub as common_sub
 from f4pga.module import Module, ModuleContext
 
 
@@ -29,31 +29,23 @@ class PlaceConstraintsModule(Module):
         }
 
     def execute(self, ctx: ModuleContext):
-        arch_dir = str(Path(ctx.share) / 'arch')
-        arch_def = str(Path(arch_dir) / ctx.values.device / 'arch.timing.xml')
-
-        database = sub('prjxray-config').decode().replace('\n', '')
-
-        yield 'Generating .place...'
-
-        extra_opts: 'list[str]'
-        if ctx.values.extra_opts:
-            extra_opts = options_dict_to_list(ctx.values.extra_opts)
-        else:
-            extra_opts = []
-
-        data = sub(*(['python3', ctx.values.script,
-                      '--net', ctx.takes.net,
-                      '--arch', arch_def,
-                      '--blif', ctx.takes.eblif,
-                      '--input', ctx.takes.io_place,
-                      '--db_root', database,
-                      '--part', ctx.values.part_name]
-                      + extra_opts))
-
         yield 'Saving place constraint data...'
-        with open(ctx.outputs.place_constraints, 'wb') as f:
-            f.write(data)
+        with Path(ctx.outputs.place_constraints).open('wb') as wfptr:
+            wfptr.write(
+                common_sub(*(
+                    [
+                        'python3', ctx.values.script,
+                        '--net', ctx.takes.net,
+                        '--arch', str(Path(ctx.share) / 'arch' / ctx.values.device / 'arch.timing.xml'),
+                        '--blif', ctx.takes.eblif,
+                        '--input', ctx.takes.io_place,
+                        '--db_root', common_sub('prjxray-config').decode().replace('\n', ''),
+                        '--part', ctx.values.part_name
+                    ] + (
+                        options_dict_to_list(ctx.values.extra_opts) if ctx.values.extra_opts else []
+                    )
+                ))
+            )
 
     def __init__(self, _):
         self.name = 'place_constraints'
