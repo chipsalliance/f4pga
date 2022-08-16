@@ -24,9 +24,6 @@ from subprocess import run
 
 from setuptools import setup as setuptools_setup
 
-from os import environ
-FPGA_FAM = environ.get('FPGA_FAM', 'xc7')
-
 
 packagePath = Path(__file__).resolve().parent
 requirementsFile = packagePath / "requirements.txt"
@@ -68,6 +65,7 @@ if git is not None:
 
 if version is None:
     version = semver
+
 
 sf = "symbiflow"
 shwrappers = "f4pga.wrappers.sh.__init__"
@@ -112,21 +110,19 @@ setuptools_setup(
             f"{sf}_place = {shwrappers}:place",
             f"{sf}_route = {shwrappers}:route",
             f"{sf}_synth = {shwrappers}:synth",
-            f"{sf}_write_fasm = {shwrappers}:write_fasm"
-        ] + (
-            [
-                f"{sf}_write_bitstream = {shwrappers}:write_bitstream",
-            ] if FPGA_FAM == 'xc7' else [
-                f"{sf}_analysis = {shwrappers}:analysis",
-                f"{sf}_fasm2bels = {shwrappers}:fasm2bels",
-                f"{sf}_generate_bitstream = {shwrappers}:generate_bitstream",
-                f"{sf}_repack = {shwrappers}:repack",
-                f"{sf}_write_binary = {shwrappers}:write_binary",
-                f"{sf}_write_bitheader = {shwrappers}:write_bitheader",
-                f"{sf}_write_jlink = {shwrappers}:write_jlink",
-                f"{sf}_write_openocd = {shwrappers}:write_openocd",
-                f"ql_{sf} = {shwrappers}:ql",
-            ]
-        )
+            f"{sf}_write_fasm = {shwrappers}:write_fasm",
+            # Xilinx only
+            f"{sf}_write_bitstream = {shwrappers}:write_bitstream",
+            # QuickLogic only
+            f"{sf}_analysis = {shwrappers}:analysis",
+            f"{sf}_fasm2bels = {shwrappers}:fasm2bels",
+            f"{sf}_generate_bitstream = {shwrappers}:generate_bitstream",
+            f"{sf}_repack = {shwrappers}:repack",
+            f"{sf}_write_binary = {shwrappers}:write_binary",
+            f"{sf}_write_bitheader = {shwrappers}:write_bitheader",
+            f"{sf}_write_jlink = {shwrappers}:write_jlink",
+            f"{sf}_write_openocd = {shwrappers}:write_openocd",
+            f"ql_{sf} = {shwrappers}:ql",
+        ]
     },
 )
