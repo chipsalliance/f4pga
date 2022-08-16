@@ -106,23 +106,27 @@ setuptools_setup(
     entry_points={
         "console_scripts": [
             "f4pga = f4pga.__init__:main",
-            f"{sf}_pack = {shwrappers}:pack",
-            f"{sf}_place = {shwrappers}:place",
-            f"{sf}_route = {shwrappers}:route",
-            f"{sf}_synth = {shwrappers}:synth",
-            f"{sf}_write_fasm = {shwrappers}:write_fasm",
-            # Xilinx only
-            f"{sf}_write_bitstream = {shwrappers}:write_bitstream",
             # QuickLogic only
-            f"{sf}_analysis = {shwrappers}:analysis",
-            f"{sf}_fasm2bels = {shwrappers}:fasm2bels",
-            f"{sf}_generate_bitstream = {shwrappers}:generate_bitstream",
-            f"{sf}_repack = {shwrappers}:repack",
-            f"{sf}_write_binary = {shwrappers}:write_binary",
-            f"{sf}_write_bitheader = {shwrappers}:write_bitheader",
-            f"{sf}_write_jlink = {shwrappers}:write_jlink",
-            f"{sf}_write_openocd = {shwrappers}:write_openocd",
             f"ql_{sf} = {shwrappers}:ql",
+        ] + [
+            f"{sf}_{script} = {shwrappers}:{script}" for script in [
+                "pack",
+                "place",
+                "route",
+                "synth",
+                "write_fasm",
+                # Xilinx only
+                "write_bitstream",
+                # QuickLogic only
+                "analysis",
+                "fasm2bels",
+                "generate_bitstream",
+                "repack",
+                "write_binary",
+                "write_bitheader",
+                "write_jlink",
+                "write_openocd",
+            ]
         ]
     },
 )
