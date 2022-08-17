@@ -21,7 +21,7 @@ set -e
 export TECHMAP_PATH="${F4PGA_SHARE_DIR}"/techmaps/xc7_vpr/techmap
 
 export UTILS_PATH="${F4PGA_SHARE_DIR}"/scripts
-SYNTH_TCL_PATH=${UTILS_PATH}/xc7/synth.tcl
+SYNTH_TCL_PATH="$(python3 -m f4pga.wrappers.tcl synth)"
 
 VERILOG_FILES=()
 XDC_FILES=()
@@ -140,4 +140,4 @@ else
 fi
 
 python3 ${UTILS_PATH}/split_inouts.py -i ${OUT_JSON} -o ${SYNTH_JSON}
-yosys -p "read_json $SYNTH_JSON; tcl ${UTILS_PATH}/xc7/conv.tcl"
+yosys -p "read_json $SYNTH_JSON; tcl $(python3 -m f4pga.wrappers.tcl conv)"

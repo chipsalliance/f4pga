@@ -123,8 +123,8 @@ PINMAPCSV="pinmap_${PART}.csv"
 
 export TECHMAP_PATH="${F4PGA_SHARE_DIR}/techmaps/${FAMILY}"
 
-SYNTH_TCL_PATH="${F4PGA_SHARE_DIR}/scripts/${FAMILY}/synth.tcl"
-CONV_TCL_PATH="${F4PGA_SHARE_DIR}/scripts/${FAMILY}/conv.tcl"
+SYNTH_TCL_PATH="$(python3 -m f4pga.wrappers.tcl synth "${FAMILY}")"
+CONV_TCL_PATH="$(python3 -m f4pga.wrappers.tcl conv "${FAMILY}")"
 
 export USE_ROI="FALSE"
 export OUT_JSON=$TOP.json

@@ -22,6 +22,7 @@ from pathlib import Path
 
 from f4pga.common import decompose_depname, get_verbosity_level, sub as common_sub
 from f4pga.module import Module, ModuleContext
+from f4pga.wrappers.tcl import get_script_path as get_tcl_wrapper_path
 
 
 def yosys_setup_tcl_env(tcl_env_def):
@@ -100,16 +101,19 @@ class SynthModule(Module):
         tcl_env = yosys_setup_tcl_env(ctx.values.yosys_tcl_env) \
             if ctx.values.yosys_tcl_env else {}
         split_inouts = Path(tcl_env["UTILS_PATH"]) / 'split_inouts.py'
-        synth_tcl = Path(ctx.values.tcl_scripts) / 'synth.tcl'
-        conv_tcl = Path(ctx.values.tcl_scripts) / 'conv.tcl'
 
         if get_verbosity_level() >= 2:
             yield f'Synthesizing sources: {ctx.takes.sources}...'
         else:
             yield f'Synthesizing sources...'
 
-        yosys_synth(str(synth_tcl), tcl_env, ctx.takes.sources,
-                    ctx.values.read_verilog_args, ctx.outputs.synth_log)
+        yosys_synth(
+            str(get_tcl_wrapper_path('synth')),
+            tcl_env,
+            ctx.takes.sources,
+            ctx.values.read_verilog_args,
+            ctx.outputs.synth_log
+        )
 
         yield f'Splitting in/outs...'
         common_sub('python3', str(split_inouts), '-i', ctx.outputs.json, '-o',
@@ -120,7 +124,11 @@ class SynthModule(Module):
                 wfptr.write('')
 
         yield f'Converting...'
-        yosys_conv(str(conv_tcl), tcl_env, ctx.outputs.synth_json)
+        yosys_conv(
+            str(get_tcl_wrapper_path('conv')),
+            tcl_env,
+            ctx.outputs.synth_json
+        )
 
     def __init__(self, params):
         self.name = 'synthesize'
