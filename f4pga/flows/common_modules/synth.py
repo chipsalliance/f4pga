@@ -60,15 +60,14 @@ class SynthModule(Module):
     extra_products: "list[str]"
 
     def map_io(self, ctx: ModuleContext):
-        mapping = {}
+        top = Path(ctx.takes.build_dir) / ctx.values.top if ctx.takes.build_dir else Path(ctx.values.top)
 
-        top = ctx.values.top
-        if ctx.takes.build_dir:
-            top = str(Path(ctx.takes.build_dir) / top)
-        mapping["eblif"] = top + ".eblif"
-        mapping["fasm_extra"] = top + "_fasm_extra.fasm"
-        mapping["json"] = top + ".json"
-        mapping["synth_json"] = top + "_io.json"
+        mapping = {
+            "eblif": f"{top!s}.eblif",
+            "fasm_extra": f"{top!s}_fasm_extra.fasm",
+            "json": f"{top!s}.json",
+            "synth_json": f"{top!s}_io.json",
+        }
 
         for extra in self.extra_products:
             name, spec = decompose_depname(extra)
@@ -77,8 +76,8 @@ class SynthModule(Module):
                     f"Yosys synth extra products can't use 'maybe\ "
                     f"(?) specifier. Product causing this error: `{extra}`."
                 )
-            elif spec == 'req':
-                mapping[name] = str(Path(top).parent / f'{ctx.values.device}_{name}.{name}')
+            elif spec == "req":
+                mapping[name] = str(top.parent / f"{ctx.values.device}_{name}.{name}")
 
         return mapping
 

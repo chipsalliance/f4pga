@@ -198,7 +198,7 @@ def vpr(mode: str, vprargs: VprArgs, cwd=None):
             + modeargs
             + vprargs.optional
         ),
-        cwd=str(cwd),
+        cwd=cwd,
     )
 
 

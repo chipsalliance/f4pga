@@ -239,11 +239,12 @@ class Flow:
 
     def _build_dep(self, dep):
         paths = self.dep_paths.get(dep)
-        provider = self.os_map.get(dep)
-        run = (provider.name in self.run_stages) if provider else False
         if not paths:
             sfprint(2, f"Dependency {dep} is unresolved.")
             return False
+
+        provider = self.os_map.get(dep)
+        run = (provider.name in self.run_stages) if provider else False
 
         if p_req_exists(paths) and not run:
             return True

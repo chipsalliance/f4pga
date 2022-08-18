@@ -25,8 +25,7 @@ from f4pga.flows.runner import get_module, module_io
 class StageIO:
     """
     Stage dependency input/output.
-    TODO: Solve the inconsistecy between usage of that and usage of
-          `decompose_depname` with an unprocessed string.
+    TODO: Solve the inconsistecy between usage of that and usage of `decompose_depname` with an unprocessed string.
     """
 
     name: str  # A symbolic name given to the dependency
@@ -47,49 +46,41 @@ class StageIO:
 
 class Stage:
     """
-    Represents a single stage in a flow. I.e an instance of a module with a
-    local set of values.
+    Represents a single stage in a flow.
+    I.e an instance of a module with a local set of values.
     """
 
-    name: str  #   Name of the stage (module's name)
-    takes: "list[StageIO]"  #   List of symbolic names of dependencies used by
-    # the stage
-    produces: "list[StageIO]"  #   List of symbolic names of dependencies
-    # produced by the stage
-    value_overrides: "dict[str, ]"  # Stage-specific values
     module: Module
-    meta: "dict[str, str]"  #   Stage's metadata extracted from module's
-    # output.
+
+    # Name of the stage (module's name)
+    name: str
+
+    # List of symbolic names of dependencies used by the stage
+    takes: "list[StageIO]"
+
+    # List of symbolic names of dependencies produced by the stage
+    produces: "list[StageIO]"
+
+    # Stage-specific values
+    value_overrides: "dict[str, ]"
+
+    # Stage's metadata extracted from module's output.
+    meta: "dict[str, str]"
 
     def __init__(self, name: str, stage_def: "dict[str, ]"):
+        self.name = name
+
         if stage_def is None:
             stage_def = {}
 
-        modstr = stage_def["module"]
-
-        module_path = resolve_modstr(modstr)
-        ModuleClass = get_module(module_path)
-        self.module = ModuleClass(stage_def.get("params"))
+        self.module = get_module(resolve_modstr(stage_def["module"]))(stage_def.get("params"))
 
         values = stage_def.get("values")
-        if values is not None:
-            self.value_overrides = values
-        else:
-            self.value_overrides = {}
+        self.value_overrides = values if values is not None else {}
 
         mod_io = module_io(self.module)
-        self.name = name
-
-        self.takes = []
-        for input in mod_io["takes"]:
-            io = StageIO(input)
-            self.takes.append(io)
-
-        self.produces = []
-        for input in mod_io["produces"]:
-            io = StageIO(input)
-            self.produces.append(io)
-
+        self.takes = [StageIO(input) for input in mod_io["takes"]]
+        self.produces = [StageIO(input) for input in mod_io["produces"]]
         self.meta = mod_io["meta"]
 
     def __repr__(self) -> str:

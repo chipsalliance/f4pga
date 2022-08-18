@@ -73,9 +73,7 @@ class FlowDefinition:
         if global_vals is not None:
             self.r_env.add_values(global_vals)
 
-        stages_d = flow_def["stages"]
-
-        for stage_name, stage_def in stages_d.items():
+        for stage_name, stage_def in flow_def["stages"].items():
             self.stages[stage_name] = Stage(stage_name, stage_def)
 
     def stage_names(self):
@@ -142,14 +140,13 @@ class FlowConfig:
 
     def __init__(self, project_config: ProjectFlowConfig, platform_def: FlowDefinition, part: str):
         self.r_env = platform_def.r_env
-        platform_vals = project_config.get_values_raw(part)
-        self.r_env.add_values(platform_vals)
+        self.r_env.add_values(project_config.get_values_raw(part))
         self.stages = platform_def.stages
         self.part = part
 
-        raw_project_deps = project_config.get_dependencies_raw(part)
-
-        self.dependencies_explicit = deep(lambda p: str(Path(p).resolve()))(self.r_env.resolve(raw_project_deps))
+        self.dependencies_explicit = deep(lambda p: str(Path(p).resolve()))(
+            self.r_env.resolve(project_config.get_dependencies_raw(part))
+        )
 
         for stage_name, stage in platform_def.stages.items():
             project_val_ovds = project_config.get_stage_value_overrides(part, stage_name)
