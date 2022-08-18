@@ -29,27 +29,15 @@ def yosys_setup_tcl_env(tcl_env_def):
     """
     Setup environmental variables for YOSYS TCL scripts.
     """
-    env = {}
-    for key, value in tcl_env_def.items():
-        if value is None:
-            continue
-        v = value
-        if type(value) is list:
-            v = ' '.join(value)
-        env[key] = v
-    return env
+    return {
+        key: (' '.join(val) if type(val) is list else val)
+        for key, val in tcl_env_def.items()
+        if val is not None
+    }
 
 
 def yosys_synth(tcl, tcl_env, verilog_files=[], read_verilog_args=None, log=None):
-    # Set up environment for TCL weirdness
-    optional = []
-    if log:
-        optional += ['-l', log]
-    env = environ.copy()
-    env.update(tcl_env)
-
     tcl = f'tcl {tcl}'
-
     # Use append read_verilog commands to the scripts for more sophisticated
     # input if arguments are specified. Omit direct input throught `yosys` command.
     if read_verilog_args:
@@ -58,8 +46,11 @@ def yosys_synth(tcl, tcl_env, verilog_files=[], read_verilog_args=None, log=None
             tcl = f'read_verilog {args_str} {verilog}; {tcl}'
         verilog_files = []
 
+    # Set up environment for TCL weirdness
+    env = environ.copy()
+    env.update(tcl_env)
     # Execute YOSYS command
-    return common_sub(*(['yosys', '-p', tcl] + optional + verilog_files), env=env)
+    return common_sub(*(['yosys', '-p', tcl] + (['-l', log] if log else []) + verilog_files), env=env)
 
 
 def yosys_conv(tcl, tcl_env, synth_json):
