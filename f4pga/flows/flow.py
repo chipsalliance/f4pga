@@ -66,10 +66,14 @@ class Flow:
                                      'provider at most.')
         self.os_map = os_map
 
-        self.dep_paths = dict(p_filter_existing_deps(cfg.get_dependency_overrides(), f4cache))
+        self.dep_paths = {
+            n: p
+            for n, p in cfg.get_dependency_overrides().items()
+            if p_req_exists(p) # and not p_dep_differ(p, f4cache)
+        }
         if f4cache is not None:
             for dep in self.dep_paths.values():
-                _cache_deps(dep, f4cache)
+                self._cache_deps(dep, f4cache)
 
         self.run_stages = set()
         self.f4cache = f4cache
@@ -78,12 +82,53 @@ class Flow:
 
         self._resolve_dependencies(self.target, set())
 
+    @staticmethod
+    def _config_mod_runctx(
+        stage: Stage,
+        values: 'dict[str, ]',
+        dep_paths: 'dict[str, str | list[str]]',
+        config_paths: 'dict[str, str | list[str]]'
+    ):
+        takes = {}
+        for take in stage.takes:
+            paths = dep_paths.get(take.name)
+            if paths: # Some takes may be not required
+                takes[take.name] = paths
+
+        produces = {}
+        for prod in stage.produces:
+            if dep_paths.get(prod.name):
+                produces[prod.name] = dep_paths[prod.name]
+            elif config_paths.get(prod.name):
+                produces[prod.name] = config_paths[prod.name]
+
+        return ModRunCtx(
+            share_dir_path,
+            bin_dir_path,
+            {
+                'takes': takes,
+                'produces': produces,
+                'values': values
+            }
+        )
+
+    @staticmethod
+    def _cache_deps(path: str, f4cache: F4Cache):
+        def _process_dep_path(path: str, f4cache: F4Cache):
+            f4cache.process_file(Path(path))
+        deep(_process_dep_path)(path, f4cache)
+
     def _dep_will_differ(self, dep: str, paths, consumer: str):
+        """
+        Check if a dependency or any of the dependencies it depends on differ from
+        their last versions.
+        """
         if not self.f4cache: # Handle --nocache mode
             return True
-        return p_dep_will_differ(dep, paths, consumer,
-                               self.os_map, self.run_stages,
-                               self.f4cache)
+        provider = self.os_map.get(dep)
+        if provider and (provider.name in self.run_stages):
+            return True
+        return p_dep_differ(paths, consumer, self.f4cache)
 
     def _resolve_dependencies(self, dep: str, stages_checked: 'set[str]',
                               skip_dep_warnings: 'set[str]' = None):
@@ -111,10 +156,13 @@ class Flow:
             # provider stage cannot be run
             take_paths = self.dep_paths.get(take.name)
             # Add input path to values (dirty hack)
-            provider.value_overrides[p_dep_value_str(take.name)] = take_paths
+            provider.value_overrides[f':{take.name}'] = take_paths
 
             if not take_paths and take.spec == 'req':
-                p_print_unreachable_stage_message(provider, take)
+                sfprint(0,
+                    f'    Stage `{Style.BRIGHT + provider.name + Style.RESET_ALL}` is '
+                    f'unreachable due to unmet dependency `{Style.BRIGHT + take.name + Style.RESET_ALL}`'
+                )
                 return
 
             will_differ = False
@@ -126,7 +174,6 @@ class Flow:
             else:
                 will_differ = True
 
-
             if will_differ:
                 if take.name not in skip_dep_warnings:
                     sfprint(2, f'{Style.BRIGHT}{take.name}{Style.RESET_ALL} is causing '
@@ -135,15 +182,19 @@ class Flow:
                 self.run_stages.add(provider.name)
                 self.deps_rebuilds[take.name] += 1
 
-        stage_values = self.cfg.get_r_env(provider.name).values
-        modrunctx = p_config_mod_runctx(provider, stage_values, self.dep_paths,
-                                      self.cfg.get_dependency_overrides())
-
-        outputs = module_map(provider.module, modrunctx)
+        outputs = module_map(
+            provider.module,
+            self._config_mod_runctx(
+                provider,
+                self.cfg.get_r_env(provider.name).values,
+                self.dep_paths,
+                self.cfg.get_dependency_overrides()
+            )
+        )
         for output_paths in outputs.values():
             if output_paths is not None:
                 if p_req_exists(output_paths) and self.f4cache:
-                    _cache_deps(output_paths, self.f4cache)
+                    self._cache_deps(output_paths, self.f4cache)
 
         stages_checked.add(provider.name)
         self.dep_paths.update(outputs)
@@ -168,7 +219,7 @@ class Flow:
             o_path = outputs.get(o.name)
 
             if o_path is not None:
-                provider.value_overrides[p_dep_value_str(o.name)] = \
+                provider.value_overrides[f':{o.name}'] = \
                     outputs.get(o.name)
 
 
@@ -185,17 +236,10 @@ class Flow:
                 exists = p_req_exists(paths)
                 provider = self.os_map.get(dep)
                 if provider and provider.name in self.run_stages:
-                    if exists:
-                        status = Fore.YELLOW + '[R]' + Fore.RESET
-                    else:
-                        status = Fore.YELLOW + '[S]' + Fore.RESET
-                    source = f'{Fore.BLUE + self.os_map[dep].name + Fore.RESET} ' \
-                            f'-> {paths}'
+                    status = Fore.YELLOW + ('[R]' if exists else '[S]') + Fore.RESET
+                    source = f'{Fore.BLUE + self.os_map[dep].name + Fore.RESET} -> {paths}'
                 elif exists:
-                    if self.deps_rebuilds[dep] > 0:
-                        status = Fore.GREEN + '[N]' + Fore.RESET
-                    else:
-                        status = Fore.GREEN + '[O]' + Fore.RESET
+                    status = Fore.GREEN + ('[N]' if self.deps_rebuilds[dep] > 0 else '[O]') + Fore.RESET
                     source = paths
             elif self.os_map.get(dep):
                 status = Fore.RED + '[U]' + Fore.RESET
@@ -223,11 +267,8 @@ class Flow:
                 if not self._build_dep(p_dep.name):
                     assert (p_dep.spec != 'req')
                     continue
-
                 if self.f4cache is not None:
-                    any_dep_differ |= \
-                        p_update_dep_statuses(self.dep_paths[p_dep.name],
-                                            provider.name, self.f4cache)
+                    any_dep_differ |= p_update_dep_statuses(self.dep_paths[p_dep.name], provider.name, self.f4cache)
 
             # If dependencies remained the same, consider the dep as up-to date
             # For example, when changing a comment in Verilog source code,
@@ -241,10 +282,14 @@ class Flow:
                            f'of it\'s dependencies remained unchanged')
                 return True
 
-            stage_values = self.cfg.get_r_env(provider.name).values
-            modrunctx = p_config_mod_runctx(provider, stage_values, self.dep_paths,
-                                          self.cfg.get_dependency_overrides())
-            module_exec(provider.module, modrunctx)
+            module_exec(
+                provider.module,
+                self._config_mod_runctx(
+                    provider,
+                    self.cfg.get_r_env(provider.name).values,
+                    self.dep_paths,self.cfg.get_dependency_overrides()
+                )
+            )
 
             self.run_stages.discard(provider.name)
 
@@ -253,18 +298,16 @@ class Flow:
                     raise DependencyNotProducedException(dep, provider.name)
                 prod_paths = self.dep_paths[product.name]
                 if (prod_paths is not None) and p_req_exists(paths) and self.f4cache:
-                    _cache_deps(prod_paths, self.f4cache)
+                    self._cache_deps(prod_paths, self.f4cache)
 
         return True
 
     def execute(self):
         self._build_dep(self.target)
         if self.f4cache:
-            _cache_deps(self.dep_paths[self.target], self.f4cache)
-            p_update_dep_statuses(self.dep_paths[self.target], '__target',
-                                self.f4cache)
-        sfprint(0, f'Target {Style.BRIGHT + self.target + Style.RESET_ALL} '
-                   f'-> {self.dep_paths[self.target]}')
+            self._cache_deps(self.dep_paths[self.target], self.f4cache)
+            p_update_dep_statuses(self.dep_paths[self.target], '__target', self.f4cache)
+        sfprint(0, f'Target {Style.BRIGHT + self.target + Style.RESET_ALL} -> {self.dep_paths[self.target]}')
 
 
 class DependencyNotProducedException(F4PGAException):
@@ -274,77 +317,21 @@ class DependencyNotProducedException(F4PGAException):
     def __init__(self, dep_name: str, provider: str):
         self.dep_name = dep_name
         self.provider = provider
-        self.message = f'Stage `{self.provider}` did not produce promised ' \
-                       f'dependency `{self.dep_name}`'
-
-
-def p_print_unreachable_stage_message(provider: Stage, take: str):
-    sfprint(0, '    Stage '
-              f'`{Style.BRIGHT + provider.name + Style.RESET_ALL}` is '
-               'unreachable due to unmet dependency '
-              f'`{Style.BRIGHT + take.name + Style.RESET_ALL}`')
-
-
-def _process_dep_path(path: str, f4cache: F4Cache):
-    f4cache.process_file(Path(path))
-
-
-_cache_deps = deep(_process_dep_path)
-
-
-def p_dep_value_str(dep: str):
-    return ':' + dep
+        self.message = f'Stage `{self.provider}` did not produce promised dependency `{self.dep_name}`'
 
 
 def p_req_exists(r):
-    """ Checks whether a dependency exists on a drive. """
-
+    """
+    Checks whether a dependency exists on a drive.
+    """
     if type(r) is str:
         if not Path(r).exists():
             return False
     elif type(r) is list:
         return not (False in map(p_req_exists, r))
     else:
-        raise Exception(f'Requirements can be currently checked only for single '
-                        f'paths, or path lists (reason: {r})')
+        raise Exception(f'Requirements can be currently checked only for single paths, or path lists (reason: {r})')
     return True
-
-
-def p_filter_existing_deps(deps: 'dict[str, ]', f4cache):
-    return [(n, p) for n, p in deps.items() \
-            if p_req_exists(p)] # and not p_dep_differ(p, f4cache)]
-
-
-def p_prepare_stage_input(stage: Stage, values: dict, dep_paths: 'dict[str, ]',
-                        config_paths: 'dict[str, ]'):
-    takes = {}
-    for take in stage.takes:
-        paths = dep_paths.get(take.name)
-        if paths: # Some takes may be not required
-            takes[take.name] = paths
-
-    produces = {}
-    for prod in stage.produces:
-        if dep_paths.get(prod.name):
-            produces[prod.name] = dep_paths[prod.name]
-        elif config_paths.get(prod.name):
-            produces[prod.name] = config_paths[prod.name]
-
-    stage_mod_cfg = {
-        'takes': takes,
-        'produces': produces,
-        'values': values
-    }
-
-    return stage_mod_cfg
-
-
-def p_config_mod_runctx(stage: Stage, values: 'dict[str, ]',
-                      dep_paths: 'dict[str, str | list[str]]',
-                      config_paths: 'dict[str, str | list[str]]'):
-    config = p_prepare_stage_input(stage, values,
-                                 dep_paths, config_paths)
-    return ModRunCtx(share_dir_path, bin_dir_path, config)
 
 
 def p_update_dep_statuses(paths, consumer: str, f4cache: F4Cache):
@@ -361,10 +348,8 @@ def p_update_dep_statuses(paths, consumer: str, f4cache: F4Cache):
 
 def p_dep_differ(paths, consumer: str, f4cache: F4Cache):
     """
-    Check if a dependency differs from its last version, lack of dependency is
-    treated as "differs"
+    Check if a dependency differs from its last version, lack of dependency is treated as "differs".
     """
-
     if type(paths) is str:
         if not Path(paths).exists():
             return True
@@ -372,21 +357,5 @@ def p_dep_differ(paths, consumer: str, f4cache: F4Cache):
     elif type(paths) is list:
         return True in [p_dep_differ(p, consumer, f4cache) for p in paths]
     elif type(paths) is dict:
-        return True in [p_dep_differ(p, consumer, f4cache) \
-                        for _, p in paths.items()]
+        return True in [p_dep_differ(p, consumer, f4cache) for _, p in paths.items()]
     return False
-
-
-def p_dep_will_differ(target: str, paths, consumer: str,
-                    os_map: 'dict[str, Stage]', run_stages: 'set[str]',
-                    f4cache: F4Cache):
-    """
-    Check if a dependency or any of the dependencies it depends on differ from
-    their last versions.
-    """
-
-    provider = os_map.get(target)
-    if provider:
-        return (provider.name in run_stages) or \
-               p_dep_differ(paths, consumer, f4cache)
-    return p_dep_differ(paths, consumer, f4cache)
