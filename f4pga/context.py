@@ -25,7 +25,16 @@ FPGA_FAM = environ.get('FPGA_FAM', 'xc7')
 if FPGA_FAM not in ['xc7', 'eos-s3', 'qlf_k4n8']:
     raise(Exception(f"Unsupported FPGA_FAM <{FPGA_FAM}>!"))
 
-F4PGA_INSTALL_DIR = environ.get('F4PGA_INSTALL_DIR')
-if F4PGA_INSTALL_DIR is None:
-    raise(Exception("Required environment variable F4PGA_INSTALL_DIR is undefined!"))
-F4PGA_INSTALL_DIR_PATH = Path(F4PGA_INSTALL_DIR)
+F4PGA_DEBUG = environ.get('F4PGA_DEBUG')
+
+install_dir = environ.get('F4PGA_INSTALL_DIR')
+if install_dir is None:
+    default_install_dir = Path('/usr/local')
+    if F4PGA_DEBUG is not None:
+        print("Environment variable F4PGA_INSTALL_DIR is undefined!")
+        print(f"Using default {default_install_dir}")
+    F4PGA_INSTALL_DIR = default_install_dir
+else:
+    F4PGA_INSTALL_DIR = Path(install_dir)
+
+F4PGA_SHARE_DIR = Path(environ.get('F4PGA_SHARE_DIR', F4PGA_INSTALL_DIR / FPGA_FAM / 'share/f4pga'))

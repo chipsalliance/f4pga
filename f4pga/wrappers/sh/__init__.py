@@ -25,7 +25,7 @@ from pathlib import Path
 from shutil import which
 from subprocess import check_call
 
-from f4pga.context import FPGA_FAM, F4PGA_INSTALL_DIR_PATH
+from f4pga.context import FPGA_FAM, F4PGA_SHARE_DIR
 
 python3 = which('python3')
 
@@ -35,7 +35,7 @@ isQuickLogic = FPGA_FAM != 'xc7'
 SH_SUBDIR = 'quicklogic' if isQuickLogic else FPGA_FAM
 
 f4pga_environ = environ.copy()
-f4pga_environ['F4PGA_SHARE_DIR'] = f4pga_environ.get('F4PGA_SHARE_DIR', str(F4PGA_INSTALL_DIR_PATH / FPGA_FAM / 'share/f4pga'))
+f4pga_environ['F4PGA_SHARE_DIR'] = f4pga_environ.get('F4PGA_SHARE_DIR', F4PGA_SHARE_DIR)
 
 
 # Helper functions
