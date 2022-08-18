@@ -21,6 +21,7 @@ from f4pga.flows.common import decompose_depname, resolve_modstr
 from f4pga.flows.module import Module
 from f4pga.flows.runner import get_module, module_io
 
+
 class StageIO:
     """
     Stage dependency input/output.
@@ -28,7 +29,7 @@ class StageIO:
           `decompose_depname` with an unprocessed string.
     """
 
-    name: str       # A symbolic name given to the dependency
+    name: str  # A symbolic name given to the dependency
     spec: str
 
     def __init__(self, encoded_name: str):
@@ -41,8 +42,8 @@ class StageIO:
         self.name, self.spec = decompose_depname(encoded_name)
 
     def __repr__(self) -> str:
-        return 'StageIO { name: \'' + self.name + '\', spec: ' + \
-               self.spec + '}'
+        return "StageIO { name: '" + self.name + "', spec: " + self.spec + "}"
+
 
 class Stage:
     """
@@ -50,27 +51,27 @@ class Stage:
     local set of values.
     """
 
-    name: str                  #   Name of the stage (module's name)
-    takes: 'list[StageIO]'     #   List of symbolic names of dependencies used by
-                               # the stage
-    produces: 'list[StageIO]'  #   List of symbolic names of dependencies
-                               # produced by the stage
-    value_overrides: 'dict[str, ]'      # Stage-specific values
+    name: str  #   Name of the stage (module's name)
+    takes: "list[StageIO]"  #   List of symbolic names of dependencies used by
+    # the stage
+    produces: "list[StageIO]"  #   List of symbolic names of dependencies
+    # produced by the stage
+    value_overrides: "dict[str, ]"  # Stage-specific values
     module: Module
-    meta: 'dict[str, str]'     #   Stage's metadata extracted from module's
-                               # output.
+    meta: "dict[str, str]"  #   Stage's metadata extracted from module's
+    # output.
 
-    def __init__(self, name: str, stage_def: 'dict[str, ]'):
+    def __init__(self, name: str, stage_def: "dict[str, ]"):
         if stage_def is None:
             stage_def = {}
 
-        modstr = stage_def['module']
+        modstr = stage_def["module"]
 
         module_path = resolve_modstr(modstr)
         ModuleClass = get_module(module_path)
-        self.module = ModuleClass(stage_def.get('params'))
+        self.module = ModuleClass(stage_def.get("params"))
 
-        values = stage_def.get('values')
+        values = stage_def.get("values")
         if values is not None:
             self.value_overrides = values
         else:
@@ -80,20 +81,22 @@ class Stage:
         self.name = name
 
         self.takes = []
-        for input in mod_io['takes']:
+        for input in mod_io["takes"]:
             io = StageIO(input)
             self.takes.append(io)
 
         self.produces = []
-        for input in mod_io['produces']:
+        for input in mod_io["produces"]:
             io = StageIO(input)
             self.produces.append(io)
 
-        self.meta = mod_io['meta']
+        self.meta = mod_io["meta"]
 
     def __repr__(self) -> str:
-        return 'Stage \'' + self.name + '\' {' \
-               f' value_overrides: {self.value_ovds},' \
-               f' args: {self.args},' \
-               f' takes: {self.takes},' \
-               f' produces: {self.produces} ' + '}'
+        return (
+            "Stage '" + self.name + "' {"
+            f" value_overrides: {self.value_ovds},"
+            f" args: {self.args},"
+            f" takes: {self.takes},"
+            f" produces: {self.produces} " + "}"
+        )

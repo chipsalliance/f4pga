@@ -24,18 +24,18 @@ from f4pga.flows.module import Module, ModuleContext
 
 
 def analysis_merged_post_implementation_file(ctx: ModuleContext):
-    return str(Path(ctx.takes.eblif).with_suffix('')) + '_merged_post_implementation.v'
+    return str(Path(ctx.takes.eblif).with_suffix("")) + "_merged_post_implementation.v"
 
 
 def analysis_post_implementation_file(ctx: ModuleContext):
-    return str(Path(ctx.takes.eblif).with_suffix('')) + '_post_synthesis.v'
+    return str(Path(ctx.takes.eblif).with_suffix("")) + "_post_synthesis.v"
 
 
 class analysisModule(Module):
     def map_io(self, ctx: ModuleContext):
         return {
-            'merged_post_implementation_v': analysis_merged_post_implementation_file(ctx),
-            'post_implementation_v': analysis_post_implementation_file(ctx)
+            "merged_post_implementation_v": analysis_merged_post_implementation_file(ctx),
+            "post_implementation_v": analysis_post_implementation_file(ctx),
         }
 
     def execute(self, ctx: ModuleContext):
@@ -43,43 +43,24 @@ class analysisModule(Module):
 
         vpr_options = options_dict_to_list(ctx.values.vpr_options) if ctx.values.vpr_options else []
 
-        yield 'Analysis with VPR...'
-        common_vpr(
-            'analysis',
-            VprArgs(
-                ctx.share,
-                ctx.takes.eblif,
-                ctx.values,
-                sdc_file=ctx.takes.sdc
-            ),
-            cwd=build_dir
-        )
+        yield "Analysis with VPR..."
+        common_vpr("analysis", VprArgs(ctx.share, ctx.takes.eblif, ctx.values, sdc_file=ctx.takes.sdc), cwd=build_dir)
 
-        if ctx.is_output_explicit('merged_post_implementation_v'):
+        if ctx.is_output_explicit("merged_post_implementation_v"):
             Path(analysis_merged_post_implementation_file(ctx)).rename(ctx.outputs.merged_post_implementation_v)
 
-        if ctx.is_output_explicit('post_implementation_v'):
+        if ctx.is_output_explicit("post_implementation_v"):
             Path(analysis_post_implementation_file(ctx)).rename(ctx.outputs.post_implementation_v)
 
-        yield 'Saving log...'
-        save_vpr_log('analysis.log', build_dir=build_dir)
+        yield "Saving log..."
+        save_vpr_log("analysis.log", build_dir=build_dir)
 
     def __init__(self, _):
-        self.name = 'analysis'
+        self.name = "analysis"
         self.no_of_phases = 2
-        self.takes = [
-            'eblif',
-            'route',
-            'sdc?'
-        ]
-        self.produces = [
-            'merged_post_implementation_v',
-            'post_implementation_v',
-            'analysis_log'
-        ]
-        self.values = [
-            'device',
-            'vpr_options?'
-        ] + vpr_specific_values()
+        self.takes = ["eblif", "route", "sdc?"]
+        self.produces = ["merged_post_implementation_v", "post_implementation_v", "analysis_log"]
+        self.values = ["device", "vpr_options?"] + vpr_specific_values()
+
 
 ModuleClass = analysisModule

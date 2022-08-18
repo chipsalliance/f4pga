@@ -34,6 +34,7 @@ from f4pga.flows.common import ResolutionEnv, deep, sfprint
 @contextmanager
 def _add_to_sys_path(path: str):
     import sys
+
     old_syspath = sys.path
     sys.path = [path] + sys.path
     try:
@@ -72,15 +73,15 @@ def get_module(path: str):
 class ModRunCtx:
     share: str
     bin: str
-    config: 'dict[str, ]'
+    config: "dict[str, ]"
 
-    def __init__(self, share: str, bin: str, config: 'dict[str, ]'):
+    def __init__(self, share: str, bin: str, config: "dict[str, ]"):
         self.share = share
         self.bin = bin
         self.config = config
 
     def make_r_env(self):
-        return ResolutionEnv(self.config['values'])
+        return ResolutionEnv(self.config["values"])
 
 
 class ModuleFailException(Exception):
@@ -101,50 +102,34 @@ class ModuleFailException(Exception):
 
 
 def module_io(module: Module):
-    return {
-        'name': module.name,
-        'takes': module.takes,
-        'produces': module.produces,
-        'meta': get_mod_metadata(module)
-    }
+    return {"name": module.name, "takes": module.takes, "produces": module.produces, "meta": get_mod_metadata(module)}
 
 
 _deep_resolve = deep(lambda p: str(Path(p).resolve()), allow_none=True)
 
+
 def module_map(module: Module, ctx: ModRunCtx):
     try:
-        mod_ctx = ModuleContext(
-            module,
-            ctx.config,
-            ctx.make_r_env(),
-            ctx.share,
-            ctx.bin
-        )
+        mod_ctx = ModuleContext(module, ctx.config, ctx.make_r_env(), ctx.share, ctx.bin)
     except Exception as e:
-        raise ModuleFailException(module.name, 'map', e)
+        raise ModuleFailException(module.name, "map", e)
 
     return _deep_resolve(vars(mod_ctx.outputs))
 
 
 def module_exec(module: Module, ctx: ModRunCtx):
     try:
-        mod_ctx = ModuleContext(
-            module,
-            ctx.config,
-            ctx.make_r_env(),
-            ctx.share,
-            ctx.bin
-        )
+        mod_ctx = ModuleContext(module, ctx.config, ctx.make_r_env(), ctx.share, ctx.bin)
     except Exception as e:
-        raise ModuleFailException(module.name, 'exec', e)
+        raise ModuleFailException(module.name, "exec", e)
 
-    sfprint(1, f'Executing module `{Style.BRIGHT + module.name + Style.RESET_ALL}`:')
+    sfprint(1, f"Executing module `{Style.BRIGHT + module.name + Style.RESET_ALL}`:")
     current_phase = 1
     try:
         for phase_msg in module.execute(mod_ctx):
-            sfprint(1, f'    {Style.BRIGHT}[{current_phase}/{module.no_of_phases}] {Style.RESET_ALL}: {phase_msg}')
+            sfprint(1, f"    {Style.BRIGHT}[{current_phase}/{module.no_of_phases}] {Style.RESET_ALL}: {phase_msg}")
             current_phase += 1
     except Exception as e:
-        raise ModuleFailException(module.name, 'exec', e)
+        raise ModuleFailException(module.name, "exec", e)
 
-    sfprint(1, f'Module `{Style.BRIGHT + module.name + Style.RESET_ALL}` has finished its work!')
+    sfprint(1, f"Module `{Style.BRIGHT + module.name + Style.RESET_ALL}` has finished its work!")

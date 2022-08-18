@@ -25,10 +25,10 @@ from f4pga.flows.module import Module, ModuleContext
 
 
 def default_output_name(place_constraints):
-    m = re_match('(.*)\\.[^.]*$', place_constraints)
+    m = re_match("(.*)\\.[^.]*$", place_constraints)
     if m:
-        return m.groups()[0] + '.place'
-    return f'{place_constraints}.place'
+        return m.groups()[0] + ".place"
+    return f"{place_constraints}.place"
 
 
 def place_constraints_file(ctx: ModuleContext):
@@ -36,36 +36,34 @@ def place_constraints_file(ctx: ModuleContext):
         return ctx.takes.place_constraints, False
     if ctx.takes.io_place:
         return ctx.takes.io_place, False
-    return f'{Path(ctx.takes.eblif).stem}.place', True
+    return f"{Path(ctx.takes.eblif).stem}.place", True
 
 
 class PlaceModule(Module):
     def map_io(self, ctx: ModuleContext):
         p, _ = place_constraints_file(ctx)
-        return {
-            'place': default_output_name(p)
-        }
+        return {"place": default_output_name(p)}
 
     def execute(self, ctx: ModuleContext):
         place_constraints, dummy = place_constraints_file(ctx)
         place_constraints = Path(place_constraints).resolve()
         if dummy:
-            with place_constraints.open('wb') as wfptr:
-                wfptr.write(b'')
+            with place_constraints.open("wb") as wfptr:
+                wfptr.write(b"")
 
         build_dir = Path(ctx.takes.eblif).parent
 
-        yield 'Running VPR...'
+        yield "Running VPR..."
         common_vpr(
-            'place',
+            "place",
             VprArgs(
                 ctx.share,
                 ctx.takes.eblif,
                 ctx.values,
                 sdc_file=ctx.takes.sdc,
-                vpr_extra_opts=['--fix_clusters', place_constraints]
+                vpr_extra_opts=["--fix_clusters", place_constraints],
             ),
-            cwd=build_dir
+            cwd=build_dir,
         )
 
         # VPR names output on its own. If user requested another name, the
@@ -75,25 +73,18 @@ class PlaceModule(Module):
         # when the problem gets tackled, we should keep in mind that VPR-based
         # modules may produce some temporary files with names that differ from
         # the ones in flow configuration.
-        if ctx.is_output_explicit('place'):
+        if ctx.is_output_explicit("place"):
             Path(default_output_name(str(place_constraints))).rename(ctx.outputs.place)
 
-        yield 'Saving log...'
-        save_vpr_log('place.log', build_dir=build_dir)
+        yield "Saving log..."
+        save_vpr_log("place.log", build_dir=build_dir)
 
     def __init__(self, _):
-        self.name = 'place'
+        self.name = "place"
         self.no_of_phases = 2
-        self.takes = [
-            'eblif',
-            'sdc?',
-            'place_constraints?',
-            'io_place?'
-        ]
-        self.produces = [ 'place' ]
-        self.values = [
-            'device',
-            'vpr_options?'
-        ] + vpr_specific_values()
+        self.takes = ["eblif", "sdc?", "place_constraints?", "io_place?"]
+        self.produces = ["place"]
+        self.values = ["device", "vpr_options?"] + vpr_specific_values()
+
 
 ModuleClass = PlaceModule

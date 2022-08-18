@@ -19,5 +19,5 @@
 
 from f4pga.wrappers.sh import p_vpr_run
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     p_vpr_run()

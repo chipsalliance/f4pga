@@ -44,7 +44,7 @@ from f4pga.flows.module import Module, ModuleContext
 from f4pga.flows.runner import get_module
 
 
-def _switch_keys(d: 'dict[str, ]', renames: 'dict[str, str]') -> 'dict[str, ]':
+def _switch_keys(d: "dict[str, ]", renames: "dict[str, str]") -> "dict[str, ]":
     newd = {}
     for k, v in d.items():
         r = renames.get(k)
@@ -55,7 +55,7 @@ def _switch_keys(d: 'dict[str, ]', renames: 'dict[str, str]') -> 'dict[str, ]':
     return newd
 
 
-def _switchback_attrs(d: Namespace, renames: 'dict[str, str]') -> SimpleNamespace:
+def _switchback_attrs(d: Namespace, renames: "dict[str, str]") -> SimpleNamespace:
     newn = SimpleNamespace()
     for k, v in vars(d).items():
         setattr(newn, k, v)
@@ -67,7 +67,7 @@ def _switchback_attrs(d: Namespace, renames: 'dict[str, str]') -> SimpleNamespac
     return newn
 
 
-def _switch_entries(l: 'list[str]', renames: 'dict[str, str]') -> 'list[str]':
+def _switch_entries(l: "list[str]", renames: "dict[str, str]") -> "list[str]":
     newl = []
     for e in l:
         r = renames.get(e)
@@ -79,15 +79,15 @@ def _switch_entries(l: 'list[str]', renames: 'dict[str, str]') -> 'list[str]':
     return newl
 
 
-def _or_empty_dict(d: 'dict | None'):
+def _or_empty_dict(d: "dict | None"):
     return d if d is not None else {}
 
 
 class IORenameModule(Module):
     module: Module
-    rename_takes: 'dict[str, str]'
-    rename_produces: 'dict[str, str]'
-    rename_values: 'dict[str, str]'
+    rename_takes: "dict[str, str]"
+    rename_produces: "dict[str, str]"
+    rename_values: "dict[str, str]"
 
     def map_io(self, ctx: ModuleContext):
         newctx = ctx.shallow_copy()
@@ -114,12 +114,13 @@ class IORenameModule(Module):
         self.rename_values = _or_empty_dict(params.get("rename_values"))
 
         self.module = module
-        self.name = f'{module.name}-io_renamed'
+        self.name = f"{module.name}-io_renamed"
         self.no_of_phases = module.no_of_phases
         self.takes = _switch_entries(module.takes, self.rename_takes)
         self.produces = _switch_entries(module.produces, self.rename_produces)
         self.values = _switch_entries(module.values, self.rename_values)
-        if hasattr(module, 'prod_meta'):
+        if hasattr(module, "prod_meta"):
             self.prod_meta = _switch_keys(module.prod_meta, self.rename_produces)
+
 
 ModuleClass = IORenameModule

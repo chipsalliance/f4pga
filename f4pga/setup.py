@@ -52,14 +52,14 @@ def get_requirements(file: Path) -> List[str]:
 semver = "0.0.0"
 version = None
 
-with (packagePath.parent / '.gitcommit').open("r") as rptr:
+with (packagePath.parent / ".gitcommit").open("r") as rptr:
     sha = rptr.read().strip()
-    if sha != '$Format:%h$':
-        version = f'{semver}+{sha}'
+    if sha != "$Format:%h$":
+        version = f"{semver}+{sha}"
 
-git = which('git')
+git = which("git")
 if git is not None:
-    proc = run(['git', 'rev-parse', 'HEAD'], capture_output=True)
+    proc = run(["git", "rev-parse", "HEAD"], capture_output=True)
     if proc.returncode == 0:
         version = f'{semver}+{proc.stdout.decode("utf8")[0:8]}'
 
@@ -78,39 +78,32 @@ setuptools_setup(
     author="F4PGA Authors",
     description="F4PGA.",
     url="https://github.com/chipsalliance/f4pga",
-    packages=[
-        "f4pga",
-        "f4pga.flows",
-        "f4pga.flows.common_modules",
-        "f4pga.wrappers.sh",
-        "f4pga.wrappers.tcl"
-    ],
+    packages=["f4pga", "f4pga.flows", "f4pga.flows.common_modules", "f4pga.wrappers.sh", "f4pga.wrappers.tcl"],
     package_dir={"f4pga": "."},
     package_data={
-        'f4pga.flows': [
-            '*.yml',
+        "f4pga.flows": [
+            "*.yml",
         ],
-        'f4pga.wrappers.sh': [
-            'xc7/*.f4pga.sh',
-            'quicklogic/*.f4pga.sh'
+        "f4pga.wrappers.sh": ["xc7/*.f4pga.sh", "quicklogic/*.f4pga.sh"],
+        "f4pga.wrappers.tcl": [
+            "xc7/*.f4pga.tcl",
+            "eos-s3/*.f4pga.tcl",
+            "qlf_k4n8/*.f4pga.tcl",
+            "ice40/*.f4pga.tcl",
         ],
-        'f4pga.wrappers.tcl': [
-            'xc7/*.f4pga.tcl',
-            'eos-s3/*.f4pga.tcl',
-            'qlf_k4n8/*.f4pga.tcl',
-            'ice40/*.f4pga.tcl',
-        ]
     },
     classifiers=[],
-    python_requires='>=3.6',
+    python_requires=">=3.6",
     install_requires=list(set(get_requirements(requirementsFile))),
     entry_points={
         "console_scripts": [
             "f4pga = f4pga.__init__:main",
             # QuickLogic only
             f"ql_{sf} = {shwrappers}:ql",
-        ] + [
-            f"{sf}_{script} = {shwrappers}:{script}" for script in [
+        ]
+        + [
+            f"{sf}_{script} = {shwrappers}:{script}"
+            for script in [
                 "pack",
                 "place",
                 "route",

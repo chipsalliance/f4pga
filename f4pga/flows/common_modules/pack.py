@@ -23,8 +23,8 @@ from f4pga.flows.common import vpr_specific_values, noisy_warnings, vpr as commo
 from f4pga.flows.module import Module, ModuleContext
 
 
-DEFAULT_TIMING_RPT = 'pre_pack.report_timing.setup.rpt'
-DEFAULT_UTIL_RPT = 'packing_pin_util.rpt'
+DEFAULT_TIMING_RPT = "pre_pack.report_timing.setup.rpt"
+DEFAULT_UTIL_RPT = "packing_pin_util.rpt"
 
 
 class PackModule(Module):
@@ -32,30 +32,21 @@ class PackModule(Module):
         epath = Path(ctx.takes.eblif)
         build_dir = epath.parent
         return {
-            'net': str(epath.with_suffix('.net')),
-            'util_rpt': str(build_dir / DEFAULT_UTIL_RPT),
-            'timing_rpt': str(build_dir / DEFAULT_TIMING_RPT)
+            "net": str(epath.with_suffix(".net")),
+            "util_rpt": str(build_dir / DEFAULT_UTIL_RPT),
+            "timing_rpt": str(build_dir / DEFAULT_TIMING_RPT),
         }
 
     def execute(self, ctx: ModuleContext):
         noisy_warnings(ctx.values.device)
         build_dir = Path(ctx.outputs.net).parent
 
-        yield 'Packing with VPR...'
-        common_vpr(
-            'pack',
-            VprArgs(
-                ctx.share,
-                ctx.takes.eblif,
-                ctx.values,
-                sdc_file=ctx.takes.sdc
-            ),
-            cwd=build_dir
-        )
+        yield "Packing with VPR..."
+        common_vpr("pack", VprArgs(ctx.share, ctx.takes.eblif, ctx.values, sdc_file=ctx.takes.sdc), cwd=build_dir)
 
-        og_log = build_dir / 'vpr_stdout.log'
+        og_log = build_dir / "vpr_stdout.log"
 
-        yield 'Moving/deleting files...'
+        yield "Moving/deleting files..."
         if ctx.outputs.pack_log:
             og_log.rename(ctx.outputs.pack_log)
         else:
@@ -68,20 +59,13 @@ class PackModule(Module):
             (build_dir / DEFAULT_UTIL_RPT).rename(ctx.outputs.util_rpt)
 
     def __init__(self, _):
-        self.name = 'pack'
+        self.name = "pack"
         self.no_of_phases = 2
-        self.takes = [
-            'eblif',
-            'sdc?'
-        ]
-        self.produces = [
-            'net',
-            'util_rpt',
-            'timing_rpt',
-            'pack_log!'
-        ]
+        self.takes = ["eblif", "sdc?"]
+        self.produces = ["net", "util_rpt", "timing_rpt", "pack_log!"]
         self.values = [
-            'device',
+            "device",
         ] + vpr_specific_values()
+
 
 ModuleClass = PackModule
