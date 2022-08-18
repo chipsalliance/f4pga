@@ -17,8 +17,15 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from f4pga.flows import main
+from pathlib import Path
+from os import environ
 
 
-if __name__ == '__main__':
-    main()
+FPGA_FAM = environ.get('FPGA_FAM', 'xc7')
+if FPGA_FAM not in ['xc7', 'eos-s3', 'qlf_k4n8']:
+    raise(Exception(f"Unsupported FPGA_FAM <{FPGA_FAM}>!"))
+
+F4PGA_INSTALL_DIR = environ.get('F4PGA_INSTALL_DIR')
+if F4PGA_INSTALL_DIR is None:
+    raise(Exception("Required environment variable F4PGA_INSTALL_DIR is undefined!"))
+F4PGA_INSTALL_DIR_PATH = Path(F4PGA_INSTALL_DIR)

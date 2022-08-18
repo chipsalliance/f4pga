@@ -17,9 +17,11 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from f4pga.module import Module
-from f4pga.common import decompose_depname
 from colorama import Style
+
+from f4pga.flows.module import Module
+from f4pga.flows.common import decompose_depname
+
 
 def _get_if_qualifier(deplist: 'list[str]', qualifier: str):
     for dep_name in deplist:

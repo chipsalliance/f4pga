@@ -25,22 +25,16 @@ from pathlib import Path
 from shutil import which
 from subprocess import check_call
 
-from f4pga import FPGA_FAM
+from f4pga.context import FPGA_FAM, F4PGA_INSTALL_DIR_PATH
 
 python3 = which('python3')
-
-f4pga_environ = environ.copy()
 
 ROOT = Path(__file__).resolve().parent
 
 isQuickLogic = FPGA_FAM != 'xc7'
 SH_SUBDIR = 'quicklogic' if isQuickLogic else FPGA_FAM
 
-F4PGA_INSTALL_DIR = f4pga_environ.get('F4PGA_INSTALL_DIR')
-if F4PGA_INSTALL_DIR is None:
-    raise(Exception("Required environment variable F4PGA_INSTALL_DIR is undefined!"))
-F4PGA_INSTALL_DIR_PATH = Path(F4PGA_INSTALL_DIR)
-
+f4pga_environ = environ.copy()
 f4pga_environ['F4PGA_SHARE_DIR'] = f4pga_environ.get('F4PGA_SHARE_DIR', str(F4PGA_INSTALL_DIR_PATH / FPGA_FAM / 'share/f4pga'))
 
 

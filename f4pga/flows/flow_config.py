@@ -22,8 +22,8 @@ from copy import copy
 from os import listdir as os_listdir
 from json import dump as json_dump, load as json_load
 
-from f4pga.common import ResolutionEnv, deep
-from f4pga.stage import Stage
+from f4pga.flows.common import ResolutionEnv, deep
+from f4pga.flows.stage import Stage
 
 
 def open_flow_cfg(path: str) -> dict:
@@ -135,7 +135,7 @@ class ProjectFlowConfig:
             vals = stage_cfg.get('values')
             if vals is not None:
                 stage_vals_ovds.update(vals)
-        
+
         return stage_vals_ovds
 
     def get_dependency_platform_overrides(self, part: str):

@@ -20,7 +20,8 @@
 # TCL scripts moved from f4pga-arch-defs
 
 from pathlib import Path
-from f4pga import FPGA_FAM
+
+from f4pga.context import FPGA_FAM
 
 ROOT = Path(__file__).resolve().parent
 

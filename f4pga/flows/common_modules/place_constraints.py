@@ -18,8 +18,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from pathlib import Path
-from f4pga.common import sub as common_sub
-from f4pga.module import Module, ModuleContext
+
+from f4pga.flows.common import sub as common_sub
+from f4pga.flows.module import Module, ModuleContext
 
 
 class PlaceConstraintsModule(Module):

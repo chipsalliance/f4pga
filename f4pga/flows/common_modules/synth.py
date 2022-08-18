@@ -20,8 +20,8 @@
 from os import environ
 from pathlib import Path
 
-from f4pga.common import decompose_depname, get_verbosity_level, sub as common_sub
-from f4pga.module import Module, ModuleContext
+from f4pga.flows.common import decompose_depname, get_verbosity_level, sub as common_sub
+from f4pga.flows.module import Module, ModuleContext
 from f4pga.wrappers.tcl import get_script_path as get_tcl_wrapper_path
 
 
@@ -83,8 +83,6 @@ class SynthModule(Module):
         mapping['json'] = top + '.json'
         mapping['synth_json'] = top + '_io.json'
 
-        b_path = Path(top).parent.name
-
         for extra in self.extra_products:
             name, spec = decompose_depname(extra)
             if spec == 'maybe':
@@ -93,7 +91,7 @@ class SynthModule(Module):
                     f'(?) specifier. Product causing this error: `{extra}`.'
                 )
             elif spec == 'req':
-                mapping[name] = str(Path(b_path) / f'{ctx.values.device}_{name}.{name}')
+                mapping[name] = str(Path(top).parent / f'{ctx.values.device}_{name}.{name}')
 
         return mapping
 

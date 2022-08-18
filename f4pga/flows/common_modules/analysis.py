@@ -19,18 +19,23 @@
 
 from pathlib import Path
 
-from f4pga.common import vpr_specific_values, vpr as common_vpr, VprArgs, options_dict_to_list, save_vpr_log
-from f4pga.module import Module, ModuleContext
+from f4pga.flows.common import vpr_specific_values, vpr as common_vpr, VprArgs
+from f4pga.flows.module import Module, ModuleContext
 
 
-def route_place_file(ctx: ModuleContext):
-    return Path(ctx.takes.eblif).with_suffix('.route')
+def analysis_merged_post_implementation_file(ctx: ModuleContext):
+    return str(Path(ctx.takes.eblif).with_suffix('')) + '_merged_post_implementation.v'
 
 
-class RouteModule(Module):
+def analysis_post_implementation_file(ctx: ModuleContext):
+    return str(Path(ctx.takes.eblif).with_suffix('')) + '_post_synthesis.v'
+
+
+class analysisModule(Module):
     def map_io(self, ctx: ModuleContext):
         return {
-            'route': str(route_place_file(ctx))
+            'merged_post_implementation_v': analysis_merged_post_implementation_file(ctx),
+            'post_implementation_v': analysis_post_implementation_file(ctx)
         }
 
     def execute(self, ctx: ModuleContext):
@@ -38,9 +43,9 @@ class RouteModule(Module):
 
         vpr_options = options_dict_to_list(ctx.values.vpr_options) if ctx.values.vpr_options else []
 
-        yield 'Routing with VPR...'
+        yield 'Analysis with VPR...'
         common_vpr(
-            'route',
+            'analysis',
             VprArgs(
                 ctx.share,
                 ctx.takes.eblif,
@@ -50,24 +55,31 @@ class RouteModule(Module):
             cwd=build_dir
         )
 
-        if ctx.is_output_explicit('route'):
-            route_place_file(ctx).rename(ctx.outputs.route)
+        if ctx.is_output_explicit('merged_post_implementation_v'):
+            Path(analysis_merged_post_implementation_file(ctx)).rename(ctx.outputs.merged_post_implementation_v)
+
+        if ctx.is_output_explicit('post_implementation_v'):
+            Path(analysis_post_implementation_file(ctx)).rename(ctx.outputs.post_implementation_v)
 
         yield 'Saving log...'
-        save_vpr_log('route.log', build_dir=build_dir)
+        save_vpr_log('analysis.log', build_dir=build_dir)
 
     def __init__(self, _):
-        self.name = 'route'
+        self.name = 'analysis'
         self.no_of_phases = 2
         self.takes = [
             'eblif',
-            'place',
+            'route',
             'sdc?'
         ]
-        self.produces = [ 'route' ]
+        self.produces = [
+            'merged_post_implementation_v',
+            'post_implementation_v',
+            'analysis_log'
+        ]
         self.values = [
             'device',
             'vpr_options?'
         ] + vpr_specific_values()
 
-ModuleClass = RouteModule
+ModuleClass = analysisModule
