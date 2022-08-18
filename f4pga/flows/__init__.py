@@ -64,7 +64,7 @@ from f4pga.flows.flow_config import (
     open_project_flow_cfg,
     verify_platform_name
 )
-from f4pga.flows.module_runner import ModRunCtx, module_map, module_exec
+from f4pga.flows.runner import ModRunCtx, module_map, module_exec
 from f4pga.flows.module_inspector import get_module_info
 from f4pga.flows.stage import Stage
 from f4pga.flows.argparser import setup_argparser, get_cli_flow_config
