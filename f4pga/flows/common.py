@@ -25,6 +25,16 @@ from shutil import move as sh_mv
 from subprocess import run
 from re import match as re_match, finditer as re_finditer
 
+from f4pga.context import FPGA_FAM
+
+
+install_dir = environ.get("F4PGA_INSTALL_DIR", "/usr/local")
+bin_dir_path = str(Path(sys_argv[0]).resolve().parent.parent)
+share_dir_path = \
+    environ.get('F4PGA_SHARE_DIR',
+                str(Path(f'{install_dir}/{FPGA_FAM}/share/f4pga').resolve()))
+
+
 class F4PGAException(Exception):
     def __init__(self, message = 'unknown exception'):
         self.message = message
