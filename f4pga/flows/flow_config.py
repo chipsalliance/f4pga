@@ -27,15 +27,11 @@ from f4pga.flows.stage import Stage
 
 
 def open_flow_cfg(path: str) -> dict:
-    with Path(path).open('r') as rfptr:
+    with Path(path).open("r") as rfptr:
         return json_load(rfptr)
 
-def _get_ovs_raw(
-    dict_name: str,
-    flow_cfg,
-    part: 'str | None',
-    stage: 'str | None'
-):
+
+def _get_ovs_raw(dict_name: str, flow_cfg, part: "str | None", stage: "str | None"):
     vals = flow_cfg.get(dict_name)
     if vals is None:
         vals = {}
@@ -50,8 +46,9 @@ def _get_ovs_raw(
 
     return vals
 
+
 def verify_platform_name(platform: str, mypath: str):
-    for plat_def_filename in os_listdir(str(Path(mypath) / 'platforms')):
+    for plat_def_filename in os_listdir(str(Path(mypath) / "platforms")):
         platform_name = str(Path(plat_def_filename).stem)
         if platform == platform_name:
             return True
@@ -59,17 +56,12 @@ def verify_platform_name(platform: str, mypath: str):
 
 
 def _is_kword(w: str):
-    kwords = {
-        'dependencies',
-        'values',
-        'default_platform',
-        'default_target'
-    }
+    kwords = {"dependencies", "values", "default_platform", "default_target"}
     return w in kwords
 
 
 class FlowDefinition:
-    stages: 'dict[str, Stage]' # stage name -> module path mapping
+    stages: "dict[str, Stage]"  # stage name -> module path mapping
     r_env: ResolutionEnv
 
     def __init__(self, flow_def: dict, r_env: ResolutionEnv):
@@ -77,17 +69,16 @@ class FlowDefinition:
         self.r_env = r_env
         self.stages = {}
 
-        global_vals = flow_def.get('values')
+        global_vals = flow_def.get("values")
         if global_vals is not None:
             self.r_env.add_values(global_vals)
 
-        stages_d = flow_def['stages']
-
-        for stage_name, stage_def in stages_d.items():
+        for stage_name, stage_def in flow_def["stages"].items():
             self.stages[stage_name] = Stage(stage_name, stage_def)
 
     def stage_names(self):
         return self.stages.keys()
+
 
 class ProjectFlowConfig:
     flow_cfg: dict
@@ -102,44 +93,40 @@ class ProjectFlowConfig:
             if not _is_kword(part):
                 yield part
 
-    def get_default_part(self) -> 'str | None':
-        return self.flow_cfg.get('default_part')
+    def get_default_part(self) -> "str | None":
+        return self.flow_cfg.get("default_part")
 
-    def get_default_target(self, part: str) -> 'str | None':
-        return self.flow_cfg[part].get('default_target')
+    def get_default_target(self, part: str) -> "str | None":
+        return self.flow_cfg[part].get("default_target")
 
-    def get_dependencies_raw(self, part: 'str | None' = None):
+    def get_dependencies_raw(self, part: "str | None" = None):
         """
         Get dependencies without value resolution applied.
         """
-        return _get_ovs_raw('dependencies', self.flow_cfg, part, None)
+        return _get_ovs_raw("dependencies", self.flow_cfg, part, None)
 
-    def get_values_raw(
-        self,
-        part: 'str | None' = None,
-        stage: 'str | None' = None
-    ):
+    def get_values_raw(self, part: "str | None" = None, stage: "str | None" = None):
         """
         Get values without value resolution applied.
         """
-        return _get_ovs_raw('values', self.flow_cfg, part, stage)
+        return _get_ovs_raw("values", self.flow_cfg, part, stage)
 
     def get_stage_value_overrides(self, part: str, stage: str):
         stage_vals_ovds = {}
 
-        vals = self.flow_cfg.get('values')
+        vals = self.flow_cfg.get("values")
         if vals is not None:
             stage_vals_ovds.update(vals)
         stage_cfg = self.flow_cfg[part].get(stage)
         if stage_cfg is not None:
-            vals = stage_cfg.get('values')
+            vals = stage_cfg.get("values")
             if vals is not None:
                 stage_vals_ovds.update(vals)
 
         return stage_vals_ovds
 
     def get_dependency_platform_overrides(self, part: str):
-        platform_ovds = self.flow_cfg[part].get('dependencies')
+        platform_ovds = self.flow_cfg[part].get("dependencies")
         if platform_ovds is None:
             return {}
         return platform_ovds
@@ -148,24 +135,21 @@ class ProjectFlowConfig:
 class FlowConfig:
     part: str
     r_env: ResolutionEnv
-    dependencies_explicit: 'dict[str, ]'
-    stages: 'dict[str, Stage]'
+    dependencies_explicit: "dict[str, ]"
+    stages: "dict[str, Stage]"
 
-    def __init__(self, project_config: ProjectFlowConfig,
-                 platform_def: FlowDefinition, part: str):
+    def __init__(self, project_config: ProjectFlowConfig, platform_def: FlowDefinition, part: str):
         self.r_env = platform_def.r_env
-        platform_vals = project_config.get_values_raw(part)
-        self.r_env.add_values(platform_vals)
+        self.r_env.add_values(project_config.get_values_raw(part))
         self.stages = platform_def.stages
         self.part = part
 
-        raw_project_deps = project_config.get_dependencies_raw(part)
-
-        self.dependencies_explicit = deep(lambda p: str(Path(p).resolve()))(self.r_env.resolve(raw_project_deps))
+        self.dependencies_explicit = deep(lambda p: str(Path(p).resolve()))(
+            self.r_env.resolve(project_config.get_dependencies_raw(part))
+        )
 
         for stage_name, stage in platform_def.stages.items():
-            project_val_ovds = \
-                project_config.get_stage_value_overrides(part, stage_name)
+            project_val_ovds = project_config.get_stage_value_overrides(part, stage_name)
             stage.value_overrides.update(project_val_ovds)
 
     def get_dependency_overrides(self):
@@ -181,6 +165,7 @@ class FlowConfig:
     def get_stage(self, stage_name: str) -> Stage:
         return self.stages[stage_name]
 
+
 class FlowConfigException(Exception):
     path: str
     message: str
@@ -190,11 +175,11 @@ class FlowConfigException(Exception):
         self.message = message
 
     def __str__(self) -> str:
-        return f'Error in config `{self.path}: {self.message}'
+        return f"Error in config `{self.path}: {self.message}"
 
 
 def open_project_flow_cfg(path: str) -> ProjectFlowConfig:
     cfg = ProjectFlowConfig(path)
-    with Path(path).open('r') as rfptr:
+    with Path(path).open("r") as rfptr:
         cfg.flow_cfg = json_load(rfptr)
     return cfg

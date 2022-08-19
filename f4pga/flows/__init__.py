@@ -46,10 +46,10 @@ from f4pga.flows.commands import cmd_build, cmd_show_dependencies, f4pga_done
 
 
 def platform_stages(platform_flow, r_env):
-    """ Iterates over all stages available in a given flow. """
+    """Iterates over all stages available in a given flow."""
 
-    stage_options = platform_flow.get('stage_options')
-    for stage_name, modulestr in platform_flow['stages'].items():
+    stage_options = platform_flow.get("stage_options")
+    for stage_name, modulestr in platform_flow["stages"].items():
         mod_opts = stage_options.get(stage_name) if stage_options else None
         yield Stage(stage_name, modulestr, mod_opts, r_env)
 
@@ -61,7 +61,7 @@ def get_stage_values_override(og_values: dict, stage: Stage):
 
 
 def prepare_stage_io_input(stage: Stage):
-    return { 'params': stage.params } if stage.params is not None else {}
+    return {"params": stage.params} if stage.params is not None else {}
 
 
 def main():
@@ -70,17 +70,17 @@ def main():
 
     set_verbosity_level(args.verbose - (1 if args.silent else 0))
 
-    if args.command == 'build':
+    if args.command == "build":
         cmd_build(args)
         f4pga_done()
 
-    if args.command == 'showd':
+    if args.command == "showd":
         cmd_show_dependencies(args)
         f4pga_done()
 
-    sfprint(0, 'Please use a command.\nUse `--help` flag to learn more.')
+    sfprint(0, "Please use a command.\nUse `--help` flag to learn more.")
     f4pga_done()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

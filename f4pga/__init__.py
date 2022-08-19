@@ -20,5 +20,5 @@
 from f4pga.flows import main
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

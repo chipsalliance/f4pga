@@ -24,11 +24,7 @@ Here are the things necessary to write an F4PGA Module.
 from types import SimpleNamespace
 from abc import abstractmethod
 
-from f4pga.flows.common import (
-    decompose_depname,
-    ResolutionEnv,
-    fatal
-)
+from f4pga.flows.common import decompose_depname, ResolutionEnv, fatal
 
 
 class Module:
@@ -41,10 +37,10 @@ class Module:
 
     no_of_phases: int
     name: str
-    takes: 'list[str]'
-    produces: 'list[str]'
-    values: 'list[str]'
-    prod_meta: 'dict[str, str]'
+    takes: "list[str]"
+    produces: "list[str]"
+    values: "list[str]"
+    prod_meta: "dict[str, str]"
 
     @abstractmethod
     def execute(self, ctx):
@@ -56,17 +52,17 @@ class Module:
         pass
 
     @abstractmethod
-    def map_io(self, ctx) -> 'dict[str, ]':
+    def map_io(self, ctx) -> "dict[str, ]":
         """
         Returns paths for outputs derived from given inputs.
         `ctx` is `ModuleContext`.
         """
         pass
 
-    def __init__(self, params: 'dict[str, ]'):
+    def __init__(self, params: "dict[str, ]"):
         self.no_of_phases = 0
         self.current_phase = 0
-        self.name = '<BASE STAGE>'
+        self.name = "<BASE STAGE>"
         self.prod_meta = {}
 
 
@@ -76,16 +72,16 @@ class ModuleContext:
     execution.
     """
 
-    share: str                 #  Absolute path to F4PGA's share directory
-    bin: str                   #  Absolute path to F4PGA's bin directory
-    takes: SimpleNamespace     #  Maps symbolic dependency names to relative paths.
+    share: str  #  Absolute path to F4PGA's share directory
+    bin: str  #  Absolute path to F4PGA's bin directory
+    takes: SimpleNamespace  #  Maps symbolic dependency names to relative paths.
     produces: SimpleNamespace  #  Contains mappings for explicitely specified dependencies.
-                               #  Useful mostly for checking for on-demand optional outputs (such as logs) with
-                               #    `is_output_explicit` method.
-    outputs: SimpleNamespace   #  Contains mappings for all available outputs.
-    values: SimpleNamespace    #  Contains all available requested values.
-    r_env: ResolutionEnv       # `ResolutionEnvironmet` object holding mappings for current scope.
-    module_name: str           # Name of the module.
+    #  Useful mostly for checking for on-demand optional outputs (such as logs) with
+    #    `is_output_explicit` method.
+    outputs: SimpleNamespace  #  Contains mappings for all available outputs.
+    values: SimpleNamespace  #  Contains all available requested values.
+    r_env: ResolutionEnv  # `ResolutionEnvironmet` object holding mappings for current scope.
+    module_name: str  # Name of the module.
 
     def is_output_explicit(self, name: str):
         """
@@ -93,26 +89,19 @@ class ModuleContext:
         """
         return getattr(self.produces, name) is not None
 
-    def _getreqmaybe(self, obj, deps: 'list[str]', deps_cfg: 'dict[str, ]'):
+    def _getreqmaybe(self, obj, deps: "list[str]", deps_cfg: "dict[str, ]"):
         """
         Add attribute for a dependency or panic if a required dependency has not been given to the module on its input.
         """
         for name in deps:
             name, spec = decompose_depname(name)
             value = deps_cfg.get(name)
-            if value is None and spec == 'req':
-                fatal(-1, f'Dependency `{name}` is required by module `{self.module_name}` but wasn\'t provided')
+            if value is None and spec == "req":
+                fatal(-1, f"Dependency `{name}` is required by module `{self.module_name}` but wasn't provided")
             setattr(obj, name, self.r_env.resolve(value))
 
     # `config` should be a dictionary given as modules input.
-    def __init__(
-        self,
-        module: Module,
-        config: 'dict[str, ]',
-        r_env: ResolutionEnv,
-        share: str,
-        bin: str
-    ):
+    def __init__(self, module: Module, config: "dict[str, ]", r_env: ResolutionEnv, share: str, bin: str):
         self.module_name = module.name
         self.takes = SimpleNamespace()
         self.produces = SimpleNamespace()
@@ -122,10 +111,10 @@ class ModuleContext:
         self.share = share
         self.bin = bin
 
-        self._getreqmaybe(self.takes, module.takes, config['takes'])
-        self._getreqmaybe(self.values, module.values, config['values'])
+        self._getreqmaybe(self.takes, module.takes, config["takes"])
+        self._getreqmaybe(self.values, module.values, config["values"])
 
-        produces_resolved = self.r_env.resolve(config['produces'])
+        produces_resolved = self.r_env.resolve(config["produces"])
         for name, value in produces_resolved.items():
             setattr(self.produces, name, value)
 
@@ -165,12 +154,12 @@ def get_mod_metadata(module: Module):
     Get descriptions for produced dependencies.
     """
     meta = {}
-    has_meta = hasattr(module, 'prod_meta')
+    has_meta = hasattr(module, "prod_meta")
     for prod in module.produces:
-        prod = prod.replace('?', '').replace('!', '')
+        prod = prod.replace("?", "").replace("!", "")
         if not has_meta:
-            meta[prod] = '<no descritption>'
+            meta[prod] = "<no descritption>"
             continue
         prod_meta = module.prod_meta.get(prod)
-        meta[prod] = prod_meta if prod_meta else '<no description>'
+        meta[prod] = prod_meta if prod_meta else "<no description>"
     return meta

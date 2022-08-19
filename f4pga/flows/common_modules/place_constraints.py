@@ -25,43 +25,41 @@ from f4pga.flows.module import Module, ModuleContext
 
 class PlaceConstraintsModule(Module):
     def map_io(self, ctx: ModuleContext):
-        return {
-            'place_constraints': f'{Path(ctx.takes.net).stem!s}.preplace'
-        }
+        return {"place_constraints": f"{Path(ctx.takes.net).stem!s}.preplace"}
 
     def execute(self, ctx: ModuleContext):
-        yield 'Saving place constraint data...'
-        with Path(ctx.outputs.place_constraints).open('wb') as wfptr:
+        yield "Saving place constraint data..."
+        with Path(ctx.outputs.place_constraints).open("wb") as wfptr:
             wfptr.write(
-                common_sub(*(
-                    [
-                        'python3', ctx.values.script,
-                        '--net', ctx.takes.net,
-                        '--arch', str(Path(ctx.share) / 'arch' / ctx.values.device / 'arch.timing.xml'),
-                        '--blif', ctx.takes.eblif,
-                        '--input', ctx.takes.io_place,
-                        '--db_root', common_sub('prjxray-config').decode().replace('\n', ''),
-                        '--part', ctx.values.part_name
-                    ] + (
-                        options_dict_to_list(ctx.values.extra_opts) if ctx.values.extra_opts else []
+                common_sub(
+                    *(
+                        [
+                            "python3",
+                            ctx.values.script,
+                            "--net",
+                            ctx.takes.net,
+                            "--arch",
+                            str(Path(ctx.share) / "arch" / ctx.values.device / "arch.timing.xml"),
+                            "--blif",
+                            ctx.takes.eblif,
+                            "--input",
+                            ctx.takes.io_place,
+                            "--db_root",
+                            common_sub("prjxray-config").decode().replace("\n", ""),
+                            "--part",
+                            ctx.values.part_name,
+                        ]
+                        + (options_dict_to_list(ctx.values.extra_opts) if ctx.values.extra_opts else [])
                     )
-                ))
+                )
             )
 
     def __init__(self, _):
-        self.name = 'place_constraints'
+        self.name = "place_constraints"
         self.no_of_phases = 2
-        self.takes = [
-            'eblif',
-            'net',
-            'io_place'
-        ]
-        self.produces = [ 'place_constraints' ]
-        self.values = [
-            'device',
-            'part_name',
-            'script',
-            'extra_opts?'
-        ]
+        self.takes = ["eblif", "net", "io_place"]
+        self.produces = ["place_constraints"]
+        self.values = ["device", "part_name", "script", "extra_opts?"]
+
 
 ModuleClass = PlaceConstraintsModule

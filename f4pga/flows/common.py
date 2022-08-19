@@ -33,35 +33,35 @@ share_dir_path = str(F4PGA_SHARE_DIR)
 
 
 class F4PGAException(Exception):
-    def __init__(self, message = 'unknown exception'):
+    def __init__(self, message="unknown exception"):
         self.message = message
 
     def __repr__(self):
-        return f'F4PGAException(message = \'{self.message}\')'
+        return f"F4PGAException(message = '{self.message}')"
 
     def __str__(self):
         return self.message
 
 
 def decompose_depname(name: str):
-    spec = 'req'
+    spec = "req"
     specchar = name[len(name) - 1]
-    if specchar == '?':
-        spec = 'maybe'
-    elif specchar == '!':
-        spec = 'demand'
-    if spec != 'req':
-        name = name[:len(name) - 1]
+    if specchar == "?":
+        spec = "maybe"
+    elif specchar == "!":
+        spec = "demand"
+    if spec != "req":
+        name = name[: len(name) - 1]
     return name, spec
 
 
 def with_qualifier(name: str, q: str) -> str:
-    if q == 'req':
+    if q == "req":
         return decompose_depname(name)[0]
-    if q == 'maybe':
-        return decompose_depname(name)[0] + '?'
-    if q == 'demand':
-        return decompose_depname(name)[0] + '!'
+    if q == "maybe":
+        return decompose_depname(name)[0] + "?"
+    if q == "demand":
+        return decompose_depname(name)[0] + "!"
 
 
 _sfbuild_module_collection_name_to_path = {}
@@ -71,8 +71,8 @@ def scan_modules(mypath: str):
     global _sfbuild_module_collection_name_to_path
     sfbuild_home = mypath
     _sfbuild_module_collection_name_to_path = {
-        re_match('(.*)_modules$', moddir).groups()[0]: str(Path(sfbuild_home) / moddir)
-        for moddir in [dir for dir in os_listdir(sfbuild_home) if re_match('.*_modules$', dir)]
+        re_match("(.*)_modules$", moddir).groups()[0]: str(Path(sfbuild_home) / moddir)
+        for moddir in [dir for dir in os_listdir(sfbuild_home) if re_match(".*_modules$", dir)]
     }
 
 
@@ -80,17 +80,17 @@ def resolve_modstr(modstr: str):
     """
     Resolves module location from modulestr.
     """
-    sl = modstr.split(':')
+    sl = modstr.split(":")
     if len(sl) > 2:
-        raise Exception('Incorrect module sysntax. Expected one \':\' or one \'::\'')
+        raise Exception("Incorrect module sysntax. Expected one ':' or one '::'")
     if len(sl) < 2:
         return modstr
     collection_name = sl[0]
-    module_filename = sl[1] + '.py'
+    module_filename = sl[1] + ".py"
 
     col_path = _sfbuild_module_collection_name_to_path.get(collection_name)
     if not col_path:
-        fatal(-1, f'Module collection {collection_name} does not exist')
+        fatal(-1, f"Module collection {collection_name} does not exist")
     return str(Path(col_path) / module_filename)
 
 
@@ -98,18 +98,20 @@ def deep(fun, allow_none=False):
     """
     Create a recursive string transform function for 'str | list | dict', i.e a dependency.
     """
+
     def d(paths, *args, **kwargs):
         nonlocal allow_none
         if type(paths) is str:
             return fun(paths, *args, **kwargs)
         elif type(paths) is list:
-            return [d(p, *args, **kwargs) for p in paths];
+            return [d(p, *args, **kwargs) for p in paths]
         elif type(paths) is dict:
             return dict([(k, d(p, *args, **kwargs)) for k, p in paths.items()])
         elif allow_none and (paths is None):
             return paths
         else:
-            raise RuntimeError(f'paths is of type {type(paths)}')
+            raise RuntimeError(f"paths is of type {type(paths)}")
+
     return d
 
 
@@ -127,10 +129,10 @@ class VprArgs:
     eblif: str
     optional: list
 
-    def __init__(self, share: str, eblif, values: Namespace,
-                 sdc_file: 'str | None' = None,
-                 vpr_extra_opts: 'list | None' = None):
-        self.arch_dir = str(Path(share) / 'arch')
+    def __init__(
+        self, share: str, eblif, values: Namespace, sdc_file: "str | None" = None, vpr_extra_opts: "list | None" = None
+    ):
+        self.arch_dir = str(Path(share) / "arch")
         self.arch_def = values.arch_def
         self.lookahead = values.rr_graph_lookahead_bin
         self.rr_graph = values.rr_graph_real_bin
@@ -144,7 +146,7 @@ class VprArgs:
         if vpr_extra_opts is not None:
             self.optional += vpr_extra_opts
         if sdc_file is not None:
-            self.optional += ['--sdc_file', sdc_file]
+            self.optional += ["--sdc_file", sdc_file]
 
 
 class SubprocessException(Exception):
@@ -158,9 +160,7 @@ def sub(*args, env=None, cwd=None):
 
     out = run(args, capture_output=True, env=env, cwd=cwd)
     if out.returncode != 0:
-        print(f'[ERROR]: {args[0]} non-zero return code.\n'
-              f'stderr:\n{out.stderr.decode()}\n\n'
-              )
+        print(f"[ERROR]: {args[0]} non-zero return code.\n" f"stderr:\n{out.stderr.decode()}\n\n")
         exit(out.returncode)
     return out.stdout
 
@@ -171,34 +171,44 @@ def vpr(mode: str, vprargs: VprArgs, cwd=None):
     """
 
     modeargs = []
-    if mode == 'pack':
-        modeargs = ['--pack']
-    elif mode == 'place':
-        modeargs = ['--place']
-    elif mode == 'route':
-        modeargs = ['--route']
-    elif mode == 'analysis':
-        modeargs = ['--analysis']
+    if mode == "pack":
+        modeargs = ["--pack"]
+    elif mode == "place":
+        modeargs = ["--place"]
+    elif mode == "route":
+        modeargs = ["--route"]
+    elif mode == "analysis":
+        modeargs = ["--analysis"]
 
-    return sub(*([
-        'vpr',
-        vprargs.arch_def,
-        vprargs.eblif,
-        '--device', vprargs.device_name,
-        '--read_rr_graph', vprargs.rr_graph,
-        '--read_router_lookahead', vprargs.lookahead,
-        '--read_placement_delay_lookup', vprargs.place_delay
-    ] + modeargs + vprargs.optional), cwd=str(cwd))
-
+    return sub(
+        *(
+            [
+                "vpr",
+                vprargs.arch_def,
+                vprargs.eblif,
+                "--device",
+                vprargs.device_name,
+                "--read_rr_graph",
+                vprargs.rr_graph,
+                "--read_router_lookahead",
+                vprargs.lookahead,
+                "--read_placement_delay_lookup",
+                vprargs.place_delay,
+            ]
+            + modeargs
+            + vprargs.optional
+        ),
+        cwd=cwd,
+    )
 
 
 _vpr_specific_values = [
-    'arch_def',
-    'rr_graph_lookahead_bin',
-    'rr_graph_real_bin',
-    'vpr_place_delay',
-    'vpr_grid_layout_name',
-    'vpr_options?'
+    "arch_def",
+    "rr_graph_lookahead_bin",
+    "rr_graph_real_bin",
+    "vpr_place_delay",
+    "vpr_grid_layout_name",
+    "vpr_options?",
 ]
 
 
@@ -215,8 +225,8 @@ def options_dict_to_list(opt_dict: dict):
 
     opts = []
     for key, val in opt_dict.items():
-        opts.append(f'--{key}')
-        if not(type(val) is list and val == []):
+        opts.append(f"--{key}")
+        if not (type(val) is list and val == []):
             opts.append(str(val))
     return opts
 
@@ -225,7 +235,7 @@ def noisy_warnings(device):
     """
     Emit some noisy warnings.
     """
-    environ['OUR_NOISY_WARNINGS'] = f'noisy_warnings-{device}_pack.log'
+    environ["OUR_NOISY_WARNINGS"] = f"noisy_warnings-{device}_pack.log"
 
 
 def my_path():
@@ -235,18 +245,18 @@ def my_path():
     return str(Path(sys_argv[0]).resolve().parent)
 
 
-def save_vpr_log(filename, build_dir=''):
+def save_vpr_log(filename, build_dir=""):
     """
     Save VPR logic (moves the default output file into a desired path).
     """
-    sh_mv(str(Path(build_dir) / 'vpr_stdout.log'), filename)
+    sh_mv(str(Path(build_dir) / "vpr_stdout.log"), filename)
 
 
 def fatal(code, message):
     """
     Print a message informing about an error that has occured and terminate program with a given return code.
     """
-    raise(Exception(f'[FATAL ERROR]: {message}'))
+    raise (Exception(f"[FATAL ERROR]: {message}"))
     exit(code)
 
 
@@ -276,23 +286,23 @@ class ResolutionEnv:
         """
 
         if type(s) is str:
-            match_list = list(re_finditer('\$\{([^${}]*)\}', s))
+            match_list = list(re_finditer("\$\{([^${}]*)\}", s))
             # Assumption: re_finditer finds matches in a left-to-right order
             match_list.reverse()
             for match in match_list:
                 match_str = match.group(1)
-                match_str = match_str.replace('?', '')
+                match_str = match_str.replace("?", "")
                 v = self.values.get(match_str)
                 if not v:
                     if final:
-                        v = ''
+                        v = ""
                     else:
                         continue
                 span = match.span()
                 if type(v) is str:
-                    s = s[:span[0]] + v + s[span[1]:]
-                elif type(v) is list: # Assume it's a list of strings
-                    ns = list([s[:span[0]] + ve + s[span[1]:] for ve in v])
+                    s = s[: span[0]] + v + s[span[1] :]
+                elif type(v) is list:  # Assume it's a list of strings
+                    ns = list([s[: span[0]] + ve + s[span[1] :] for ve in v])
                     s = ns
 
         elif type(s) is list:

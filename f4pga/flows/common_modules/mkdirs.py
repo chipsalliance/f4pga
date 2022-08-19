@@ -31,7 +31,7 @@ from f4pga.flows.module import Module, ModuleContext
 
 
 class MkDirsModule(Module):
-    deps_to_produce: 'dict[str, str]'
+    deps_to_produce: "dict[str, str]"
 
     def map_io(self, ctx: ModuleContext):
         return ctx.r_env.resolve(self.deps_to_produce)
@@ -39,11 +39,11 @@ class MkDirsModule(Module):
     def execute(self, ctx: ModuleContext):
         outputs = vars(ctx.outputs)
         for _, path in outputs.items():
-            yield f'Creating directory {path}...'
+            yield f"Creating directory {path}..."
             Path(path).mkdir(parents=True, exist_ok=True)
 
     def __init__(self, params):
-        self.name = 'mkdirs'
+        self.name = "mkdirs"
         self.no_of_phases = len(params) if params else 0
         self.takes = []
         self.produces = list(params.keys()) if params else []

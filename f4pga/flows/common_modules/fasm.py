@@ -24,12 +24,9 @@ from f4pga.flows.module import Module, ModuleContext
 
 
 class FasmModule(Module):
-
     def map_io(self, ctx: ModuleContext):
         build_dir = str(Path(ctx.takes.eblif).parent)
-        return {
-            'fasm': f'{(Path(build_dir)/ctx.values.top)!s}.fasm'
-        }
+        return {"fasm": f"{(Path(build_dir)/ctx.values.top)!s}.fasm"}
 
     def execute(self, ctx: ModuleContext):
         build_dir = str(Path(ctx.takes.eblif).parent)
@@ -38,59 +35,45 @@ class FasmModule(Module):
 
         optional = []
         if ctx.values.pnr_corner is not None:
-            optional += ['--pnr_corner', ctx.values.pnr_corner]
+            optional += ["--pnr_corner", ctx.values.pnr_corner]
         if ctx.takes.sdc:
-            optional += ['--sdc', ctx.takes.sdc]
+            optional += ["--sdc", ctx.takes.sdc]
 
         s = [
-            'genfasm',
+            "genfasm",
             vprargs.arch_def,
             str(Path(ctx.takes.eblif).resolve()),
-            '--device',
+            "--device",
             vprargs.device_name,
-            '--read_rr_graph',
-            vprargs.rr_graph
+            "--read_rr_graph",
+            vprargs.rr_graph,
         ] + vprargs.optional
 
         if get_verbosity_level() >= 2:
-            yield 'Generating FASM...\n           ' + ' '.join(s)
+            yield "Generating FASM...\n           " + " ".join(s)
         else:
-            yield 'Generating FASM...'
+            yield "Generating FASM..."
 
         common_sub(*s, cwd=build_dir)
 
-        default_fasm_output_name = Path(build_dir)/ f'{ctx.values.top}.fasm'
+        default_fasm_output_name = Path(build_dir) / f"{ctx.values.top}.fasm"
         if str(default_fasm_output_name) != ctx.outputs.fasm:
             default_fasm_output_name.rename(ctx.outputs.fasm)
 
         if ctx.takes.fasm_extra:
-            yield 'Appending extra FASM...'
-            with \
-                    open(ctx.outputs.fasm, 'a') as fasm_file, \
-                    open(ctx.takes.fasm_extra, 'r') as fasm_extra_file:
+            yield "Appending extra FASM..."
+            with open(ctx.outputs.fasm, "a") as fasm_file, open(ctx.takes.fasm_extra, "r") as fasm_extra_file:
                 fasm_file.write(f"\n{fasm_extra_file.read()}")
         else:
-            yield 'No extra FASM to append'
+            yield "No extra FASM to append"
 
     def __init__(self, _):
-        self.name = 'fasm'
+        self.name = "fasm"
         self.no_of_phases = 2
-        self.takes = [
-            'eblif',
-            'net',
-            'place',
-            'route',
-            'fasm_extra?',
-            'sdc?'
-        ]
-        self.produces = [ 'fasm' ]
-        self.values = [
-            'device',
-            'top',
-            'pnr_corner?'
-        ] + vpr_specific_values()
-        self.prod_meta = {
-            'fasm': 'FPGA assembly file'
-        }
+        self.takes = ["eblif", "net", "place", "route", "fasm_extra?", "sdc?"]
+        self.produces = ["fasm"]
+        self.values = ["device", "top", "pnr_corner?"] + vpr_specific_values()
+        self.prod_meta = {"fasm": "FPGA assembly file"}
+
 
 ModuleClass = FasmModule

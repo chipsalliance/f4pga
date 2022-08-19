@@ -66,22 +66,21 @@ from f4pga.flows.module import Module, ModuleContext
 def _get_param(params, name: str):
     param = params.get(name)
     if not param:
-        raise Exception(f'generic module wrapper parameters '
-                        f'missing `{name}` field')
+        raise Exception(f"generic module wrapper parameters " f"missing `{name}` field")
     return param
 
 
 def _parse_param_def(param_def: str):
-    if param_def[0] == '#':
-        return 'positional', int(param_def[1:])
-    elif param_def[0] == '$':
-        return 'environmental', param_def[1:]
-    return 'named', param_def
+    if param_def[0] == "#":
+        return "positional", int(param_def[1:])
+    elif param_def[0] == "$":
+        return "environmental", param_def[1:]
+    return "named", param_def
 
 
 class InputReferences:
-    dependencies: 'set[str]'
-    values: 'set[str]'
+    dependencies: "set[str]"
+    values: "set[str]"
 
     def merge(self, other):
         self.dependencies.update(other.dependencies)
@@ -96,20 +95,21 @@ def _get_input_references(input: str) -> InputReferences:
     refs = InputReferences()
     if type(input) is not str:
         return refs
-    for match in re_finditer('\$\{([^${}]*)\}', input):
+    for match in re_finditer("\$\{([^${}]*)\}", input):
         match_str = match.group(1)
-        if match_str[0] != ':':
+        if match_str[0] != ":":
             refs.values.add(match_str)
             continue
         if len(match_str) < 2:
-            raise Exception('Dependency name must be at least 1 character long')
-        refs.dependencies.add(re_match('([^\\[\\]]*)', match_str[1:]).group(1))
+            raise Exception("Dependency name must be at least 1 character long")
+        refs.dependencies.add(re_match("([^\\[\\]]*)", match_str[1:]).group(1))
     return refs
 
 
 def _make_noop1():
     def noop(_):
         return
+
     return noop
 
 
@@ -117,22 +117,23 @@ def _tailcall1(self, fun):
     def newself(arg, self=self, fun=fun):
         fun(arg)
         self(arg)
+
     return newself
 
 
 class GenericScriptWrapperModule(Module):
     script_path: str
-    stdout_target: 'None | tuple[str, str]'
-    file_outputs: 'list[tuple[str, str, str]]'
-    interpreter: 'None | str'
-    cwd: 'None | str'
+    stdout_target: "None | tuple[str, str]"
+    file_outputs: "list[tuple[str, str, str]]"
+    interpreter: "None | str"
+    cwd: "None | str"
 
     @staticmethod
     def _add_extra_values_to_env(ctx: ModuleContext):
         for take_name, take_path in vars(ctx.takes).items():
             if take_path is not None:
-                ctx.r_env.values[f':{take_name}[noext]'] = deep(lambda p: str(Path(p).with_suffix('')))(take_path)
-                ctx.r_env.values[f':{take_name}[dir]'] = deep(lambda p: str(Path(p).parent.resolve()))(take_path)
+                ctx.r_env.values[f":{take_name}[noext]"] = deep(lambda p: str(Path(p).with_suffix("")))(take_path)
+                ctx.r_env.values[f":{take_name}[dir]"] = deep(lambda p: str(Path(p).parent.resolve()))(take_path)
 
     def map_io(self, ctx: ModuleContext):
         self._add_extra_values_to_env(ctx)
@@ -143,8 +144,7 @@ class GenericScriptWrapperModule(Module):
             outputs[dep] = out_path_resolved
 
         if self.stdout_target:
-            out_path_resolved = \
-                ctx.r_env.resolve(self.stdout_target[1], final=True)
+            out_path_resolved = ctx.r_env.resolve(self.stdout_target[1], final=True)
             outputs[self.stdout_target[0]] = out_path_resolved
 
         return outputs
@@ -154,8 +154,7 @@ class GenericScriptWrapperModule(Module):
 
         cwd = ctx.r_env.resolve(self.cwd)
 
-        sub_args = [ctx.r_env.resolve(self.script_path, final=True)] \
-            + self.get_args(ctx)
+        sub_args = [ctx.r_env.resolve(self.script_path, final=True)] + self.get_args(ctx)
         if self.interpreter:
             sub_args = [ctx.r_env.resolve(self.interpreter, final=True)] + sub_args
 
@@ -163,19 +162,19 @@ class GenericScriptWrapperModule(Module):
 
         # XXX: This may produce incorrect string if arguments contains whitespace
         #      characters
-        cmd = ' '.join(sub_args)
+        cmd = " ".join(sub_args)
 
         if get_verbosity_level() >= 2:
-            yield f'Running script...\n           {cmd}'
+            yield f"Running script...\n           {cmd}"
         else:
-            yield f'Running an externel script...'
+            yield f"Running an externel script..."
 
         data = sub(*sub_args, cwd=cwd, env=sub_env)
 
-        yield 'Writing outputs...'
+        yield "Writing outputs..."
         if self.stdout_target:
             target = ctx.r_env.resolve(self.stdout_target[1], final=True)
-            with open(target, 'wb') as f:
+            with open(target, "wb") as f:
                 f.write(data)
 
         for _, file, target in self.file_outputs:
@@ -184,33 +183,33 @@ class GenericScriptWrapperModule(Module):
             if target != file:
                 Path(file).rename(target)
 
-    def _init_outputs(self, output_defs: 'dict[str, dict[str, str]]'):
+    def _init_outputs(self, output_defs: "dict[str, dict[str, str]]"):
         self.stdout_target = None
         self.file_outputs = []
 
         for dep_name, output_def in output_defs.items():
             dname, _ = decompose_depname(dep_name)
             self.produces.append(dep_name)
-            meta = output_def.get('meta')
+            meta = output_def.get("meta")
             if meta is str:
                 self.prod_meta[dname] = meta
 
-            mode = output_def.get('mode')
+            mode = output_def.get("mode")
             if type(mode) is not str:
-                raise Exception(f'Output mode for `{dep_name}` is not specified')
+                raise Exception(f"Output mode for `{dep_name}` is not specified")
 
-            target = output_def.get('target')
+            target = output_def.get("target")
             if type(target) is not str:
-                raise Exception('`target` field is not specified')
+                raise Exception("`target` field is not specified")
 
-            if mode == 'file':
-                file = output_def.get('file')
+            if mode == "file":
+                file = output_def.get("file")
                 if type(file) is not str:
-                    raise Exception('Output file is not specified')
+                    raise Exception("Output file is not specified")
                 self.file_outputs.append((dname, file, target))
-            elif mode == 'stdout':
+            elif mode == "stdout":
                 if self.stdout_target is not None:
-                    raise Exception('stdout output is already specified')
+                    raise Exception("stdout output is already specified")
                 self.stdout_target = dname, target
 
     # A very functional approach
@@ -228,39 +227,49 @@ class GenericScriptWrapperModule(Module):
 
             push = None
             push_env = None
-            if param_kind == 'named':
-                def push_named(val: 'str | bool | int', param=param):
+            if param_kind == "named":
+
+                def push_named(val: "str | bool | int", param=param):
                     nonlocal named_args
                     if type(val) is bool:
-                        named_args.append(f'--{param}')
+                        named_args.append(f"--{param}")
                     else:
-                        named_args += [f'--{param}', str(val)]
+                        named_args += [f"--{param}", str(val)]
+
                 push = push_named
-            elif param_kind == 'environmental':
-                def push_environ(val: 'str | bool | int', param=param):
+            elif param_kind == "environmental":
+
+                def push_environ(val: "str | bool | int", param=param):
                     nonlocal env_vars
                     env_vars[param] = val
+
                 push_env = push_environ
             else:
+
                 def push_positional(val: str, param=param):
                     nonlocal positional_args
                     positional_args.append((param, val))
+
                 push = push_positional
 
             input_refs = _get_input_references(input)
             refs.merge(input_refs)
 
             if push is not None:
+
                 def push_q(ctx: ModuleContext, push=push, input=input):
                     val = ctx.r_env.resolve(input, final=True)
-                    if val != '':
+                    if val != "":
                         push(val)
+
                 get_args = _tailcall1(get_args, push_q)
             else:
+
                 def push_q(ctx: ModuleContext, push_env=push_env, input=input):
                     val = ctx.r_env.resolve(input, final=True)
-                    if val != '':
+                    if val != "":
                         push_env(val)
+
                 get_env = _tailcall1(get_env, push_q)
 
         def get_all_args(ctx: ModuleContext):
@@ -269,7 +278,7 @@ class GenericScriptWrapperModule(Module):
             get_args(ctx)
 
             positional_args.sort(key=lambda t: t[0])
-            pos =  [ a for _, a in positional_args]
+            pos = [a for _, a in positional_args]
 
             return named_args + pos
 
@@ -280,8 +289,8 @@ class GenericScriptWrapperModule(Module):
                 return None
             return env_vars
 
-        setattr(self, 'get_args', get_all_args)
-        setattr(self, 'get_env', get_all_env)
+        setattr(self, "get_args", get_all_args)
+        setattr(self, "get_env", get_all_env)
 
         for dep in refs.dependencies:
             self.takes.append(dep)
@@ -289,18 +298,19 @@ class GenericScriptWrapperModule(Module):
             self.values.append(val)
 
     def __init__(self, params):
-        stage_name = params.get('stage_name')
+        stage_name = params.get("stage_name")
         self.name = f"{'<unknown>' if stage_name is None else stage_name}-generic"
         self.no_of_phases = 2
-        self.script_path = params.get('script')
-        self.interpreter = params.get('interpreter')
-        self.cwd = params.get('cwd')
+        self.script_path = params.get("script")
+        self.interpreter = params.get("interpreter")
+        self.cwd = params.get("cwd")
         self.takes = []
         self.produces = []
         self.values = []
         self.prod_meta = {}
 
-        self._init_outputs(_get_param(params, 'outputs'))
-        self._init_inputs(_get_param(params, 'inputs'))
+        self._init_outputs(_get_param(params, "outputs"))
+        self._init_inputs(_get_param(params, "inputs"))
+
 
 ModuleClass = GenericScriptWrapperModule

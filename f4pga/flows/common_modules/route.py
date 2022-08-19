@@ -24,50 +24,33 @@ from f4pga.flows.module import Module, ModuleContext
 
 
 def route_place_file(ctx: ModuleContext):
-    return Path(ctx.takes.eblif).with_suffix('.route')
+    return Path(ctx.takes.eblif).with_suffix(".route")
 
 
 class RouteModule(Module):
     def map_io(self, ctx: ModuleContext):
-        return {
-            'route': str(route_place_file(ctx))
-        }
+        return {"route": str(route_place_file(ctx))}
 
     def execute(self, ctx: ModuleContext):
         build_dir = Path(ctx.takes.eblif).parent
 
         vpr_options = options_dict_to_list(ctx.values.vpr_options) if ctx.values.vpr_options else []
 
-        yield 'Routing with VPR...'
-        common_vpr(
-            'route',
-            VprArgs(
-                ctx.share,
-                ctx.takes.eblif,
-                ctx.values,
-                sdc_file=ctx.takes.sdc
-            ),
-            cwd=build_dir
-        )
+        yield "Routing with VPR..."
+        common_vpr("route", VprArgs(ctx.share, ctx.takes.eblif, ctx.values, sdc_file=ctx.takes.sdc), cwd=build_dir)
 
-        if ctx.is_output_explicit('route'):
+        if ctx.is_output_explicit("route"):
             route_place_file(ctx).rename(ctx.outputs.route)
 
-        yield 'Saving log...'
-        save_vpr_log('route.log', build_dir=build_dir)
+        yield "Saving log..."
+        save_vpr_log("route.log", build_dir=build_dir)
 
     def __init__(self, _):
-        self.name = 'route'
+        self.name = "route"
         self.no_of_phases = 2
-        self.takes = [
-            'eblif',
-            'place',
-            'sdc?'
-        ]
-        self.produces = [ 'route' ]
-        self.values = [
-            'device',
-            'vpr_options?'
-        ] + vpr_specific_values()
+        self.takes = ["eblif", "place", "sdc?"]
+        self.produces = ["route"]
+        self.values = ["device", "vpr_options?"] + vpr_specific_values()
+
 
 ModuleClass = RouteModule

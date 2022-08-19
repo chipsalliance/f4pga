@@ -23,5 +23,5 @@ from sys import argv as sys_argv
 from f4pga.wrappers.tcl import get_script_path
 
 
-if __name__ == '__main__':
-    print(get_script_path(sys_argv[1], sys_argv[2]) if len(sys_argv)>2 else get_script_path(sys_argv[1]))
+if __name__ == "__main__":
+    print(get_script_path(sys_argv[1], sys_argv[2]) if len(sys_argv) > 2 else get_script_path(sys_argv[1]))

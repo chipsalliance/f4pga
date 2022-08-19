@@ -19,5 +19,5 @@
 
 from f4pga.wrappers.sh import generate_constraints
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     generate_constraints()
