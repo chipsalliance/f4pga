@@ -25,6 +25,13 @@ from shutil import move as sh_mv
 from subprocess import run
 from re import match as re_match, finditer as re_finditer
 
+from f4pga.context import FPGA_FAM, F4PGA_SHARE_DIR
+
+
+bin_dir_path = str(Path(sys_argv[0]).resolve().parent.parent)
+share_dir_path = str(F4PGA_SHARE_DIR)
+
+
 class F4PGAException(Exception):
     def __init__(self, message = 'unknown exception'):
         self.message = message
@@ -62,18 +69,11 @@ _sfbuild_module_collection_name_to_path = {}
 
 def scan_modules(mypath: str):
     global _sfbuild_module_collection_name_to_path
-
     sfbuild_home = mypath
-    sfbuild_home_dirs = os_listdir(sfbuild_home)
-    sfbuild_module_dirs = \
-        [dir for dir in sfbuild_home_dirs if re_match('.*_modules$', dir)]
-    _sfbuild_module_collection_name_to_path = dict([
-            (
-                re_match('(.*)_modules$', moddir).groups()[0],
-                str(Path(sfbuild_home) / moddir)
-            )
-            for moddir in sfbuild_module_dirs
-        ])
+    _sfbuild_module_collection_name_to_path = {
+        re_match('(.*)_modules$', moddir).groups()[0]: str(Path(sfbuild_home) / moddir)
+        for moddir in [dir for dir in os_listdir(sfbuild_home) if re_match('.*_modules$', dir)]
+    }
 
 
 def resolve_modstr(modstr: str):
@@ -215,7 +215,7 @@ def options_dict_to_list(opt_dict: dict):
 
     opts = []
     for key, val in opt_dict.items():
-        opts.append('--' + key)
+        opts.append(f'--{key}')
         if not(type(val) is list and val == []):
             opts.append(str(val))
     return opts

@@ -40,8 +40,8 @@ Accepted module parameters:
 
 """
 
-from f4pga.module import Module, ModuleContext
-from f4pga.module_runner import get_module
+from f4pga.flows.module import Module, ModuleContext
+from f4pga.flows.runner import get_module
 
 
 def _switch_keys(d: 'dict[str, ]', renames: 'dict[str, str]') -> 'dict[str, ]':

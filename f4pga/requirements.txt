@@ -1,2 +1,1 @@
-colorama
-pyyaml
+-r ./flows/requirements.txt
