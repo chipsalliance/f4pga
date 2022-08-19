@@ -23,13 +23,13 @@ from f4pga.flows.common import vpr_specific_values, vpr as common_vpr, VprArgs, 
 from f4pga.flows.module import Module, ModuleContext
 
 
-def route_place_file(ctx: ModuleContext):
+def p_route_place_file(ctx: ModuleContext):
     return Path(ctx.takes.eblif).with_suffix(".route")
 
 
 class RouteModule(Module):
     def map_io(self, ctx: ModuleContext):
-        return {"route": str(route_place_file(ctx))}
+        return {"route": str(p_route_place_file(ctx))}
 
     def execute(self, ctx: ModuleContext):
         build_dir = Path(ctx.takes.eblif).parent
@@ -52,7 +52,7 @@ class RouteModule(Module):
         )
 
         if ctx.is_output_explicit("route"):
-            route_place_file(ctx).rename(ctx.outputs.route)
+            p_route_place_file(ctx).rename(ctx.outputs.route)
 
         yield "Saving log..."
         save_vpr_log("route.log", build_dir=build_dir)

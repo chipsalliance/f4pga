@@ -23,19 +23,11 @@ from f4pga.flows.common import vpr_specific_values, vpr as common_vpr, VprArgs
 from f4pga.flows.module import Module, ModuleContext
 
 
-def analysis_merged_post_implementation_file(ctx: ModuleContext):
-    return str(Path(ctx.takes.eblif).with_suffix("")) + "_merged_post_implementation.v"
-
-
-def analysis_post_implementation_file(ctx: ModuleContext):
-    return str(Path(ctx.takes.eblif).with_suffix("")) + "_post_synthesis.v"
-
-
 class analysisModule(Module):
     def map_io(self, ctx: ModuleContext):
         return {
-            "merged_post_implementation_v": analysis_merged_post_implementation_file(ctx),
-            "post_implementation_v": analysis_post_implementation_file(ctx),
+            "merged_post_implementation_v": p_analysis_merged_post_implementation_file(ctx),
+            "post_implementation_v": p_analysis_post_implementation_file(ctx),
         }
 
     def execute(self, ctx: ModuleContext):
@@ -59,10 +51,10 @@ class analysisModule(Module):
         )
 
         if ctx.is_output_explicit("merged_post_implementation_v"):
-            Path(analysis_merged_post_implementation_file(ctx)).rename(ctx.outputs.merged_post_implementation_v)
+            Path(p_analysis_merged_post_implementation_file(ctx)).rename(ctx.outputs.merged_post_implementation_v)
 
         if ctx.is_output_explicit("post_implementation_v"):
-            Path(analysis_post_implementation_file(ctx)).rename(ctx.outputs.post_implementation_v)
+            Path(p_analysis_post_implementation_file(ctx)).rename(ctx.outputs.post_implementation_v)
 
         yield "Saving log..."
         save_vpr_log("analysis.log", build_dir=build_dir)
@@ -76,3 +68,11 @@ class analysisModule(Module):
 
 
 ModuleClass = analysisModule
+
+
+def p_analysis_merged_post_implementation_file(ctx: ModuleContext):
+    return str(Path(ctx.takes.eblif).with_suffix("")) + "_merged_post_implementation.v"
+
+
+def p_analysis_post_implementation_file(ctx: ModuleContext):
+    return str(Path(ctx.takes.eblif).with_suffix("")) + "_post_synthesis.v"
