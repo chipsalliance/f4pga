@@ -28,11 +28,17 @@ ROOT = Path(__file__).resolve().parent
 
 def repo_url(repo, value):
     ref = value
+    url = 'commit'
+    parts = None
     if '@' in value:
-       parts = value.split('@')
-       repo = parts[0]
-       ref = parts[1]
-    return f'https://github.com/{repo}/commit/{ref}'
+        parts = value.split('@')
+    if '#' in value:
+        parts = value.split('#')
+    if parts is not None:
+        url = 'pull'
+        repo = parts[0]
+        ref = parts[1]
+    return f'https://github.com/{repo}/{url}/{ref}'
 
 
 def generate_changes_inc():
