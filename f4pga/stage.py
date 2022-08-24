@@ -17,9 +17,9 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from f4pga.flows.common import decompose_depname, resolve_modstr
-from f4pga.flows.module import Module
-from f4pga.flows.runner import get_module, module_io
+from f4pga.common import decompose_depname, resolve_modstr
+from f4pga.module import Module
+from f4pga.module_runner import get_module, module_io
 
 
 class StageIO:

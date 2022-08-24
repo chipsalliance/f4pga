@@ -19,8 +19,8 @@
 
 from pathlib import Path
 
-from f4pga.flows.common import vpr_specific_values, noisy_warnings, vpr as common_vpr, VprArgs
-from f4pga.flows.module import Module, ModuleContext
+from f4pga.common import vpr_specific_values, noisy_warnings, vpr as common_vpr, VprArgs
+from f4pga.module import Module, ModuleContext
 
 
 DEFAULT_TIMING_RPT = "pre_pack.report_timing.setup.rpt"

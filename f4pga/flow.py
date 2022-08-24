@@ -21,11 +21,11 @@ from pathlib import Path
 
 from colorama import Fore, Style
 
-from f4pga.flows.common import deep, sfprint, bin_dir_path, share_dir_path, F4PGAException
-from f4pga.flows.cache import F4Cache
-from f4pga.flows.flow_config import FlowConfig
-from f4pga.flows.runner import ModRunCtx, module_map, module_exec
-from f4pga.flows.stage import Stage
+from f4pga.common import deep, sfprint, bin_dir_path, share_dir_path, F4PGAException
+from f4pga.cache import F4Cache
+from f4pga.flow_config import FlowConfig
+from f4pga.module_runner import ModRunCtx, module_map, module_exec
+from f4pga.stage import Stage
 
 
 class Flow:

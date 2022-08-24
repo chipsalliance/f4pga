@@ -27,7 +27,7 @@ the dependency algorithm to lazily create the directories if they become necessa
 
 from pathlib import Path
 
-from f4pga.flows.module import Module, ModuleContext
+from f4pga.module import Module, ModuleContext
 
 
 class MkDirsModule(Module):

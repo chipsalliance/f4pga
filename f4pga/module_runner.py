@@ -27,8 +27,8 @@ from pathlib import Path
 
 from colorama import Style
 
-from f4pga.flows.module import Module, ModuleContext, get_mod_metadata
-from f4pga.flows.common import ResolutionEnv, deep, sfprint
+from f4pga.module import Module, ModuleContext, get_mod_metadata
+from f4pga.common import ResolutionEnv, deep, sfprint
 
 
 @contextmanager

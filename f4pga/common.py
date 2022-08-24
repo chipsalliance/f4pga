@@ -25,7 +25,7 @@ from shutil import move as sh_mv
 from subprocess import run
 from re import match as re_match, finditer as re_finditer
 
-from f4pga.context import FPGA_FAM, F4PGA_SHARE_DIR
+from f4pga.context import F4PGA_SHARE_DIR
 
 
 bin_dir_path = str(Path(sys_argv[0]).resolve().parent.parent)

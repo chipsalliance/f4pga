@@ -21,7 +21,7 @@ from pathlib import Path
 from zlib import adler32 as zlib_adler32
 from json import dump as json_dump, load as json_load, JSONDecodeError
 
-from f4pga.flows.common import sfprint
+from f4pga.common import sfprint
 
 
 def _get_hash(path: Path):

@@ -26,7 +26,7 @@ from colorama import Fore, Style
 from yaml import load as yaml_load, Loader as yaml_loader
 
 from f4pga.context import FPGA_FAM
-from f4pga.flows.common import (
+from f4pga.common import (
     bin_dir_path,
     share_dir_path,
     F4PGAException,
@@ -37,18 +37,18 @@ from f4pga.flows.common import (
     sfprint,
     sub as common_sub,
 )
-from f4pga.flows.argparser import get_cli_flow_config
-from f4pga.flows.cache import F4Cache
-from f4pga.flows.flow_config import (
+from f4pga.argparser import get_cli_flow_config
+from f4pga.cache import F4Cache
+from f4pga.flow_config import (
     ProjectFlowConfig,
     FlowConfig,
     FlowDefinition,
     open_project_flow_cfg,
     verify_platform_name,
 )
-from f4pga.flows.flow import Flow
-from f4pga.flows.stage import Stage
-from f4pga.flows.inspector import get_module_info
+from f4pga.flow import Flow
+from f4pga.stage import Stage
+from f4pga.module_inspector import get_module_info
 
 
 ROOT = Path(__file__).resolve().parent

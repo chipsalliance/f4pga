@@ -59,8 +59,8 @@ Accepted module parameters:
 from pathlib import Path
 from re import match as re_match, finditer as re_finditer
 
-from f4pga.flows.common import decompose_depname, deep, get_verbosity_level, sub
-from f4pga.flows.module import Module, ModuleContext
+from f4pga.common import decompose_depname, deep, get_verbosity_level, sub
+from f4pga.module import Module, ModuleContext
 
 
 def _get_param(params, name: str):

@@ -20,8 +20,8 @@
 from pathlib import Path
 from re import match as re_match
 
-from f4pga.flows.common import vpr_specific_values, vpr as common_vpr, VprArgs, save_vpr_log
-from f4pga.flows.module import Module, ModuleContext
+from f4pga.common import vpr_specific_values, vpr as common_vpr, VprArgs, save_vpr_log
+from f4pga.module import Module, ModuleContext
 
 
 def default_output_name(place_constraints):

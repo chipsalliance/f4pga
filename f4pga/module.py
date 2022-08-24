@@ -24,7 +24,7 @@ Here are the things necessary to write an F4PGA Module.
 from types import SimpleNamespace
 from abc import abstractmethod
 
-from f4pga.flows.common import decompose_depname, ResolutionEnv, fatal
+from f4pga.common import decompose_depname, ResolutionEnv, fatal
 
 
 class Module:

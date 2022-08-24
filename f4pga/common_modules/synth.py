@@ -20,8 +20,8 @@
 from os import environ
 from pathlib import Path
 
-from f4pga.flows.common import decompose_depname, get_verbosity_level, sub as common_sub
-from f4pga.flows.module import Module, ModuleContext
+from f4pga.common import decompose_depname, get_verbosity_level, sub as common_sub
+from f4pga.module import Module, ModuleContext
 from f4pga.wrappers.tcl import get_script_path as get_tcl_wrapper_path
 
 
