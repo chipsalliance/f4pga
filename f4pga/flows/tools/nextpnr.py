@@ -17,8 +17,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from f4pga.flows.module import *
-from f4pga.flows.common import *
+from f4pga.flows.common import ResolutionEnv
+from f4pga.flows.module import Module, ModuleContext
 
 
 class NextPnrBaseModule(Module):

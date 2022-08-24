@@ -18,7 +18,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import pathlib
-from f4pga.flows.module import *
+from f4pga.flows.common import ResolutionEnv
+from f4pga.flows.module import ModuleContext
 from f4pga.flows.tools.nextpnr import NextPnrBaseModule
 
 import re
