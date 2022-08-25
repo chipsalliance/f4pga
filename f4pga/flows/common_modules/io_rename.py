@@ -40,6 +40,10 @@ Accepted module parameters:
 
 """
 
+from argparse import Namespace
+from types import SimpleNamespace
+
+from f4pga.flows.common import decompose_depname, resolve_modstr, with_qualifier
 from f4pga.flows.module import Module, ModuleContext
 from f4pga.flows.runner import get_module
 
