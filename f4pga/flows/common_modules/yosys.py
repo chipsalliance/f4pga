@@ -139,6 +139,7 @@ class YosysScriptMeta:
                  2) f4pga produce dependencyName pathExpr ?-meta metadata?
                  3) f4pga value valueName
                  4) f4pga tempfile pathVariableName
+                 5) f4pga is_dry
 
                   * 1: Take dependency, use `dependencyName`* to hold path to it.
                        `?` qualifier is accepted.
@@ -147,6 +148,8 @@ class YosysScriptMeta:
                   * 3: Use a value provided by f4pga. `?` qualifier is accepted.
                   * 4: Provide a temprary file. The path will be assigned to
                        `pathVariableName`*.
+                  * 5: Returns TRUE if the script is executed for introspection
+                       purposees, FALSE if for execution.
 
                   * All variables set by `f4pga` command will have `f4pga_` prefix.
                 """
@@ -208,6 +211,10 @@ class YosysScriptMeta:
                             raise F4PGAException(message="f4pga produce (tcl) - unrecognized " f"flag {arg}")
                     meta.outputs[name] = (pathexpr, meta_d)
                     tcl.setvar(f"f4pga_{name}", "${:" + name + "}")
+                elif action == "is_dry":
+                    return True
+                else:
+                    raise F4PGAException(message=f"(tcl) - Unknown f4pga action: {action}")
 
             return tcl_f4pga
 

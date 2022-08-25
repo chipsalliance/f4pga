@@ -51,6 +51,15 @@ After the script executes, if a file is present under that path, it will get rem
 
 Note: This by itself won't create any files.
 
+### Check if the script is in executed in yosys
+
+```
+f4pga is_dry
+```
+
+Returns `TRUE` if the script is executed by `f4pga` for introspection purposes.
+`FALSE` if script is executed by `yosys`.
+
 ## Parameters
 
 * `tcl_script` (string, required): A path to an f4pga-compatible Tcl script to use with
