@@ -26,26 +26,37 @@ void test_ql_bram_asymmetric_wider_read(ql_bram_asymmetric_wider_read_pm &pm)
     auto wr_en_and_y = pm.st_ql_bram_asymmetric_wider_read.wr_en_and_y;
 
     // Add the BRAM cell
-    RTLIL::Cell *cell = pm.module->addCell(RTLIL::escape_id("bram_asymmetric"), mem);
+    std::string name = mem->name.str() + "$asymmetric";
+    RTLIL::Cell *cell = pm.module->addCell(RTLIL::escape_id(name), mem);
 
     // Set new type for cell so that it won't be processed by memory_bram pass
-    cell->type = IdString("$mem_v2_asymmetric");
+    cell->type = IdString(RTLIL::escape_id("_$_mem_v2_asymmetric"));
 
     // Prepare wires from memory cell side to compare against module wires
-    if (!mux_s.as_wire())
-        log_error("WR_EN input wire not found");
+    if (!mux_s.is_wire())
+        log_error("WR_EN input wire not found\n");
     RTLIL::Wire *wr_en_cw = mux_s.as_wire();
-    if (!mem_wr_addr.as_wire())
-        log_error("WR_ADDR input wire not found");
-    RTLIL::Wire *wr_addr_cw = mem_wr_addr.as_wire();
-    if (!wr_data_shift_a.as_wire())
-        log_error("WR_DATA input wire not found");
+
+    // The WR address wire can be narrower
+    RTLIL::Wire *wr_addr_cw = nullptr;
+    if (mem_wr_addr.is_wire())
+        wr_addr_cw = mem_wr_addr.as_wire();
+    else if (!mem_wr_addr.chunks().empty()) {
+        auto chunk = mem_wr_addr.chunks()[0];
+        if (chunk.is_wire())
+            wr_addr_cw = chunk.wire;
+    }
+    if (!wr_addr_cw)
+        log_error("WR_ADDR input wire not found\n");
+
+    if (!wr_data_shift_a.is_wire())
+        log_error("WR_DATA input wire not found\n");
     RTLIL::Wire *wr_data_cw = wr_data_shift_a.as_wire();
-    if (!mem_rd_addr.as_wire())
-        log_error("RD_ADDR input wire not found");
+    if (!mem_rd_addr.is_wire())
+        log_error("RD_ADDR input wire not found\n");
     RTLIL::Wire *rd_addr_cw = mem_rd_addr.as_wire();
-    if (!mem_rd_data.as_wire())
-        log_error("RD_DATA input wire not found");
+    if (!mem_rd_data.is_wire())
+        log_error("RD_DATA input wire not found\n");
     RTLIL::Wire *rd_data_cw = mem_rd_data.as_wire();
 
     // Check if wr_en_and cell has one of its inputs connected to write address
@@ -61,9 +72,9 @@ void test_ql_bram_asymmetric_wider_read(ql_bram_asymmetric_wider_read_pm &pm)
         wr_en_and_b_w = wr_en_and_b.as_wire();
     }
     if (!has_wire)
-        log_error("RD_ADDR $and cell input wire not found");
-    if ((wr_en_and_a_w != mem_wr_addr.as_wire()) & (wr_en_and_b_w != mem_wr_addr.as_wire()))
-        log_error("This is not the $and cell we are looking for");
+        log_error("RD_ADDR $and cell input wire not found\n");
+    if ((wr_en_and_a_w != wr_addr_cw) & (wr_en_and_b_w != wr_addr_cw))
+        log_error("This is not the $and cell we are looking for\n");
 
     // Compare and assign wires
     RTLIL::Wire *wr_en_w = nullptr;
@@ -135,9 +146,9 @@ void test_ql_bram_asymmetric_wider_read(ql_bram_asymmetric_wider_read_pm &pm)
     }
 
     if (wr_en_and_y != wr_en_shift_b.extract(offset, wr_addr_width))
-        log_error("This is not the wr_en $shl cell we are looking for");
+        log_error("This is not the wr_en $shl cell we are looking for\n");
     if (wr_en_and_y != wr_data_shift_b.extract(offset, wr_addr_width))
-        log_error("This is not the wr_data $shl cell we are looking for");
+        log_error("This is not the wr_data $shl cell we are looking for\n");
 
     // Bypass shift on write address line
     cell->setPort(RTLIL::escape_id("WR_ADDR"), RTLIL::SigSpec(wr_addr_w));
@@ -178,10 +189,11 @@ void test_ql_bram_asymmetric_wider_write(ql_bram_asymmetric_wider_write_pm &pm)
     auto rd_addr_and_b = pm.st_ql_bram_asymmetric_wider_write.rd_addr_and_b;
 
     // Add the BRAM cell
-    RTLIL::Cell *cell = pm.module->addCell(RTLIL::escape_id("bram_asymmetric"), mem);
+    std::string name = mem->name.str() + "$asymmetric";
+    RTLIL::Cell *cell = pm.module->addCell(RTLIL::escape_id(name), mem);
 
     // Set new type for cell so that it won't be processed by memory_bram pass
-    cell->type = IdString("$mem_v2_asymmetric");
+    cell->type = IdString(RTLIL::escape_id("_$_mem_v2_asymmetric"));
 
     // Prepare wires from memory cell side to compare against module wires
     RTLIL::Wire *rd_data_wc = nullptr;
@@ -191,17 +203,17 @@ void test_ql_bram_asymmetric_wider_write(ql_bram_asymmetric_wider_write_pm &pm)
     RTLIL::Wire *rd_addr_and_b_wc = nullptr;
 
     if (rd_data_ff) {
-        if (!rd_data_ff_q.as_wire())
-            log_error("RD_DATA input wire not found");
+        if (!rd_data_ff_q.is_wire())
+            log_error("RD_DATA input wire not found\n");
         rd_data_wc = rd_data_ff_q.as_wire();
-        if (!rd_data_ff_en.as_wire())
-            log_error("RD_EN input wire not found");
+        if (!rd_data_ff_en.is_wire())
+            log_error("RD_EN input wire not found\n");
         rd_en_wc = rd_data_ff_en.as_wire();
-        if (!rd_data_ff_clk.as_wire())
-            log_error("RD_CLK input wire not found");
+        if (!rd_data_ff_clk.is_wire())
+            log_error("RD_CLK input wire not found\n");
         clk_wc = rd_data_ff_clk.as_wire();
     } else {
-        log_error("output FF not found");
+        log_error("output FF not found\n");
     }
 
     if (rd_addr_and) {
@@ -215,27 +227,36 @@ void test_ql_bram_asymmetric_wider_write(ql_bram_asymmetric_wider_write_pm &pm)
             rd_addr_and_b_wc = rd_addr_and_b.as_wire();
         }
         if (!has_wire)
-            log_error("RD_ADDR $and cell input wire not found");
+            log_error("RD_ADDR $and cell input wire not found\n");
     } else {
-        log_debug("RD_ADDR $and cell not found");
+        log_debug("RD_ADDR $and cell not found\n");
     }
 
     RTLIL::Wire *wr_addr_wc;
     if (wr_addr_ff) {
-        if (!wr_addr_ff_d.as_wire())
-            log_error("WR_ADDR input wire not found");
+        if (!wr_addr_ff_d.is_wire())
+            log_error("WR_ADDR input wire not found\n");
         wr_addr_wc = wr_addr_ff_d.as_wire();
     } else {
-        if (!mem_wr_addr.as_wire())
-            log_error("WR_ADDR input wire not found");
+        if (!mem_wr_addr.is_wire())
+            log_error("WR_ADDR input wire not found\n");
         wr_addr_wc = mem_wr_addr.as_wire();
     }
 
-    if (!mem_rd_addr.as_wire())
-        log_error("RD_ADDR input wire not found");
-    auto rd_addr_wc = mem_rd_addr.as_wire();
-    if (!mem_wr_data.as_wire())
-        log_error("WR_DATA input wire not found");
+    // The RD address wire can be narrower
+    RTLIL::Wire *rd_addr_wc = nullptr;
+    if (mem_rd_addr.is_wire())
+        rd_addr_wc = mem_rd_addr.as_wire();
+    else if (!mem_rd_addr.chunks().empty()) {
+        auto chunk = mem_rd_addr.chunks()[0];
+        if (chunk.is_wire())
+            rd_addr_wc = chunk.wire;
+    }
+    if (!rd_addr_wc)
+        log_error("RD_ADDR input wire not found\n");
+
+    if (!mem_wr_data.is_wire())
+        log_error("WR_DATA input wire not found\n");
     auto wr_data_wc = mem_wr_data.as_wire();
 
     // Check if wr_en_and cell has one of its inputs connected to write address
@@ -309,7 +330,7 @@ void test_ql_bram_asymmetric_wider_write(ql_bram_asymmetric_wider_write_pm &pm)
 
     // Connect Read Enable signal to memory cell
     if (!rd_en_w)
-        log_error("Wire \\rce not found");
+        log_error("Wire \\rce not found\n");
     auto rd_en_s = RTLIL::SigSpec(rd_en_w);
     cell->setPort(RTLIL::escape_id("RD_EN"), rd_en_s);
 
@@ -322,7 +343,7 @@ void test_ql_bram_asymmetric_wider_write(ql_bram_asymmetric_wider_write_pm &pm)
         pm.module->remove(wr_addr_ff);
     // Check if detected $and is connected to RD_ADDR
     if ((rd_addr_and_a_wc != rd_addr_w) & (rd_addr_and_b_wc != rd_addr_w))
-        log_error("This is not the $and cell we are looking for");
+        log_error("This is not the $and cell we are looking for\n");
     else
         pm.module->remove(rd_addr_and);
 }

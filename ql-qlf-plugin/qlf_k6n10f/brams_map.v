@@ -483,7 +483,7 @@ module \$__QLF_FACTOR_BRAM36_SDP (CLK2, CLK3, A1ADDR, A1DATA, A1EN, B1ADDR, B1DA
 	);
 endmodule
 
-(* techmap_celltype = "$mem_v2_asymmetric" *)
+(* techmap_celltype = "_$_mem_v2_asymmetric" *)
 module \$__QLF_FACTOR_BRAM36_SDP_ASYMMETRIC (RD_ADDR, RD_ARST, RD_CLK, RD_DATA, RD_EN, RD_SRST, WR_ADDR, WR_CLK, WR_DATA, WR_EN);
 	parameter CFG_ABITS = 10;
 	parameter CFG_DBITS = 36;
