@@ -27,6 +27,9 @@ f4pga value     shareDir
 f4pga value     yosys_plugins?
 f4pga value     top
 f4pga value     surelog_cmd?
+f4pga value     extra_techmaps_path?
+f4pga value     simulation_models
+f4pga value     techmap
 f4pga take      build_dir
 f4pga take      sources
 f4pga take      pcf
@@ -35,6 +38,11 @@ f4pga produce   json                  ${f4pga_build_dir}/${f4pga_top}.json      
 f4pga tempfile  json_org
 f4pga tempfile  json_premapped
 
+
+set extra_techmaps ${f4pga_extra_techmaps_path}
+if { $extra_techmaps eq "" } {
+    set extra_techmaps ${f4pga_shareDir}/arch/ql-eos-s3_wlcsp/cells
+}
 
 if { [contains $f4pga_yosys_plugins uhdm] } {
     foreach {sysverilog_source} $f4pga_sources {
@@ -47,9 +55,9 @@ if { [contains $f4pga_yosys_plugins uhdm] } {
 }
 
 # Read VPR cells library
-read_verilog -lib -specify ${f4pga_shareDir}/techmaps/pp3/cells_sim.v
+read_verilog -lib -specify ${f4pga_simulation_models}
 # Read device specific cells library
-read_verilog -lib -specify ${f4pga_shareDir}/arch/ql-eos-s3_wlcsp/cells/ram_sim.v
+read_verilog -lib -specify ${extra_techmaps}/ram_sim.v
 
 # Synthesize
 synth_quicklogic -family pp3
@@ -73,12 +81,12 @@ write_verilog $f4pga_json_premapped
 # Select all logic_0 and logic_1 and apply the techmap to them first. This is
 # necessary for constant connection detection in the subsequent techmaps.
 select -set consts t:logic_0 t:logic_1
-techmap -map ${f4pga_shareDir}/techmaps/pp3/cells_map.v @consts
+techmap -map ${f4pga_techmap} @consts
 
 # Map to the VPR cell library
-techmap -map ${f4pga_shareDir}/techmaps/pp3/cells_map.v
+techmap -map ${f4pga_techmap}
 # Map to the device specific VPR cell library
-techmap -map ${f4pga_shareDir}/arch/ql-eos-s3_wlcsp/cells/ram_map.v
+techmap -map ${extra_techmaps}/ram_map.v
 
 # opt_expr -undriven makes sure all nets are driven, if only by the $undef
 # net.

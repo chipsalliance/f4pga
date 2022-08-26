@@ -37,6 +37,9 @@ f4pga value     python3
 f4pga value     shareDir
 f4pga value     yosys_plugins?
 f4pga value     surelog_cmd?
+f4pga value     extra_techmaps_path?
+f4pga value     simulation_models
+f4pga value     techmap
 f4pga tempfile  json_carry_fixup
 f4pga tempfile  json_carry_fixup_out
 f4pga take      sources
@@ -49,7 +52,10 @@ f4pga produce   json                  ${f4pga_build_dir}/${f4pga_top}.json      
 f4pga produce   rtlil_preopt          ${f4pga_build_dir}/${f4pga_top}.pre_abc9.ilang   -meta "Yosys RTLIL file (before optimization)"
 f4pga produce   rtlil                 ${f4pga_build_dir}/${f4pga_top}.post_abc9.ilang  -meta "Yosys RTLIL file"
 
-set techmap_path ${f4pga_shareDir}/techmaps/xc7_vpr/techmap
+set extra_techmaps_path ${f4pga_extra_techmaps_path}
+if { ${extra_techmaps_path} eq "" } {
+    set extra_techmaps_path ${f4pga_shareDir}/techmaps/xc7_vpr/techmap
+}
 set utils_path ${f4pga_shareDir}/scripts
 
 if { [contains $f4pga_yosys_plugins uhdm] } {
@@ -79,13 +85,13 @@ if { $f4pga_use_roi == "TRUE" } {
     read_verilog -lib +/xilinx/cells_xtra.v
 
     # Overwrite some models (e.g. IBUF with more parameters)
-    read_verilog -lib ${techmap_path}/iobs.v
+    read_verilog -lib ${extra_techmaps_path}/iobs.v
 
     # TODO: This should eventually end up in upstream Yosys
     #       as models such as FD are not currently supported
     #       as being used in old FPGAs (e.g. Spartan6)
     # Read in unsupported models
-    read_verilog -lib ${techmap_path}/retarget.v
+    read_verilog -lib ${extra_techmaps_path}/retarget.v
 
     if { $f4pga_top != "" } {
         hierarchy -check -top $f4pga_top
@@ -130,7 +136,7 @@ select -set obufds t:OSERDESE2 %co2:+\[OQ,I\] t:OBUFDS t:OBUFTDS %u  %i
 setparam -set HAS_OSERDES 1 @obufds
 
 # Map Xilinx tech library to 7-series VPR tech library.
-read_verilog -specify -lib ${techmap_path}/cells_sim.v
+read_verilog -specify -lib ${f4pga_simulation_models}
 
 # Convert congested CARRY4 outputs to LUTs.
 #
@@ -195,7 +201,7 @@ read_verilog -specify -lib ${techmap_path}/cells_sim.v
 # +--------------------------------------------------------------------------+
 #
 
-techmap -map ${techmap_path}/carry_map.v
+techmap -map ${extra_techmaps_path}/carry_map.v
 
 clean_processes
 write_json ${f4pga_json_carry_fixup}
@@ -204,14 +210,14 @@ exec $f4pga_python3 -m f4pga.utils.xc7.fix_xc7_carry < ${f4pga_json_carry_fixup}
 design -push
 read_json ${f4pga_json_carry_fixup_out}
 
-techmap -map ${techmap_path}/clean_carry_map.v
+techmap -map ${extra_techmaps_path}/clean_carry_map.v
 
 # Re-read baseline libraries
 read_verilog -lib -specify +/xilinx/cells_sim.v
 read_verilog -lib +/xilinx/cells_xtra.v
-read_verilog -specify -lib ${techmap_path}/cells_sim.v
+read_verilog -specify -lib ${f4pga_simulation_models}
 if { $f4pga_use_roi != "TRUE" } {
-    read_verilog -lib ${techmap_path}/iobs.v
+    read_verilog -lib ${extra_techmaps_path}/iobs.v
 }
 
 # Re-run optimization flow to absorb carry modifications
@@ -230,11 +236,11 @@ write_ilang $f4pga_rtlil
 # to have 0's when unused.  As a result VPR will attempt to route a 0 to those
 # ports. However this is not generally possible or desirable.
 #
-# $::env(TECHMAP_PATH)/cells_map.v has a simple techmap pass where these
-# unused ports are removed.  In theory yosys's "rmports" would work here, but
+# The techmap has a simple pass where these unused ports are removed.
+# In theory yosys's "rmports" would work here, but
 # it does not.
 chtype -map CARRY4_VPR CARRY4_FIX
-techmap -map  ${techmap_path}/cells_map.v
+techmap -map  ${f4pga_techmap}
 
 # opt_expr -undriven makes sure all nets are driven, if only by the $undef
 # net.

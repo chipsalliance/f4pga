@@ -63,8 +63,10 @@ xc7a50t: &xc7
       params:
         tcl_script: '${auxDir}/tool_data/yosys/scripts/vendor/xilinx/xc7/synth.tcl'
       values:
-        yosys_plugins: []
+        simulation_models: '${shareDir}/techmaps/xc7_vpr/techmap/cells_sim.v'
+        techmap: '${shareDir}/techmaps/xc7_vpr/techmap/cells_map.v'
         use_roi: 'FALSE'
+        yosys_plugins: []
     split_inouts:
       module: 'common:generic_script_wrapper'
       params:
@@ -224,6 +226,8 @@ ql-eos-s3:
       params:
         tcl_script: '${auxDir}/tool_data/yosys/scripts/vendor/quicklogic/pp3/synth.tcl'
       values:
+        simulation_models: '${shareDir}/techmaps/pp3/cells_sim.v'
+        techmap: '${shareDir}/techmaps/pp3/cells_map.v'
         yosys_plugins:
           - ql-iob
           - ql-qlf
