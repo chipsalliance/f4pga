@@ -577,32 +577,32 @@ module \$__QLF_FACTOR_BRAM36_SDP_ASYMMETRIC (RD_ADDR, RD_ARST, RD_CLK, RD_DATA, 
 				end
 				2: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_2, `MODE_2, `MODE_1, `MODE_1, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_2, `MODE_2, `MODE_1, `MODE_1, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_2, `MODE_1, `MODE_2, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_2, `MODE_1, `MODE_2, 1'd0
 					};
 				end
 				4: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_4, `MODE_4, `MODE_1, `MODE_1, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_4, `MODE_4, `MODE_1, `MODE_1, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_4, `MODE_1, `MODE_4, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_4, `MODE_1, `MODE_4, 1'd0
 					};
 				end
 				8, 9: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_9, `MODE_9, `MODE_1, `MODE_1, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_9, `MODE_9, `MODE_1, `MODE_1, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_9, `MODE_1, `MODE_9, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_9, `MODE_1, `MODE_9, 1'd0
 					};
 				end
 				16, 18: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_18, `MODE_18, `MODE_1, `MODE_1, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_18, `MODE_18, `MODE_1, `MODE_1, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_18, `MODE_1, `MODE_18, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_18, `MODE_1, `MODE_18, 1'd0
 					};
 				end
 				32, 36: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_36, `MODE_36, `MODE_1, `MODE_1, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_36, `MODE_36, `MODE_1, `MODE_1, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_36, `MODE_1, `MODE_36, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_36, `MODE_1, `MODE_36, 1'd0
 					};
 				end
 				default: begin
@@ -617,8 +617,8 @@ module \$__QLF_FACTOR_BRAM36_SDP_ASYMMETRIC (RD_ADDR, RD_ARST, RD_CLK, RD_DATA, 
 			case (WR_DATA_WIDTH)
 				1: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_1, `MODE_2, `MODE_2, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_1, `MODE_2, `MODE_2, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_2, `MODE_1, `MODE_2, `MODE_1, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_2, `MODE_1, `MODE_2, `MODE_1, 1'd0
 					};
 				end
 				2: begin
@@ -629,32 +629,32 @@ module \$__QLF_FACTOR_BRAM36_SDP_ASYMMETRIC (RD_ADDR, RD_ARST, RD_CLK, RD_DATA, 
 				end
 				4: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_4, `MODE_4, `MODE_2, `MODE_2, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_4, `MODE_4, `MODE_2, `MODE_2, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_2, `MODE_4, `MODE_2, `MODE_4, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_2, `MODE_4, `MODE_2, `MODE_4, 1'd0
 					};
 				end
 				8, 9: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_9, `MODE_9, `MODE_2, `MODE_2, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_9, `MODE_9, `MODE_2, `MODE_2, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_2, `MODE_9, `MODE_2, `MODE_9, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_2, `MODE_9, `MODE_2, `MODE_9, 1'd0
 					};
 				end
 				16, 18: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_18, `MODE_18, `MODE_2, `MODE_2, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_18, `MODE_18, `MODE_2, `MODE_2, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_2, `MODE_18, `MODE_2, `MODE_18, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_2, `MODE_18, `MODE_2, `MODE_18, 1'd0
 					};
 				end
 				32, 36: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_36, `MODE_36, `MODE_2, `MODE_2, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_36, `MODE_36, `MODE_2, `MODE_2, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_2, `MODE_36, `MODE_2, `MODE_36, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_2, `MODE_36, `MODE_2, `MODE_36, 1'd0
 					};
 				end
 				default: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_1, `MODE_2, `MODE_2, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_1, `MODE_2, `MODE_2, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_2, `MODE_1, `MODE_2, `MODE_1, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_2, `MODE_1, `MODE_2, `MODE_1, 1'd0
 					};
 				end
 			endcase
@@ -663,14 +663,14 @@ module \$__QLF_FACTOR_BRAM36_SDP_ASYMMETRIC (RD_ADDR, RD_ARST, RD_CLK, RD_DATA, 
 			case (WR_DATA_WIDTH)
 				1: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_1, `MODE_4, `MODE_4, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_1, `MODE_4, `MODE_4, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_4, `MODE_1, `MODE_4, `MODE_1, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_4, `MODE_1, `MODE_4, `MODE_1, 1'd0
 					};
 				end
 				2: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_2, `MODE_2, `MODE_4, `MODE_4, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_2, `MODE_2, `MODE_4, `MODE_4, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_4, `MODE_2, `MODE_4, `MODE_2, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_4, `MODE_2, `MODE_4, `MODE_2, 1'd0
 					};
 				end
 				4: begin
@@ -681,26 +681,26 @@ module \$__QLF_FACTOR_BRAM36_SDP_ASYMMETRIC (RD_ADDR, RD_ARST, RD_CLK, RD_DATA, 
 				end
 				8, 9: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_9, `MODE_9, `MODE_4, `MODE_4, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_9, `MODE_9, `MODE_4, `MODE_4, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_4, `MODE_9, `MODE_4, `MODE_9, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_4, `MODE_9, `MODE_4, `MODE_9, 1'd0
 					};
 				end
 				16, 18: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_18, `MODE_18, `MODE_4, `MODE_4, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_18, `MODE_18, `MODE_4, `MODE_4, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_4, `MODE_18, `MODE_4, `MODE_18, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_4, `MODE_18, `MODE_4, `MODE_18, 1'd0
 					};
 				end
 				32, 36: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_36, `MODE_36, `MODE_4, `MODE_4, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_36, `MODE_36, `MODE_4, `MODE_4, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_4, `MODE_36, `MODE_4, `MODE_36, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_4, `MODE_36, `MODE_4, `MODE_36, 1'd0
 					};
 				end
 				default: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_1, `MODE_4, `MODE_4, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_1, `MODE_4, `MODE_4, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_4, `MODE_1, `MODE_4, `MODE_1, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_4, `MODE_1, `MODE_4, `MODE_1, 1'd0
 					};
 				end
 			endcase
@@ -709,20 +709,20 @@ module \$__QLF_FACTOR_BRAM36_SDP_ASYMMETRIC (RD_ADDR, RD_ARST, RD_CLK, RD_DATA, 
 			case (WR_DATA_WIDTH)
 				1: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_1, `MODE_9, `MODE_9, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_1, `MODE_9, `MODE_9, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_9, `MODE_1, `MODE_9, `MODE_1, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_9, `MODE_1, `MODE_9, `MODE_1, 1'd0
 					};
 				end
 				2: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_2, `MODE_2, `MODE_9, `MODE_9, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_2, `MODE_2, `MODE_9, `MODE_9, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_9, `MODE_2, `MODE_9, `MODE_2, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_9, `MODE_2, `MODE_9, `MODE_2, 1'd0
 					};
 				end
 				4: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_4, `MODE_4, `MODE_9, `MODE_9, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_4, `MODE_4, `MODE_9, `MODE_9, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_9, `MODE_4, `MODE_9, `MODE_4, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_9, `MODE_4, `MODE_9, `MODE_4, 1'd0
 					};
 				end
 				8, 9: begin
@@ -733,20 +733,20 @@ module \$__QLF_FACTOR_BRAM36_SDP_ASYMMETRIC (RD_ADDR, RD_ARST, RD_CLK, RD_DATA, 
 				end
 				16, 18: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_18, `MODE_18, `MODE_9, `MODE_9, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_18, `MODE_18, `MODE_9, `MODE_9, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_9, `MODE_18, `MODE_9, `MODE_18, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_9, `MODE_18, `MODE_9, `MODE_18, 1'd0
 					};
 				end
 				32, 36: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_36, `MODE_36, `MODE_9, `MODE_9, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_36, `MODE_36, `MODE_9, `MODE_9, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_9, `MODE_36, `MODE_9, `MODE_36, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_9, `MODE_36, `MODE_9, `MODE_36, 1'd0
 					};
 				end
 				default: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_1, `MODE_9, `MODE_9, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_1, `MODE_9, `MODE_9, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_9, `MODE_1, `MODE_9, `MODE_1, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_9, `MODE_1, `MODE_9, `MODE_1, 1'd0
 					};
 				end
 			endcase
@@ -755,26 +755,26 @@ module \$__QLF_FACTOR_BRAM36_SDP_ASYMMETRIC (RD_ADDR, RD_ARST, RD_CLK, RD_DATA, 
 			case (WR_DATA_WIDTH)
 				1: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_1, `MODE_18, `MODE_18, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_1, `MODE_18, `MODE_18, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_18, `MODE_1, `MODE_18, `MODE_1, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_18, `MODE_1, `MODE_18, `MODE_1, 1'd0
 					};
 				end
 				2: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_2, `MODE_2, `MODE_18, `MODE_18, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_2, `MODE_2, `MODE_18, `MODE_18, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_18, `MODE_2, `MODE_18, `MODE_2, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_18, `MODE_2, `MODE_18, `MODE_2, 1'd0
 					};
 				end
 				4: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_4, `MODE_4, `MODE_18, `MODE_18, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_4, `MODE_4, `MODE_18, `MODE_18, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_18, `MODE_4, `MODE_18, `MODE_4, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_18, `MODE_4, `MODE_18, `MODE_4, 1'd0
 					};
 				end
 				8, 9: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_9, `MODE_9, `MODE_18, `MODE_18, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_9, `MODE_9, `MODE_18, `MODE_18, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_18, `MODE_9, `MODE_18, `MODE_9, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_18, `MODE_9, `MODE_18, `MODE_9, 1'd0
 					};
 				end
 				16, 18: begin
@@ -785,14 +785,14 @@ module \$__QLF_FACTOR_BRAM36_SDP_ASYMMETRIC (RD_ADDR, RD_ARST, RD_CLK, RD_DATA, 
 				end
 				32, 36: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_36, `MODE_36, `MODE_18, `MODE_18, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_36, `MODE_36, `MODE_18, `MODE_18, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_18, `MODE_36, `MODE_18, `MODE_36, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_18, `MODE_36, `MODE_18, `MODE_36, 1'd0
 					};
 				end
 				default: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_1, `MODE_18, `MODE_18, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_1, `MODE_18, `MODE_18, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_18, `MODE_1, `MODE_18, `MODE_1, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_18, `MODE_1, `MODE_18, `MODE_1, 1'd0
 					};
 				end
 			endcase
@@ -801,32 +801,32 @@ module \$__QLF_FACTOR_BRAM36_SDP_ASYMMETRIC (RD_ADDR, RD_ARST, RD_CLK, RD_DATA, 
 			case (WR_DATA_WIDTH)
 				1: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_1, `MODE_36, `MODE_36, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_1, `MODE_36, `MODE_36, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_36, `MODE_1, `MODE_36, `MODE_1, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_36, `MODE_1, `MODE_36, `MODE_1, 1'd0
 					};
 				end
 				2: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_2, `MODE_2, `MODE_36, `MODE_36, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_2, `MODE_2, `MODE_36, `MODE_36, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_36, `MODE_2, `MODE_36, `MODE_2, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_36, `MODE_2, `MODE_36, `MODE_2, 1'd0
 					};
 				end
 				4: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_4, `MODE_4, `MODE_36, `MODE_36, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_4, `MODE_4, `MODE_36, `MODE_36, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_36, `MODE_4, `MODE_36, `MODE_4, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_36, `MODE_4, `MODE_36, `MODE_4, 1'd0
 					};
 				end
 				8, 9: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_9, `MODE_9, `MODE_36, `MODE_36, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_9, `MODE_9, `MODE_36, `MODE_36, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_36, `MODE_9, `MODE_36, `MODE_9, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_36, `MODE_9, `MODE_36, `MODE_9, 1'd0
 					};
 				end
 				16, 18: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_18, `MODE_18, `MODE_36, `MODE_36, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_18, `MODE_18, `MODE_36, `MODE_36, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_36, `MODE_18, `MODE_36, `MODE_18, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_36, `MODE_18, `MODE_36, `MODE_18, 1'd0
 					};
 				end
 				32, 36: begin
@@ -837,8 +837,8 @@ module \$__QLF_FACTOR_BRAM36_SDP_ASYMMETRIC (RD_ADDR, RD_ARST, RD_CLK, RD_DATA, 
 				end
 				default: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_1, `MODE_36, `MODE_36, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_1, `MODE_36, `MODE_36, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_36, `MODE_1, `MODE_36, `MODE_1, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_36, `MODE_1, `MODE_36, `MODE_1, 1'd0
 					};
 				end
 			endcase
@@ -853,32 +853,32 @@ module \$__QLF_FACTOR_BRAM36_SDP_ASYMMETRIC (RD_ADDR, RD_ARST, RD_CLK, RD_DATA, 
 				end
 				2: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_2, `MODE_2, `MODE_1, `MODE_1, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_2, `MODE_2, `MODE_1, `MODE_1, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_2, `MODE_1, `MODE_2, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_2, `MODE_1, `MODE_2, 1'd0
 					};
 				end
 				4: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_4, `MODE_4, `MODE_1, `MODE_1, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_4, `MODE_4, `MODE_1, `MODE_1, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_4, `MODE_1, `MODE_4, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_4, `MODE_1, `MODE_4, 1'd0
 					};
 				end
 				8, 9: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_9, `MODE_9, `MODE_1, `MODE_1, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_9, `MODE_9, `MODE_1, `MODE_1, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_9, `MODE_1, `MODE_9, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_9, `MODE_1, `MODE_9, 1'd0
 					};
 				end
 				16, 18: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_18, `MODE_18, `MODE_1, `MODE_1, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_18, `MODE_18, `MODE_1, `MODE_1, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_18, `MODE_1, `MODE_18, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_18, `MODE_1, `MODE_18, 1'd0
 					};
 				end
 				32, 36: begin
 					defparam _TECHMAP_REPLACE_.MODE_BITS = { 1'b0,
-						11'd10, 11'd10, 4'd0, `MODE_36, `MODE_36, `MODE_1, `MODE_1, 1'd0,
-						12'd10, 12'd10, 4'd0, `MODE_36, `MODE_36, `MODE_1, `MODE_1, 1'd0
+						11'd10, 11'd10, 4'd0, `MODE_1, `MODE_36, `MODE_1, `MODE_36, 1'd0,
+						12'd10, 12'd10, 4'd0, `MODE_1, `MODE_36, `MODE_1, `MODE_36, 1'd0
 					};
 				end
 				default: begin
@@ -940,10 +940,6 @@ module \$__QLF_FACTOR_BRAM36_SDP_ASYMMETRIC (RD_ADDR, RD_ARST, RD_CLK, RD_DATA, 
 		end
 	endcase
 
-	wire [14:0] PORT_A_ADDR = WR_EN ? WR_ADDR_SHIFTED : (RD_EN ? RD_ADDR_SHIFTED : 14'd0);
-	wire [14:0] PORT_A1_ADDR = PORT_A_ADDR;
-	wire [14:0] PORT_A2_ADDR = PORT_A_ADDR;
-
 	assign FLUSH1 = 1'b0;
 	assign FLUSH2 = 1'b0;
 
@@ -974,21 +970,38 @@ module \$__QLF_FACTOR_BRAM36_SDP_ASYMMETRIC (RD_ADDR, RD_ARST, RD_CLK, RD_DATA, 
 
 	TDP36K _TECHMAP_REPLACE_ (
 		.RESET_ni(1'b1),
+
 		.WDATA_A1_i(PORT_A1_WDATA),
-		.RDATA_A1_o(PORT_A1_RDATA),
-		.ADDR_A1_i(PORT_A1_ADDR),
+		.RDATA_A1_o(),
+		.ADDR_A1_i(WR_ADDR_SHIFTED),
 		.CLK_A1_i(PORT_A1_CLK),
-		.REN_A1_i(PORT_A1_REN),
+		.REN_A1_i(1'b0),
 		.WEN_A1_i(PORT_A1_WEN),
 		.BE_A1_i(PORT_A1_BE),
 
+		.WDATA_B1_i(),
+		.RDATA_B1_o(PORT_A1_RDATA),
+		.ADDR_B1_i(RD_ADDR_SHIFTED),
+		.CLK_B1_i(PORT_A1_CLK),
+		.REN_B1_i(PORT_A1_REN),
+		.WEN_B1_i(1'b0),
+		.BE_B1_i(PORT_A1_BE),
+
 		.WDATA_A2_i(PORT_A2_WDATA),
-		.RDATA_A2_o(PORT_A2_RDATA),
-		.ADDR_A2_i(PORT_A2_ADDR),
+		.RDATA_A2_o(),
+		.ADDR_A2_i(WR_ADDR_SHIFTED),
 		.CLK_A2_i(PORT_A2_CLK),
-		.REN_A2_i(PORT_A2_REN),
+		.REN_A2_i(1'b0),
 		.WEN_A2_i(PORT_A2_WEN),
 		.BE_A2_i(PORT_A2_BE),
+
+		.WDATA_B2_i(),
+		.RDATA_B2_o(PORT_A2_RDATA),
+		.ADDR_B2_i(RD_ADDR_SHIFTED),
+		.CLK_B2_i(PORT_A2_CLK),
+		.REN_B2_i(PORT_A2_REN),
+		.WEN_B2_i(1'b0),
+		.BE_B2_i(PORT_A2_BE),
 
 		.FLUSH1_i(FLUSH1),
 		.FLUSH2_i(FLUSH2)
