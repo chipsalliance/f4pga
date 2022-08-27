@@ -24,8 +24,10 @@ from os import environ
 from pathlib import Path
 from shutil import which
 from subprocess import check_call
+from argparse import ArgumentParser, RawDescriptionHelpFormatter
 
 from f4pga.context import FPGA_FAM, F4PGA_SHARE_DIR
+
 
 python3 = which("python3")
 
@@ -47,10 +49,10 @@ def p_run_sh_script(script):
     check_call([str(script)] + sys_argv[1:], env=f4pga_environ)
 
 
-def p_run_bash_cmds(cmds):
+def p_run_bash_cmds(cmds, env=f4pga_environ):
     stdout.flush()
     stderr.flush()
-    check_call(cmds, env=f4pga_environ, shell=True, executable="/bin/bash")
+    check_call(cmds, env=env, shell=True, executable="/bin/bash")
 
 
 def p_run_pym(module):
@@ -59,17 +61,20 @@ def p_run_pym(module):
     check_call([python3, "-m", module] + sys_argv[1:], env=f4pga_environ)
 
 
-def p_vpr_common_cmds(log_suffix=None):
-    return f"""
-set -e
-source {ROOT / SH_SUBDIR}/vpr_common.f4pga.sh {' '.join([f"'{arg}'" for arg in sys_argv[1:]])}
-""" + (
-        f"""
-export OUT_NOISY_WARNINGS=noisy_warnings-${{DEVICE}}_{log_suffix}.log
-"""
-        if log_suffix is not None
-        else ""
+def p_vpr_env_from_args(log_suffix=None):
+    vpr_options = f4pga_environ.get("VPR_OPTIONS")
+    if vpr_options is not None:
+        vpr_options = p_args_str2list(vpr_options)
+
+    env = f4pga_environ.copy()
+    env.update(
+        p_parse_vpr_args(
+            vpr_options=vpr_options,
+            log_suffix=log_suffix,
+            isQuickLogic=isQuickLogic,
+        )
     )
+    return env
 
 
 def p_args_str2list(args):
@@ -130,6 +135,256 @@ def p_vpr_run():
     )
 
 
+def p_parse_vpr_args(vpr_options=None, log_suffix=None, isQuickLogic=False):
+    if isQuickLogic:
+        return p_parse_vpr_args_quicklogic(vpr_options, log_suffix)
+    else:
+        return p_parse_vpr_args_xc7(vpr_options, log_suffix)
+
+
+def p_parse_vpr_args_xc7(vpr_options=None, log_suffix=None):
+
+    parser = ArgumentParser(description=__doc__, formatter_class=RawDescriptionHelpFormatter)
+    parser.add_argument("--device", "-d", required=False, type=str, help="")
+    parser.add_argument("--eblif", "-e", required=True, type=str, help="")
+    parser.add_argument("--pcf", "-p", required=False, type=str, help="")
+    parser.add_argument("--net", "-n", required=False, type=str, help="")
+    parser.add_argument("--part", "-P", required=False, type=str, help="")
+    parser.add_argument("--sdc", "-s", required=False, type=str, help="")
+    parser.add_argument("additional_vpr_options", nargs="*", type=str, help="")
+    args = parser.parse_args()
+
+    device = args.device
+    if device is None and args.part is not None:
+        parts_dir = F4PGA_SHARE_DIR
+        # Try to find device name.
+        # Accept only when exactly one is found.
+        # PART_DIRS=(${F4PGA_SHARE_DIR}/arch/*/${PART})
+        # if [ ${#PART_DIRS[@]} -eq 1 ]; then DEVICE=$(basename $(dirname "${PART_DIRS[0]}")); fi
+
+    if device is None:
+        raise Exception("Please provide device name")
+
+    noisy_warnings = "" if log_suffix is None else f"noisy_warnings-{device}_{log_suffix}.log"
+
+    if vpr_options is None:
+        print("Using default VPR options")
+        vpr_options = [
+            "--max_router_iterations",
+            "500",
+            "--routing_failure_predictor",
+            "off",
+            "--router_high_fanout_threshold",
+            "-1",
+            "--constant_net_method",
+            "route",
+            "--route_chan_width",
+            "500",
+            "--router_heap",
+            "bucket",
+            "--clock_modeling",
+            "route",
+            "--place_delta_delay_matrix_calculation_method",
+            "dijkstra",
+            "--place_delay_model",
+            "delta",
+            "--router_lookahead",
+            "extended_map",
+            "--check_route",
+            "quick",
+            "--strict_checks",
+            "off",
+            "--allow_dangling_combinational_nodes",
+            "on",
+            "--disable_errors",
+            "check_unbuffered_edges:check_route",
+            "--congested_routing_iteration_threshold",
+            "0.8",
+            "--incremental_reroute_delay_ripup",
+            "off",
+            "--base_cost_type",
+            "delay_normalized_length_bounded",
+            "--bb_factor",
+            "10",
+            "--acc_fac",
+            "0.7",
+            "--astar_fac",
+            "1.8",
+            "--initial_pres_fac",
+            "2.828",
+            "--pres_fac_mult",
+            "1.2",
+            "--check_rr_graph",
+            "off",
+            "--suppress_warnings",
+            noisy_warnings
+            + ",sum_pin_class:check_unbuffered_edges:load_rr_indexed_data_T_values:check_rr_node:trans_per_R:check_route:set_rr_graph_tool_comment:calculate_average_switch",
+        ]
+
+    arch_dir = F4PGA_SHARE_DIR / "arch" / device
+
+    envvars = {
+        "DEVICE": device,
+        "DEVICE_NAME": device.replace("_", "-"),
+        "EBLIF": args.eblif,
+        "VPR_OPTIONS": " ".join(vpr_options + args.additional_vpr_options),
+        "ARCH_DIR": str(arch_dir),
+        "ARCH_DEF": str(arch_dir / "arch.timing.xml"),
+        "RR_GRAPH": str(arch_dir / f"rr_graph_{device}.rr_graph.real.bin"),
+        "RR_GRAPH_XML": str(arch_dir / f"rr_graph_{device}.rr_graph.real.xml"),
+        "PLACE_DELAY": str(arch_dir / f"rr_graph_{device}.place_delay.bin"),
+        "LOOKAHEAD": str(arch_dir / f"rr_graph_{device}.lookahead.bin"),
+    }
+
+    if args.pcf is not None:
+        envvars["PCF"] = args.pcf
+    if args.net is not None:
+        envvars["NET"] = args.net
+    if args.part is not None:
+        envvars["PART"] = args.part
+    if args.sdc is not None:
+        envvars["SDC"] = args.sdc
+
+    if log_suffix is not None:
+        envvars["OUT_NOISY_WARNINGS"] = noisy_warnings
+
+    return envvars
+
+
+def p_parse_vpr_args_quicklogic(vpr_options=None, log_suffix=None):
+
+    parser = ArgumentParser(description=__doc__, formatter_class=RawDescriptionHelpFormatter)
+    parser.add_argument("--device", "-d", required=True, type=str, help="")
+    parser.add_argument("--family", "-f", required=True, type=str, help="")
+    parser.add_argument("--eblif", "-e", required=True, type=str, help="")
+    parser.add_argument("--pcf", "-p", required=False, type=str, help="")
+    parser.add_argument("--net", "-n", required=False, type=str, help="")
+    parser.add_argument("--part", "-P", required=False, type=str, help="")
+    parser.add_argument("--json", "-j", required=False, type=str, help="")
+    parser.add_argument("--sdc", "-s", required=False, type=str, help="")
+    parser.add_argument("--top", "-t", required=False, type=str, help="")
+    parser.add_argument("--corner", "-c", required=False, type=str, help="")
+    args = parser.parse_args()
+
+    if vpr_options is None:
+        print("Using default VPR options")
+        vpr_options = [
+            "--max_router_iterations",
+            "500",
+            "--routing_failure_predictor",
+            "off",
+            "--router_high_fanout_threshold",
+            "-1",
+            "--constant_net_method",
+            "route",
+        ]
+
+    noisy_warnings = "" if log_suffix is None else f"noisy_warnings-{args.device}_{log_suffix}.log"
+
+    vpr_options.extend(
+        [
+            "--place_delay_model",
+            "delta_override",
+            "--router_lookahead",
+            "extended_map",
+            "--allow_dangling_combinational_nodes",
+            "on",
+        ]
+        + (
+            [
+                "--route_chan_width",
+                "10",
+                "--clock_modeling",
+                "ideal",
+                "--place_delta_delay_matrix_calculation_method",
+                "dijkstra",
+                "--absorb_buffer_luts",
+                "off",
+            ]
+            if args.device == "qlf_k4n8_qlf_k4n8"
+            else [
+                "--route_chan_width",
+                "100",
+                "--clock_modeling",
+                "route",
+                "--check_route",
+                "quick",
+                "--strict_checks",
+                "off",
+                "--disable_errors",
+                "check_unbuffered_edges:check_route",
+                "--congested_routing_iteration_threshold",
+                "0.8",
+                "--incremental_reroute_delay_ripup",
+                "off",
+                "--base_cost_type",
+                "delay_normalized_length_bounded",
+                "--bb_factor",
+                "10",
+                "--initial_pres_fac",
+                "4.0",
+                "--check_rr_graph",
+                "off",
+                "--pack_high_fanout_threshold",
+                "PB-LOGIC:18",
+                "--suppress_warnings",
+                noisy_warnings
+                + ",sum_pin_class:check_unbuffered_edges:load_rr_indexed_data_T_values:check_rr_node:trans_per_R:check_route:set_rr_graph_tool_comment",
+            ]
+        )
+    )
+
+    device_2 = None
+    if args.device == "qlf_k4n8_qlf_k4n8":
+        device_1 = f"qlf_k4n8-qlf_k4n8_umc22_{args.corner}"
+    elif args.device == "qlf_k6n10_qlf_k6n10":
+        device_1 = "qlf_k6n10-qlf_k6n10_gf12"
+    else:
+        device_1 = args.device
+        device_2 = "wlcsp"
+    if device_2 is None:
+        device_2 = device_1
+
+    device_arch = f"{device_1}_{device_2}"
+    arch_dir = F4PGA_SHARE_DIR / "arch" / device_arch
+
+    rr_graph = arch_dir / f"{device_1}.rr_graph.bin"
+    # qlf* devices use different naming scheme than pp3* ones.
+    if not rr_graph.exists():
+        rr_graph = arch_dir / f"rr_graph_{device_arch}.rr_graph.real.bin"
+
+    envvars = {
+        "DEVICE": args.device,
+        "FAMILY": args.family,
+        "EBLIF": args.eblif,
+        "VPR_OPTIONS": " ".join(vpr_options),
+        "ARCH_DIR": str(arch_dir),
+        "ARCH_DEF": str(arch_dir / f"arch_{device_arch}.xml"),
+        "RR_GRAPH": str(rr_graph),
+        "PLACE_DELAY": str(arch_dir / f"rr_graph_{device_arch}.place_delay.bin"),
+        "LOOKAHEAD": str(arch_dir / f"rr_graph_{device_arch}.lookahead.bin"),
+        "DEVICE_NAME": device_1,
+    }
+
+    if args.pcf is not None:
+        envvars["PCF"] = args.pcf
+    if args.net is not None:
+        envvars["NET"] = args.net
+    if args.json is not None:
+        envvars["JSON"] = args.json
+    if args.sdc is not None:
+        envvars["SDC"] = args.sdc
+    if args.top is not None:
+        envvars["TOP"] = args.top
+    if args.sdc is not None:
+        envvars["CORNER"] = args.corner
+
+    if log_suffix is not None:
+        envvars["OUT_NOISY_WARNINGS"] = noisy_warnings
+
+    return envvars
+
+
 # Entrypoints
 
 
@@ -138,9 +393,8 @@ def generate_constraints():
     if isQuickLogic:
         (pcf, eblif, net, part, device, arch_def, corner) = sys_argv[1:8]
         place_file_prefix = Path(eblif).stem
-        share_dir = Path(f4pga_environ["F4PGA_SHARE_DIR"])
-        scripts_dir = share_dir / "scripts"
-        archs_dir = share_dir / "arch"
+        scripts_dir = F4PGA_SHARE_DIR / "scripts"
+        archs_dir = F4PGA_SHARE_DIR / "arch"
         p_run_bash_cmds(
             f"""
 set -e
@@ -224,21 +478,20 @@ fi
         (eblif, net, part, device, arch_def) = sys_argv[1:6]
         pcf_opts = f"'--pcf' '{sys_argv[6]}'" if len(sys_argv) > 6 else ""
         ioplace_file = f"{Path(eblif).stem}.ioplace"
-        share_dir = f4pga_environ["F4PGA_SHARE_DIR"]
         p_run_bash_cmds(
             f"""
 set -e
-python3 '{share_dir}/scripts/prjxray_create_ioplace.py' \
+python3 '{F4PGA_SHARE_DIR}/scripts/prjxray_create_ioplace.py' \
   --blif '{eblif}' \
   --net '{net}' {pcf_opts} \
-  --map '{share_dir}/arch/{device}/{part}/pinmap.csv' \
+  --map '{F4PGA_SHARE_DIR}/arch/{device}/{part}/pinmap.csv' \
   > '{ioplace_file}'
-python3 '{share_dir}'/scripts/prjxray_create_place_constraints.py \
+python3 '{F4PGA_SHARE_DIR}'/scripts/prjxray_create_place_constraints.py \
   --blif '{eblif}' \
   --net '{net}' \
   --arch '{arch_def}' \
   --part '{part}' \
-  --vpr_grid_map '{share_dir}/arch/{device}/vpr_grid_map.csv' \
+  --vpr_grid_map '{F4PGA_SHARE_DIR}/arch/{device}/vpr_grid_map.csv' \
   --input '{ioplace_file}' \
   --db_root "${{DATABASE_DIR:-$(prjxray-config)}}" \
   > constraints.place
@@ -249,7 +502,9 @@ python3 '{share_dir}'/scripts/prjxray_create_place_constraints.py \
 def pack():
     print("[F4PGA] Running (deprecated) pack")
     extra_args = ["--write_block_usage", "block_usage.json"] if isQuickLogic else []
-    p_run_bash_cmds(p_vpr_common_cmds("pack") + f"python3 -m f4pga.wrappers.sh.vpr_run --pack {' '.join(extra_args)}")
+    p_run_bash_cmds(
+        f"python3 -m f4pga.wrappers.sh.vpr_run --pack {' '.join(extra_args)}", env=p_vpr_env_from_args("pack")
+    )
     Path("vpr_stdout.log").rename("pack.log")
 
 
@@ -280,14 +535,16 @@ python3 -m f4pga.wrappers.sh.generate_constraints $EBLIF $NET $PART $DEVICE $ARC
 VPR_PLACE_FILE='constraints.place'
 """
     place_cmds += 'python3 -m f4pga.wrappers.sh.vpr_run --fix_clusters "${VPR_PLACE_FILE}" --place'
-    p_run_bash_cmds(p_vpr_common_cmds("place") + place_cmds)
+    p_run_bash_cmds(place_cmds, env=p_vpr_env_from_args("place"))
     Path("vpr_stdout.log").rename("place.log")
 
 
 def route():
     print("[F4PGA] Running (deprecated) route")
     extra_args = ["--write_timing_summary", "timing_summary.json"] if isQuickLogic else []
-    p_run_bash_cmds(p_vpr_common_cmds("pack") + f"python3 -m f4pga.wrappers.sh.vpr_run --route {' '.join(extra_args)}")
+    p_run_bash_cmds(
+        f"python3 -m f4pga.wrappers.sh.vpr_run --route {' '.join(extra_args)}", env=p_vpr_env_from_args("pack")
+    )
     Path("vpr_stdout.log").rename("route.log")
 
 
@@ -299,8 +556,7 @@ def synth():
 def write_fasm(genfasm_extra_args=None):
     print("[F4PGA] Running (deprecated) write fasm")
     p_run_bash_cmds(
-        p_vpr_common_cmds("fasm")
-        + f"""
+        f"""
 '{which('genfasm')}' \
   ${{ARCH_DEF}} ${{EBLIF}} --device ${{DEVICE_NAME}} \
   ${{VPR_OPTIONS}} \
@@ -313,7 +569,8 @@ if [ -f $FASM_EXTRA ]; then
   echo "writing final fasm (extra: $FASM_EXTRA)"
   cat $FASM_EXTRA >> ${TOP}.fasm
 fi
-"""
+""",
+        env=p_vpr_env_from_args("fasm"),
     )
     Path("vpr_stdout.log").rename("fasm.log")
 
@@ -384,8 +641,7 @@ xcfasm \
 def analysis():
     print("[F4PGA] Running (deprecated) analysis")
     p_run_bash_cmds(
-        p_vpr_common_cmds("analysis")
-        + """
+        """
 python3 -m f4pga.wrappers.sh.vpr_run \
   --analysis \
   --gen_post_synthesis_netlist on \
@@ -393,7 +649,8 @@ python3 -m f4pga.wrappers.sh.vpr_run \
   --post_synth_netlist_unconn_inputs nets \
   --post_synth_netlist_unconn_outputs nets \
   --verify_file_digests off
-"""
+""",
+        env=p_vpr_env_from_args("analysis"),
     )
     Path("vpr_stdout.log").rename("analysis.log")
 
@@ -401,8 +658,7 @@ python3 -m f4pga.wrappers.sh.vpr_run \
 def repack():
     print("[F4PGA] Running (deprecated) repack")
     p_run_bash_cmds(
-        p_vpr_common_cmds()
-        + """
+        """
 DESIGN=${EBLIF/.eblif/}
 [ ! -z "${JSON}" ] && JSON_ARGS="--json-constraints ${JSON}" || JSON_ARGS=
 [ ! -z "${PCF_PATH}" ] && PCF_ARGS="--pcf-constraints ${PCF_PATH}" || PCF_ARGS=
@@ -411,7 +667,7 @@ DESIGN=${EBLIF/.eblif/}
 PYTHONPATH=$F4PGA_SHARE_DIR/scripts:$PYTHONPATH \
   '{python3}' "$F4PGA_SHARE_DIR"/scripts/repacker/repack.py \
     --vpr-arch ${{ARCH_DEF}} \
-    --repacking-rules ${{ARCH_DIR}}/${{DEVICE_1}}.repacking_rules.json \
+    --repacking-rules ${{ARCH_DIR}}/${{DEVICE_NAME}}.repacking_rules.json \
     $JSON_ARGS \
     $PCF_ARGS \
     --eblif-in ${{DESIGN}}.eblif \
@@ -422,7 +678,8 @@ PYTHONPATH=$F4PGA_SHARE_DIR/scripts:$PYTHONPATH \
     --place-out ${{DESIGN}}.repacked.place \
     --absorb_buffer_luts on \
     > repack.log 2>&1
-"""
+""",
+        env=p_vpr_env_from_args(),
     )
 
 
