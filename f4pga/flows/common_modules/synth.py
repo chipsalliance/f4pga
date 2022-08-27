@@ -23,6 +23,7 @@ from pathlib import Path
 from f4pga.flows.common import decompose_depname, get_verbosity_level, sub as common_sub
 from f4pga.flows.module import Module, ModuleContext
 from f4pga.wrappers.tcl import get_script_path as get_tcl_wrapper_path
+from f4pga.utils import split_inouts
 
 
 class SynthModule(Module):
@@ -83,14 +84,7 @@ class SynthModule(Module):
         )
 
         yield f"Splitting in/outs..."
-        common_sub(
-            "python3",
-            str(Path(tcl_env["UTILS_PATH"]) / "split_inouts.py"),
-            "-i",
-            ctx.outputs.json,
-            "-o",
-            ctx.outputs.synth_json,
-        )
+        split_inouts(ctx.outputs.json, ctx.outputs.synth_json)
 
         if not Path(ctx.produces.fasm_extra).is_file():
             with Path(ctx.produces.fasm_extra).open("w") as wfptr:
