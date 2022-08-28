@@ -388,7 +388,7 @@ if [ "$FAMILY" == "qlf_k4n8" ]; then
 elif [ "$FAMILY" == "pp3" ]; then
     echo -e "\
 \${BUILDDIR}/\${TOP}.bit: \${BUILDDIR}/\${TOP}.fasm\n\
-	cd \${BUILDDIR} && symbiflow_generate_bitstream -d \${DEVICE} -f \${TOP}.fasm -P \${PARTNAME} -b \${TOP}.bit >> $LOG_FILE 2>&1\n\
+	cd \${BUILDDIR} && symbiflow_generate_bitstream -d \${DEVICE} -f \${TOP}.fasm -b \${TOP}.bit >> $LOG_FILE 2>&1\n\
     " >>$MAKE_FILE
 fi
 

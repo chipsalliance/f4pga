@@ -706,57 +706,27 @@ PYTHONPATH='{F4PGA_SHARE_DIR}/scripts':$PYTHONPATH \
 
 def generate_bitstream():
     print("[F4PGA] Running (deprecated) generate_bitstream")
-    p_run_bash_cmds(
-        f"""
-set -e
-eval set -- "$(
-  getopt \
-    --options=d:f:r:b:P: \
-    --longoptions=device:,fasm:,format:,bit:,part: \
-    --name $0 -- {' '.join(sys_argv[1:])}
-)"
-"""
-        + """
-DEVICE=""
-FASM=""
-BIT_FORMAT="4byte"
-BIT=""
-PART=""
-while true; do
-  case "$1" in
-    -d|--device) DEVICE=$2;     shift 2;;
-    -f|--fasm)   FASM=$2;       shift 2;;
-    -r|--format) BIT_FORMAT=$2; shift 2;;
-    -b|--bit)    BIT=$2;        shift 2;;
-    -P|--part)   PART=$2;       shift 2;;
-    --) break;;
-  esac
-done
-if [ -z $DEVICE ]; then echo "Please provide device name"; exit 1; fi
-if [ -z $FASM ]; then echo "Please provide an input FASM file name"; exit 1; fi
-if [ ! -f "$FASM" ]; then echo "File <$FASM> does not exist!"; exit 1; fi
-if [ -z $BIT ]; then echo "Please provide an output bistream file name"; exit 1; fi
-"""
-        + f"""
-if [[ "$DEVICE" =~ ^(qlf_k4n8.*)$ ]]; then
-  '{which('qlf_fasm')}' \
-    --db-root '{F4PGA_SHARE_DIR}/fasm_database/'"${{DEVICE}}" \
-    --format "$BIT_FORMAT" \
-    --assemble \
-    "$FASM" \
-    "$BIT"
-elif [[ "$DEVICE" =~ ^(ql-eos-s3|ql-pp3e)$ ]]; then
-  qlfasm \
-    --dev-type \
-    "$DEVICE" \
-    "$FASM" \
-    "$BIT"
-else
-  echo "ERROR: Unsupported device '${{DEVICE}}' for bitstream generation"
-  exit -1
-fi
-"""
-    )
+    parser = ArgumentParser(description=__doc__, formatter_class=RawDescriptionHelpFormatter)
+    parser.add_argument("--device", "-d", required=True, type=str, help="")
+    parser.add_argument("--fasm", "-f", required=True, type=str, help="")
+    parser.add_argument("--bit", "-b", required=True, type=str, help="")
+    parser.add_argument("--format", "-r", required=False, type=str, help="")
+    args = parser.parse_args()
+
+    if not Path(args.fasm).exists():
+        raise Exception(f"File <{args.fasm}> does not exist!")
+
+    fmt = "4byte" if args.format is None else args.format
+    db_root = F4PGA_SHARE_DIR / "fasm_database" / args.device
+
+    if "qlf_k4n8" in args.device:
+        p_run_bash_cmds(
+            f"'{which('qlf_fasm')}' --db-root '{db_root}' --format '{fmt}' --assemble '{args.fasm}' '{args.bit}'"
+        )
+    elif args.device in ["ql-eos-s3", "ql-pp3e"]:
+        p_run_bash_cmds(f"qlfasm --dev-type '{args.device}' '{args.fasm}' '{args.bit}'")
+    else:
+        raise Exception(f"[bitstream generation] Unsupported device '{args.device}'!")
 
 
 def generate_libfile():
