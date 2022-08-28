@@ -798,54 +798,40 @@ def ql():
 
 def fasm2bels():
     print("[F4PGA] Running (deprecated) fasm2bels")
+    parser = ArgumentParser(description=__doc__, formatter_class=RawDescriptionHelpFormatter)
+    parser.add_argument("--device", "-d", required=True, type=str, help="")
+    parser.add_argument("--bit", "-b", required=True, type=str, help="")
+    parser.add_argument("--part", "-P", required=True, type=str, help="")
+    parser.add_argument("--pcf", "-p", required=False, type=str, help="")
+    parser.add_argument("--out-verilog", "-v", required=False, type=str, help="")
+    parser.add_argument("--out-pcf", "-o", required=False, type=str, help="")
+    parser.add_argument("--out-qcf", "-q", required=False, type=str, help="")
+    args = parser.parse_args()
+
+    if args.device not in ["ql-eos-s3", "ql-pp3e"]:
+        raise Exception(f"[fasm2bels] Unsupported device '{args.device}'")
+
+    env = f4pga_environ.copy()
+    env["DEVICE"] = args.device
+
+    pcf_args = "" if args.pcf is None else f"--input-pcf {args.pcf}"
+    out_verilog = f"{args.bit}.v" if args.out_verilog is None else args.out_verilog
+    out_pcf = f"{args.bit}.v.pcf" if args.out_pcf is None else args.out_pcf
+    out_qcf = f"{args.bit}.v.qcf" if args.out_qcf is None else args.out_qcf
+
     p_run_bash_cmds(
         f"""
-set -e
-eval set -- "$(
-  getopt \
-    --options=d:P:p:b:v:o:q \
-    --longoptions=device:,part:,pcf:,bit:,out-verilog:,out-pcf:,out-qcf:, \
-    --name $0 -- {' '.join(sys_argv[1:])}
-)"
-"""
-        + """
-DEVICE=""
-PART=""
-PCF=""
-BIT=""
-OUT_VERILOG=""
-OUT_PCF=""
-OUT_QCF=""
-while true; do
-  case "$1" in
-    -d|--device)      DEVICE=$2; shift 2 ;;
-    -P|--part)        PART=$2;   shift 2 ;;
-    -p|--pcf)         PCF=$2;    shift 2 ;;
-    -b|--bit)         BIT=$2;    shift 2 ;;
-    -v|--out-verilog) OUT_VERILOG=$2; shift 2 ;;
-    -o|--out-pcf)     OUT_PCF=$2;     shift 2 ;;
-    -q|--out-qcf)     OUT_QCF=$2;     shift 2 ;;
-    --) break ;;
-  esac
-done
-if [ -z $DEVICE ]; then echo "Please provide device name"; exit 1; fi
-if [ -z $BIT ]; then echo "Please provide an input bistream file name"; exit 1; fi
-# $DEVICE is not ql-eos-s3 or ql-pp3e
-if ! [[ "$DEVICE" =~ ^(ql-eos-s3|ql-pp3e)$ ]]; then echo "ERROR: Unsupported device '${DEVICE}' for fasm2bels"; exit -1; fi
-if [ -z "{PCF}" ]; then PCF_ARGS=""; else PCF_ARGS="--input-pcf ${PCF}"; fi
-echo "Running fasm2bels"
-"""
-        + f"""
-'{python3}' '{F4PGA_SHARE_DIR}/scripts/fasm2bels.py' "${{BIT}}" \
-  --phy-db '{F4PGA_SHARE_DIR}/arch/'"${{DEVICE}}_wlcsp/db_phy.pickle" \
+'{python3}' '{F4PGA_SHARE_DIR}/scripts/fasm2bels.py' '{args.bit}' \
+  --phy-db '{F4PGA_SHARE_DIR}/arch/{args.device}_wlcsp/db_phy.pickle' \
   --device-name "${{DEVICE/ql-/}}" \
-  --package-name "$PART" \
+  --package-name '{args.part}' \
   --input-type bitstream \
-  --output-verilog "${{OUT_VERILOG:-$BIT.v}}" \
-  ${{PCF_ARGS}} \
-  --output-pcf "${{OUT_PCF:-$BIT.v.pcf}}" \
-  --output-qcf "${{OUT_QCF:-$BIT.v.qcf}}"
-"""
+  --output-verilog '{out_verilog}' \
+  {pcf_args} \
+  --output-pcf '{out_pcf}' \
+  --output-qcf '{out_qcf}'
+""",
+        env=env,
     )
 
 
