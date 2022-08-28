@@ -36,37 +36,34 @@ ROOT = Path(__file__).resolve().parent
 isQuickLogic = FPGA_FAM != "xc7"
 SH_SUBDIR = "quicklogic" if isQuickLogic else FPGA_FAM
 
-f4pga_environ = environ.copy()
-f4pga_environ["F4PGA_SHARE_DIR"] = f4pga_environ.get("F4PGA_SHARE_DIR", F4PGA_SHARE_DIR)
-
 
 # Helper functions
 
 
-def p_run_sh_script(script, env=f4pga_environ):
+def p_run_sh_script(script, env=environ):
     stdout.flush()
     stderr.flush()
     check_call([str(script)] + sys_argv[1:], env=env)
 
 
-def p_run_bash_cmds(cmds, env=f4pga_environ):
+def p_run_bash_cmds(cmds, env=environ):
     stdout.flush()
     stderr.flush()
     check_call(cmds, env=env, shell=True, executable="/bin/bash")
 
 
-def p_run_pym(module, env=f4pga_environ):
+def p_run_pym(module, env=environ):
     stdout.flush()
     stderr.flush()
     check_call([python3, "-m", module] + sys_argv[1:], env=env)
 
 
 def p_vpr_env_from_args(log_suffix=None):
-    vpr_options = f4pga_environ.get("VPR_OPTIONS")
+    vpr_options = environ.get("VPR_OPTIONS")
     if vpr_options is not None:
         vpr_options = p_args_str2list(vpr_options)
 
-    env = f4pga_environ.copy()
+    env = environ.copy()
     env.update(
         p_parse_vpr_args(
             vpr_options=vpr_options,
@@ -84,35 +81,35 @@ def p_args_str2list(args):
 def p_vpr_run():
     print("[F4PGA] Running (deprecated) vpr run")
 
-    arg_arch_def = f4pga_environ.get("ARCH_DEF")
+    arg_arch_def = environ.get("ARCH_DEF")
     if arg_arch_def is None:
         raise (Exception("[F4PGA] vpr run: envvar ARCH_DEF cannot be unset/empty!"))
 
-    arg_eblif = f4pga_environ.get("EBLIF")
+    arg_eblif = environ.get("EBLIF")
     if arg_eblif is None:
         raise (Exception("[F4PGA] vpr run: envvar EBLIF cannot be unset/empty!"))
 
-    arg_vpr_options = f4pga_environ.get("VPR_OPTIONS")
+    arg_vpr_options = environ.get("VPR_OPTIONS")
     if arg_vpr_options is None:
         raise (Exception("[F4PGA] vpr run: envvar VPR_OPTIONS cannot be unset/empty!"))
 
-    arg_device_name = f4pga_environ.get("DEVICE_NAME")
+    arg_device_name = environ.get("DEVICE_NAME")
     if arg_device_name is None:
         raise (Exception("[F4PGA] vpr run: envvar DEVICE_NAME cannot be unset/empty!"))
 
-    arg_rr_graph = f4pga_environ.get("RR_GRAPH")
+    arg_rr_graph = environ.get("RR_GRAPH")
     if arg_rr_graph is None:
         raise (Exception("[F4PGA] vpr run: envvar RR_GRAPH cannot be unset/empty!"))
 
-    arg_lookahead = f4pga_environ.get("LOOKAHEAD")
+    arg_lookahead = environ.get("LOOKAHEAD")
     if arg_lookahead is None:
         raise (Exception("[F4PGA] vpr run: envvar LOOKAHEAD cannot be unset/empty!"))
 
-    arg_place_delay = f4pga_environ.get("PLACE_DELAY")
+    arg_place_delay = environ.get("PLACE_DELAY")
     if arg_place_delay is None:
         raise (Exception("[F4PGA] vpr run: envvar PLACE_DELAY cannot be unset/empty!"))
 
-    sdc = f4pga_environ.get("SDC")
+    sdc = environ.get("SDC")
     if sdc == "":
         sdc = None
 
@@ -131,7 +128,6 @@ def p_vpr_run():
         ]
         + (["--sdc_file", sdc] if sdc is not None else [])
         + sys_argv[1:],
-        env=f4pga_environ,
     )
 
 
@@ -550,7 +546,10 @@ def route():
 
 def synth():
     print("[F4PGA] Running (deprecated) synth")
-    env = f4pga_environ.copy()
+    env = environ.copy()
+
+    if environ.get("F4PGA_SHARE_DIR") is None:
+        env["F4PGA_SHARE_DIR"] = str(F4PGA_SHARE_DIR)
 
     env["UTILS_PATH"] = str(F4PGA_SHARE_DIR / "scripts")
 
@@ -793,7 +792,10 @@ PINMAP_XML=${ARCH_DIR}/${PINMAPXML}
 
 def ql():
     print("[F4PGA] Running (deprecated) ql")
-    p_run_sh_script(ROOT / "quicklogic/ql.f4pga.sh")
+    env = environ.copy()
+    if environ.get("F4PGA_SHARE_DIR") is None:
+        env["F4PGA_SHARE_DIR"] = str(F4PGA_SHARE_DIR)
+    p_run_sh_script(ROOT / "quicklogic/ql.f4pga.sh", env=env)
 
 
 def fasm2bels():
@@ -811,7 +813,7 @@ def fasm2bels():
     if args.device not in ["ql-eos-s3", "ql-pp3e"]:
         raise Exception(f"[fasm2bels] Unsupported device '{args.device}'")
 
-    env = f4pga_environ.copy()
+    env = environ.copy()
     env["DEVICE"] = args.device
 
     pcf_args = "" if args.pcf is None else f"--input-pcf {args.pcf}"
