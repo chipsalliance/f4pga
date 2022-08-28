@@ -43,10 +43,10 @@ f4pga_environ["F4PGA_SHARE_DIR"] = f4pga_environ.get("F4PGA_SHARE_DIR", F4PGA_SH
 # Helper functions
 
 
-def p_run_sh_script(script):
+def p_run_sh_script(script, env=f4pga_environ):
     stdout.flush()
     stderr.flush()
-    check_call([str(script)] + sys_argv[1:], env=f4pga_environ)
+    check_call([str(script)] + sys_argv[1:], env=env)
 
 
 def p_run_bash_cmds(cmds, env=f4pga_environ):
@@ -55,10 +55,10 @@ def p_run_bash_cmds(cmds, env=f4pga_environ):
     check_call(cmds, env=env, shell=True, executable="/bin/bash")
 
 
-def p_run_pym(module):
+def p_run_pym(module, env=f4pga_environ):
     stdout.flush()
     stderr.flush()
-    check_call([python3, "-m", module] + sys_argv[1:], env=f4pga_environ)
+    check_call([python3, "-m", module] + sys_argv[1:], env=env)
 
 
 def p_vpr_env_from_args(log_suffix=None):
@@ -550,7 +550,29 @@ def route():
 
 def synth():
     print("[F4PGA] Running (deprecated) synth")
-    p_run_sh_script(ROOT / SH_SUBDIR / "synth.f4pga.sh")
+    env = f4pga_environ.copy()
+
+    env["UTILS_PATH"] = str(F4PGA_SHARE_DIR / "scripts")
+
+    if isQuickLogic:
+        key = None
+        for item in ["-F", "--family"]:
+            if item in sys_argv:
+                key = item
+                break
+        if key is None:
+            raise Exception("Please specify device family")
+        family = sys_argv[sys_argv.index(key) + 1]
+        env.update(
+            {
+                "FAMILY": family,
+                "TECHMAP_PATH": str(F4PGA_SHARE_DIR / "techmaps" / family),
+            }
+        )
+    else:
+        env["TECHMAP_PATH"] = str(F4PGA_SHARE_DIR / "techmaps/xc7_vpr/techmap")
+
+    p_run_sh_script(ROOT / SH_SUBDIR / "synth.f4pga.sh", env=env)
 
 
 def write_fasm(genfasm_extra_args=None):

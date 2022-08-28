@@ -18,9 +18,6 @@
 
 set -e
 
-export TECHMAP_PATH="${F4PGA_SHARE_DIR}"/techmaps/xc7_vpr/techmap
-
-export UTILS_PATH="${F4PGA_SHARE_DIR}"/scripts
 SYNTH_TCL_PATH="$(python3 -m f4pga.wrappers.tcl synth)"
 
 VERILOG_FILES=()
