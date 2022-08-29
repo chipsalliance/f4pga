@@ -23,10 +23,10 @@
     - `f4pga build` now supports Lattice's NX devices.
 
 
-6:
-  examples: 78b5e8f2845985be0c63631324adc33756de642d
-  arch-defs: 20220803-160711@df6d9e5
-  f4pga: e9a520a17a00cfd268f8ee549340aaa297b63da5
+7:
+  examples: 954a21090b14808b50d259b552e353b69f0ddae0
+  arch-defs: 20220818-143856@24e8f73
+  f4pga: 2d8d85706ecc7a72e17078ea903e2751022825da
   <<: &tarballs-consistent
     tarballs:
       xc7:
@@ -35,6 +35,22 @@
       eos-s3:
         - symbiflow-install-ql-*-tar-xz
         - symbiflow-ql-eos-s3_wlcsp-*-tar-xz
+  description: |
+    * Yosys TCL scripts from f4pga-arch-defs tarballs were moved to f4pga as ``f4pga.wrappers.tcl``.
+
+    * Use ``--`` (instead of ``-a|--additional_vpr_options``) to provide additional VPR arguments to the (deprecated)
+      ``symbiflow_*`` entrypoints.
+
+    * Setting ``FPGA_FAM`` before installing ``f4pga`` is not required anymore.
+
+    * Sources related to ``f4pga build`` were moved to submodule ``f4pga.flows``.
+
+
+6:
+  examples: 78b5e8f2845985be0c63631324adc33756de642d
+  arch-defs: 20220803-160711@df6d9e5
+  f4pga: e9a520a17a00cfd268f8ee549340aaa297b63da5
+  <<: *tarballs-consistent
   description: |
     * Tarballs from f4pga-arch-defs now include usable environment and requirements files which allow bootstraping
       minimal Conda environments.
