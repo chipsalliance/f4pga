@@ -78,38 +78,38 @@ def p_args_str2list(args):
     return [arg for arg in args.strip().split() if arg != ""]
 
 
-def p_vpr_run():
+def p_vpr_run(args, env=environ):
     print("[F4PGA] Running (deprecated) vpr run")
 
-    arg_arch_def = environ.get("ARCH_DEF")
+    arg_arch_def = env.get("ARCH_DEF")
     if arg_arch_def is None:
         raise (Exception("[F4PGA] vpr run: envvar ARCH_DEF cannot be unset/empty!"))
 
-    arg_eblif = environ.get("EBLIF")
+    arg_eblif = env.get("EBLIF")
     if arg_eblif is None:
         raise (Exception("[F4PGA] vpr run: envvar EBLIF cannot be unset/empty!"))
 
-    arg_vpr_options = environ.get("VPR_OPTIONS")
+    arg_vpr_options = env.get("VPR_OPTIONS")
     if arg_vpr_options is None:
         raise (Exception("[F4PGA] vpr run: envvar VPR_OPTIONS cannot be unset/empty!"))
 
-    arg_device_name = environ.get("DEVICE_NAME")
+    arg_device_name = env.get("DEVICE_NAME")
     if arg_device_name is None:
         raise (Exception("[F4PGA] vpr run: envvar DEVICE_NAME cannot be unset/empty!"))
 
-    arg_rr_graph = environ.get("RR_GRAPH")
+    arg_rr_graph = env.get("RR_GRAPH")
     if arg_rr_graph is None:
         raise (Exception("[F4PGA] vpr run: envvar RR_GRAPH cannot be unset/empty!"))
 
-    arg_lookahead = environ.get("LOOKAHEAD")
+    arg_lookahead = env.get("LOOKAHEAD")
     if arg_lookahead is None:
         raise (Exception("[F4PGA] vpr run: envvar LOOKAHEAD cannot be unset/empty!"))
 
-    arg_place_delay = environ.get("PLACE_DELAY")
+    arg_place_delay = env.get("PLACE_DELAY")
     if arg_place_delay is None:
         raise (Exception("[F4PGA] vpr run: envvar PLACE_DELAY cannot be unset/empty!"))
 
-    sdc = environ.get("SDC")
+    sdc = env.get("SDC")
     if sdc == "":
         sdc = None
 
@@ -127,7 +127,7 @@ def p_vpr_run():
             arg_place_delay,
         ]
         + (["--sdc_file", sdc] if sdc is not None else [])
-        + sys_argv[1:],
+        + args,
     )
 
 
@@ -498,9 +498,7 @@ python3 '{F4PGA_SHARE_DIR}'/scripts/prjxray_create_place_constraints.py \
 def pack():
     print("[F4PGA] Running (deprecated) pack")
     extra_args = ["--write_block_usage", "block_usage.json"] if isQuickLogic else []
-    p_run_bash_cmds(
-        f"python3 -m f4pga.wrappers.sh.vpr_run --pack {' '.join(extra_args)}", env=p_vpr_env_from_args("pack")
-    )
+    p_vpr_run(["--pack"] + extra_args, env=p_vpr_env_from_args("pack"))
     Path("vpr_stdout.log").rename("pack.log")
 
 
@@ -538,9 +536,7 @@ VPR_PLACE_FILE='constraints.place'
 def route():
     print("[F4PGA] Running (deprecated) route")
     extra_args = ["--write_timing_summary", "timing_summary.json"] if isQuickLogic else []
-    p_run_bash_cmds(
-        f"python3 -m f4pga.wrappers.sh.vpr_run --route {' '.join(extra_args)}", env=p_vpr_env_from_args("pack")
-    )
+    p_vpr_run(["--route"] + extra_args, env=p_vpr_env_from_args("pack"))
     Path("vpr_stdout.log").rename("route.log")
 
 
@@ -661,16 +657,20 @@ xcfasm \
 
 def analysis():
     print("[F4PGA] Running (deprecated) analysis")
-    p_run_bash_cmds(
-        """
-python3 -m f4pga.wrappers.sh.vpr_run \
-  --analysis \
-  --gen_post_synthesis_netlist on \
-  --gen_post_implementation_merged_netlist on \
-  --post_synth_netlist_unconn_inputs nets \
-  --post_synth_netlist_unconn_outputs nets \
-  --verify_file_digests off
-""",
+    p_vpr_run(
+        [
+            "--analysis",
+            "--gen_post_synthesis_netlist",
+            "on",
+            "--gen_post_implementation_merged_netlist",
+            "on",
+            "--post_synth_netlist_unconn_inputs",
+            "nets",
+            "--post_synth_netlist_unconn_outputs",
+            "nets",
+            "--verify_file_digests",
+            "off",
+        ],
         env=p_vpr_env_from_args("analysis"),
     )
     Path("vpr_stdout.log").rename("analysis.log")
