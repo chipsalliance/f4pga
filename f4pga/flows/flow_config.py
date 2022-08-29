@@ -132,6 +132,54 @@ class ProjectFlowConfig:
         return platform_ovds
 
 
+def override_prj_flow_cfg_by_cli(cfg: ProjectFlowConfig, cli_d: "dict[str, dict[str, dict]]"):
+    for part_name, part_cfg in cli_d.items():
+        print(f"OVERRIDING CONFIG FOR {part_name}")
+        p_cfg = cfg.flow_cfg.get(part_name)
+        if p_cfg is None:
+            p_cfg = {}
+            cfg.flow_cfg[part_name] = p_cfg
+        cli_p_values = part_cfg.get("values")
+        cli_p_dependencies = part_cfg.get("dependencies")
+        p_values = p_cfg.get("values")
+        p_dependencies = p_cfg.get("dependencies")
+        if cli_p_values is not None:
+            if p_values is None:
+                p_values = {}
+                part_cfg["values"] = p_values
+            p_values.update(cli_p_values)
+        if cli_p_dependencies is not None:
+            if p_dependencies is None:
+                p_dependencies = {}
+                part_cfg["dependencies"] = p_dependencies
+            p_dependencies.update(cli_p_dependencies)
+
+        for stage_name, cli_stage_cfg in part_cfg.items():
+            if _is_kword(stage_name):
+                continue
+
+            stage_cfg = part_cfg.get(stage_name)
+            if stage_cfg is None:
+                stage_cfg = {}
+                part_cfg[stage_name] = stage_cfg
+
+            stage_values = stage_cfg.get("values")
+            stage_dependencies = stage_cfg.get("dependencies")
+            cli_stage_values = cli_stage_cfg.get("values")
+            cli_stage_dependencies = cli_stage_cfg.get("dependencies")
+
+            if cli_stage_values is not None:
+                if stage_values is None:
+                    stage_values = {}
+                    stage_cfg["values"] = stage_values
+                stage_values.update(cli_stage_values)
+            if cli_stage_dependencies is not None:
+                if stage_dependencies is None:
+                    stage_dependencies = {}
+                    stage_cfg["dependencies"] = stage_dependencies
+                stage_dependencies.update(cli_stage_dependencies)
+
+
 class FlowConfig:
     part: str
     r_env: ResolutionEnv
@@ -144,7 +192,7 @@ class FlowConfig:
         self.stages = platform_def.stages
         self.part = part
 
-        self.dependencies_explicit = deep(lambda p: str(Path(p).resolve()))(
+        self.dependencies_explicit = deep(lambda p: str(Path(p).resolve()), allow_none=True)(
             self.r_env.resolve(project_config.get_dependencies_raw(part))
         )
 

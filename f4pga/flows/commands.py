@@ -44,6 +44,7 @@ from f4pga.flows.flow_config import (
     FlowConfig,
     FlowDefinition,
     open_project_flow_cfg,
+    override_prj_flow_cfg_by_cli,
     verify_platform_name,
 )
 from f4pga.flows.flow import Flow
@@ -219,12 +220,13 @@ def cmd_build(args: Namespace):
         project_flow_cfg = open_project_flow_config(args.flow)
     elif part_name is not None:
         project_flow_cfg = ProjectFlowConfig(".temp.flow.json")
-        project_flow_cfg.flow_cfg = get_cli_flow_config(args, part_name)
     if part_name is None and project_flow_cfg is not None:
         part_name = project_flow_cfg.get_default_part()
 
-    if project_flow_cfg is None:
+    if (project_flow_cfg is None) and part_name is None:
         fatal(-1, "No configuration was provided. Use `--flow`, and/or " "`--part` to configure flow.")
+
+    override_prj_flow_cfg_by_cli(project_flow_cfg, get_cli_flow_config(args, part_name))
 
     flow_cfg = make_flow_config(project_flow_cfg, part_name)
 
