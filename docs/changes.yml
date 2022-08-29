@@ -16,17 +16,14 @@
 
 0:
   future-work: |
-    - Python scripts moved from f4pga-arch-defs to f4pga.
-    - TCL scripts moved from f4pa-arch-defs to f4pga.
     - `f4pga build` now supports Lattice's ICE40 devices.
     - `f4pga build` now supports Lattice's ECP5 devices.
     - `f4pga build` now supports Lattice's NX devices.
 
-
-7:
-  examples: 954a21090b14808b50d259b552e353b69f0ddae0
-  arch-defs: 20220818-143856@24e8f73
-  f4pga: 2d8d85706ecc7a72e17078ea903e2751022825da
+8:
+  examples: e3a23897c2692d54a3abb57f5199cded6852da60
+  arch-defs: 20220907-210059@66a976d
+  f4pga: 6b4976a028e8a8a3b78711b6471655d3bfe58ed7
   <<: &tarballs-consistent
     tarballs:
       xc7:
@@ -35,6 +32,17 @@
       eos-s3:
         - symbiflow-install-ql-*-tar-xz
         - symbiflow-ql-eos-s3_wlcsp-*-tar-xz
+  description: |
+    * Python scripts from f4pga-arch-defs tarballs were moved to f4pga.
+
+    * Yosys 'conv' and 'synth' TCL scripts combined in a single pipeline.
+
+
+7:
+  examples: 954a21090b14808b50d259b552e353b69f0ddae0
+  arch-defs: 20220818-143856@24e8f73
+  f4pga: 2d8d85706ecc7a72e17078ea903e2751022825da
+  <<: *tarballs-consistent
   description: |
     * Yosys TCL scripts from f4pga-arch-defs tarballs were moved to f4pga as ``f4pga.wrappers.tcl``.
 
