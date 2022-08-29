@@ -75,6 +75,8 @@ def _parse_param_def(param_def: str):
         return "positional", int(param_def[1:])
     elif param_def[0] == "$":
         return "environmental", param_def[1:]
+    elif param_def[0] == "-":
+        return "char", param_def[1:]
     return "named", param_def
 
 
@@ -238,6 +240,16 @@ class GenericScriptWrapperModule(Module):
                         named_args += [f"--{param}", str(val)]
 
                 push = push_named
+            elif param_kind == "char":
+
+                def push_char(val: "str | bool | int", param=param):
+                    nonlocal named_args
+                    if type(val) is bool:
+                        named_args.append(f"-{param}")
+                    else:
+                        named_args += [f"-{param}", str(val)]
+
+                push = push_char
             elif param_kind == "environmental":
 
                 def push_environ(val: "str | bool | int", param=param):
