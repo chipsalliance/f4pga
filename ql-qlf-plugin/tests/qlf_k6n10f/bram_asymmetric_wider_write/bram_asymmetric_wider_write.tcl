@@ -14,6 +14,7 @@ opt_clean
 stat
 write_verilog sim/spram_16x1024_8x2048_post_synth.v
 select -assert-count 1 t:TDP36K
+select -assert-count 1 t:*
 
 select -clear
 design -load bram_tdp
@@ -25,6 +26,7 @@ opt_clean
 stat
 write_verilog sim/spram_16x2048_8x4096_post_synth.v
 select -assert-count 1 t:TDP36K
+select -assert-count 1 t:*
 
 select -clear
 design -load bram_tdp
@@ -36,6 +38,7 @@ opt_clean
 stat
 write_verilog sim/spram_32x1024_16x2048_post_synth.v
 select -assert-count 1 t:TDP36K
+select -assert-count 1 t:*
 
 select -clear
 design -load bram_tdp
@@ -47,5 +50,4 @@ opt_clean
 stat
 write_verilog sim/spram_32x1024_8x4096_post_synth.v
 select -assert-count 1 t:TDP36K
-
-
+select -assert-count 1 t:*
