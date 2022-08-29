@@ -70,7 +70,10 @@ for PKG in $PACKAGES; do
     | tar -xJC $F4PGA_INSTALL_DIR_FAM
 done
 
-find $F4PGA_INSTALL_DIR_FAM/share -name split_inouts.py | xargs rm -v
+case "$FPGA_FAM" in
+  xc7) rm -vrf $F4PGA_INSTALL_DIR_FAM/share/f4pga/scripts ;;
+  eos-s3) find $F4PGA_INSTALL_DIR_FAM/share -name split_inouts.py | xargs rm -v ;;
+esac
 
 echo '::endgroup::'
 
