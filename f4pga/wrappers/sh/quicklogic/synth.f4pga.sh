@@ -18,8 +18,6 @@
 
 set -e
 
-CONVERT_OPTS="${F4PGA_SHARE_DIR}"/scripts/convert_compile_opts.py
-
 print_usage () {
     echo "Usage: symbiflow_synth  -v|--verilog <Verilog file list>"
     echo "                       [-t|--top <top module name>]"
@@ -118,9 +116,10 @@ if [ ${#VERILOG_FILES[@]} -eq 0 ]; then
   exit 1
 fi
 
-PINMAPCSV="pinmap_${PART}.csv"
+SPLIT_INOUTS="${F4PGA_SHARE_DIR}"/scripts/split_inouts.py
+CONVERT_OPTS="${F4PGA_SHARE_DIR}"/scripts/convert_compile_opts.py
 
-export TECHMAP_PATH="${F4PGA_SHARE_DIR}/techmaps/${FAMILY}"
+PINMAPCSV="pinmap_${PART}.csv"
 
 SYNTH_TCL_PATH="$(python3 -m f4pga.wrappers.tcl synth "${FAMILY}")"
 CONV_TCL_PATH="$(python3 -m f4pga.wrappers.tcl conv "${FAMILY}")"
@@ -132,7 +131,6 @@ export OUT_SYNTH_V=${TOP}_synth.v
 export OUT_EBLIF=${TOP}.eblif
 export OUT_FASM_EXTRA=${TOP}_fasm_extra.fasm
 export PYTHON3=$(which python3)
-export UTILS_PATH="${F4PGA_SHARE_DIR}"/scripts
 
 if [ -s $PCF ]; then
     export PCF_FILE=$PCF

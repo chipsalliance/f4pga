@@ -17,7 +17,9 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+from sys import argv as sys_argv
+
 from f4pga.wrappers.sh import p_vpr_run
 
 if __name__ == "__main__":
-    p_vpr_run()
+    p_vpr_run(sys_argv[1:])

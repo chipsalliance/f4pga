@@ -36,37 +36,34 @@ ROOT = Path(__file__).resolve().parent
 isQuickLogic = FPGA_FAM != "xc7"
 SH_SUBDIR = "quicklogic" if isQuickLogic else FPGA_FAM
 
-f4pga_environ = environ.copy()
-f4pga_environ["F4PGA_SHARE_DIR"] = f4pga_environ.get("F4PGA_SHARE_DIR", F4PGA_SHARE_DIR)
-
 
 # Helper functions
 
 
-def p_run_sh_script(script):
+def p_run_sh_script(script, env=environ):
     stdout.flush()
     stderr.flush()
-    check_call([str(script)] + sys_argv[1:], env=f4pga_environ)
+    check_call([str(script)] + sys_argv[1:], env=env)
 
 
-def p_run_bash_cmds(cmds, env=f4pga_environ):
+def p_run_bash_cmds(cmds, env=environ):
     stdout.flush()
     stderr.flush()
     check_call(cmds, env=env, shell=True, executable="/bin/bash")
 
 
-def p_run_pym(module):
+def p_run_pym(module, env=environ):
     stdout.flush()
     stderr.flush()
-    check_call([python3, "-m", module] + sys_argv[1:], env=f4pga_environ)
+    check_call([python3, "-m", module] + sys_argv[1:], env=env)
 
 
 def p_vpr_env_from_args(log_suffix=None):
-    vpr_options = f4pga_environ.get("VPR_OPTIONS")
+    vpr_options = environ.get("VPR_OPTIONS")
     if vpr_options is not None:
         vpr_options = p_args_str2list(vpr_options)
 
-    env = f4pga_environ.copy()
+    env = environ.copy()
     env.update(
         p_parse_vpr_args(
             vpr_options=vpr_options,
@@ -81,38 +78,38 @@ def p_args_str2list(args):
     return [arg for arg in args.strip().split() if arg != ""]
 
 
-def p_vpr_run():
+def p_vpr_run(args, env=environ):
     print("[F4PGA] Running (deprecated) vpr run")
 
-    arg_arch_def = f4pga_environ.get("ARCH_DEF")
+    arg_arch_def = env.get("ARCH_DEF")
     if arg_arch_def is None:
         raise (Exception("[F4PGA] vpr run: envvar ARCH_DEF cannot be unset/empty!"))
 
-    arg_eblif = f4pga_environ.get("EBLIF")
+    arg_eblif = env.get("EBLIF")
     if arg_eblif is None:
         raise (Exception("[F4PGA] vpr run: envvar EBLIF cannot be unset/empty!"))
 
-    arg_vpr_options = f4pga_environ.get("VPR_OPTIONS")
+    arg_vpr_options = env.get("VPR_OPTIONS")
     if arg_vpr_options is None:
         raise (Exception("[F4PGA] vpr run: envvar VPR_OPTIONS cannot be unset/empty!"))
 
-    arg_device_name = f4pga_environ.get("DEVICE_NAME")
+    arg_device_name = env.get("DEVICE_NAME")
     if arg_device_name is None:
         raise (Exception("[F4PGA] vpr run: envvar DEVICE_NAME cannot be unset/empty!"))
 
-    arg_rr_graph = f4pga_environ.get("RR_GRAPH")
+    arg_rr_graph = env.get("RR_GRAPH")
     if arg_rr_graph is None:
         raise (Exception("[F4PGA] vpr run: envvar RR_GRAPH cannot be unset/empty!"))
 
-    arg_lookahead = f4pga_environ.get("LOOKAHEAD")
+    arg_lookahead = env.get("LOOKAHEAD")
     if arg_lookahead is None:
         raise (Exception("[F4PGA] vpr run: envvar LOOKAHEAD cannot be unset/empty!"))
 
-    arg_place_delay = f4pga_environ.get("PLACE_DELAY")
+    arg_place_delay = env.get("PLACE_DELAY")
     if arg_place_delay is None:
         raise (Exception("[F4PGA] vpr run: envvar PLACE_DELAY cannot be unset/empty!"))
 
-    sdc = f4pga_environ.get("SDC")
+    sdc = env.get("SDC")
     if sdc == "":
         sdc = None
 
@@ -130,8 +127,7 @@ def p_vpr_run():
             arg_place_delay,
         ]
         + (["--sdc_file", sdc] if sdc is not None else [])
-        + sys_argv[1:],
-        env=f4pga_environ,
+        + args,
     )
 
 
@@ -502,9 +498,7 @@ python3 '{F4PGA_SHARE_DIR}'/scripts/prjxray_create_place_constraints.py \
 def pack():
     print("[F4PGA] Running (deprecated) pack")
     extra_args = ["--write_block_usage", "block_usage.json"] if isQuickLogic else []
-    p_run_bash_cmds(
-        f"python3 -m f4pga.wrappers.sh.vpr_run --pack {' '.join(extra_args)}", env=p_vpr_env_from_args("pack")
-    )
+    p_vpr_run(["--pack"] + extra_args, env=p_vpr_env_from_args("pack"))
     Path("vpr_stdout.log").rename("pack.log")
 
 
@@ -542,15 +536,38 @@ VPR_PLACE_FILE='constraints.place'
 def route():
     print("[F4PGA] Running (deprecated) route")
     extra_args = ["--write_timing_summary", "timing_summary.json"] if isQuickLogic else []
-    p_run_bash_cmds(
-        f"python3 -m f4pga.wrappers.sh.vpr_run --route {' '.join(extra_args)}", env=p_vpr_env_from_args("pack")
-    )
+    p_vpr_run(["--route"] + extra_args, env=p_vpr_env_from_args("pack"))
     Path("vpr_stdout.log").rename("route.log")
 
 
 def synth():
     print("[F4PGA] Running (deprecated) synth")
-    p_run_sh_script(ROOT / SH_SUBDIR / "synth.f4pga.sh")
+    env = environ.copy()
+
+    if environ.get("F4PGA_SHARE_DIR") is None:
+        env["F4PGA_SHARE_DIR"] = str(F4PGA_SHARE_DIR)
+
+    env["UTILS_PATH"] = str(F4PGA_SHARE_DIR / "scripts")
+
+    if isQuickLogic:
+        key = None
+        for item in ["-F", "--family"]:
+            if item in sys_argv:
+                key = item
+                break
+        if key is None:
+            raise Exception("Please specify device family")
+        family = sys_argv[sys_argv.index(key) + 1]
+        env.update(
+            {
+                "FAMILY": family,
+                "TECHMAP_PATH": str(F4PGA_SHARE_DIR / "techmaps" / family),
+            }
+        )
+    else:
+        env["TECHMAP_PATH"] = str(F4PGA_SHARE_DIR / "techmaps/xc7_vpr/techmap")
+
+    p_run_sh_script(ROOT / SH_SUBDIR / "synth.f4pga.sh", env=env)
 
 
 def write_fasm(genfasm_extra_args=None):
@@ -640,16 +657,20 @@ xcfasm \
 
 def analysis():
     print("[F4PGA] Running (deprecated) analysis")
-    p_run_bash_cmds(
-        """
-python3 -m f4pga.wrappers.sh.vpr_run \
-  --analysis \
-  --gen_post_synthesis_netlist on \
-  --gen_post_implementation_merged_netlist on \
-  --post_synth_netlist_unconn_inputs nets \
-  --post_synth_netlist_unconn_outputs nets \
-  --verify_file_digests off
-""",
+    p_vpr_run(
+        [
+            "--analysis",
+            "--gen_post_synthesis_netlist",
+            "on",
+            "--gen_post_implementation_merged_netlist",
+            "on",
+            "--post_synth_netlist_unconn_inputs",
+            "nets",
+            "--post_synth_netlist_unconn_outputs",
+            "nets",
+            "--verify_file_digests",
+            "off",
+        ],
         env=p_vpr_env_from_args("analysis"),
     )
     Path("vpr_stdout.log").rename("analysis.log")
@@ -664,8 +685,8 @@ DESIGN=${EBLIF/.eblif/}
 [ ! -z "${PCF_PATH}" ] && PCF_ARGS="--pcf-constraints ${PCF_PATH}" || PCF_ARGS=
 """
         + f"""
-PYTHONPATH=$F4PGA_SHARE_DIR/scripts:$PYTHONPATH \
-  '{python3}' "$F4PGA_SHARE_DIR"/scripts/repacker/repack.py \
+PYTHONPATH='{F4PGA_SHARE_DIR}/scripts':$PYTHONPATH \
+  '{python3}' '{F4PGA_SHARE_DIR}/scripts/repacker/repack.py' \
     --vpr-arch ${{ARCH_DEF}} \
     --repacking-rules ${{ARCH_DIR}}/${{DEVICE_NAME}}.repacking_rules.json \
     $JSON_ARGS \
@@ -685,57 +706,27 @@ PYTHONPATH=$F4PGA_SHARE_DIR/scripts:$PYTHONPATH \
 
 def generate_bitstream():
     print("[F4PGA] Running (deprecated) generate_bitstream")
-    p_run_bash_cmds(
-        f"""
-set -e
-eval set -- "$(
-  getopt \
-    --options=d:f:r:b:P: \
-    --longoptions=device:,fasm:,format:,bit:,part: \
-    --name $0 -- {' '.join(sys_argv[1:])}
-)"
-"""
-        + """
-DEVICE=""
-FASM=""
-BIT_FORMAT="4byte"
-BIT=""
-PART=""
-while true; do
-  case "$1" in
-    -d|--device) DEVICE=$2;     shift 2;;
-    -f|--fasm)   FASM=$2;       shift 2;;
-    -r|--format) BIT_FORMAT=$2; shift 2;;
-    -b|--bit)    BIT=$2;        shift 2;;
-    -P|--part)   PART=$2;       shift 2;;
-    --) break;;
-  esac
-done
-if [ -z $DEVICE ]; then echo "Please provide device name"; exit 1; fi
-if [ -z $FASM ]; then echo "Please provide an input FASM file name"; exit 1; fi
-if [ ! -f "$FASM" ]; then echo "File <$FASM> does not exist!"; exit 1; fi
-if [ -z $BIT ]; then echo "Please provide an output bistream file name"; exit 1; fi
-"""
-        + f"""
-if [[ "$DEVICE" =~ ^(qlf_k4n8.*)$ ]]; then
-  '{which('qlf_fasm')}' \
-    --db-root "${{F4PGA_SHARE_DIR}}/fasm_database/${{DEVICE}}" \
-    --format "$BIT_FORMAT" \
-    --assemble \
-    "$FASM" \
-    "$BIT"
-elif [[ "$DEVICE" =~ ^(ql-eos-s3|ql-pp3e)$ ]]; then
-  qlfasm \
-    --dev-type \
-    "$DEVICE" \
-    "$FASM" \
-    "$BIT"
-else
-  echo "ERROR: Unsupported device '${{DEVICE}}' for bitstream generation"
-  exit -1
-fi
-"""
-    )
+    parser = ArgumentParser(description=__doc__, formatter_class=RawDescriptionHelpFormatter)
+    parser.add_argument("--device", "-d", required=True, type=str, help="")
+    parser.add_argument("--fasm", "-f", required=True, type=str, help="")
+    parser.add_argument("--bit", "-b", required=True, type=str, help="")
+    parser.add_argument("--format", "-r", required=False, type=str, help="")
+    args = parser.parse_args()
+
+    if not Path(args.fasm).exists():
+        raise Exception(f"File <{args.fasm}> does not exist!")
+
+    fmt = "4byte" if args.format is None else args.format
+    db_root = F4PGA_SHARE_DIR / "fasm_database" / args.device
+
+    if "qlf_k4n8" in args.device:
+        p_run_bash_cmds(
+            f"'{which('qlf_fasm')}' --db-root '{db_root}' --format '{fmt}' --assemble '{args.fasm}' '{args.bit}'"
+        )
+    elif args.device in ["ql-eos-s3", "ql-pp3e"]:
+        p_run_bash_cmds(f"qlfasm --dev-type '{args.device}' '{args.fasm}' '{args.bit}'")
+    else:
+        raise Exception(f"[bitstream generation] Unsupported device '{args.device}'!")
 
 
 def generate_libfile():
@@ -752,13 +743,13 @@ if [[ '{device}' =~ ^(qlf_k4n8_qlf_k4n8)$ ]];then
 else
   DEVICE_1={device}
 fi
+ARCH_DIR='{F4PGA_SHARE_DIR}/arch/'"${{DEVICE_1}}_${{DEVICE_1}}"
 """
         + """
-ARCH_DIR="${F4PGA_SHARE_DIR}/arch/${DEVICE_1}_${DEVICE_1}"
 PINMAP_XML=${ARCH_DIR}/${PINMAPXML}
 """
         + f"""
-'{python3}' "$F4PGA_SHARE_DIR"/scripts/create_lib.py \
+'{python3}' '{F4PGA_SHARE_DIR}/scripts/create_lib.py' \
   -n "${{DEV}}_0P72_SSM40" \
   -m fpga_top \
   -c '{part}' \
@@ -771,59 +762,48 @@ PINMAP_XML=${ARCH_DIR}/${PINMAPXML}
 
 def ql():
     print("[F4PGA] Running (deprecated) ql")
-    p_run_sh_script(ROOT / "quicklogic/ql.f4pga.sh")
+    env = environ.copy()
+    if environ.get("F4PGA_SHARE_DIR") is None:
+        env["F4PGA_SHARE_DIR"] = str(F4PGA_SHARE_DIR)
+    p_run_sh_script(ROOT / "quicklogic/ql.f4pga.sh", env=env)
 
 
 def fasm2bels():
     print("[F4PGA] Running (deprecated) fasm2bels")
+    parser = ArgumentParser(description=__doc__, formatter_class=RawDescriptionHelpFormatter)
+    parser.add_argument("--device", "-d", required=True, type=str, help="")
+    parser.add_argument("--bit", "-b", required=True, type=str, help="")
+    parser.add_argument("--part", "-P", required=True, type=str, help="")
+    parser.add_argument("--pcf", "-p", required=False, type=str, help="")
+    parser.add_argument("--out-verilog", "-v", required=False, type=str, help="")
+    parser.add_argument("--out-pcf", "-o", required=False, type=str, help="")
+    parser.add_argument("--out-qcf", "-q", required=False, type=str, help="")
+    args = parser.parse_args()
+
+    if args.device not in ["ql-eos-s3", "ql-pp3e"]:
+        raise Exception(f"[fasm2bels] Unsupported device '{args.device}'")
+
+    env = environ.copy()
+    env["DEVICE"] = args.device
+
+    pcf_args = "" if args.pcf is None else f"--input-pcf {args.pcf}"
+    out_verilog = f"{args.bit}.v" if args.out_verilog is None else args.out_verilog
+    out_pcf = f"{args.bit}.v.pcf" if args.out_pcf is None else args.out_pcf
+    out_qcf = f"{args.bit}.v.qcf" if args.out_qcf is None else args.out_qcf
+
     p_run_bash_cmds(
         f"""
-set -e
-eval set -- "$(
-  getopt \
-    --options=d:P:p:b:v:o:q \
-    --longoptions=device:,part:,pcf:,bit:,out-verilog:,out-pcf:,out-qcf:, \
-    --name $0 -- {' '.join(sys_argv[1:])}
-)"
-"""
-        + """
-DEVICE=""
-PART=""
-PCF=""
-BIT=""
-OUT_VERILOG=""
-OUT_PCF=""
-OUT_QCF=""
-while true; do
-  case "$1" in
-    -d|--device)      DEVICE=$2; shift 2 ;;
-    -P|--part)        PART=$2;   shift 2 ;;
-    -p|--pcf)         PCF=$2;    shift 2 ;;
-    -b|--bit)         BIT=$2;    shift 2 ;;
-    -v|--out-verilog) OUT_VERILOG=$2; shift 2 ;;
-    -o|--out-pcf)     OUT_PCF=$2;     shift 2 ;;
-    -q|--out-qcf)     OUT_QCF=$2;     shift 2 ;;
-    --) break ;;
-  esac
-done
-if [ -z $DEVICE ]; then echo "Please provide device name"; exit 1; fi
-if [ -z $BIT ]; then echo "Please provide an input bistream file name"; exit 1; fi
-# $DEVICE is not ql-eos-s3 or ql-pp3e
-if ! [[ "$DEVICE" =~ ^(ql-eos-s3|ql-pp3e)$ ]]; then echo "ERROR: Unsupported device '${DEVICE}' for fasm2bels"; exit -1; fi
-if [ -z "{PCF}" ]; then PCF_ARGS=""; else PCF_ARGS="--input-pcf ${PCF}"; fi
-echo "Running fasm2bels"
-"""
-        + f"""
-'{python3}' "${{F4PGA_SHARE_DIR}}"/scripts/fasm2bels.py "${{BIT}}" \
-  --phy-db "${{F4PGA_SHARE_DIR}}/arch/${{DEVICE}}_wlcsp/db_phy.pickle" \
+'{python3}' '{F4PGA_SHARE_DIR}/scripts/fasm2bels.py' '{args.bit}' \
+  --phy-db '{F4PGA_SHARE_DIR}/arch/{args.device}_wlcsp/db_phy.pickle' \
   --device-name "${{DEVICE/ql-/}}" \
-  --package-name "$PART" \
+  --package-name '{args.part}' \
   --input-type bitstream \
-  --output-verilog "${{OUT_VERILOG:-$BIT.v}}" \
-  ${{PCF_ARGS}} \
-  --output-pcf "${{OUT_PCF:-$BIT.v.pcf}}" \
-  --output-qcf "${{OUT_QCF:-$BIT.v.qcf}}"
-"""
+  --output-verilog '{out_verilog}' \
+  {pcf_args} \
+  --output-pcf '{out_pcf}' \
+  --output-qcf '{out_qcf}'
+""",
+        env=env,
     )
 
 
