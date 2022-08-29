@@ -24,11 +24,8 @@ from f4pga.flows.common import vpr_specific_values, vpr as common_vpr, VprArgs, 
 from f4pga.flows.module import Module, ModuleContext
 
 
-def default_output_name(place_constraints):
-    m = re_match("(.*)\\.[^.]*$", place_constraints)
-    if m:
-        return m.groups()[0] + ".place"
-    return f"{place_constraints}.place"
+def default_output_name(eblif):
+    return str(Path(eblif).with_suffix(".place"))
 
 
 def place_constraints_file(ctx: ModuleContext):
@@ -36,22 +33,19 @@ def place_constraints_file(ctx: ModuleContext):
         return ctx.takes.place_constraints, False
     if ctx.takes.io_place:
         return ctx.takes.io_place, False
-    return f"{Path(ctx.takes.eblif).stem}.place", True
+    return str(Path(ctx.takes.eblif).with_suffix(".place"))
 
 
 class PlaceModule(Module):
     def map_io(self, ctx: ModuleContext):
-        p, _ = place_constraints_file(ctx)
-        return {"place": default_output_name(p)}
+        return {"place": default_output_name(ctx.takes.eblif)}
 
     def execute(self, ctx: ModuleContext):
-        place_constraints, dummy = place_constraints_file(ctx)
-        place_constraints = Path(place_constraints).resolve()
-        if dummy:
-            with place_constraints.open("wb") as wfptr:
-                wfptr.write(b"")
+        place_constraints = ctx.takes.place_constraints
 
-        build_dir = Path(ctx.takes.eblif).parent
+        build_dir = ctx.takes.build_dir
+
+        vpr_options = ["--fix_clusters", place_constraints] if place_constraints else []
 
         yield "Running VPR..."
         common_vpr(
@@ -74,7 +68,7 @@ class PlaceModule(Module):
         # modules may produce some temporary files with names that differ from
         # the ones in flow configuration.
         if ctx.is_output_explicit("place"):
-            Path(default_output_name(str(place_constraints))).rename(ctx.outputs.place)
+            Path(default_output_name(ctx.takes.eblif)).rename(ctx.outputs.place)
 
         yield "Saving log..."
         save_vpr_log("place.log", build_dir=build_dir)
@@ -82,7 +76,7 @@ class PlaceModule(Module):
     def __init__(self, _):
         self.name = "place"
         self.no_of_phases = 2
-        self.takes = ["eblif", "sdc?", "place_constraints?", "io_place?"]
+        self.takes = ["build_dir", "eblif", "sdc?", "place_constraints?", "io_place?"]
         self.produces = ["place"]
         self.values = ["device", "vpr_options?"] + vpr_specific_values()
 
