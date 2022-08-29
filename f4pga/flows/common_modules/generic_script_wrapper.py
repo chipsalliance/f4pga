@@ -177,9 +177,10 @@ class GenericScriptWrapperModule(Module):
             with open(target, "wb") as f:
                 f.write(data)
 
-        for _, file, target in self.file_outputs:
+        for dep, file, _ in self.file_outputs:
             file = ctx.r_env.resolve(file, final=True)
-            target = ctx.r_env.resolve(target, final=True)
+            target = ctx.r_env.resolve(getattr(ctx.outputs, dep), final=True)
+            print(f"file is: {file}, target is: {target}")
             if target != file:
                 Path(file).rename(target)
 

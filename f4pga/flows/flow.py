@@ -238,12 +238,12 @@ class Flow:
             sfprint(verbosity, f"    {Style.BRIGHT + status} " f"{dep + Style.RESET_ALL}:  {source}")
 
     def _build_dep(self, dep):
-        paths = self.dep_paths.get(dep)
+        provider = self.os_map.get(dep)
+        r_env = self.cfg.r_env if provider is None else self.cfg.get_r_env(provider.name)
+        paths = r_env.resolve(self.dep_paths.get(dep))
         if not paths:
             sfprint(2, f"Dependency {dep} is unresolved.")
             return False
-
-        provider = self.os_map.get(dep)
         run = (provider.name in self.run_stages) if provider else False
 
         if p_req_exists(paths) and not run:
