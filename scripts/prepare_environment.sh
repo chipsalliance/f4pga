@@ -70,6 +70,8 @@ for PKG in $PACKAGES; do
     | tar -xJC $F4PGA_INSTALL_DIR_FAM
 done
 
+find $F4PGA_INSTALL_DIR_FAM/share -name split_inouts.py | xargs rm -v
+
 echo '::endgroup::'
 
 

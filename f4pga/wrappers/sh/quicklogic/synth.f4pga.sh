@@ -18,7 +18,6 @@
 
 set -e
 
-SPLIT_INOUTS="${F4PGA_SHARE_DIR}"/scripts/split_inouts.py
 CONVERT_OPTS="${F4PGA_SHARE_DIR}"/scripts/convert_compile_opts.py
 
 print_usage () {
@@ -177,5 +176,5 @@ if [ ! -z "${YOSYS_COMMANDS}" ]; then
 fi
 
 `which yosys` -p "${YOSYS_SCRIPT}" -l $LOG
-`which python3` ${SPLIT_INOUTS} -i ${OUT_JSON} -o ${SYNTH_JSON}
+`which python3` -m f4pga.utils.split_inouts -i ${OUT_JSON} -o ${SYNTH_JSON}
 `which yosys` -p "read_json $SYNTH_JSON; tcl ${CONV_TCL_PATH}"

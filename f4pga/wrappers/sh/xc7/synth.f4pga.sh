@@ -139,5 +139,5 @@ else
   yosys -p "plugin -i uhdm" -p "read_verilog_with_uhdm ${SURELOG_CMD[*]} ${VERILOG_FILES[*]}" -p "tcl ${SYNTH_TCL_PATH}" -l $LOG
 fi
 
-python3 ${UTILS_PATH}/split_inouts.py -i ${OUT_JSON} -o ${SYNTH_JSON}
+python3 -m f4pga.utils.split_inouts -i ${OUT_JSON} -o ${SYNTH_JSON}
 yosys -p "read_json $SYNTH_JSON; tcl $(python3 -m f4pga.wrappers.tcl conv)"
