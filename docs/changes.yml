@@ -24,7 +24,7 @@
 
 
 7:
-  examples: chipsalliance/f4pga-examples#359
+  examples: 954a21090b14808b50d259b552e353b69f0ddae0
   arch-defs: 20220818-143856@24e8f73
   f4pga: 2d8d85706ecc7a72e17078ea903e2751022825da
   <<: &tarballs-consistent
