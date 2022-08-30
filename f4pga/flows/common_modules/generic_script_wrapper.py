@@ -156,9 +156,15 @@ class GenericScriptWrapperModule(Module):
 
         cwd = ctx.r_env.resolve(self.cwd)
 
-        sub_args = [ctx.r_env.resolve(self.script_path, final=True)] + self.get_args(ctx)
-        if self.interpreter:
-            sub_args = [ctx.r_env.resolve(self.interpreter, final=True)] + sub_args
+        sub_args = (
+            ([ctx.r_env.resolve(self.interpreter, final=True)] if self.interpreter else [])
+            + (
+                self.script_path
+                if isinstance(self.script_path, list)
+                else [ctx.r_env.resolve(self.script_path, final=True)]
+            )
+            + self.get_args(ctx)
+        )
 
         sub_env = self.get_env(ctx)
 

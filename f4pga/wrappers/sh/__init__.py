@@ -37,6 +37,11 @@ isQuickLogic = FPGA_FAM != "xc7"
 SH_SUBDIR = "quicklogic" if isQuickLogic else FPGA_FAM
 
 
+if not isQuickLogic:
+    from f4pga.utils.xc7.create_ioplace import main as xc7_create_ioplace
+    from f4pga.utils.xc7.create_place_constraints import main as xc7_create_place_constraints
+
+
 # Helper functions
 
 
@@ -472,26 +477,22 @@ fi
         )
     else:
         (eblif, net, part, device, arch_def) = sys_argv[1:6]
-        pcf_opts = f"'--pcf' '{sys_argv[6]}'" if len(sys_argv) > 6 else ""
         ioplace_file = f"{Path(eblif).stem}.ioplace"
-        p_run_bash_cmds(
-            f"""
-set -e
-python3 '{F4PGA_SHARE_DIR}/scripts/prjxray_create_ioplace.py' \
-  --blif '{eblif}' \
-  --net '{net}' {pcf_opts} \
-  --map '{F4PGA_SHARE_DIR}/arch/{device}/{part}/pinmap.csv' \
-  > '{ioplace_file}'
-python3 '{F4PGA_SHARE_DIR}'/scripts/prjxray_create_place_constraints.py \
-  --blif '{eblif}' \
-  --net '{net}' \
-  --arch '{arch_def}' \
-  --part '{part}' \
-  --vpr_grid_map '{F4PGA_SHARE_DIR}/arch/{device}/vpr_grid_map.csv' \
-  --input '{ioplace_file}' \
-  --db_root "${{DATABASE_DIR:-$(prjxray-config)}}" \
-  > constraints.place
-"""
+        xc7_create_ioplace(
+            blif=eblif,
+            map=f"{F4PGA_SHARE_DIR}/arch/{device}/{part}/pinmap.csv",
+            net=net,
+            output=ioplace_file,
+            pcf=Path(sys_argv[6]).open("r") if len(sys_argv) > 6 else None,
+        )
+        xc7_create_place_constraints(
+            blif=eblif,
+            net=net,
+            arch=arch_def,
+            part=part,
+            vpr_grid_map=f"{F4PGA_SHARE_DIR}/arch/{device}/vpr_grid_map.csv",
+            input=ioplace_file,
+            output="constraints.place",
         )
 
 
