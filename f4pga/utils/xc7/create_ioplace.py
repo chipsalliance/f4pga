@@ -133,7 +133,7 @@ def main(
         blif=Path(blif).open("r"),
         map=Path(map).open("r"),
         net=Path(net).open("r"),
-        pcf=None if pcf is None else Path(pcf).open("r"),
+        pcf=None if pcf is None else pcf,
         output=stdout if output is None else Path(output).open("w"),
         iostandard_defs_file=iostandard_defs_file,
         iostandard=iostandard,
