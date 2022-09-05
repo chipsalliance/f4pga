@@ -294,7 +294,6 @@ else
   PCF_MAKE="\${current_dir}/${BUILDDIR}/${TOP}_dummy.pcf"
 fi
 
-PROCESS_SDC="$F4PGA_SHARE_DIR"/scripts/process_sdc_constraints.py
 if ! [ -z "$SDC" ]; then
   if ! [ -f "$SOURCE"/$SDC ];then
     echo "The sdc file: $SDC is missing at: $SOURCE"
@@ -340,7 +339,7 @@ all: \${BUILDDIR}/\${TOP}.${RUN_TILL}\n\
 	cd \${BUILDDIR} && symbiflow_synth -t \${TOP} -v \${VERILOG} -F \${FAMILY} -d \${DEVICE} -p \${PCF} -P \${PART} ${COMPILE_EXTRA_ARGS[*]} > $LOG_FILE 2>&1\n\
 \n\
 \${BUILDDIR}/\${TOP}.sdc: \${BUILDDIR}/\${TOP}.eblif\n\
-	python3 ${PROCESS_SDC} --sdc-in \${SDC_IN} --sdc-out \$@ --pcf \${PCF} --eblif \${BUILDDIR}/\${TOP}.eblif --pin-map \${PINMAP_CSV}\n\
+	python3 -m f4pga.utils.quicklogic.process_sdc_constraints --sdc-in \${SDC_IN} --sdc-out \$@ --pcf \${PCF} --eblif \${BUILDDIR}/\${TOP}.eblif --pin-map \${PINMAP_CSV}\n\
 \n\
 \${BUILDDIR}/\${TOP}.net: \${BUILDDIR}/\${TOP}.eblif \${BUILDDIR}/\${TOP}.sdc\n\
 	cd \${BUILDDIR} && symbiflow_pack -e \${TOP}.eblif -f \${FAMILY} -d \${DEVICE} -s \${SDC} -c \${PNR_CORNER} >> $LOG_FILE 2>&1\n\

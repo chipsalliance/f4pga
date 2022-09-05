@@ -1,0 +1,85 @@
+.model top
+.inputs clk
+.outputs led[0] led[1] led[2] led[3]
+.names $false
+.names $true
+1
+.names $undef
+.names cnt[1] cnt[0] $auto$alumacc.cc:485:replace_alu$5.Y[1]
+01 1
+10 1
+.names cnt[2] cnt[1] cnt[0] $auto$alumacc.cc:485:replace_alu$5.Y[2]
+011 1
+100 1
+101 1
+110 1
+.names cnt[3] cnt[2] cnt[1] cnt[0] $auto$alumacc.cc:485:replace_alu$5.Y[3]
+0111 1
+1000 1
+1001 1
+1010 1
+1011 1
+1100 1
+1101 1
+1110 1
+.names led[0] $abc$215$new_n22_ $auto$alumacc.cc:485:replace_alu$5.Y[4]
+01 1
+10 1
+.names cnt[2] cnt[3] cnt[1] cnt[0] $abc$215$new_n22_
+1111 1
+.names led[1] led[0] $abc$215$new_n22_ $auto$alumacc.cc:485:replace_alu$5.Y[5]
+011 1
+100 1
+101 1
+110 1
+.names led[2] $abc$215$new_n25_ $abc$215$new_n22_ $auto$alumacc.cc:485:replace_alu$5.Y[6]
+011 1
+100 1
+101 1
+110 1
+.names led[0] led[1] $abc$215$new_n25_
+11 1
+.names led[3] led[2] $abc$215$new_n25_ $abc$215$new_n22_ $auto$alumacc.cc:485:replace_alu$5.Y[7]
+0111 1
+1000 1
+1001 1
+1010 1
+1011 1
+1100 1
+1101 1
+1110 1
+.names cnt[0] $auto$alumacc.cc:485:replace_alu$5.X[0]
+0 1
+.latch $auto$alumacc.cc:485:replace_alu$5.X[0] cnt[0] re clk 0
+.latch $auto$alumacc.cc:485:replace_alu$5.Y[1] cnt[1] re clk 0
+.latch $auto$alumacc.cc:485:replace_alu$5.Y[2] cnt[2] re clk 0
+.latch $auto$alumacc.cc:485:replace_alu$5.Y[3] cnt[3] re clk 0
+.latch $auto$alumacc.cc:485:replace_alu$5.Y[4] led[0] re clk 0
+.latch $auto$alumacc.cc:485:replace_alu$5.Y[5] led[1] re clk 0
+.latch $auto$alumacc.cc:485:replace_alu$5.Y[6] led[2] re clk 0
+.latch $auto$alumacc.cc:485:replace_alu$5.Y[7] led[3] re clk 0
+.names cnt[1] $auto$alumacc.cc:485:replace_alu$5.X[1]
+1 1
+.names cnt[2] $auto$alumacc.cc:485:replace_alu$5.X[2]
+1 1
+.names cnt[3] $auto$alumacc.cc:485:replace_alu$5.X[3]
+1 1
+.names led[0] $auto$alumacc.cc:485:replace_alu$5.X[4]
+1 1
+.names led[1] $auto$alumacc.cc:485:replace_alu$5.X[5]
+1 1
+.names led[2] $auto$alumacc.cc:485:replace_alu$5.X[6]
+1 1
+.names led[3] $auto$alumacc.cc:485:replace_alu$5.X[7]
+1 1
+.names $auto$alumacc.cc:485:replace_alu$5.X[0] $auto$alumacc.cc:485:replace_alu$5.Y[0]
+1 1
+.names led[0] cnt[4]
+1 1
+.names led[1] cnt[5]
+1 1
+.names led[2] cnt[6]
+1 1
+.names led[3] cnt[7]
+1 1
+.end

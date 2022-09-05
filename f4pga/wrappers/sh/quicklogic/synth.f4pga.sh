@@ -116,9 +116,6 @@ if [ ${#VERILOG_FILES[@]} -eq 0 ]; then
   exit 1
 fi
 
-SPLIT_INOUTS="${F4PGA_SHARE_DIR}"/scripts/split_inouts.py
-CONVERT_OPTS="${F4PGA_SHARE_DIR}"/scripts/convert_compile_opts.py
-
 PINMAPCSV="pinmap_${PART}.csv"
 
 SYNTH_TCL_PATH="$(python3 -m f4pga.wrappers.tcl synth "${FAMILY}")"
@@ -158,7 +155,7 @@ else
   fi
 fi
 
-YOSYS_COMMANDS=`echo ${EXTRA_ARGS[*]} | python3 ${CONVERT_OPTS}`
+YOSYS_COMMANDS=`echo ${EXTRA_ARGS[*]} | python3 -m f4pga.utils.quicklogic.convert_compile_opts`
 YOSYS_COMMANDS="${YOSYS_COMMANDS//$'\n'/'; '}"
 
 LOG=${TOP}_synth.log
