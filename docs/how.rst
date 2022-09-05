@@ -47,7 +47,7 @@ To prepare a working bitstream for a particular FPGA chip, the toolchain goes th
 
 * A description of the FPGA chip is created with the information from the relevant bitstream documentation
   project.
-  This part is done within the :gh:`F4PGA Architecture Definitions ➚ <chipsalliance/f4pga-arch-defs>`.
+  This part is done within the :gh:`F4PGA Architecture Definitions ➚ <f4pga/f4pga-arch-defs>`.
   The project prepares information about the timings and resources available in the chip needed at the implementation
   stage, as well as techmaps for the synthesis tools.
 
