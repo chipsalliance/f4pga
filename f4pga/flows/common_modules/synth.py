@@ -23,7 +23,6 @@ from pathlib import Path
 from f4pga.flows.common import decompose_depname, get_verbosity_level, sub as common_sub
 from f4pga.flows.module import Module, ModuleContext
 from f4pga.wrappers.tcl import get_script_path as get_tcl_wrapper_path
-from f4pga.utils import split_inouts
 
 
 class SynthModule(Module):
@@ -52,19 +51,9 @@ class SynthModule(Module):
         return mapping
 
     def execute(self, ctx: ModuleContext):
-        # Setup environmental variables for YOSYS TCL scripts.
-        tcl_env = (
-            {
-                key: (" ".join(val) if type(val) is list else val)
-                for key, val in ctx.values.yosys_tcl_env.items()
-                if val is not None
-            }
-            if ctx.values.yosys_tcl_env
-            else {}
-        )
-
         yield f"Synthesizing sources{f': {ctx.takes.sources}...' if get_verbosity_level() >= 2 else f'...'}"
-        tcl = f'tcl {str(get_tcl_wrapper_path("synth"))}'
+
+        tcl = f"tcl {str(get_tcl_wrapper_path())}"
         verilog_files = []
         # Use append read_verilog commands to the scripts for more sophisticated
         # input if arguments are specified. Omit direct input throught `yosys` command.
@@ -74,29 +63,30 @@ class SynthModule(Module):
                 tcl = f"read_verilog {args_str} {vfile}; {tcl}"
         else:
             verilog_files = ctx.takes.sources
+
         # Set up environment for TCL weirdness
         env = environ.copy()
-        env.update(tcl_env)
+        env.update(
+            (
+                {
+                    key: (" ".join(val) if type(val) is list else val)
+                    for key, val in ctx.values.yosys_tcl_env.items()
+                    if val is not None
+                }
+                if ctx.values.yosys_tcl_env
+                else {}
+            )
+        )
+
         # Execute YOSYS command
         common_sub(
             *(["yosys", "-p", tcl] + (["-l", ctx.outputs.synth_log] if ctx.outputs.synth_log else []) + verilog_files),
             env=env,
         )
 
-        yield f"Splitting in/outs..."
-        split_inouts(ctx.outputs.json, ctx.outputs.synth_json)
-
         if not Path(ctx.produces.fasm_extra).is_file():
             with Path(ctx.produces.fasm_extra).open("w") as wfptr:
                 wfptr.write("")
-
-        yield f"Converting..."
-        # Set up environment for TCL weirdness
-        env = environ.copy()
-        env.update(tcl_env)
-        common_sub(
-            "yosys", "-p", f'read_json {ctx.outputs.synth_json}; tcl {str(get_tcl_wrapper_path("conv"))}', env=env
-        )
 
     def __init__(self, params):
         self.name = "synthesize"

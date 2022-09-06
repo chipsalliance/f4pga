@@ -231,6 +231,7 @@ ql-eos-s3:
         read_verilog_args: []
         yosys_tcl_env:
           OUT_JSON: '${:json}'
+          SYNTH_JSON: '${:synth_json}'
           OUT_SYNTH_V: '${:synth_v}'
           OUT_EBLIF: '${:eblif}'
           OUT_FASM_EXTRA: '${:fasm_extra}'
@@ -618,6 +619,7 @@ ql-k4n8_fast: &ql-k4n8
         yosys_tcl_env:
           TOP: '${top}'
           OUT_JSON: '${:json}'
+          SYNTH_JSON: '${:synth_json}'
           TECHMAP_PATH: '${shareDir}/techmaps/qlf_k4n8'
           OUT_SYNTH_V: '${:synth_v}'
           OUT_EBLIF: '${:eblif}'

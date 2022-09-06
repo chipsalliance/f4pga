@@ -18,8 +18,6 @@
 
 set -e
 
-SYNTH_TCL_PATH="$(python3 -m f4pga.wrappers.tcl synth)"
-
 VERILOG_FILES=()
 XDC_FILES=()
 TOP=top
@@ -128,13 +126,8 @@ export PART_JSON=`realpath ${DATABASE_DIR}/$DEVICE/$PART/part.json`
 export OUT_FASM_EXTRA=${TOP}_fasm_extra.fasm
 export PYTHON3=${PYTHON3:-$(which python3)}
 
-LOG=${TOP}_synth.log
-
-if [ -z "$SURELOG_CMD" ]; then
-  yosys -p "tcl ${SYNTH_TCL_PATH}" -l $LOG ${VERILOG_FILES[*]}
-else
-  yosys -p "plugin -i uhdm" -p "read_verilog_with_uhdm ${SURELOG_CMD[*]} ${VERILOG_FILES[*]}" -p "tcl ${SYNTH_TCL_PATH}" -l $LOG
+yosys_read_cmds="read_verilog"
+if [ -n "$SURELOG_CMD" ]; then
+  yosys_read_cmds="plugin -i uhdm; read_verilog_with_uhdm ${SURELOG_CMD[*]}"
 fi
-
-python3 -m f4pga.utils.split_inouts -i ${OUT_JSON} -o ${SYNTH_JSON}
-yosys -p "read_json $SYNTH_JSON; tcl $(python3 -m f4pga.wrappers.tcl conv)"
+yosys -p "$yosys_read_cmds ${VERILOG_FILES[*]}; tcl $(python3 -m f4pga.wrappers.tcl)" -l "${TOP}_synth.log"

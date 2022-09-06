@@ -106,20 +106,10 @@ for arg in $@; do
 
 done
 
-if [ -z ${FAMILY} ]; then
-    echo "Please specify device family"
-    exit 1
-fi
-
-if [ ${#VERILOG_FILES[@]} -eq 0 ]; then
-  echo "Please provide at least one Verilog file"
-  exit 1
-fi
+if [ -z ${FAMILY} ]; then echo "Please specify device family"; exit 1; fi
+if [ ${#VERILOG_FILES[@]} -eq 0 ]; then echo "Please provide at least one Verilog file"; exit 1; fi
 
 PINMAPCSV="pinmap_${PART}.csv"
-
-SYNTH_TCL_PATH="$(python3 -m f4pga.wrappers.tcl synth "${FAMILY}")"
-CONV_TCL_PATH="$(python3 -m f4pga.wrappers.tcl conv "${FAMILY}")"
 
 export USE_ROI="FALSE"
 export OUT_JSON=$TOP.json
@@ -160,7 +150,7 @@ YOSYS_COMMANDS="${YOSYS_COMMANDS//$'\n'/'; '}"
 
 LOG=${TOP}_synth.log
 
-YOSYS_SCRIPT="tcl ${SYNTH_TCL_PATH}"
+YOSYS_SCRIPT="tcl $(python3 -m f4pga.wrappers.tcl "${FAMILY}")"
 
 for f in ${VERILOG_FILES[*]}; do
   YOSYS_SCRIPT="read_verilog ${f}; $YOSYS_SCRIPT"
@@ -171,5 +161,3 @@ if [ ! -z "${YOSYS_COMMANDS}" ]; then
 fi
 
 `which yosys` -p "${YOSYS_SCRIPT}" -l $LOG
-`which python3` -m f4pga.utils.split_inouts -i ${OUT_JSON} -o ${SYNTH_JSON}
-`which yosys` -p "read_json $SYNTH_JSON; tcl ${CONV_TCL_PATH}"

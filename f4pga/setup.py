@@ -83,12 +83,12 @@ setuptools_setup(
         "f4pga.flows": [
             "*.yml",
         ],
-        "f4pga.wrappers.sh": ["xc7/*.f4pga.sh", "quicklogic/*.f4pga.sh"],
+        "f4pga.wrappers.sh": [
+            "xc7/*.f4pga.sh",
+            "quicklogic/*.f4pga.sh",
+        ],
         "f4pga.wrappers.tcl": [
-            "xc7/*.f4pga.tcl",
-            "eos-s3/*.f4pga.tcl",
-            "qlf_k4n8/*.f4pga.tcl",
-            "ice40/*.f4pga.tcl",
+            "*.f4pga.tcl",
         ],
     },
     classifiers=[],
