@@ -38,8 +38,8 @@ SH_SUBDIR = "quicklogic" if isQuickLogic else FPGA_FAM
 
 
 if not isQuickLogic:
-    from f4pga.utils.xc7.create_ioplace import main as xc7_create_ioplace
-    from f4pga.utils.xc7.create_place_constraints import main as xc7_create_place_constraints
+    from f4pga.aux.utils.xc7.create_ioplace import main as xc7_create_ioplace
+    from f4pga.aux.utils.xc7.create_place_constraints import main as xc7_create_place_constraints
 
 
 # Helper functions

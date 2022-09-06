@@ -175,7 +175,7 @@ stat
 
 # Write output JSON, fixup cell names using an external Python script
 write_json $::env(OUT_JSON).org.json
-exec $::env(PYTHON3) -m f4pga.utils.quicklogic.yosys_fixup_cell_names $::env(OUT_JSON).org.json $::env(OUT_JSON)
+exec $::env(PYTHON3) -m f4pga.aux.utils.quicklogic.yosys_fixup_cell_names $::env(OUT_JSON).org.json $::env(OUT_JSON)
 
 # Read the fixed JSON back and write verilog
 design -reset
@@ -183,7 +183,7 @@ read_json $::env(OUT_JSON)
 write_verilog $::env(OUT_SYNTH_V)
 
 design -reset
-exec $::env(PYTHON3) -m f4pga.utils.yosys_split_inouts -i $::env(OUT_JSON) -o $::env(SYNTH_JSON)
+exec $::env(PYTHON3) -m f4pga.aux.utils.yosys_split_inouts -i $::env(OUT_JSON) -o $::env(SYNTH_JSON)
 read_json $::env(SYNTH_JSON)
 yosys -import
 opt_clean

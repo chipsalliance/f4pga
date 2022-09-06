@@ -29,7 +29,7 @@ write_json $::env(OUT_JSON)
 write_verilog $::env(OUT_SYNTH_V)
 
 design -reset
-exec $::env(PYTHON3) -m f4pga.utils.yosys_split_inouts -i $::env(OUT_JSON) -o $::env(SYNTH_JSON)
+exec $::env(PYTHON3) -m f4pga.aux.utils.yosys_split_inouts -i $::env(OUT_JSON) -o $::env(SYNTH_JSON)
 read_json $::env(SYNTH_JSON)
 yosys -import
 opt_clean

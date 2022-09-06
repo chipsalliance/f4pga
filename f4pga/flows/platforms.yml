@@ -91,7 +91,7 @@ xc7a50t: &xc7
       params:
         stage_name: ioplace
         interpreter: '${python3}'
-        script: ['-m', 'f4pga.utils.xc7.create_ioplace']
+        script: ['-m', 'f4pga.aux.utils.xc7.create_ioplace']
         outputs:
           io_place:
             mode: stdout
@@ -107,7 +107,7 @@ xc7a50t: &xc7
       params:
         stage_name: place_constraints
         interpreter: '${python3}'
-        script: ['-m', 'f4pga.utils.xc7.create_place_constraints']
+        script: ['-m', 'f4pga.aux.utils.xc7.create_place_constraints']
         outputs:
           place_constraints:
             mode: stdout
