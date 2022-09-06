@@ -53,16 +53,10 @@ class SynthModule(Module):
     def execute(self, ctx: ModuleContext):
         yield f"Synthesizing sources{f': {ctx.takes.sources}...' if get_verbosity_level() >= 2 else f'...'}"
 
-        tcl = f"tcl {str(get_tcl_wrapper_path())}"
-        verilog_files = []
-        # Use append read_verilog commands to the scripts for more sophisticated
-        # input if arguments are specified. Omit direct input throught `yosys` command.
-        if ctx.values.read_verilog_args:
-            args_str = " ".join(ctx.values.read_verilog_args)
-            for vfile in ctx.takes.sources:
-                tcl = f"read_verilog {args_str} {vfile}; {tcl}"
-        else:
-            verilog_files = ctx.takes.sources
+        tcl = f'tcl {str(get_tcl_wrapper_path("synth"))}'
+        args_str = " ".join(ctx.values.read_verilog_args) if ctx.values.read_verilog_args is not None else ""
+        for vfile in ctx.takes.sources:
+            tcl = f"read_verilog {args_str} {vfile}; {tcl}"
 
         # Set up environment for TCL weirdness
         env = environ.copy()
@@ -80,7 +74,7 @@ class SynthModule(Module):
 
         # Execute YOSYS command
         common_sub(
-            *(["yosys", "-p", tcl] + (["-l", ctx.outputs.synth_log] if ctx.outputs.synth_log else []) + verilog_files),
+            *(["yosys", "-p", tcl] + (["-l", ctx.outputs.synth_log] if ctx.outputs.synth_log else [])),
             env=env,
         )
 
