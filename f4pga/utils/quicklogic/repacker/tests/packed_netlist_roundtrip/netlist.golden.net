@@ -1,0 +1,746 @@
+<?xml version="1.0"?>
+<block name="top.net" instance="FPGA_packed_netlist[0]" architecture_id="SHA256:e4eb21dd40067be5f659dcebb9ade6d70c1a29c93255ad92035a9dccd7d4b2a0" atom_netlist_id="SHA256:907bae6d91adf12dd9385e7cdf495d7ed3f8e56911cf5256c991a11fdd7b9f1f">
+	<inputs>clk</inputs>
+	<outputs>out:led[0] out:led[1] out:led[2] out:led[3]</outputs>
+	<clocks>clk</clocks>
+	<block name="$auto$alumacc.cc:485:replace_alu$5.Y[7]" instance="clb[0]" mode="default">
+		<inputs>
+			<port name="I">cnt[0] cnt[1] open open open open open open open open open open open open open open open open open open open open open open</port>
+			<port name="reg_in">open</port>
+			<port name="sc_in">open</port>
+			<port name="cin">open</port>
+			<port name="reset">open</port>
+		</inputs>
+		<outputs>
+			<port name="O">open open open fle[3].out[0]-&gt;clbouts1 fle[4].out[0]-&gt;clbouts2 fle[5].out[0]-&gt;clbouts2 open fle[7].out[0]-&gt;clbouts2</port>
+			<port name="reg_out">open</port>
+			<port name="sc_out">open</port>
+			<port name="cout">open</port>
+			<port name="cout_copy">open</port>
+		</outputs>
+		<clocks>
+			<port name="clk">clk</port>
+		</clocks>
+		<block name="$auto$alumacc.cc:485:replace_alu$5.Y[2]" instance="fle[0]" mode="n1_lut4">
+			<inputs>
+				<port name="in">clb.I[0]-&gt;crossbar_fle[0].in[0] clb.I[1]-&gt;crossbar_fle[0].in[1] fle[0].out[0]-&gt;crossbar_fle[0].in[2] open</port>
+				<port name="reg_in">open</port>
+				<port name="sc_in">open</port>
+				<port name="cin">open</port>
+				<port name="reset">open</port>
+			</inputs>
+			<outputs>
+				<port name="out">ble4[0].out[0]-&gt;direct2</port>
+				<port name="reg_out">open</port>
+				<port name="sc_out">open</port>
+				<port name="cout">open</port>
+			</outputs>
+			<clocks>
+				<port name="clk">clb.clk[0]-&gt;clb.clk_to_fle[0].clk</port>
+			</clocks>
+			<block name="$auto$alumacc.cc:485:replace_alu$5.Y[2]" instance="ble4[0]" mode="default">
+				<inputs>
+					<port name="in">fle.in[0]-&gt;direct1 fle.in[1]-&gt;direct1 fle.in[2]-&gt;direct1 open</port>
+				</inputs>
+				<outputs>
+					<port name="out">ff[0].Q[0]-&gt;mux1</port>
+				</outputs>
+				<clocks>
+					<port name="clk">fle.clk[0]-&gt;direct3</port>
+				</clocks>
+				<block name="$auto$alumacc.cc:485:replace_alu$5.Y[2]" instance="lut4[0]" mode="lut4">
+					<inputs>
+						<port name="in">ble4.in[0]-&gt;direct1 ble4.in[1]-&gt;direct1 ble4.in[2]-&gt;direct1 open</port>
+					</inputs>
+					<outputs>
+						<port name="out">lut[0].out[0]-&gt;direct:lut4</port>
+					</outputs>
+					<clocks />
+					<block name="$auto$alumacc.cc:485:replace_alu$5.Y[2]" instance="lut[0]">
+						<attributes />
+						<parameters />
+						<inputs>
+							<port name="in">lut4.in[0]-&gt;direct:lut4 lut4.in[1]-&gt;direct:lut4 lut4.in[2]-&gt;direct:lut4 open</port>
+							<port_rotation_map name="in">2 1 0 open</port_rotation_map>
+						</inputs>
+						<outputs>
+							<port name="out">$auto$alumacc.cc:485:replace_alu$5.Y[2]</port>
+						</outputs>
+						<clocks />
+					</block>
+				</block>
+				<block name="cnt[2]" instance="ff[0]">
+					<attributes />
+					<parameters />
+					<inputs>
+						<port name="D">lut4[0].out[0]-&gt;direct2</port>
+					</inputs>
+					<outputs>
+						<port name="Q">cnt[2]</port>
+					</outputs>
+					<clocks>
+						<port name="clk">ble4.clk[0]-&gt;direct3</port>
+					</clocks>
+				</block>
+			</block>
+		</block>
+		<block name="$auto$alumacc.cc:485:replace_alu$5.Y[3]" instance="fle[1]" mode="n1_lut4">
+			<inputs>
+				<port name="in">clb.I[0]-&gt;crossbar_fle[1].in[0] fle[0].out[0]-&gt;crossbar_fle[1].in[1] clb.I[1]-&gt;crossbar_fle[1].in[2] fle[1].out[0]-&gt;crossbar_fle[1].in[3]</port>
+				<port name="reg_in">open</port>
+				<port name="sc_in">open</port>
+				<port name="cin">open</port>
+				<port name="reset">open</port>
+			</inputs>
+			<outputs>
+				<port name="out">ble4[0].out[0]-&gt;direct2</port>
+				<port name="reg_out">open</port>
+				<port name="sc_out">open</port>
+				<port name="cout">open</port>
+			</outputs>
+			<clocks>
+				<port name="clk">clb.clk[0]-&gt;clb.clk_to_fle[1].clk</port>
+			</clocks>
+			<block name="$auto$alumacc.cc:485:replace_alu$5.Y[3]" instance="ble4[0]" mode="default">
+				<inputs>
+					<port name="in">fle.in[0]-&gt;direct1 fle.in[1]-&gt;direct1 fle.in[2]-&gt;direct1 fle.in[3]-&gt;direct1</port>
+				</inputs>
+				<outputs>
+					<port name="out">ff[0].Q[0]-&gt;mux1</port>
+				</outputs>
+				<clocks>
+					<port name="clk">fle.clk[0]-&gt;direct3</port>
+				</clocks>
+				<block name="$auto$alumacc.cc:485:replace_alu$5.Y[3]" instance="lut4[0]" mode="lut4">
+					<inputs>
+						<port name="in">ble4.in[0]-&gt;direct1 ble4.in[1]-&gt;direct1 ble4.in[2]-&gt;direct1 ble4.in[3]-&gt;direct1</port>
+					</inputs>
+					<outputs>
+						<port name="out">lut[0].out[0]-&gt;direct:lut4</port>
+					</outputs>
+					<clocks />
+					<block name="$auto$alumacc.cc:485:replace_alu$5.Y[3]" instance="lut[0]">
+						<attributes />
+						<parameters />
+						<inputs>
+							<port name="in">lut4.in[0]-&gt;direct:lut4 lut4.in[1]-&gt;direct:lut4 lut4.in[2]-&gt;direct:lut4 lut4.in[3]-&gt;direct:lut4</port>
+							<port_rotation_map name="in">3 1 2 0</port_rotation_map>
+						</inputs>
+						<outputs>
+							<port name="out">$auto$alumacc.cc:485:replace_alu$5.Y[3]</port>
+						</outputs>
+						<clocks />
+					</block>
+				</block>
+				<block name="cnt[3]" instance="ff[0]">
+					<attributes />
+					<parameters />
+					<inputs>
+						<port name="D">lut4[0].out[0]-&gt;direct2</port>
+					</inputs>
+					<outputs>
+						<port name="Q">cnt[3]</port>
+					</outputs>
+					<clocks>
+						<port name="clk">ble4.clk[0]-&gt;direct3</port>
+					</clocks>
+				</block>
+			</block>
+		</block>
+		<block name="$abc$215$new_n22_" instance="fle[2]" mode="n1_lut4">
+			<inputs>
+				<port name="in">fle[1].out[0]-&gt;crossbar_fle[2].in[0] fle[0].out[0]-&gt;crossbar_fle[2].in[1] clb.I[0]-&gt;crossbar_fle[2].in[2] clb.I[1]-&gt;crossbar_fle[2].in[3]</port>
+				<port name="reg_in">open</port>
+				<port name="sc_in">open</port>
+				<port name="cin">open</port>
+				<port name="reset">open</port>
+			</inputs>
+			<outputs>
+				<port name="out">ble4[0].out[0]-&gt;direct2</port>
+				<port name="reg_out">open</port>
+				<port name="sc_out">open</port>
+				<port name="cout">open</port>
+			</outputs>
+			<clocks>
+				<port name="clk">open</port>
+			</clocks>
+			<block name="$abc$215$new_n22_" instance="ble4[0]" mode="default">
+				<inputs>
+					<port name="in">fle.in[0]-&gt;direct1 fle.in[1]-&gt;direct1 fle.in[2]-&gt;direct1 fle.in[3]-&gt;direct1</port>
+				</inputs>
+				<outputs>
+					<port name="out">lut4[0].out[0]-&gt;mux1</port>
+				</outputs>
+				<clocks>
+					<port name="clk">open</port>
+				</clocks>
+				<block name="$abc$215$new_n22_" instance="lut4[0]" mode="lut4">
+					<inputs>
+						<port name="in">ble4.in[0]-&gt;direct1 ble4.in[1]-&gt;direct1 ble4.in[2]-&gt;direct1 ble4.in[3]-&gt;direct1</port>
+					</inputs>
+					<outputs>
+						<port name="out">lut[0].out[0]-&gt;direct:lut4</port>
+					</outputs>
+					<clocks />
+					<block name="$abc$215$new_n22_" instance="lut[0]">
+						<attributes />
+						<parameters />
+						<inputs>
+							<port name="in">lut4.in[0]-&gt;direct:lut4 lut4.in[1]-&gt;direct:lut4 lut4.in[2]-&gt;direct:lut4 lut4.in[3]-&gt;direct:lut4</port>
+							<port_rotation_map name="in">1 0 3 2</port_rotation_map>
+						</inputs>
+						<outputs>
+							<port name="out">$abc$215$new_n22_</port>
+						</outputs>
+						<clocks />
+					</block>
+				</block>
+				<block name="open" instance="ff[0]" />
+			</block>
+		</block>
+		<block name="$auto$alumacc.cc:485:replace_alu$5.Y[4]" instance="fle[3]" mode="n1_lut4">
+			<inputs>
+				<port name="in">fle[3].out[0]-&gt;crossbar_fle[3].in[0] open open fle[2].out[0]-&gt;crossbar_fle[3].in[3]</port>
+				<port name="reg_in">open</port>
+				<port name="sc_in">open</port>
+				<port name="cin">open</port>
+				<port name="reset">open</port>
+			</inputs>
+			<outputs>
+				<port name="out">ble4[0].out[0]-&gt;direct2</port>
+				<port name="reg_out">open</port>
+				<port name="sc_out">open</port>
+				<port name="cout">open</port>
+			</outputs>
+			<clocks>
+				<port name="clk">clb.clk[0]-&gt;clb.clk_to_fle[3].clk</port>
+			</clocks>
+			<block name="$auto$alumacc.cc:485:replace_alu$5.Y[4]" instance="ble4[0]" mode="default">
+				<inputs>
+					<port name="in">fle.in[0]-&gt;direct1 open open fle.in[3]-&gt;direct1</port>
+				</inputs>
+				<outputs>
+					<port name="out">ff[0].Q[0]-&gt;mux1</port>
+				</outputs>
+				<clocks>
+					<port name="clk">fle.clk[0]-&gt;direct3</port>
+				</clocks>
+				<block name="$auto$alumacc.cc:485:replace_alu$5.Y[4]" instance="lut4[0]" mode="lut4">
+					<inputs>
+						<port name="in">ble4.in[0]-&gt;direct1 open open ble4.in[3]-&gt;direct1</port>
+					</inputs>
+					<outputs>
+						<port name="out">lut[0].out[0]-&gt;direct:lut4</port>
+					</outputs>
+					<clocks />
+					<block name="$auto$alumacc.cc:485:replace_alu$5.Y[4]" instance="lut[0]">
+						<attributes />
+						<parameters />
+						<inputs>
+							<port name="in">lut4.in[0]-&gt;direct:lut4 open open lut4.in[3]-&gt;direct:lut4</port>
+							<port_rotation_map name="in">0 open open 1</port_rotation_map>
+						</inputs>
+						<outputs>
+							<port name="out">$auto$alumacc.cc:485:replace_alu$5.Y[4]</port>
+						</outputs>
+						<clocks />
+					</block>
+				</block>
+				<block name="led[0]" instance="ff[0]">
+					<attributes />
+					<parameters />
+					<inputs>
+						<port name="D">lut4[0].out[0]-&gt;direct2</port>
+					</inputs>
+					<outputs>
+						<port name="Q">led[0]</port>
+					</outputs>
+					<clocks>
+						<port name="clk">ble4.clk[0]-&gt;direct3</port>
+					</clocks>
+				</block>
+			</block>
+		</block>
+		<block name="$auto$alumacc.cc:485:replace_alu$5.Y[5]" instance="fle[4]" mode="n1_lut4">
+			<inputs>
+				<port name="in">fle[4].out[0]-&gt;crossbar_fle[4].in[0] fle[2].out[0]-&gt;crossbar_fle[4].in[1] fle[3].out[0]-&gt;crossbar_fle[4].in[2] open</port>
+				<port name="reg_in">open</port>
+				<port name="sc_in">open</port>
+				<port name="cin">open</port>
+				<port name="reset">open</port>
+			</inputs>
+			<outputs>
+				<port name="out">ble4[0].out[0]-&gt;direct2</port>
+				<port name="reg_out">open</port>
+				<port name="sc_out">open</port>
+				<port name="cout">open</port>
+			</outputs>
+			<clocks>
+				<port name="clk">clb.clk[0]-&gt;clb.clk_to_fle[4].clk</port>
+			</clocks>
+			<block name="$auto$alumacc.cc:485:replace_alu$5.Y[5]" instance="ble4[0]" mode="default">
+				<inputs>
+					<port name="in">fle.in[0]-&gt;direct1 fle.in[1]-&gt;direct1 fle.in[2]-&gt;direct1 open</port>
+				</inputs>
+				<outputs>
+					<port name="out">ff[0].Q[0]-&gt;mux1</port>
+				</outputs>
+				<clocks>
+					<port name="clk">fle.clk[0]-&gt;direct3</port>
+				</clocks>
+				<block name="$auto$alumacc.cc:485:replace_alu$5.Y[5]" instance="lut4[0]" mode="lut4">
+					<inputs>
+						<port name="in">ble4.in[0]-&gt;direct1 ble4.in[1]-&gt;direct1 ble4.in[2]-&gt;direct1 open</port>
+					</inputs>
+					<outputs>
+						<port name="out">lut[0].out[0]-&gt;direct:lut4</port>
+					</outputs>
+					<clocks />
+					<block name="$auto$alumacc.cc:485:replace_alu$5.Y[5]" instance="lut[0]">
+						<attributes />
+						<parameters />
+						<inputs>
+							<port name="in">lut4.in[0]-&gt;direct:lut4 lut4.in[1]-&gt;direct:lut4 lut4.in[2]-&gt;direct:lut4 open</port>
+							<port_rotation_map name="in">0 2 1 open</port_rotation_map>
+						</inputs>
+						<outputs>
+							<port name="out">$auto$alumacc.cc:485:replace_alu$5.Y[5]</port>
+						</outputs>
+						<clocks />
+					</block>
+				</block>
+				<block name="led[1]" instance="ff[0]">
+					<attributes />
+					<parameters />
+					<inputs>
+						<port name="D">lut4[0].out[0]-&gt;direct2</port>
+					</inputs>
+					<outputs>
+						<port name="Q">led[1]</port>
+					</outputs>
+					<clocks>
+						<port name="clk">ble4.clk[0]-&gt;direct3</port>
+					</clocks>
+				</block>
+			</block>
+		</block>
+		<block name="$auto$alumacc.cc:485:replace_alu$5.Y[6]" instance="fle[5]" mode="n1_lut4">
+			<inputs>
+				<port name="in">fle[6].out[0]-&gt;crossbar_fle[5].in[0] fle[5].out[0]-&gt;crossbar_fle[5].in[1] open fle[2].out[0]-&gt;crossbar_fle[5].in[3]</port>
+				<port name="reg_in">open</port>
+				<port name="sc_in">open</port>
+				<port name="cin">open</port>
+				<port name="reset">open</port>
+			</inputs>
+			<outputs>
+				<port name="out">ble4[0].out[0]-&gt;direct2</port>
+				<port name="reg_out">open</port>
+				<port name="sc_out">open</port>
+				<port name="cout">open</port>
+			</outputs>
+			<clocks>
+				<port name="clk">clb.clk[0]-&gt;clb.clk_to_fle[5].clk</port>
+			</clocks>
+			<block name="$auto$alumacc.cc:485:replace_alu$5.Y[6]" instance="ble4[0]" mode="default">
+				<inputs>
+					<port name="in">fle.in[0]-&gt;direct1 fle.in[1]-&gt;direct1 open fle.in[3]-&gt;direct1</port>
+				</inputs>
+				<outputs>
+					<port name="out">ff[0].Q[0]-&gt;mux1</port>
+				</outputs>
+				<clocks>
+					<port name="clk">fle.clk[0]-&gt;direct3</port>
+				</clocks>
+				<block name="$auto$alumacc.cc:485:replace_alu$5.Y[6]" instance="lut4[0]" mode="lut4">
+					<inputs>
+						<port name="in">ble4.in[0]-&gt;direct1 ble4.in[1]-&gt;direct1 open ble4.in[3]-&gt;direct1</port>
+					</inputs>
+					<outputs>
+						<port name="out">lut[0].out[0]-&gt;direct:lut4</port>
+					</outputs>
+					<clocks />
+					<block name="$auto$alumacc.cc:485:replace_alu$5.Y[6]" instance="lut[0]">
+						<attributes />
+						<parameters />
+						<inputs>
+							<port name="in">lut4.in[0]-&gt;direct:lut4 lut4.in[1]-&gt;direct:lut4 open lut4.in[3]-&gt;direct:lut4</port>
+							<port_rotation_map name="in">1 0 open 2</port_rotation_map>
+						</inputs>
+						<outputs>
+							<port name="out">$auto$alumacc.cc:485:replace_alu$5.Y[6]</port>
+						</outputs>
+						<clocks />
+					</block>
+				</block>
+				<block name="led[2]" instance="ff[0]">
+					<attributes />
+					<parameters />
+					<inputs>
+						<port name="D">lut4[0].out[0]-&gt;direct2</port>
+					</inputs>
+					<outputs>
+						<port name="Q">led[2]</port>
+					</outputs>
+					<clocks>
+						<port name="clk">ble4.clk[0]-&gt;direct3</port>
+					</clocks>
+				</block>
+			</block>
+		</block>
+		<block name="$abc$215$new_n25_" instance="fle[6]" mode="n1_lut4">
+			<inputs>
+				<port name="in">fle[3].out[0]-&gt;crossbar_fle[6].in[0] fle[4].out[0]-&gt;crossbar_fle[6].in[1] open open</port>
+				<port name="reg_in">open</port>
+				<port name="sc_in">open</port>
+				<port name="cin">open</port>
+				<port name="reset">open</port>
+			</inputs>
+			<outputs>
+				<port name="out">ble4[0].out[0]-&gt;direct2</port>
+				<port name="reg_out">open</port>
+				<port name="sc_out">open</port>
+				<port name="cout">open</port>
+			</outputs>
+			<clocks>
+				<port name="clk">open</port>
+			</clocks>
+			<block name="$abc$215$new_n25_" instance="ble4[0]" mode="default">
+				<inputs>
+					<port name="in">fle.in[0]-&gt;direct1 fle.in[1]-&gt;direct1 open open</port>
+				</inputs>
+				<outputs>
+					<port name="out">lut4[0].out[0]-&gt;mux1</port>
+				</outputs>
+				<clocks>
+					<port name="clk">open</port>
+				</clocks>
+				<block name="$abc$215$new_n25_" instance="lut4[0]" mode="lut4">
+					<inputs>
+						<port name="in">ble4.in[0]-&gt;direct1 ble4.in[1]-&gt;direct1 open open</port>
+					</inputs>
+					<outputs>
+						<port name="out">lut[0].out[0]-&gt;direct:lut4</port>
+					</outputs>
+					<clocks />
+					<block name="$abc$215$new_n25_" instance="lut[0]">
+						<attributes />
+						<parameters />
+						<inputs>
+							<port name="in">lut4.in[0]-&gt;direct:lut4 lut4.in[1]-&gt;direct:lut4 open open</port>
+							<port_rotation_map name="in">0 1 open open</port_rotation_map>
+						</inputs>
+						<outputs>
+							<port name="out">$abc$215$new_n25_</port>
+						</outputs>
+						<clocks />
+					</block>
+				</block>
+				<block name="open" instance="ff[0]" />
+			</block>
+		</block>
+		<block name="$auto$alumacc.cc:485:replace_alu$5.Y[7]" instance="fle[7]" mode="n1_lut4">
+			<inputs>
+				<port name="in">fle[6].out[0]-&gt;crossbar_fle[7].in[0] fle[2].out[0]-&gt;crossbar_fle[7].in[1] fle[7].out[0]-&gt;crossbar_fle[7].in[2] fle[5].out[0]-&gt;crossbar_fle[7].in[3]</port>
+				<port name="reg_in">open</port>
+				<port name="sc_in">open</port>
+				<port name="cin">open</port>
+				<port name="reset">open</port>
+			</inputs>
+			<outputs>
+				<port name="out">ble4[0].out[0]-&gt;direct2</port>
+				<port name="reg_out">open</port>
+				<port name="sc_out">open</port>
+				<port name="cout">open</port>
+			</outputs>
+			<clocks>
+				<port name="clk">clb.clk[0]-&gt;clb.clk_to_fle[7].clk</port>
+			</clocks>
+			<block name="$auto$alumacc.cc:485:replace_alu$5.Y[7]" instance="ble4[0]" mode="default">
+				<inputs>
+					<port name="in">fle.in[0]-&gt;direct1 fle.in[1]-&gt;direct1 fle.in[2]-&gt;direct1 fle.in[3]-&gt;direct1</port>
+				</inputs>
+				<outputs>
+					<port name="out">ff[0].Q[0]-&gt;mux1</port>
+				</outputs>
+				<clocks>
+					<port name="clk">fle.clk[0]-&gt;direct3</port>
+				</clocks>
+				<block name="$auto$alumacc.cc:485:replace_alu$5.Y[7]" instance="lut4[0]" mode="lut4">
+					<inputs>
+						<port name="in">ble4.in[0]-&gt;direct1 ble4.in[1]-&gt;direct1 ble4.in[2]-&gt;direct1 ble4.in[3]-&gt;direct1</port>
+					</inputs>
+					<outputs>
+						<port name="out">lut[0].out[0]-&gt;direct:lut4</port>
+					</outputs>
+					<clocks />
+					<block name="$auto$alumacc.cc:485:replace_alu$5.Y[7]" instance="lut[0]">
+						<attributes />
+						<parameters />
+						<inputs>
+							<port name="in">lut4.in[0]-&gt;direct:lut4 lut4.in[1]-&gt;direct:lut4 lut4.in[2]-&gt;direct:lut4 lut4.in[3]-&gt;direct:lut4</port>
+							<port_rotation_map name="in">2 3 0 1</port_rotation_map>
+						</inputs>
+						<outputs>
+							<port name="out">$auto$alumacc.cc:485:replace_alu$5.Y[7]</port>
+						</outputs>
+						<clocks />
+					</block>
+				</block>
+				<block name="led[3]" instance="ff[0]">
+					<attributes />
+					<parameters />
+					<inputs>
+						<port name="D">lut4[0].out[0]-&gt;direct2</port>
+					</inputs>
+					<outputs>
+						<port name="Q">led[3]</port>
+					</outputs>
+					<clocks>
+						<port name="clk">ble4.clk[0]-&gt;direct3</port>
+					</clocks>
+				</block>
+			</block>
+		</block>
+	</block>
+	<block name="$auto$alumacc.cc:485:replace_alu$5.Y[1]" instance="clb[1]" mode="default">
+		<inputs>
+			<port name="I">open open open open open open open open open open open open open open open open open open open open open open open open</port>
+			<port name="reg_in">open</port>
+			<port name="sc_in">open</port>
+			<port name="cin">open</port>
+			<port name="reset">open</port>
+		</inputs>
+		<outputs>
+			<port name="O">open open open open open open fle[6].out[0]-&gt;clbouts2 fle[7].out[0]-&gt;clbouts2</port>
+			<port name="reg_out">open</port>
+			<port name="sc_out">open</port>
+			<port name="cout">open</port>
+			<port name="cout_copy">open</port>
+		</outputs>
+		<clocks>
+			<port name="clk">clk</port>
+		</clocks>
+		<block name="open" instance="fle[0]" />
+		<block name="open" instance="fle[1]" />
+		<block name="open" instance="fle[2]" />
+		<block name="open" instance="fle[3]" />
+		<block name="open" instance="fle[4]" />
+		<block name="open" instance="fle[5]" />
+		<block name="$auto$alumacc.cc:485:replace_alu$5.X[0]" instance="fle[6]" mode="n1_lut4">
+			<inputs>
+				<port name="in">open open fle[6].out[0]-&gt;crossbar_fle[6].in[2] open</port>
+				<port name="reg_in">open</port>
+				<port name="sc_in">open</port>
+				<port name="cin">open</port>
+				<port name="reset">open</port>
+			</inputs>
+			<outputs>
+				<port name="out">ble4[0].out[0]-&gt;direct2</port>
+				<port name="reg_out">open</port>
+				<port name="sc_out">open</port>
+				<port name="cout">open</port>
+			</outputs>
+			<clocks>
+				<port name="clk">clb.clk[0]-&gt;clb.clk_to_fle[6].clk</port>
+			</clocks>
+			<block name="$auto$alumacc.cc:485:replace_alu$5.X[0]" instance="ble4[0]" mode="default">
+				<inputs>
+					<port name="in">open open fle.in[2]-&gt;direct1 open</port>
+				</inputs>
+				<outputs>
+					<port name="out">ff[0].Q[0]-&gt;mux1</port>
+				</outputs>
+				<clocks>
+					<port name="clk">fle.clk[0]-&gt;direct3</port>
+				</clocks>
+				<block name="$auto$alumacc.cc:485:replace_alu$5.X[0]" instance="lut4[0]" mode="lut4">
+					<inputs>
+						<port name="in">open open ble4.in[2]-&gt;direct1 open</port>
+					</inputs>
+					<outputs>
+						<port name="out">lut[0].out[0]-&gt;direct:lut4</port>
+					</outputs>
+					<clocks />
+					<block name="$auto$alumacc.cc:485:replace_alu$5.X[0]" instance="lut[0]">
+						<attributes />
+						<parameters />
+						<inputs>
+							<port name="in">open open lut4.in[2]-&gt;direct:lut4 open</port>
+							<port_rotation_map name="in">open open 0 open</port_rotation_map>
+						</inputs>
+						<outputs>
+							<port name="out">$auto$alumacc.cc:485:replace_alu$5.X[0]</port>
+						</outputs>
+						<clocks />
+					</block>
+				</block>
+				<block name="cnt[0]" instance="ff[0]">
+					<attributes />
+					<parameters />
+					<inputs>
+						<port name="D">lut4[0].out[0]-&gt;direct2</port>
+					</inputs>
+					<outputs>
+						<port name="Q">cnt[0]</port>
+					</outputs>
+					<clocks>
+						<port name="clk">ble4.clk[0]-&gt;direct3</port>
+					</clocks>
+				</block>
+			</block>
+		</block>
+		<block name="$auto$alumacc.cc:485:replace_alu$5.Y[1]" instance="fle[7]" mode="n1_lut4">
+			<inputs>
+				<port name="in">fle[7].out[0]-&gt;crossbar_fle[7].in[0] open open fle[6].out[0]-&gt;crossbar_fle[7].in[3]</port>
+				<port name="reg_in">open</port>
+				<port name="sc_in">open</port>
+				<port name="cin">open</port>
+				<port name="reset">open</port>
+			</inputs>
+			<outputs>
+				<port name="out">ble4[0].out[0]-&gt;direct2</port>
+				<port name="reg_out">open</port>
+				<port name="sc_out">open</port>
+				<port name="cout">open</port>
+			</outputs>
+			<clocks>
+				<port name="clk">clb.clk[0]-&gt;clb.clk_to_fle[7].clk</port>
+			</clocks>
+			<block name="$auto$alumacc.cc:485:replace_alu$5.Y[1]" instance="ble4[0]" mode="default">
+				<inputs>
+					<port name="in">fle.in[0]-&gt;direct1 open open fle.in[3]-&gt;direct1</port>
+				</inputs>
+				<outputs>
+					<port name="out">ff[0].Q[0]-&gt;mux1</port>
+				</outputs>
+				<clocks>
+					<port name="clk">fle.clk[0]-&gt;direct3</port>
+				</clocks>
+				<block name="$auto$alumacc.cc:485:replace_alu$5.Y[1]" instance="lut4[0]" mode="lut4">
+					<inputs>
+						<port name="in">ble4.in[0]-&gt;direct1 open open ble4.in[3]-&gt;direct1</port>
+					</inputs>
+					<outputs>
+						<port name="out">lut[0].out[0]-&gt;direct:lut4</port>
+					</outputs>
+					<clocks />
+					<block name="$auto$alumacc.cc:485:replace_alu$5.Y[1]" instance="lut[0]">
+						<attributes />
+						<parameters />
+						<inputs>
+							<port name="in">lut4.in[0]-&gt;direct:lut4 open open lut4.in[3]-&gt;direct:lut4</port>
+							<port_rotation_map name="in">0 open open 1</port_rotation_map>
+						</inputs>
+						<outputs>
+							<port name="out">$auto$alumacc.cc:485:replace_alu$5.Y[1]</port>
+						</outputs>
+						<clocks />
+					</block>
+				</block>
+				<block name="cnt[1]" instance="ff[0]">
+					<attributes />
+					<parameters />
+					<inputs>
+						<port name="D">lut4[0].out[0]-&gt;direct2</port>
+					</inputs>
+					<outputs>
+						<port name="Q">cnt[1]</port>
+					</outputs>
+					<clocks>
+						<port name="clk">ble4.clk[0]-&gt;direct3</port>
+					</clocks>
+				</block>
+			</block>
+		</block>
+	</block>
+	<block name="out:led[0]" instance="io[2]" mode="outpad">
+		<inputs>
+			<port name="outpad">led[0]</port>
+		</inputs>
+		<outputs>
+			<port name="inpad">open</port>
+		</outputs>
+		<clocks />
+		<block name="out:led[0]" instance="outpad[0]">
+			<attributes />
+			<parameters />
+			<inputs>
+				<port name="outpad">io.outpad[0]-&gt;outpad</port>
+			</inputs>
+			<outputs />
+			<clocks />
+		</block>
+	</block>
+	<block name="out:led[1]" instance="io[3]" mode="outpad">
+		<inputs>
+			<port name="outpad">led[1]</port>
+		</inputs>
+		<outputs>
+			<port name="inpad">open</port>
+		</outputs>
+		<clocks />
+		<block name="out:led[1]" instance="outpad[0]">
+			<attributes />
+			<parameters />
+			<inputs>
+				<port name="outpad">io.outpad[0]-&gt;outpad</port>
+			</inputs>
+			<outputs />
+			<clocks />
+		</block>
+	</block>
+	<block name="out:led[2]" instance="io[4]" mode="outpad">
+		<inputs>
+			<port name="outpad">led[2]</port>
+		</inputs>
+		<outputs>
+			<port name="inpad">open</port>
+		</outputs>
+		<clocks />
+		<block name="out:led[2]" instance="outpad[0]">
+			<attributes />
+			<parameters />
+			<inputs>
+				<port name="outpad">io.outpad[0]-&gt;outpad</port>
+			</inputs>
+			<outputs />
+			<clocks />
+		</block>
+	</block>
+	<block name="out:led[3]" instance="io[5]" mode="outpad">
+		<inputs>
+			<port name="outpad">led[3]</port>
+		</inputs>
+		<outputs>
+			<port name="inpad">open</port>
+		</outputs>
+		<clocks />
+		<block name="out:led[3]" instance="outpad[0]">
+			<attributes />
+			<parameters />
+			<inputs>
+				<port name="outpad">io.outpad[0]-&gt;outpad</port>
+			</inputs>
+			<outputs />
+			<clocks />
+		</block>
+	</block>
+	<block name="clk" instance="io[6]" mode="inpad">
+		<inputs>
+			<port name="outpad">open</port>
+		</inputs>
+		<outputs>
+			<port name="inpad">inpad[0].inpad[0]-&gt;inpad</port>
+		</outputs>
+		<clocks />
+		<block name="clk" instance="inpad[0]">
+			<attributes />
+			<parameters />
+			<inputs />
+			<outputs>
+				<port name="inpad">clk</port>
+			</outputs>
+			<clocks />
+		</block>
+	</block>
+</block>

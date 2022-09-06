@@ -1,0 +1,7 @@
+.model top
+.inputs a
+.outputs o
+.subckt frac_lut4_arith in[1]=a lut4_out=o
+.param LUT 1100110011001100
+.param MODE 0
+.end

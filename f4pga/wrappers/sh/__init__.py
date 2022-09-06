@@ -413,7 +413,7 @@ if [[ '{device}' =~ ^(qlf_.*)$ ]]; then
     exit -1
   fi
 
-  '{python3}' '{scripts_dir}/qlf_k4n8_create_ioplace.py' \
+  '{python3}' -m f4pga.utils.quicklogic.qlf_k4n8.create_ioplace \
     --pcf '{pcf}' \
     --blif '{eblif}' \
     --pinmap_xml '{archs_dir}'/"${{DEVICE_PATH}}_${{DEVICE_PATH}}/${{PINMAPXML}}" \
@@ -437,14 +437,14 @@ elif [[ '{device}' =~ ^(ql-.*)$ ]]; then
   DEVICE_PATH='{device}_wlcsp'
   PINMAP='{archs_dir}'/"${{DEVICE_PATH}}/${{PINMAPCSV}}"
 
-  '{python3}' '{scripts_dir}/pp3_create_ioplace.py' \
+  '{python3}' -m f4pga.utils.quicklogic.pp3.create_ioplace \
     --pcf '{pcf}' \
     --blif '{eblif}' \
     --map "$PINMAP" \
     --net '{net}' \
     > '{place_file_prefix}_io.place'
 
-  '{python3}' '{scripts_dir}/pp3_create_place_constraints.py' \
+  '{python3}' -m f4pga.utils.quicklogic.pp3.create_place_constraints \
     --blif '{eblif}' \
     --map '{archs_dir}'/"${{DEVICE_PATH}}/${{CLKMAPCSV}}" \
     -i '{place_file_prefix}_io.place' \
@@ -456,7 +456,7 @@ elif [[ '{device}' =~ ^(ql-.*)$ ]]; then
             + "\n".join(
                 [
                     f"""
-    '{python3}' '{scripts_dir}/pp3_eos_s3_iomux_config.py' \
+    '{python3}' -m f4pga.utils.quicklogic.pp3.eos-s3.iomux_config \
       --eblif '{eblif}' \
       --pcf '{pcf}' \
       --map "$PINMAP" \
@@ -687,7 +687,7 @@ DESIGN=${EBLIF/.eblif/}
 """
         + f"""
 PYTHONPATH='{F4PGA_SHARE_DIR}/scripts':$PYTHONPATH \
-  '{python3}' '{F4PGA_SHARE_DIR}/scripts/repacker/repack.py' \
+  '{python3}' -m f4pga.utils.quicklogic.repacker.repack \
     --vpr-arch ${{ARCH_DEF}} \
     --repacking-rules ${{ARCH_DIR}}/${{DEVICE_NAME}}.repacking_rules.json \
     $JSON_ARGS \
@@ -750,7 +750,7 @@ ARCH_DIR='{F4PGA_SHARE_DIR}/arch/'"${{DEVICE_1}}_${{DEVICE_1}}"
 PINMAP_XML=${ARCH_DIR}/${PINMAPXML}
 """
         + f"""
-'{python3}' '{F4PGA_SHARE_DIR}/scripts/create_lib.py' \
+'{python3}' -m f4pga.utils.quicklogic.create_lib \
   -n "${{DEV}}_0P72_SSM40" \
   -m fpga_top \
   -c '{part}' \
@@ -794,7 +794,7 @@ def fasm2bels():
 
     p_run_bash_cmds(
         f"""
-'{python3}' '{F4PGA_SHARE_DIR}/scripts/fasm2bels.py' '{args.bit}' \
+'{python3}' -m f4pga.utils.quicklogic.pp3.fasm2bels '{args.bit}' \
   --phy-db '{F4PGA_SHARE_DIR}/arch/{args.device}_wlcsp/db_phy.pickle' \
   --device-name "${{DEVICE/ql-/}}" \
   --package-name '{args.part}' \

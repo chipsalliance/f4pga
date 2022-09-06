@@ -1,0 +1,156 @@
+<?xml version="1.0"?>
+<block name="top.net" instance="FPGA_packed_netlist[0]" architecture_id="SHA256:75d400c4d0f05a6b7a7cc26b5315f29d3cbc1d64579f5a3d3b40f77b1deed75c" atom_netlist_id="SHA256:bcfc8354052a41bff85e4c6f44f7a8c3b27a73ca9ed4db64341c3852c6d323c1">
+	<inputs>a</inputs>
+	<outputs>out:o</outputs>
+	<clocks></clocks>
+	<block name="o" instance="clb[0]" mode="default">
+		<inputs>
+			<port name="I">open open open open open open open open open open open open open open a open open open open open open open open open</port>
+			<port name="reg_in">open</port>
+			<port name="sc_in">open</port>
+			<port name="cin">open</port>
+			<port name="lreset">open</port>
+			<port name="reset">open</port>
+			<port name="preset">open</port>
+		</inputs>
+		<outputs>
+			<port name="O">open open open open open open open fle[7].out[0]-&gt;clbouts2</port>
+			<port name="reg_out">open</port>
+			<port name="sc_out">open</port>
+			<port name="cout">open</port>
+		</outputs>
+		<clocks>
+			<port name="clk">open open open open</port>
+		</clocks>
+		<block name="open" instance="fle[0]" />
+		<block name="open" instance="fle[1]" />
+		<block name="open" instance="fle[2]" />
+		<block name="open" instance="fle[3]" />
+		<block name="open" instance="fle[4]" />
+		<block name="open" instance="fle[5]" />
+		<block name="open" instance="fle[6]" />
+		<block name="o" instance="fle[7]" mode="n1_lut4">
+			<inputs>
+				<port name="in">open open clb.I[14]-&gt;crossbar_fle[7].in[2] open</port>
+				<port name="reg_in">open</port>
+				<port name="sc_in">open</port>
+				<port name="cin">open</port>
+				<port name="reset">open</port>
+				<port name="preset">open</port>
+			</inputs>
+			<outputs>
+				<port name="out">ble4[0].out[0]-&gt;direct2</port>
+				<port name="reg_out">open</port>
+				<port name="sc_out">open</port>
+				<port name="cout">open</port>
+			</outputs>
+			<clocks>
+				<port name="clk">open</port>
+			</clocks>
+			<block name="o" instance="ble4[0]" mode="default">
+				<inputs>
+					<port name="in">open open fle.in[2]-&gt;direct1 open</port>
+					<port name="reset">open</port>
+					<port name="preset">open</port>
+				</inputs>
+				<outputs>
+					<port name="out">lut4[0].out[0]-&gt;mux1</port>
+				</outputs>
+				<clocks>
+					<port name="clk">open</port>
+				</clocks>
+				<block name="o" instance="lut4[0]" mode="lut4">
+					<inputs>
+						<port name="in">open open ble4.in[2]-&gt;direct1 open</port>
+					</inputs>
+					<outputs>
+						<port name="out">lut[0].out[0]-&gt;direct:lut4</port>
+					</outputs>
+					<clocks />
+					<block name="o" instance="lut[0]">
+						<attributes />
+						<parameters />
+						<inputs>
+							<port name="in">open open lut4.in[2]-&gt;direct:lut4 open</port>
+							<port_rotation_map name="in">open open 0 open</port_rotation_map>
+						</inputs>
+						<outputs>
+							<port name="out">o</port>
+						</outputs>
+						<clocks />
+					</block>
+				</block>
+				<block name="open" instance="ff[0]" />
+			</block>
+		</block>
+	</block>
+	<block name="out:o" instance="io[1]" mode="io_output">
+		<inputs>
+			<port name="f2a_i">o</port>
+			<port name="sc_in">open</port>
+			<port name="reset">open</port>
+		</inputs>
+		<outputs>
+			<port name="a2f_o">open</port>
+			<port name="sc_out">open</port>
+		</outputs>
+		<clocks>
+			<port name="clk">open open open open</port>
+		</clocks>
+		<block name="out:o" instance="io_output[0]" mode="default">
+			<inputs>
+				<port name="f2a_i">io.f2a_i[0]-&gt;io_output-f2a_i</port>
+				<port name="reset">open</port>
+			</inputs>
+			<outputs />
+			<clocks>
+				<port name="clk">open</port>
+			</clocks>
+			<block name="open" instance="ff[0]" />
+			<block name="out:o" instance="outpad[0]">
+				<attributes />
+				<parameters />
+				<inputs>
+					<port name="outpad">io_output.f2a_i[0]-&gt;mux1</port>
+				</inputs>
+				<outputs />
+				<clocks />
+			</block>
+		</block>
+	</block>
+	<block name="a" instance="io[2]" mode="io_input">
+		<inputs>
+			<port name="f2a_i">open</port>
+			<port name="sc_in">open</port>
+			<port name="reset">open</port>
+		</inputs>
+		<outputs>
+			<port name="a2f_o">io_input[0].a2f_o[0]-&gt;io-a2f_o</port>
+			<port name="sc_out">open</port>
+		</outputs>
+		<clocks>
+			<port name="clk">open open open open</port>
+		</clocks>
+		<block name="a" instance="io_input[0]" mode="default">
+			<inputs>
+				<port name="reset">open</port>
+			</inputs>
+			<outputs>
+				<port name="a2f_o">inpad[0].inpad[0]-&gt;mux2</port>
+			</outputs>
+			<clocks>
+				<port name="clk">open</port>
+			</clocks>
+			<block name="a" instance="inpad[0]">
+				<attributes />
+				<parameters />
+				<inputs />
+				<outputs>
+					<port name="inpad">a</port>
+				</outputs>
+				<clocks />
+			</block>
+			<block name="open" instance="ff[0]" />
+		</block>
+	</block>
+</block>
