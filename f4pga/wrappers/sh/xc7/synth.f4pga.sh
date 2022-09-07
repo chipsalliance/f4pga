@@ -35,55 +35,12 @@ SURELOG=0
 for arg in $@; do
   echo $arg
   case "$arg" in
-    -t|--top)
-      echo "adding top"
-      VERILOGLIST=0
-      XDCLIST=0
-      TOPNAME=1
-      DEVICENAME=0
-      PARTNAME=0
-      SURELOG=0
-      ;;
-    -x|--xdc)
-      VERILOGLIST=0
-      XDCLIST=1
-      TOPNAME=0
-      DEVICENAME=0
-      PARTNAME=0
-      SURELOG=0
-      ;;
-    -v|--verilog)
-      VERILOGLIST=1
-      XDCLIST=0
-      TOPNAME=0
-      DEVICENAME=0
-      PARTNAME=0
-      SURELOG=0
-      ;;
-    -d|--device)
-      VERILOGLIST=0
-      XDCLIST=0
-      TOPNAME=0
-      DEVICENAME=1
-      PARTNAME=0
-      SURELOG=0
-      ;;
-    -p|--part)
-      VERILOGLIST=0
-      XDCLIST=0
-      TOPNAME=0
-      DEVICENAME=0
-      PARTNAME=1
-      SURELOG=0
-      ;;
-    -s|--surelog)
-      VERILOGLIST=0
-      XDCLIST=0
-      TOPNAME=0
-      DEVICENAME=0
-      PARTNAME=0
-      SURELOG=1
-      ;;
+    -v|--verilog) VERILOGLIST=1 XDCLIST=0 TOPNAME=0 DEVICENAME=0 PARTNAME=0 SURELOG=0 ;;
+    -x|--xdc)     VERILOGLIST=0 XDCLIST=1 TOPNAME=0 DEVICENAME=0 PARTNAME=0 SURELOG=0 ;;
+    -t|--top)     VERILOGLIST=0 XDCLIST=0 TOPNAME=1 DEVICENAME=0 PARTNAME=0 SURELOG=0 ;;
+    -d|--device)  VERILOGLIST=0 XDCLIST=0 TOPNAME=0 DEVICENAME=1 PARTNAME=0 SURELOG=0 ;;
+    -p|--part)    VERILOGLIST=0 XDCLIST=0 TOPNAME=0 DEVICENAME=0 PARTNAME=1 SURELOG=0 ;;
+    -s|--surelog) VERILOGLIST=0 XDCLIST=0 TOPNAME=0 DEVICENAME=0 PARTNAME=0 SURELOG=1 ;;
     *)
       if [ $VERILOGLIST -eq 1 ]; then
         VERILOG_FILES+=($arg)
@@ -107,27 +64,27 @@ for arg in $@; do
   esac
 done
 
-if [ ${#VERILOG_FILES[@]} -eq 0 ]; then
-  echo "Please provide at least one Verilog file"
-  exit 1
-fi
+if [ ${#VERILOG_FILES[@]} -eq 0 ]; then echo "Please provide at least one Verilog file"; exit 1; fi
 
-DATABASE_DIR=${DATABASE_DIR:-$(prjxray-config)}
+export TOP="${TOP}"
+export USE_ROI='FALSE'
+export INPUT_XDC_FILES="${XDC_FILES[*]}"
+export OUT_JSON="$TOP.json"
+export OUT_SDC="${TOP}.sdc"
+export SYNTH_JSON="${TOP}_io.json"
+export OUT_SYNTH_V="${TOP}_synth.v"
+export OUT_EBLIF="${TOP}.eblif"
+export PART_JSON=`realpath ${DATABASE_DIR:-$(prjxray-config)}/$DEVICE/$PART/part.json`
+export OUT_FASM_EXTRA="${TOP}_fasm_extra.fasm"
+export PYTHON3="${PYTHON3:-$(which python3)}"
 
-export TOP=${TOP}
-export USE_ROI="FALSE"
-export INPUT_XDC_FILES=${XDC_FILES[*]}
-export OUT_JSON=$TOP.json
-export OUT_SDC=${TOP}.sdc
-export SYNTH_JSON=${TOP}_io.json
-export OUT_SYNTH_V=${TOP}_synth.v
-export OUT_EBLIF=${TOP}.eblif
-export PART_JSON=`realpath ${DATABASE_DIR}/$DEVICE/$PART/part.json`
-export OUT_FASM_EXTRA=${TOP}_fasm_extra.fasm
-export PYTHON3=${PYTHON3:-$(which python3)}
-
-yosys_read_cmds="read_verilog"
+yosys_read_cmds=""
+yosys_files="${VERILOG_FILES[*]}"
 if [ -n "$SURELOG_CMD" ]; then
-  yosys_read_cmds="plugin -i uhdm; read_verilog_with_uhdm ${SURELOG_CMD[*]}"
+  yosys_read_cmds="plugin -i uhdm; read_verilog_with_uhdm ${SURELOG_CMD[*]} ${VERILOG_FILES[*]}"
+  yosys_files=""
 fi
-yosys -p "$yosys_read_cmds ${VERILOG_FILES[*]}; tcl $(python3 -m f4pga.wrappers.tcl)" -l "${TOP}_synth.log"
+yosys \
+  -p "$yosys_read_cmds; tcl $(python3 -m f4pga.wrappers.tcl)" \
+  -l "${TOP}_synth.log" \
+  $yosys_files

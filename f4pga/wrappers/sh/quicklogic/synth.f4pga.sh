@@ -44,66 +44,28 @@ EXTRA_ARGS=()
 
 OPT=""
 for arg in $@; do
-    case $arg in
-        -t|--top)
-            OPT="top"
-            ;;
-        -v|--verilog)
-            OPT="vlog"
-            ;;
-        -d|--device)
-            OPT="dev"
-            ;;
-        -F|--family)
-            OPT="family"
-            ;;
-        -P|--part)
-            OPT="part"
-            ;;
-        -p|--pcf)
-            OPT="pcf"
-            ;;
-        -y|-f|+incdir+*|+libext+*|+define+*)
-            OPT="xtra"
-            ;;
-        *)
-            case $OPT in
-                "top")
-                    TOP=$arg
-                    OPT=""
-                    ;;
-                "vlog")
-                    VERILOG_FILES+=($arg)
-                    ;;
-                "dev")
-                    DEVICE=$arg
-                    OPT=""
-                    ;;
-                "family")
-                    FAMILY=$arg
-                    OPT=""
-                    ;;
-                "part")
-                    PART=$arg
-                    OPT=""
-                    ;;
-                "pcf")
-                    PCF=$arg
-                    OPT=""
-                    ;;
-                "xtra")
-                    ;;
-                *)
-                    print_usage
-                    ;;
-            esac
-            ;;
-    esac
-
-    if [ "$OPT" == "xtra" ]; then
-        EXTRA_ARGS+=($arg)
-    fi
-
+  case $arg in
+    -t|--top)     OPT="top" ;;
+    -v|--verilog) OPT="vlog" ;;
+    -d|--device)  OPT="dev" ;;
+    -F|--family)  OPT="family" ;;
+    -P|--part)    OPT="part" ;;
+    -p|--pcf)     OPT="pcf" ;;
+    -y|-f|+incdir+*|+libext+*|+define+*) OPT="xtra" ;;
+    *)
+      case $OPT in
+        "top")    TOP=$arg;    OPT="" ;;
+        "dev")    DEVICE=$arg; OPT="" ;;
+        "family") FAMILY=$arg; OPT="" ;;
+        "part")   PART=$arg;   OPT="" ;;
+        "pcf")    PCF=$arg;    OPT="" ;;
+        "vlog")   VERILOG_FILES+=($arg) ;;
+        "xtra") ;;
+        *) print_usage ;;
+      esac
+      ;;
+  esac
+  if [ "$OPT" == "xtra" ]; then EXTRA_ARGS+=($arg); fi
 done
 
 if [ -z ${FAMILY} ]; then echo "Please specify device family"; exit 1; fi
@@ -120,9 +82,9 @@ export OUT_FASM_EXTRA=${TOP}_fasm_extra.fasm
 export PYTHON3=$(which python3)
 
 if [ -s $PCF ]; then
-    export PCF_FILE=$PCF
+  export PCF_FILE=$PCF
 else
-    export PCF_FILE=""
+  export PCF_FILE=""
 fi
 
 DEVICE_PATH="${F4PGA_SHARE_DIR}/arch/${DEVICE}_${DEVICE}"
@@ -145,19 +107,8 @@ else
   fi
 fi
 
-YOSYS_COMMANDS=`echo ${EXTRA_ARGS[*]} | python3 -m f4pga.utils.quicklogic.convert_compile_opts`
-YOSYS_COMMANDS="${YOSYS_COMMANDS//$'\n'/'; '}"
-
-LOG=${TOP}_synth.log
-
-YOSYS_SCRIPT="tcl $(python3 -m f4pga.wrappers.tcl "${FAMILY}")"
-
-for f in ${VERILOG_FILES[*]}; do
-  YOSYS_SCRIPT="read_verilog ${f}; $YOSYS_SCRIPT"
-done
-
-if [ ! -z "${YOSYS_COMMANDS}" ]; then
-  YOSYS_SCRIPT="$YOSYS_COMMANDS; $YOSYS_SCRIPT"
-fi
-
-`which yosys` -p "${YOSYS_SCRIPT}" -l $LOG
+yosys_cmds=`echo ${EXTRA_ARGS[*]} | python3 -m f4pga.utils.quicklogic.convert_compile_opts`
+`which yosys` \
+  -p "${yosys_cmds//$'\n'/'; '} tcl $(python3 -m f4pga.wrappers.tcl "${FAMILY}")" \
+  -l "${TOP}_synth.log" \
+  ${VERILOG_FILES[*]}
