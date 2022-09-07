@@ -108,7 +108,13 @@ else
 fi
 
 yosys_cmds=`echo ${EXTRA_ARGS[*]} | python3 -m f4pga.utils.quicklogic.convert_compile_opts`
+if [ ! -z "${yosys_cmds}" ]; then yosys_cmds="${yosys_cmds//$'\n'/'; '}; "; fi
+
+yosys_read_cmds=''
+for f in ${VERILOG_FILES[*]}; do
+  yosys_read_cmds="read_verilog ${f}; $yosys_read_cmds"
+done
+
 `which yosys` \
-  -p "${yosys_cmds//$'\n'/'; '} tcl $(python3 -m f4pga.wrappers.tcl "${FAMILY}")" \
-  -l "${TOP}_synth.log" \
-  ${VERILOG_FILES[*]}
+  -p "$yosys_cmds $yosys_read_cmds tcl $(python3 -m f4pga.wrappers.tcl "${FAMILY}")" \
+  -l "${TOP}_synth.log"
