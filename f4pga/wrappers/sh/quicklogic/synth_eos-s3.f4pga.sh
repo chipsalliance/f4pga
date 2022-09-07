@@ -150,13 +150,13 @@ export VAL_yosys_plugins=$YOSYS_PLUGINS
 export VAL_surelog_cmd=${SURELOG_CMD[*]}
 export VAL_pinmap=${DEVICE_PATH}/${PINMAPCSV}
 export TMP_json_org=${TMP_DIR}/json_org.json
-export TMP_json_premapped=${TMP_DIR}/json_premapped.json
+export TMP_json_presplit=${TMP_DIR}/json_premapped.json
 export DEP_sources=${VERILOG_FILES[*]}
 export DEP_build_dir="build"
 export DEP_json=${TOP}.json
 export DEP_synth_json=${TOP}_io.json
 export DEP_pcf=$PCF
-export DEP_synth_v=${TOP}_synth.v
+export DEP_synth_v_premap=${TOP}_struct_premap.v
 export DEP_eblif=${TOP}.eblif
 
 LOG=${TOP}_synth.log
@@ -185,6 +185,3 @@ if [ $RESULT != 0 ]; then
 fi
 
 set -e
-
-python3 -m f4pga.utils.split_inouts -i "${DEP_json}" -o "${DEP_synth_json}"
-yosys -p "tcl ${F4PGA_EXEC_TCL_PATH}; tcl ${F4PGA_COMMON_TCL_PATH}; tcl ${CONV_TCL_PATH}"

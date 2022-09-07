@@ -120,11 +120,13 @@ export VAL_surelog_cmd=${SURELOG_CMD[*]}
 export VAL_use_lut_constants="FALSE"
 export TMP_json_carry_fixup=${TMP_DIR}/json_carry_fixup.json
 export TMP_json_carry_fixup_out=${TMP_DIR}/json_carry_fixup_out.json
+export TMP_json_presplit=${TMP_DIR}/json_presplit.json
 export DEP_sources=${VERILOG_FILES[*]}
 export DEP_xdc=${XDC_FILES[*]}
 export DEP_build_dir="build"
 export DEP_fasm_extra=${TOP}_fasm_extra.fasm
-export DEP_synth_v=${TOP}_synth.v
+export DEP_synth_v_premap=${TOP}_struct_premap.v
+export DEP_synth_v=${TOP}_struct.v
 export DEP_sdc=${TOP}.sdc
 export DEP_json=$TOP.json
 export DEP_synth_json=${TOP}_io.json
@@ -152,6 +154,3 @@ if [ $RESULT != 0 ]; then
 fi
 
 set -e
-
-python3 -m f4pga.utils.split_inouts -i ${DEP_json} -o ${DEP_synth_json}
-yosys -p "tcl ${F4PGA_EXEC_TCL_PATH}; tcl ${F4PGA_COMMON_TCL_PATH}; tcl ${CONV_TCL_PATH}"

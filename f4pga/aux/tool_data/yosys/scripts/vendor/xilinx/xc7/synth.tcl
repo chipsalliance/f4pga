@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2022 F4PGA Authors
+# Copyright (C) 2022 F4PGA Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,35 +37,51 @@ f4pga value     python3
 f4pga value     shareDir
 f4pga value     yosys_plugins?
 f4pga value     surelog_cmd?
-f4pga value     extra_techmaps_path?
-f4pga value     simulation_models
-f4pga value     techmap
+f4pga value     use_lut_constants?
 f4pga tempfile  json_carry_fixup
 f4pga tempfile  json_carry_fixup_out
 f4pga take      sources
+f4pga tempfile  json_presplit
 f4pga take      xdc?
 f4pga take      build_dir
 f4pga produce   fasm_extra            ${f4pga_build_dir}/${f4pga_top}_extra.fasm       -meta "Extra fasm for pre-configuration of FPGA"
-f4pga produce   synth_v               ${f4pga_build_dir}/${f4pga_top}_premap.v         -meta "Pre-technology mapped structural verilog"
 f4pga produce   sdc                   ${f4pga_build_dir}/${f4pga_part_name}.sdc        -meta "Standard design constraints"
-f4pga produce   json                  ${f4pga_build_dir}/${f4pga_top}.json             -meta "Yosys JSON netlist"
-f4pga produce   rtlil_preopt          ${f4pga_build_dir}/${f4pga_top}.pre_abc9.ilang   -meta "Yosys RTLIL file (before optimization)"
-f4pga produce   rtlil                 ${f4pga_build_dir}/${f4pga_top}.post_abc9.ilang  -meta "Yosys RTLIL file"
+f4pga produce   eblif                 ${f4pga_build_dir}/${f4pga_top}.eblif            -meta "Extended BLIF circuit description"
 
-set extra_techmaps_path ${f4pga_extra_techmaps_path}
-if { ${extra_techmaps_path} eq "" } {
-    set extra_techmaps_path ${f4pga_shareDir}/techmaps/xc7_vpr/techmap
-}
+# TODO: Should be just on-demand once this feature is supported (`f4pga produce product_name! -meta Description`).
+# TODO: Support parameters OR drop them in favour of values to support conditional I/O. Requires early processing of values.
+# Uncomment the the ifs once that's supported
+#if { [f4pga value make_json?] != "" } {
+    f4pga produce   json              ${f4pga_build_dir}/${f4pga_top}.json             -meta "Yosys JSON netlist"
+#} else {
+#    f4pga tempfile  json
+#}
+#if { [f4pga value make_synth_v_premap? ] != "" } {
+    f4pga produce   synth_v_premap    ${f4pga_build_dir}/${f4pga_top}_struct_premap.v  -meta "Pre-technology mapped structural verilog"
+#}
+#if { [f4pga value make_synth_v? ] != "" } {
+    f4pga produce   synth_v           ${f4pga_build_dir}/${f4pga_top}_struct.v         -meta "Pre-technology mapped structural verilog"
+#}
+#if { [f4pga value make_rtlil_preopt? ] != "" } {
+    f4pga produce   rtlil_preopt      ${f4pga_build_dir}/${f4pga_top}.pre_abc9.ilang   -meta "Yosys RTLIL file (before optimization)"
+#}
+#if { [f4pga value make_rtlil? ] != "" } {
+    f4pga produce   rtlil             ${f4pga_build_dir}/${f4pga_top}.post_abc9.ilang  -meta "Yosys RTLIL file"
+#}
+
+set techmap_path ${f4pga_shareDir}/techmaps/xc7_vpr/techmap
 set utils_path ${f4pga_shareDir}/scripts
+
+log ">>> F4PGA Phase 1: Synthesis"
 
 if { [contains $f4pga_yosys_plugins uhdm] } {
     foreach {sysverilog_source} $f4pga_sources {
         read_verilog_with_uhdm $surelog_cmd $sysverilog_source
-    }
+    }    
 } else {
     foreach {verilog_source} $f4pga_sources {
         read_verilog $verilog_source
-    }
+    }    
 }
 
 # -flatten is used to ensure that the output eblif has only one module.
@@ -85,13 +101,13 @@ if { $f4pga_use_roi == "TRUE" } {
     read_verilog -lib +/xilinx/cells_xtra.v
 
     # Overwrite some models (e.g. IBUF with more parameters)
-    read_verilog -lib ${extra_techmaps_path}/iobs.v
+    read_verilog -lib ${techmap_path}/iobs.v
 
     # TODO: This should eventually end up in upstream Yosys
     #       as models such as FD are not currently supported
     #       as being used in old FPGAs (e.g. Spartan6)
     # Read in unsupported models
-    read_verilog -lib ${extra_techmaps_path}/retarget.v
+    read_verilog -lib ${techmap_path}/retarget.v
 
     if { $f4pga_top != "" } {
         hierarchy -check -top $f4pga_top
@@ -128,7 +144,9 @@ update_pll_and_mmcm_params
 # segfault.
 write_sdc -include_propagated_clocks $f4pga_sdc
 
-write_verilog $f4pga_synth_v
+#if { $f4pga_make_synth_v_premap != "" } {
+    write_verilog $f4pga_synth_v_premap
+#}
 
 # Look for connections OSERDESE2.OQ -> OBUFDS.I. Annotate OBUFDS with a parameter
 # indicating that it is connected to an OSERDESE2
@@ -136,7 +154,7 @@ select -set obufds t:OSERDESE2 %co2:+\[OQ,I\] t:OBUFDS t:OBUFTDS %u  %i
 setparam -set HAS_OSERDES 1 @obufds
 
 # Map Xilinx tech library to 7-series VPR tech library.
-read_verilog -specify -lib ${f4pga_simulation_models}
+read_verilog -specify -lib ${techmap_path}/cells_sim.v
 
 # Convert congested CARRY4 outputs to LUTs.
 #
@@ -201,7 +219,7 @@ read_verilog -specify -lib ${f4pga_simulation_models}
 # +--------------------------------------------------------------------------+
 #
 
-techmap -map ${extra_techmaps_path}/carry_map.v
+techmap -map ${techmap_path}/carry_map.v
 
 clean_processes
 write_json ${f4pga_json_carry_fixup}
@@ -210,37 +228,42 @@ exec $f4pga_python3 -m f4pga.utils.xc7.fix_xc7_carry < ${f4pga_json_carry_fixup}
 design -push
 read_json ${f4pga_json_carry_fixup_out}
 
-techmap -map ${extra_techmaps_path}/clean_carry_map.v
+techmap -map ${techmap_path}/clean_carry_map.v
 
 # Re-read baseline libraries
 read_verilog -lib -specify +/xilinx/cells_sim.v
 read_verilog -lib +/xilinx/cells_xtra.v
-read_verilog -specify -lib ${f4pga_simulation_models}
+read_verilog -specify -lib ${techmap_path}/cells_sim.v
 if { $f4pga_use_roi != "TRUE" } {
-    read_verilog -lib ${extra_techmaps_path}/iobs.v
+    read_verilog -lib ${techmap_path}/iobs.v
 }
 
 # Re-run optimization flow to absorb carry modifications
 hierarchy -check
 
-write_ilang $f4pga_rtlil_preopt
+#if { $f4pga_make_rtlil_preopt != "" } {
+    write_ilang $f4pga_rtlil_preopt
+#}
+
 if { $f4pga_use_roi == "TRUE" } {
     synth_xilinx -flatten -abc9 -nosrl -noclkbuf -nodsp -noiopad -nowidelut -run map_ffs:check
 } else {
     synth_xilinx -flatten -abc9 -nosrl -noclkbuf -nodsp -iopad -nowidelut -run map_ffs:check
 }
 
+#if { $f4pga_make_rtlil != "" } {
 write_ilang $f4pga_rtlil
+#}
 
 # Either the JSON bounce or ABC9 pass causes the CARRY4_VPR CIN/CYINIT pins
 # to have 0's when unused.  As a result VPR will attempt to route a 0 to those
 # ports. However this is not generally possible or desirable.
 #
-# The techmap has a simple pass where these unused ports are removed.
-# In theory yosys's "rmports" would work here, but
+# $::env(TECHMAP_PATH)/cells_map.v has a simple techmap pass where these
+# unused ports are removed.  In theory yosys's "rmports" would work here, but
 # it does not.
 chtype -map CARRY4_VPR CARRY4_FIX
-techmap -map  ${f4pga_techmap}
+techmap -map  ${techmap_path}/cells_map.v
 
 # opt_expr -undriven makes sure all nets are driven, if only by the $undef
 # net.
@@ -255,6 +278,34 @@ attrmap -remove hdlname
 
 # Write the design in JSON format.
 clean_processes
-write_json $f4pga_json
 # Write the design in Verilog format.
-write_verilog $f4pga_synth_v
+#if { $f4pga_make_synth_v != "" } {
+    write_verilog $f4pga_synth_v
+#}
+write_json $f4pga_json_presplit
+
+log ">>> F4PGA Phase 2: Splitting in/outs"
+
+exec ${f4pga_python3} ${f4pga_shareDir}/scripts/split_inouts.py -i $f4pga_json_presplit -o $f4pga_json
+
+log ">>> F4PGA Phase 3: Writing eblif"
+
+# Clean
+design -reset
+
+read_json ${f4pga_json}
+
+# Designs that directly tie OPAD's to constants cannot use the dedicate
+# constant network as an artifact of the way the ROI is configured.
+# Until the ROI is removed, enable designs to selectively disable the dedicated
+# constant network.
+if { $f4pga_use_lut_constants == "TRUE" } {
+    write_blif -attr -cname -param $f4pga_eblif
+} else {
+    write_blif -attr -cname -param \
+      -true VCC VCC \
+      -false GND GND \
+      -undef VCC VCC \
+    $f4pga_eblif
+}
+

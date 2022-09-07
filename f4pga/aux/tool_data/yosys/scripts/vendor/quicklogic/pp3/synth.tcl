@@ -27,22 +27,18 @@ f4pga value     shareDir
 f4pga value     yosys_plugins?
 f4pga value     top
 f4pga value     surelog_cmd?
-f4pga value     extra_techmaps_path?
-f4pga value     simulation_models
-f4pga value     techmap
 f4pga take      build_dir
 f4pga take      sources
 f4pga take      pcf
-f4pga produce   synth_v               ${f4pga_build_dir}/${f4pga_top}_premap.v         -meta "Structural verilog"
-f4pga produce   json                  ${f4pga_build_dir}/${f4pga_top}.json             -meta "Yosys JSON netlist"
+
+f4pga produce   eblif            ${f4pga_build_dir}/${f4pga_top}.eblif      -meta "Extended BLIF circuit description"
+# See comment about on-demands in the xc7 tcl script.
+f4pga produce   synth_v_premap   ${f4pga_build_dir}/${f4pga_top}_premap.v  -meta "Structural verilog"
+f4pga produce   json             ${f4pga_build_dir}/${f4pga_top}.json      -meta "Yosys JSON netlist"
 f4pga tempfile  json_org
-f4pga tempfile  json_premapped
+f4pga tempfile  json_presplit
 
-
-set extra_techmaps ${f4pga_extra_techmaps_path}
-if { $extra_techmaps eq "" } {
-    set extra_techmaps ${f4pga_shareDir}/arch/ql-eos-s3_wlcsp/cells
-}
+log ">>> F4PGA Phase 1: Synthesis"
 
 if { [contains $f4pga_yosys_plugins uhdm] } {
     foreach {sysverilog_source} $f4pga_sources {
@@ -55,9 +51,9 @@ if { [contains $f4pga_yosys_plugins uhdm] } {
 }
 
 # Read VPR cells library
-read_verilog -lib -specify ${f4pga_simulation_models}
+read_verilog -lib -specify ${f4pga_shareDir}/techmaps/pp3/cells_sim.v
 # Read device specific cells library
-read_verilog -lib -specify ${extra_techmaps}/ram_sim.v
+read_verilog -lib -specify ${f4pga_shareDir}/arch/ql-eos-s3_wlcsp/cells/ram_sim.v
 
 # Synthesize
 synth_quicklogic -family pp3
@@ -76,17 +72,17 @@ if { $f4pga_pcf != "" && $f4pga_pinmap != ""} {
 }
 
 # Write a pre-mapped design
-write_verilog $f4pga_json_premapped
+write_verilog $f4pga_synth_v_premap
 
 # Select all logic_0 and logic_1 and apply the techmap to them first. This is
 # necessary for constant connection detection in the subsequent techmaps.
 select -set consts t:logic_0 t:logic_1
-techmap -map ${f4pga_techmap} @consts
+techmap -map ${f4pga_shareDir}/techmaps/pp3/cells_map.v @consts
 
 # Map to the VPR cell library
-techmap -map ${f4pga_techmap}
+techmap -map ${f4pga_shareDir}/techmaps/pp3/cells_map.v
 # Map to the device specific VPR cell library
-techmap -map ${extra_techmaps}/ram_map.v
+techmap -map ${f4pga_shareDir}/arch/ql-eos-s3_wlcsp/cells/ram_map.v
 
 # opt_expr -undriven makes sure all nets are driven, if only by the $undef
 # net.
@@ -95,11 +91,24 @@ opt_clean
 setundef -zero -params
 stat
 
+log ">>> F4PGA Phase 2: Cell names fixup"
+
 # Write output JSON, fixup cell names using an external Python script
 write_json $f4pga_json_org
-exec $f4pga_python3 ${f4pga_shareDir}/scripts/yosys_fixup_cell_names.py $f4pga_json_org $f4pga_json
+exec $f4pga_python3 ${f4pga_shareDir}/scripts/yosys_fixup_cell_names.py $f4pga_json_org $f4pga_json_presplit
 
-# Read the fixed JSON back and write verilog
+log ">>> F4PGA Phase 3: Splitting in/outs"
+
+exec ${f4pga_python3} ${f4pga_shareDir}/scripts/split_inouts.py -i $f4pga_json_presplit -o $f4pga_json
+
+
+log ">>> F4PGA Phase 4: Writing eblif"
 design -reset
-read_json $f4pga_json
-write_verilog $f4pga_synth_v
+
+read_json ${f4pga_json}
+
+write_blif -attr -cname -param \
+    -true VCC VCC \
+    -false GND GND \
+    -undef VCC VCC \
+    $f4pga_eblif

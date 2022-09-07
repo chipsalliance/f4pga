@@ -152,6 +152,16 @@ class YosysScriptMeta:
                        purposees, FALSE if for execution.
 
                   * All variables set by `f4pga` command will have `f4pga_` prefix.
+
+                XXX: The output file paths in the dry-pass are being faked because
+                calculating them requires input paths to be present. However. the
+                paths are resolved at later stage, during dependency resolution.
+                In order to allow early path resolution, we would need to resolve
+                them as soon as modules are being constructed, but this would
+                require the modules to be constructed in the order that follows the
+                dependency graph, thus creating a circular dependency.
+
+                The control flow in Tcl scripts should not rely on reading those values.
                 """
                 args = list(args)
                 if len(args) < 1:
@@ -165,7 +175,12 @@ class YosysScriptMeta:
                     value = r_env.values.get(name)
                     if value is None:
                         value = ""
-                    tcl.setvar(f"f4pga_{name}", "${" + name + "}")
+                    # TODO: Return actual value. Requires dropping parameters in favour of early value processing
+                    # XXX: The actual resolution happens outside of the module, when building ModuleContext.
+                    # Then the results are taken from ctx in the make_env method.
+                    valstr = "${" + name + "}"
+                    tcl.setvar(f"f4pga_{name}", valstr)
+                    return valstr
                 elif action == "tempfile":
                     if len(args) != 2:
                         raise F4PGAException(message="f4pga tempfile (tcl): wrong arguments count")
@@ -177,11 +192,14 @@ class YosysScriptMeta:
                         raise F4PGAException(message="f4pga take (tcl): wrong arguments count")
                     meta.inputs.add(args[1])
                     name, _ = decompose_depname(args[1])
-                    tcl.setvar(f"f4pga_{name}", "${:" + name + "}")
+                    v = "${:" + name + "}"
+                    tcl.setvar(f"f4pga_{name}", v)
+                    return v
                 elif action == "produce":
                     argno = 0
                     meta_d = None
                     name = None
+                    value = ""
                     pathexpr = None
                     args.pop(0)
                     while len(args) != 0:
@@ -197,6 +215,15 @@ class YosysScriptMeta:
                             continue
                         elif argno == 0:
                             name = arg
+                            name_decomp, qualifier = decompose_depname(name)
+                            # XXX: Handling on-demand dependencies requires checking if output
+                            # path is specified, but currently this is not a straightforward
+                            # process. See the docstring of tcl_f4pga.
+                            # TODO: Handling of on-demand dependencies should be possible if
+                            # we make modules aware of dependency paths specified by the user
+                            # when they are initialized.
+                            assert qualifier == "req"
+                            value = "${:' + name_decomp + '}"
                             args.pop(0)
                             argno += 1
                             continue
@@ -210,7 +237,8 @@ class YosysScriptMeta:
                         else:
                             raise F4PGAException(message="f4pga produce (tcl) - unrecognized " f"flag {arg}")
                     meta.outputs[name] = (pathexpr, meta_d)
-                    tcl.setvar(f"f4pga_{name}", "${:" + name + "}")
+                    tcl.setvar(f"f4pga_{name_decomp}", value)
+                    return value
                 elif action == "is_dry":
                     return True
                 else:

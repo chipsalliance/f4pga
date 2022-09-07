@@ -67,27 +67,6 @@ xc7a50t: &xc7
         techmap: '${shareDir}/techmaps/xc7_vpr/techmap/cells_map.v'
         use_roi: 'FALSE'
         yosys_plugins: []
-    split_inouts:
-      module: 'common:generic_script_wrapper'
-      params:
-        stage_name: 'split_inouts'
-        interpreter: '${python3}'
-        script: ['-m', 'f4pga.utils.split_inouts']
-        outputs:
-            synth_json:
-              mode: 'file'
-              file: '${:json[noext]}_splitted.json'
-              target: '${:json[noext]}_splitted.json'
-              meta: 'Post split-inout Yosys netlist'
-        inputs:
-          -i: '${:json}'
-          -o: '${:json[noext]}_splitted.json'
-    make_eblif:
-        module: 'common:yosys'
-        params:
-          tcl_script: '${auxDir}/tool_data/yosys/scripts/vendor/xilinx/xc7/conv.tcl'
-        values:
-          use_lut_constants: 'FALSE'
     pack:
       module: 'common:pack'
     ioplace:
@@ -231,25 +210,6 @@ ql-eos-s3:
         yosys_plugins:
           - ql-iob
           - ql-qlf
-    split_inouts:
-      module: 'common:generic_script_wrapper'
-      params:
-        stage_name: split_inouts
-        interpreter: '${python3}'
-        script: ['-m', 'f4pga.utils.split_inouts']
-        outputs:
-          synth_json:
-            mode: file
-            file: '${:json[noext]}_splitted.json'
-            target: '${:json[noext]}_splitted.json'
-            meta: Post split-inout Yosys netlist
-        inputs:
-          '-i': '${:json}'
-          '-o': '${:json[noext]}_splitted.json'
-    make_eblif:
-      module: 'common:yosys'
-      params:
-        tcl_script: '${auxDir}/tool_data/yosys/scripts/vendor/quicklogic/pp3/conv.tcl'
     prepare_sdc:
       module: 'common:generic_script_wrapper'
       params:
