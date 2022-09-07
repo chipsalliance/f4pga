@@ -27,7 +27,7 @@ export SHARE_DIR_PATH=${SHARE_DIR_PATH:="$F4PGA_SHARE_DIR"}
 
 export UTILS_PATH=${SHARE_DIR_PATH}/scripts
 
-F4PGA_AUX_PATH=`realpath ${MYDIR}/../../../aux`
+F4PGA_AUX_PATH=`realpath ${MYDIR}/../../../auxiliary`
 F4PGA_EXEC_TCL_PATH=${F4PGA_AUX_PATH}/tool_data/yosys/scripts/common/f4pga_exec.tcl
 F4PGA_COMMON_TCL_PATH=${F4PGA_AUX_PATH}/tool_data/yosys/scripts/common/common.tcl
 SYNTH_TCL_PATH=${F4PGA_AUX_PATH}/tool_data/yosys/scripts/vendor/quicklogic/pp3/synth.tcl

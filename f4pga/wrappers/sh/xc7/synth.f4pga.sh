@@ -23,7 +23,7 @@ MYDIR=`dirname $MYPATH`
 
 source ${MYDIR}/../common.f4pga.sh
 
-F4PGA_AUX_PATH=`realpath ${MYDIR}/../../../aux`
+F4PGA_AUX_PATH=`realpath ${MYDIR}/../../../auxiliary`
 F4PGA_EXEC_TCL_PATH=${F4PGA_AUX_PATH}/tool_data/yosys/scripts/common/f4pga_exec.tcl
 F4PGA_COMMON_TCL_PATH=${F4PGA_AUX_PATH}/tool_data/yosys/scripts/common/common.tcl
 SYNTH_TCL_PATH=${F4PGA_AUX_PATH}/tool_data/yosys/scripts/vendor/xilinx/xc7/synth.tcl
