@@ -54,8 +54,8 @@ echo '::group::Install arch-defs'
 
 mkdir -p "$F4PGA_INSTALL_DIR_FAM"
 
-F4PGA_TIMESTAMP='20220818-143856'
-F4PGA_HASH='24e8f73'
+F4PGA_TIMESTAMP='20220907-210059'
+F4PGA_HASH='66a976d'
 
 case "$FPGA_FAM" in
   xc7)    PACKAGES='install-xc7 xc7a50t_test';;
