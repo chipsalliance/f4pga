@@ -286,7 +286,7 @@ write_json $f4pga_json_presplit
 
 log ">>> F4PGA Phase 2: Splitting in/outs"
 
-exec ${f4pga_python3} ${f4pga_shareDir}/scripts/split_inouts.py -i $f4pga_json_presplit -o $f4pga_json
+exec ${f4pga_python3} -m f4pga.utils.split_inouts -i $f4pga_json_presplit -o $f4pga_json
 
 log ">>> F4PGA Phase 3: Writing eblif"
 

@@ -95,11 +95,11 @@ log ">>> F4PGA Phase 2: Cell names fixup"
 
 # Write output JSON, fixup cell names using an external Python script
 write_json $f4pga_json_org
-exec $f4pga_python3 ${f4pga_shareDir}/scripts/yosys_fixup_cell_names.py $f4pga_json_org $f4pga_json_presplit
+exec $f4pga_python3 -m f4pga.utils.quicklogic.yosys_fixup_cell_names $f4pga_json_org $f4pga_json_presplit
 
 log ">>> F4PGA Phase 3: Splitting in/outs"
 
-exec ${f4pga_python3} ${f4pga_shareDir}/scripts/split_inouts.py -i $f4pga_json_presplit -o $f4pga_json
+exec ${f4pga_python3} -m f4pga.utils.split_inouts -i $f4pga_json_presplit -o $f4pga_json
 
 
 log ">>> F4PGA Phase 4: Writing eblif"
