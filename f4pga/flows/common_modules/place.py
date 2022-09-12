@@ -73,7 +73,8 @@ class PlaceModule(Module):
         yield "Saving log..."
         save_vpr_log("place.log", build_dir=build_dir)
 
-    def __init__(self, _):
+    def __init__(self, params, r_env, instance_name):
+        super().__init__(params, r_env, instance_name)
         self.name = "place"
         self.no_of_phases = 2
         self.takes = ["build_dir", "eblif", "sdc?", "place_constraints?", "io_place?"]

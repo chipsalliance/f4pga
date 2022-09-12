@@ -18,6 +18,9 @@
 
 set -e
 
+MYPATH=`realpath $0`
+MYDIR=`dirname $MYPATH`
+
 print_usage () {
     echo "Usage: symbiflow_synth  -v|--verilog <Verilog file list>"
     echo "                       [-t|--top <top module name>]"
@@ -70,6 +73,22 @@ done
 
 if [ -z ${FAMILY} ]; then echo "Please specify device family"; exit 1; fi
 if [ ${#VERILOG_FILES[@]} -eq 0 ]; then echo "Please provide at least one Verilog file"; exit 1; fi
+if [ ${DEVICE} == "ql-eos-s3" ]; then
+    # EOS-s3 needs a different wrapping method because it requires to bind to the new f4pga
+    # interface.
+    bash ${MYDIR}/synth_eos-s3.f4pga.sh $@
+    exit
+fi
+
+if [ -z ${FAMILY} ]; then
+    echo "Please specify device family"
+    exit 1
+fi
+
+if [ ${#VERILOG_FILES[@]} -eq 0 ]; then
+  echo "Please provide at least one Verilog file"
+  exit 1
+fi
 
 PINMAPCSV="pinmap_${PART}.csv"
 

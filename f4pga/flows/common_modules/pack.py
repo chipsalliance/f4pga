@@ -58,8 +58,8 @@ class PackModule(Module):
         if ctx.outputs.util_rpt:
             (build_dir / DEFAULT_UTIL_RPT).rename(ctx.outputs.util_rpt)
 
-    def __init__(self, _):
-        self.name = "pack"
+    def __init__(self, params, r_env, instance_name):
+        super().__init__(params, r_env, instance_name)
         self.no_of_phases = 2
         self.takes = ["eblif", "sdc?"]
         self.produces = ["net", "util_rpt", "timing_rpt", "pack_log!"]

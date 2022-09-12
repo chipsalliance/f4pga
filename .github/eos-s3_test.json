@@ -7,20 +7,23 @@
         "sources": [
             "btn_counter/btn_counter.v"
         ],
-        "synth_log": "synth.log",
+        "yosys_synth_log": "synth.log",
+        "yosys_make_eblif_log": "make_eblif.log",
         "pack_log": "pack.log",
-        "analysis_log": "analysis.log"
+        "analysis_log": "analysis.log",
+        "bitstream": "${build_dir}/${top}.bit"
     },
     "EOS3FF512-PDN64": {
         "default_target": "bitstream",
         "dependencies": {
-            "build_dir": "build",
+            "build_dir": "${build_dir}",
             "pcf": "btn_counter/chandalar.pcf",
-            "sdc-in": "btn_counter/dummy.sdc"
+            "sdc": "btn_counter/dummy.sdc"
         },
         "values": {
             "part": "ql-eos-s3",
-            "package": "PD64"
+            "package": "PD64",
+            "build_dir": "build"
         }
     }
 }

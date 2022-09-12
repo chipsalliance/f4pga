@@ -21,18 +21,20 @@
 Here are the things necessary to write an F4PGA Module.
 """
 
+from pathlib import Path
 from types import SimpleNamespace
 from abc import abstractmethod
 
-from f4pga.flows.common import decompose_depname, ResolutionEnv, fatal
+from f4pga.flows.common import decompose_depname, ResolutionEnv, deep, fatal
 
 
 class Module:
     """
     A `Module` is a wrapper for whatever tool is used in a flow.
-    Modules can request dependencies, values and are guranteed to have all the required ones present when entering
-    `exec` mode.
-    They also have to specify what dependencies they produce and create the files for these dependencies.
+    Modules can request dependencies, values and are guranteed to have all the
+    required ones present when entering `exec` mode.
+    They also have to specify what dependencies they produce and create the
+    files for these dependencies.
     """
 
     no_of_phases: int
@@ -59,21 +61,28 @@ class Module:
         """
         pass
 
-    def __init__(self, params: "dict[str, ]"):
+    def __init__(self, params: "dict[str, ]", r_env: ResolutionEnv, instance_name: str = "<anonymous>"):
+        """
+        Note that r_env is not going to feature any dependecy value
+        at this moment. Params are resolved early or late depending on module
+        init's implementation.
+        """
+
         self.no_of_phases = 0
         self.current_phase = 0
-        self.name = "<BASE STAGE>"
+        self.name = instance_name
         self.prod_meta = {}
 
 
 class ModuleContext:
     """
-    A class for object holding mappings for dependencies and values as well as other information needed during modules
-    execution.
+    A class for object holding mappings for dependencies and values as well as
+    other information needed during modules execution.
     """
 
     share: str  #  Absolute path to F4PGA's share directory
     bin: str  #  Absolute path to F4PGA's bin directory
+    aux: str  #  Absolute path to F4PGA's aux directory
     takes: SimpleNamespace  #  Maps symbolic dependency names to relative paths.
     produces: SimpleNamespace  #  Contains mappings for explicitely specified dependencies.
     #  Useful mostly for checking for on-demand optional outputs (such as logs) with
@@ -81,7 +90,7 @@ class ModuleContext:
     outputs: SimpleNamespace  #  Contains mappings for all available outputs.
     values: SimpleNamespace  #  Contains all available requested values.
     r_env: ResolutionEnv  # `ResolutionEnvironmet` object holding mappings for current scope.
-    module_name: str  # Name of the module.
+    stage_name: str  # Name of the module.
 
     def is_output_explicit(self, name: str):
         """
@@ -91,18 +100,25 @@ class ModuleContext:
 
     def _getreqmaybe(self, obj, deps: "list[str]", deps_cfg: "dict[str, ]"):
         """
-        Add attribute for a dependency or panic if a required dependency has not been given to the module on its input.
+        Add attribute for a dependency or panic if a required dependency has not
+        been given to the module on its input.
         """
         for name in deps:
             name, spec = decompose_depname(name)
             value = deps_cfg.get(name)
             if value is None and spec == "req":
-                fatal(-1, f"Dependency `{name}` is required by module `{self.module_name}` but wasn't provided")
+                fatal(-1, f"Dependency/value `{name}` is required by stage `{self.stage_name}` but wasn't provided")
             setattr(obj, name, self.r_env.resolve(value))
 
+    def _add_noext_values_to_env(self):
+        for take_name, take_path in vars(self.takes).items():
+            if take_path is not None:
+                self.r_env.values[f":{take_name}[noext]"] = deep(lambda p: str(Path(p).with_suffix("")))(take_path)
+                self.r_env.values[f":{take_name}[dir]"] = deep(lambda p: str(Path(p).parent.resolve()))(take_path)
+
     # `config` should be a dictionary given as modules input.
-    def __init__(self, module: Module, config: "dict[str, ]", r_env: ResolutionEnv, share: str, bin: str):
-        self.module_name = module.name
+    def __init__(self, module: Module, config: "dict[str, ]", r_env: ResolutionEnv, share: str, bin: str, aux: str):
+        self.stage_name = module.name
         self.takes = SimpleNamespace()
         self.produces = SimpleNamespace()
         self.values = SimpleNamespace()
@@ -110,6 +126,7 @@ class ModuleContext:
         self.r_env = r_env
         self.share = share
         self.bin = bin
+        self.aux = aux
 
         self._getreqmaybe(self.takes, module.takes, config["takes"])
         self._getreqmaybe(self.values, module.values, config["values"])
@@ -117,6 +134,8 @@ class ModuleContext:
         produces_resolved = self.r_env.resolve(config["produces"])
         for name, value in produces_resolved.items():
             setattr(self.produces, name, value)
+
+        self._add_noext_values_to_env()
 
         outputs = module.map_io(self)
         outputs.update(produces_resolved)
@@ -127,7 +146,7 @@ class ModuleContext:
         cls = type(self)
         mycopy = cls.__new__(cls)
 
-        mycopy.module_name = self.module_name
+        mycopy.stage_name = self.stage_name
         mycopy.takes = self.takes
         mycopy.produces = self.produces
         mycopy.values = self.values

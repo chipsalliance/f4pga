@@ -17,7 +17,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from f4pga.flows.common import decompose_depname, resolve_modstr
+from f4pga.flows.common import decompose_depname, resolve_modstr, ResolutionEnv
 from f4pga.flows.module import Module
 from f4pga.flows.runner import get_module, module_io
 
@@ -67,13 +67,13 @@ class Stage:
     # Stage's metadata extracted from module's output.
     meta: "dict[str, str]"
 
-    def __init__(self, name: str, stage_def: "dict[str, ]"):
+    def __init__(self, name: str, stage_def: "dict[str, ]", r_env: ResolutionEnv):
         self.name = name
 
         if stage_def is None:
             stage_def = {}
 
-        self.module = get_module(resolve_modstr(stage_def["module"]))(stage_def.get("params"))
+        self.module = get_module(resolve_modstr(stage_def["module"]))(stage_def.get("params"), r_env, name)
 
         values = stage_def.get("values")
         self.value_overrides = values if values is not None else {}

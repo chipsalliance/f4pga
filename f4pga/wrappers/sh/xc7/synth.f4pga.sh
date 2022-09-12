@@ -18,6 +18,17 @@
 
 set -e
 
+MYPATH=`realpath $0`
+MYDIR=`dirname $MYPATH`
+
+source ${MYDIR}/../common.f4pga.sh
+
+F4PGA_AUX_PATH=`realpath ${MYDIR}/../../../auxiliary`
+F4PGA_EXEC_TCL_PATH=${F4PGA_AUX_PATH}/tool_data/yosys/scripts/common/f4pga_exec.tcl
+F4PGA_COMMON_TCL_PATH=${F4PGA_AUX_PATH}/tool_data/yosys/scripts/common/common.tcl
+SYNTH_TCL_PATH=${F4PGA_AUX_PATH}/tool_data/yosys/scripts/vendor/xilinx/xc7/synth.tcl
+CONV_TCL_PATH=${F4PGA_AUX_PATH}/tool_data/yosys/scripts/vendor/xilinx/xc7/conv.tcl
+
 VERILOG_FILES=()
 XDC_FILES=()
 TOP=top
@@ -84,7 +95,62 @@ if [ -n "$SURELOG_CMD" ]; then
   yosys_read_cmds="plugin -i uhdm; read_verilog_with_uhdm ${SURELOG_CMD[*]} ${VERILOG_FILES[*]}"
   yosys_files=""
 fi
-yosys \
-  -p "$yosys_read_cmds; tcl $(python3 -m f4pga.wrappers.tcl)" \
-  -l "${TOP}_synth.log" \
-  $yosys_files
+
+DATABASE_DIR=${DATABASE_DIR:-$(prjxray-config)}
+
+if [ -z "$SURELOG_CMD" ]; then
+  YOSYS_PLUGINS="uhdm"
+else
+  YOSYS_PLUGINS=""
+fi
+
+# Create temporary directory for temporary files used by yosys Tcl script.
+TMP_DIR=`make_tmp_dir 16 yosys_tmp_legacy_`
+
+# Emulate inputs from f4pga. See the yosys module for the context.
+export VAL_top=${TOP}
+export VAL_use_roi="FALSE"
+export VAL_part_name=$PART
+export VAL_prjxray_db=$DATABASE_DIR
+export VAL_bitstream_device=$DEVICE
+export VAL_python3=${PYTHON3:=$(which python3)}
+export VAL_shareDir=$F4PGA_SHARE_DIR
+export VAL_yosys_plugins=$YOSYS_PLUGINS
+export VAL_surelog_cmd=${SURELOG_CMD[*]}
+export VAL_use_lut_constants="FALSE"
+export TMP_json_carry_fixup=${TMP_DIR}/json_carry_fixup.json
+export TMP_json_carry_fixup_out=${TMP_DIR}/json_carry_fixup_out.json
+export TMP_json_presplit=${TMP_DIR}/json_presplit.json
+export DEP_sources=${VERILOG_FILES[*]}
+export DEP_xdc=${XDC_FILES[*]}
+export DEP_build_dir="build"
+export DEP_fasm_extra=${TOP}_fasm_extra.fasm
+export DEP_synth_v_premap=${TOP}_struct_premap.v
+export DEP_synth_v=${TOP}_struct.v
+export DEP_sdc=${TOP}.sdc
+export DEP_json=$TOP.json
+export DEP_synth_json=${TOP}_io.json
+export DEP_rtlil_preopt=${TOP}.pre_abc9.ilang
+export DEP_rtlil=${TOP}.post_abc9.ilang
+export DEP_eblif=${TOP}.eblif
+
+LOG=${TOP}_synth.log
+
+set +e
+
+CMDS="tcl ${F4PGA_EXEC_TCL_PATH}; tcl ${F4PGA_COMMON_TCL_PATH}; tcl ${SYNTH_TCL_PATH}"
+
+if [ -z "$SURELOG_CMD" ]; then
+  yosys -p "${CMDS}" -l $LOG
+else
+  yosys -p "plugin -i uhdm; ${CMDS}" -l $LOG
+fi
+
+rm -rf $TMP_DIR
+
+RESULT=$?
+if [ $RESULT != 0 ]; then
+  exit $RESULT
+fi
+
+set -e

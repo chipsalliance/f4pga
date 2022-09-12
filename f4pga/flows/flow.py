@@ -21,7 +21,7 @@ from pathlib import Path
 
 from colorama import Fore, Style
 
-from f4pga.flows.common import deep, sfprint, bin_dir_path, share_dir_path, F4PGAException
+from f4pga.flows.common import deep, sfprint, bin_dir_path, share_dir_path, aux_dir_path, F4PGAException
 from f4pga.flows.cache import F4Cache
 from f4pga.flows.flow_config import FlowConfig
 from f4pga.flows.runner import ModRunCtx, module_map, module_exec
@@ -103,7 +103,9 @@ class Flow:
             elif config_paths.get(prod.name):
                 produces[prod.name] = config_paths[prod.name]
 
-        return ModRunCtx(share_dir_path, bin_dir_path, {"takes": takes, "produces": produces, "values": values})
+        return ModRunCtx(
+            share_dir_path, bin_dir_path, aux_dir_path, {"takes": takes, "produces": produces, "values": values}
+        )
 
     @staticmethod
     def _cache_deps(path: str, f4cache: F4Cache):

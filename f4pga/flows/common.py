@@ -30,6 +30,7 @@ from f4pga.context import FPGA_FAM, F4PGA_SHARE_DIR
 
 bin_dir_path = str(Path(sys_argv[0]).resolve().parent.parent)
 share_dir_path = str(F4PGA_SHARE_DIR)
+aux_dir_path = str(Path(__file__).resolve().parent.parent / "auxiliary")
 
 
 class F4PGAException(Exception):
@@ -339,3 +340,35 @@ def set_verbosity_level(level: int):
 def get_verbosity_level() -> int:
     global verbosity_level
     return verbosity_level
+
+
+class InputReferences:
+    """ " Represents value/dependency references contained in a string"""
+
+    dependencies: "set[str]"
+    values: "set[str]"
+
+    def merge(self, other):
+        self.dependencies.update(other.dependencies)
+        self.values.update(other.values)
+
+    def __init__(self):
+        self.dependencies = set()
+        self.values = set()
+
+
+def get_input_references(input: str) -> InputReferences:
+    """Parse a string for references to values/dependencies"""
+
+    refs = InputReferences()
+    if type(input) is not str:
+        return refs
+    for match in re_finditer("\$\{([^${}]*)\}", input):
+        match_str = match.group(1)
+        if match_str[0] != ":":
+            refs.values.add(match_str)
+            continue
+        if len(match_str) < 2:
+            raise Exception("Dependency name must be at least 1 character long")
+        refs.dependencies.add(re_match("([^\\[\\]]*)", match_str[1:]).group(1))
+    return refs

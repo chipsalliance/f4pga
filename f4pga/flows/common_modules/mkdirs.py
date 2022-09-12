@@ -42,8 +42,8 @@ class MkDirsModule(Module):
             yield f"Creating directory {path}..."
             Path(path).mkdir(parents=True, exist_ok=True)
 
-    def __init__(self, params):
-        self.name = "mkdirs"
+    def __init__(self, params, r_env, instance_name):
+        super().__init__(params, r_env, instance_name)
         self.no_of_phases = len(params) if params else 0
         self.takes = []
         self.produces = list(params.keys()) if params else []

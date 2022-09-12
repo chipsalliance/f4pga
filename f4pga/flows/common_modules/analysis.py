@@ -55,7 +55,7 @@ class analysisModule(Module):
         yield "Saving log..."
         save_vpr_log("analysis.log", build_dir=build_dir)
 
-    def __init__(self, _):
+    def __init__(self, params, r_env, instance_name):
         self.name = "analysis"
         self.no_of_phases = 2
         self.takes = ["eblif", "route", "sdc?"]

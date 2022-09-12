@@ -274,5 +274,5 @@ pack
 place
 place_constraints
 route
-synth
+yosys
 ```

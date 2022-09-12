@@ -59,31 +59,14 @@ xc7a50t: &xc7
       params:
         build_dir: 'build/${device}'
     synth:
-      module: 'common:synth'
+      module: 'common:yosys'
       params:
-        takes:
-          - xdc?
-        produces:
-          - sdc
-          - synth_v
-        prod_meta:
-          sdc: Standard Design Constraints file for X7 series.
+        tcl_script: '${auxDir}/tool_data/yosys/scripts/vendor/xilinx/xc7/synth.tcl'
       values:
-        tcl_scripts: '${shareDir}/scripts/xc7'
-        yosys_tcl_env:
-          USE_ROI: 'FALSE'
-          TOP: '${top}'
-          OUT_JSON: '${:json}'
-          OUT_SDC: '${:sdc}'
-          PART_JSON: '${prjxray_db}/${bitstream_device}/${part_name}/part.json'
-          OUT_FASM_EXTRA: '${:fasm_extra}'
-          TECHMAP_PATH: '${shareDir}/techmaps/xc7_vpr/techmap'
-          OUT_SYNTH_V: '${:synth_v}'
-          SYNTH_JSON: '${:synth_json}'
-          OUT_EBLIF: '${:eblif}'
-          PYTHON3: '${python3}'
-          UTILS_PATH: '${shareDir}/scripts'
-          INPUT_XDC_FILES: '${:xdc}'
+        simulation_models: '${shareDir}/techmaps/xc7_vpr/techmap/cells_sim.v'
+        techmap: '${shareDir}/techmaps/xc7_vpr/techmap/cells_map.v'
+        use_roi: 'FALSE'
+        yosys_plugins: []
     pack:
       module: 'common:pack'
     ioplace:
@@ -211,37 +194,22 @@ ql-eos-s3:
       initial_pres_fac: '4.0'
       check_rr_graph: 'off'
       pack_high_fanout_threshold: 'PB-lOGIC:18'
-      suppress_warnings: >-
-        ${noisyWarnings},sum_pin_class:check_unbuffered_edges:load_rr_indexed_data_T_values:check_rr_node:trans_per_R:check_route:set_rr_graph_tool_comment
-
+      suppress_warnings: '${noisyWarnings},sum_pin_class:check_unbuffered_edges:load_rr_indexed_data_T_values:check_rr_node:trans_per_R:check_route:set_rr_graph_tool_comment'
   stages:
     mk_build_dir:
       module: 'common:mkdirs'
       params:
         build_dir: 'build/${device}'
     synth:
-      module: 'common:synth'
+      module: 'common:yosys'
       params:
-        takes:
-          - pcf?
-        produces:
-          - synth_v
+        tcl_script: '${auxDir}/tool_data/yosys/scripts/vendor/quicklogic/pp3/synth.tcl'
       values:
-        tcl_scripts: '${shareDir}/scripts/pp3'
-        read_verilog_args: []
-        yosys_tcl_env:
-          OUT_JSON: '${:json}'
-          SYNTH_JSON: '${:synth_json}'
-          OUT_SYNTH_V: '${:synth_v}'
-          OUT_EBLIF: '${:eblif}'
-          OUT_FASM_EXTRA: '${:fasm_extra}'
-          TECHMAP_PATH: '${shareDir}/techmaps/pp3'
-          DEVICE_CELLS_SIM: '${shareDir}/arch/ql-eos-s3_wlcsp/cells/ram_sim.v'
-          DEVICE_CELLS_MAP: '${shareDir}/arch/ql-eos-s3_wlcsp/cells/ram_map.v'
-          PINMAP_FILE: '${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_${package}.csv'
-          PCF_FILE: '${:pcf}'
-          PYTHON3: '${python3}'
-          UTILS_PATH: '${shareDir}/scripts'
+        simulation_models: '${shareDir}/techmaps/pp3/cells_sim.v'
+        techmap: '${shareDir}/techmaps/pp3/cells_map.v'
+        yosys_plugins:
+          - ql-iob
+          - ql-qlf
     prepare_sdc:
       module: 'common:generic_script_wrapper'
       params:
@@ -249,29 +217,31 @@ ql-eos-s3:
         interpreter: '${python3}'
         script: ['-m', 'f4pga.utils.quicklogic.process_sdc_constraints']
         outputs:
-          sdc:
+          sdc_constrained:
             mode: file
-            file: '${:eblif[noext]}.sdc'
-            target: '${:eblif[noext]}.sdc'
+            file: '${:sdc[noext]}_constrained.sdc'
+            target: '${:sdc[noext]}_constrained.sdc'
         inputs:
           eblif: '${:eblif}'
-          sdc-in: '${:sdc-in}'
-          sdc-out: '${:eblif[noext]}.sdc'
+          sdc-in: '${:sdc}'
+          sdc-out: '${:sdc[noext]}_constrained.sdc'
           pcf: '${:pcf}'
           pin-map: ''
           $PYTHONPATH: '${shareDir}/scripts/'
     pack:
-      module: 'common:pack'
+      module: 'common:io_rename'
+      params:
+        module: 'common:pack'
+        rename_takes:
+          sdc: sdc_constrained
       values:
         device: ql-eos-s3
         device_alt: ql-eos-s3_wlcsp
         pinmap: '${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_${package}.csv'
         arch_def: '${shareDir}/arch/ql-eos-s3_wlcsp/arch.timing.xml'
         rr_graph_lookahead_bin: '${shareDir}/arch/ql-eos-s3_wlcsp/rr_graph_ql-eos-s3_wlcsp.lookahead.bin'
-        rr_graph_real_bin: >-
-          ${shareDir}/arch/ql-eos-s3_wlcsp/rr_graph_ql-eos-s3_wlcsp.rr_graph.real.bin
-        vpr_place_delay: >-
-          ${shareDir}/arch/ql-eos-s3_wlcsp/rr_graph_ql-eos-s3_wlcsp.place_delay.bin
+        rr_graph_real_bin: '${shareDir}/arch/ql-eos-s3_wlcsp/rr_graph_ql-eos-s3_wlcsp.rr_graph.real.bin'
+        vpr_place_delay: '${shareDir}/arch/ql-eos-s3_wlcsp/rr_graph_ql-eos-s3_wlcsp.place_delay.bin'
         vpr_grid_layout_name: ql-eos-s3
         vpr_options:
           write_block_usage: block_usage.json
@@ -294,8 +264,7 @@ ql-eos-s3:
           initial_pres_fac: '4.0'
           check_rr_graph: 'off'
           pack_high_fanout_threshold: 'PB-lOGIC:18'
-          suppress_warnings: >-
-            ${noisyWarnings},sum_pin_class:check_unbuffered_edges:load_rr_indexed_data_T_values:check_rr_node:trans_per_R:check_route:set_rr_graph_tool_comment
+          suppress_warnings: '${noisyWarnings},sum_pin_class:check_unbuffered_edges:load_rr_indexed_data_T_values:check_rr_node:trans_per_R:check_route:set_rr_graph_tool_comment'
     ioplace:
       module: 'common:generic_script_wrapper'
       params:
@@ -327,8 +296,6 @@ ql-eos-s3:
           map: '${shareDir}/arch/ql-eos-s3_wlcsp/clkmap_${package}.csv'
           i: '${:io_place}'
           $PYTHONPATH: '${shareDir}/scripts/'
-    place:
-      module: 'common:place'
     iomux_jlink:
       module: 'common:generic_script_wrapper'
       params:
@@ -377,18 +344,26 @@ ql-eos-s3:
           map: '${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_${package}.csv'
           output-format: binary
           $PYTHONPATH: '${shareDir}/scripts/'
+    place:
+      module: 'common:place'
+      params:
+        module: 'common:place'
+        rename_takes:
+          sdc: sdc_constrained
     route:
       module: 'common:route'
+      params:
+        module: 'common:route'
+        rename_takes:
+          sdc: sdc_constrained
       values:
         device: ql-eos-s3
         device_alt: ql-eos-s3_wlcsp
         pinmap: '${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_${package}.csv'
         arch_def: '${shareDir}/arch/ql-eos-s3_wlcsp/arch.timing.xml'
         rr_graph_lookahead_bin: '${shareDir}/arch/ql-eos-s3_wlcsp/rr_graph_ql-eos-s3_wlcsp.lookahead.bin'
-        rr_graph_real_bin: >-
-          ${shareDir}/arch/ql-eos-s3_wlcsp/rr_graph_ql-eos-s3_wlcsp.rr_graph.real.bin
-        vpr_place_delay: >-
-          ${shareDir}/arch/ql-eos-s3_wlcsp/rr_graph_ql-eos-s3_wlcsp.place_delay.bin
+        rr_graph_real_bin: '${shareDir}/arch/ql-eos-s3_wlcsp/rr_graph_ql-eos-s3_wlcsp.rr_graph.real.bin'
+        vpr_place_delay: '${shareDir}/arch/ql-eos-s3_wlcsp/rr_graph_ql-eos-s3_wlcsp.place_delay.bin'
         vpr_grid_layout_name: ql-eos-s3
         vpr_options:
           write_timing_summary: timing_summary.json
@@ -411,20 +386,21 @@ ql-eos-s3:
           initial_pres_fac: '4.0'
           check_rr_graph: 'off'
           pack_high_fanout_threshold: 'PB-lOGIC:18'
-          suppress_warnings: >-
-            ${noisyWarnings},sum_pin_class:check_unbuffered_edges:load_rr_indexed_data_T_values:check_rr_node:trans_per_R:check_route:set_rr_graph_tool_comment
+          suppress_warnings: '${noisyWarnings},sum_pin_class:check_unbuffered_edges:load_rr_indexed_data_T_values:check_rr_node:trans_per_R:check_route:set_rr_graph_tool_comment'
     analysis:
-      module: 'common:analysis'
+      module: 'common:io_rename'
+      params:
+        module: 'common:analysis'
+        rename_takes:
+          sdc: sdc_constrained
       values:
         device: ql-eos-s3
         device_alt: ql-eos-s3_wlcsp
         pinmap: '${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_${package}.csv'
         arch_def: '${shareDir}/arch/ql-eos-s3_wlcsp/arch.timing.xml'
         rr_graph_lookahead_bin: '${shareDir}/arch/ql-eos-s3_wlcsp/rr_graph_ql-eos-s3_wlcsp.lookahead.bin'
-        rr_graph_real_bin: >-
-          ${shareDir}/arch/ql-eos-s3_wlcsp/rr_graph_ql-eos-s3_wlcsp.rr_graph.real.bin
-        vpr_place_delay: >-
-          ${shareDir}/arch/ql-eos-s3_wlcsp/rr_graph_ql-eos-s3_wlcsp.place_delay.bin
+        rr_graph_real_bin: '${shareDir}/arch/ql-eos-s3_wlcsp/rr_graph_ql-eos-s3_wlcsp.rr_graph.real.bin'
+        vpr_place_delay: '${shareDir}/arch/ql-eos-s3_wlcsp/rr_graph_ql-eos-s3_wlcsp.place_delay.bin'
         vpr_grid_layout_name: ql-eos-s3
         vpr_options:
           gen_post_synthesis_netlist: 'on'
@@ -451,10 +427,13 @@ ql-eos-s3:
           initial_pres_fac: '4.0'
           check_rr_graph: 'off'
           pack_high_fanout_threshold: 'PB-lOGIC:18'
-          suppress_warnings: >-
-            ${noisyWarnings},sum_pin_class:check_unbuffered_edges:load_rr_indexed_data_T_values:check_rr_node:trans_per_R:check_route:set_rr_graph_tool_comment
+          suppress_warnings: '${noisyWarnings},sum_pin_class:check_unbuffered_edges:load_rr_indexed_data_T_values:check_rr_node:trans_per_R:check_route:set_rr_graph_tool_comment'
     fasm:
-      module: 'common:fasm'
+      module: 'common:io_rename'
+      params:
+        module: 'common:fasm'
+        rename_takes:
+          sdc: sdc_constrained
     bitstream:
       module: 'common:generic_script_wrapper'
       params:
@@ -463,14 +442,14 @@ ql-eos-s3:
         outputs:
           bitstream:
             mode: file
-            file: '${:eblif[noext]}.bit'
-            target: '${:eblif[noext]}.bit'
+            file: '${:fasm[noext]}.bit'
+            target: '${:fasm[noext]}.bit'
           bitstream_log:
             mode: stdout
-            target: '${:eblif[noext]}.bit.log'
+            target: '${:fasm[noext]}.bit.log'
         inputs:
           '#1': '${:fasm}'
-          '#2': '${:eblif[noext]}.bit'
+          '#2': '${:fasm[noext]}.bit'
           dev-type: ql-eos-s3
       values:
         build_dir: .
