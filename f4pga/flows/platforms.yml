@@ -59,7 +59,7 @@ xc7a50t: &xc7
       params:
         build_dir: 'build/${device}'
     synth:
-      module: 'common:synth'
+      module: 'common:yosys'
       params:
         takes:
           - xdc?
@@ -193,7 +193,7 @@ ice40:
       params:
         build_dir: build/${device}
     synth:
-      module: 'common:synth'
+      module: 'common:yosys'
       params:
         takes:
         produces:
@@ -261,7 +261,7 @@ ql-eos-s3:
       params:
         build_dir: 'build/${device}'
     synth:
-      module: 'common:synth'
+      module: 'common:yosys'
       params:
         takes:
           - pcf?
@@ -650,7 +650,7 @@ ql-k4n8_fast: &ql-k4n8
       params:
         build_dir: 'build/${device}'
     synth:
-      module: 'common:synth'
+      module: 'common:yosys'
       params:
         produces:
           - synth_v

@@ -29,7 +29,7 @@ from f4pga.wrappers.tcl import get_script_path as get_tcl_wrapper_path
 isLattice = FPGA_FAM == "ice40"
 
 
-class SynthModule(Module):
+class YosysModule(Module):
     extra_products: "list[str]"
 
     def map_io(self, ctx: ModuleContext):
@@ -99,7 +99,7 @@ class SynthModule(Module):
                     wfptr.write("")
 
     def __init__(self, params):
-        self.name = "synthesize"
+        self.name = "yosys"
         self.no_of_phases = 3
 
         self.pnrtool = "nextpnr" if isLattice else "vpr"
@@ -147,4 +147,4 @@ class SynthModule(Module):
             self.prod_meta.update(extra_meta)
 
 
-ModuleClass = SynthModule
+ModuleClass = YosysModule
