@@ -64,34 +64,14 @@ def with_qualifier(name: str, q: str) -> str:
         return decompose_depname(name)[0] + "!"
 
 
-_sfbuild_module_collection_name_to_path = {}
-
-
-def scan_modules(mypath: str):
-    global _sfbuild_module_collection_name_to_path
-    sfbuild_home = mypath
-    _sfbuild_module_collection_name_to_path = {
-        re_match("(.*)_modules$", moddir).groups()[0]: str(Path(sfbuild_home) / moddir)
-        for moddir in [dir for dir in os_listdir(sfbuild_home) if re_match(".*_modules$", dir)]
-    }
-
-
 def resolve_modstr(modstr: str):
     """
-    Resolves module location from modulestr.
+    Resolves module location from modstr.
     """
-    sl = modstr.split(":")
-    if len(sl) > 2:
-        raise Exception("Incorrect module sysntax. Expected one ':' or one '::'")
-    if len(sl) < 2:
-        return modstr
-    collection_name = sl[0]
-    module_filename = sl[1] + ".py"
-
-    col_path = _sfbuild_module_collection_name_to_path.get(collection_name)
-    if not col_path:
-        fatal(-1, f"Module collection {collection_name} does not exist")
-    return str(Path(col_path) / module_filename)
+    modpath = Path(__file__).resolve().parent / f"modules/{modstr}.py"
+    if not modpath.exists():
+        raise Exception(f"Unknown module <{modstr}>!")
+    return str(modpath)
 
 
 def deep(fun, allow_none=False):

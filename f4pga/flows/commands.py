@@ -33,7 +33,6 @@ from f4pga.flows.common import (
     F4PGAException,
     ResolutionEnv,
     fatal,
-    scan_modules,
     set_verbosity_level,
     sfprint,
     sub as common_sub,
@@ -194,8 +193,6 @@ def make_flow_config(project_flow_cfg: ProjectFlowConfig, part_name: str) -> Flo
 
     r_env = setup_resolution_env()
     r_env.add_values({"part_name": part_name.lower()})
-
-    scan_modules(str(ROOT))
 
     with (ROOT / "platforms.yml").open("r") as rfptr:
         platforms = yaml_load(rfptr, yaml_loader)
