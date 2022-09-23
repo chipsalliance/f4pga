@@ -22,7 +22,7 @@ from os import environ
 
 
 FPGA_FAM = environ.get("FPGA_FAM", "xc7")
-if FPGA_FAM not in ["xc7", "eos-s3", "qlf_k4n8"]:
+if FPGA_FAM not in ["xc7", "eos-s3", "qlf_k4n8", "ice40"]:
     raise (Exception(f"Unsupported FPGA_FAM <{FPGA_FAM}>!"))
 
 F4PGA_DEBUG = environ.get("F4PGA_DEBUG")

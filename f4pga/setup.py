@@ -52,10 +52,12 @@ def get_requirements(file: Path) -> List[str]:
 semver = "0.0.0"
 version = None
 
-with (packagePath.parent / ".gitcommit").open("r") as rptr:
-    sha = rptr.read().strip()
-    if sha != "$Format:%h$":
-        version = f"{semver}+{sha}"
+gitcommit = packagePath.parent / ".gitcommit"
+if gitcommit.exists():
+    with gitcommit.open("r") as rptr:
+        sha = rptr.read().strip()
+        if sha != "$Format:%h$":
+            version = f"{semver}+{sha}"
 
 git = which("git")
 if git is not None:

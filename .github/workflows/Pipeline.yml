@@ -189,6 +189,47 @@ jobs:
           path: f4pga-examples/${{ matrix.fam }}/btn_counter/build/top.bit
           if-no-files-found: error
 
+  Lattice:
+    runs-on: ubuntu-latest
+    name: '🚦 Lattice | ice40'
+    env:
+      F4PGA_INSTALL_DIR: /usr/local
+      FPGA_FAM: ice40
+
+    steps:
+
+      - name: 🧰 Checkout
+        uses: actions/checkout@v3
+
+      - name: 🛠️ Clone fomu-workshop
+        run: git clone https://github.com/im-tomu/fomu-workshop
+
+      - name: 🚧 [F4PGA] Test f4pga build
+        run: |
+          cat > ice40-test.sh <<'EOF'
+          set -e
+          apt-get update -qq
+          DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends python3-pip git
+
+          pip install ./f4pga
+
+          cd fomu-workshop/hdl/verilog/blink
+          f4pga -vv build --flow ../../../../.github/ice40_test.json
+          EOF
+
+          docker run --rm -i \
+          -v $(pwd):/wrk -w /wrk \
+          -e FPGA_FAM=ice40 \
+          gcr.io/hdl-containers/impl/icestorm \
+          bash -le /wrk/ice40-test.sh
+
+      - name: '📤 Upload artifact: ice40 bitstream'
+        uses: actions/upload-artifact@v3
+        with:
+          name: Lattice-ice40-Bitstream
+          path: fomu-workshop/hdl/verilog/blink/build/top.bit
+          if-no-files-found: error
+
 
   Python-Tests:
     runs-on: ubuntu-latest
