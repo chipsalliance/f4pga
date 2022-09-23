@@ -1,7 +1,8 @@
 {
     "default_part": "ICE40UP5K-UWG30",
     "values": {
-        "top": "top"
+        "top": "top",
+        "extra_args": ["-D", "PVT=1"]
     },
     "dependencies": {
         "sources": [

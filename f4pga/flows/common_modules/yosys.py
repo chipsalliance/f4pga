@@ -26,9 +26,6 @@ from f4pga.flows.module import Module, ModuleContext
 from f4pga.wrappers.tcl import get_script_path as get_tcl_wrapper_path
 
 
-isLattice = FPGA_FAM == "ice40"
-
-
 class YosysModule(Module):
     extra_products: "list[str]"
 
@@ -74,14 +71,14 @@ class YosysModule(Module):
         # Execute YOSYS command
         args_str = "" if ctx.values.read_verilog_args is None else " ".join(ctx.values.read_verilog_args)
 
-        yosys_extra_args = ["-l", ctx.outputs.synth_log] if ctx.outputs.synth_log else []
-        if isLattice:
-            yosys_extra_args.extend(["-D", "PVT=1"])
+        extra_args = ["-l", ctx.outputs.synth_log] if ctx.outputs.synth_log else []
+        if ctx.values.extra_args is not None:
+            extra_args.extend(ctx.values.extra_args)
 
         common_sub(
             *(
                 ["yosys"]
-                + yosys_extra_args
+                + extra_args
                 + [
                     "-p",
                     (
@@ -102,7 +99,7 @@ class YosysModule(Module):
         self.name = "yosys"
         self.no_of_phases = 3
 
-        self.pnrtool = "nextpnr" if isLattice else "vpr"
+        self.pnrtool = "nextpnr" if FPGA_FAM == "ice40" else "vpr"
 
         self.takes = ["sources", "build_dir?"]
         # Extra takes for use with TCL scripts
@@ -131,6 +128,7 @@ class YosysModule(Module):
             "top",
             "device",
             "tcl_scripts?",
+            "extra_args?",
             "yosys_tcl_env?",
             "read_verilog_args?",
         ]
