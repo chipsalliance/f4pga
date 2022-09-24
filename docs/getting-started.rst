@@ -17,7 +17,7 @@ Guidelines
 ==========
 
 This is the main documentation, which gathers info about the :ref:`Python CLI tools and APIs <pyF4PGA>` and the
-:ref:`Desing Flows <Flows>` supported by F4PGA, along with a :ref:`Glossary`, references to specifications, plugins and
+:ref:`Design Flows <Flows>` supported by F4PGA, along with a :ref:`Glossary`, references to specifications, plugins and
 :ref:`publications <References>`.
 
 Since F4PGA is meant for users with varying backgrounds and expertise, three paths are provided to walk into the ecosystem.
