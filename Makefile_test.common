@@ -14,8 +14,10 @@
 # test2_verify = $(call diff_test,test2,ext)
 #
 
+SHELL := /usr/bin/env bash
+
 # Either find yosys in system and use its path or use the given path
-YOSYS_PATH ?= $(realpath $(dir $(shell which yosys))/..)
+YOSYS_PATH ?= $(realpath $(dir $(shell command -v yosys))/..)
 
 # Find yosys-config, throw an error if not found
 YOSYS_CONFIG = $(YOSYS_PATH)/bin/yosys-config
