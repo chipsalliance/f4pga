@@ -64,27 +64,30 @@ def get_module_info(module: Module) -> str:
 
     return r
 
+
 def _make_io_dict(io: str, metas: "None | dict[str]" = None) -> "dict[str, str]":
     name, q = decompose_depname(io)
-    d = { "qualifier": q }
+    d = {"qualifier": q}
     if metas is not None:
         meta = metas.get(name)
         if meta is not None:
             d["meta"] = meta
     return name, d
 
+
 def _make_io_dict_dict(ios: "list[str]", metas: "None | dict[str]" = None) -> "dict[str, str]":
     return dict(_make_io_dict(io, metas) for io in ios)
+
 
 def _get_module_info_dict(module: Module) -> "dict[str, dict[str, str]]":
     return {
         "takes": _make_io_dict_dict(module.takes),
         "produces": _make_io_dict_dict(
-            module.produces,
-            metas=module.prod_meta if hasattr(module, 'prod_meta') else None
+            module.produces, metas=module.prod_meta if hasattr(module, "prod_meta") else None
         ),
-        "values": _make_io_dict_dict(module.produces)
+        "values": _make_io_dict_dict(module.produces),
     }
+
 
 def get_stages_info_dict(flow_definition: FlowDefinition) -> "dict[str, dict[str, dict[str, str]]]":
     d = {}
