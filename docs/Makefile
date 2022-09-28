@@ -49,5 +49,9 @@ latexpdf:
 	make -C $(BUILDDIR)/latex all-pdf
 	@echo "pdflatex finished; the PDF files are in $(BUILDDIR)/latex."
 
+gen_flow_rst:
+	mkdir -p f4pga/generated/flows
+	python3 gen_flow_docs.py f4pga/generated/flows
+
 %:
 	$(SPHINXBUILD) -b $@ $(ALLSPHINXOPTS) $(BUILDDIR)/$@

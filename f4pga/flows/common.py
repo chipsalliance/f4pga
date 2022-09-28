@@ -27,6 +27,7 @@ from re import match as re_match, finditer as re_finditer
 
 from f4pga.context import FPGA_FAM, F4PGA_SHARE_DIR
 
+ROOT = Path(__file__).resolve().parent
 
 bin_dir_path = str(Path(sys_argv[0]).resolve().parent.parent)
 share_dir_path = str(F4PGA_SHARE_DIR)
@@ -67,12 +68,11 @@ def with_qualifier(name: str, q: str) -> str:
 _sfbuild_module_collection_name_to_path = {}
 
 
-def scan_modules(mypath: str):
+def scan_modules():
     global _sfbuild_module_collection_name_to_path
-    sfbuild_home = mypath
     _sfbuild_module_collection_name_to_path = {
-        re_match("(.*)_modules$", moddir).groups()[0]: str(Path(sfbuild_home) / moddir)
-        for moddir in [dir for dir in os_listdir(sfbuild_home) if re_match(".*_modules$", dir)]
+        re_match("(.*)_modules$", moddir).groups()[0]: str(ROOT / moddir)
+        for moddir in [dir for dir in os_listdir(str(ROOT)) if re_match(".*_modules$", dir)]
     }
 
 

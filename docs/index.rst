@@ -63,7 +63,7 @@ Table of Contents
   :maxdepth: 2
 
   f4pga/index
-  f4pga/Usage
+  f4pga/flows/index
   f4pga/modules/index
   f4pga/DevNotes
   f4pga/Deprecated

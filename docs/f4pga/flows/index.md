@@ -362,6 +362,20 @@ In the example above file `counter.v` has been modified and is now marked as "**
 This causes a bunch of other dependencies to be rebuilt ("**R**").
 `build_dir` and `xdc` were already present, so they are marked as "**O**".
 
+# Flow documentation
+
+Here you can find generated documentation for various platforms:
+
+```{toctree}
+:maxdepth: 1
+
+../generated/flows/xc7a50t
+../generated/flows/xc7a100t
+../generated/flows/xc7a200t
+../generated/flows/eos-s3
+../generated/flows/ice40
+```
+
 ## Common targets and values
 
 Targets and values are named with some conventions.
