@@ -18,9 +18,13 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from colorama import Style
+from f4pga.flows.flow_config import FlowDefinition
+from pathlib import Path
 
 from f4pga.flows.module import Module
 from f4pga.flows.common import decompose_depname
+
+ROOT = Path(__file__).resolve().parent
 
 
 def _get_if_qualifier(deplist: "list[str]", qualifier: str):
@@ -59,3 +63,31 @@ def get_module_info(module: Module) -> str:
     r += _list_if_qualifier(module.produces, "maybe", indent=4)
 
     return r
+
+def _make_io_dict(io: str, metas: "None | dict[str]" = None) -> "dict[str, str]":
+    name, q = decompose_depname(io)
+    d = { "qualifier": q }
+    if metas is not None:
+        meta = metas.get(name)
+        if meta is not None:
+            d["meta"] = meta
+    return name, d
+
+def _make_io_dict_dict(ios: "list[str]", metas: "None | dict[str]" = None) -> "dict[str, str]":
+    return dict(_make_io_dict(io, metas) for io in ios)
+
+def _get_module_info_dict(module: Module) -> "dict[str, dict[str, str]]":
+    return {
+        "takes": _make_io_dict_dict(module.takes),
+        "produces": _make_io_dict_dict(
+            module.produces,
+            metas=module.prod_meta if hasattr(module, 'prod_meta') else None
+        ),
+        "values": _make_io_dict_dict(module.produces)
+    }
+
+def get_stages_info_dict(flow_definition: FlowDefinition) -> "dict[str, dict[str, dict[str, str]]]":
+    d = {}
+    for stage_name, stage in flow_definition.stages.items():
+        d[stage_name] = _get_module_info_dict(stage.module)
+    return d
