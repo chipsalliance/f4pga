@@ -66,7 +66,7 @@ def with_qualifier(name: str, q: str) -> str:
 
 def resolve_modstr(modstr: str):
     """
-    Resolves module location from modstr.
+    Resolves module location given its name.
     """
     modpath = Path(__file__).resolve().parent / f"modules/{modstr}.py"
     if not modpath.exists():
