@@ -274,5 +274,5 @@ jobs:
 
       - name: 🚧 Test pyF4PGA (PYTHONPATH)
         run: |
-          PYTHONPATH=$(pwd) python3 f4pga/__init__.py
-          PYTHONPATH=$(pwd) python3 f4pga/__init__.py -h
+          PYTHONPATH=$(pwd) python3 -m f4pga
+          PYTHONPATH=$(pwd) python3 -m f4pga -h
