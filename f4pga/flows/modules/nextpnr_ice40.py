@@ -20,7 +20,7 @@
 import pathlib
 from f4pga.flows.common import ResolutionEnv
 from f4pga.flows.module import ModuleContext
-from f4pga.flows.common_modules.nextpnr import NextPnrBaseModule
+from f4pga.flows.modules.nextpnr import NextPnrBaseModule
 
 import re
 from pathlib import Path
