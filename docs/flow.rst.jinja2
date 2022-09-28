@@ -1,0 +1,53 @@
+{{ platform_name }} flow
+{% for c in platform_name -%}#{% endfor %}#####
+
+.. NOTE::
+  This document has been generated. It's purpose is to provide an overview over usage of the flow
+  for a group of devices which are considered to be one "platform". See ``f4pga/platforms.yml``
+  to see the current platforms.
+  You can query information about individual stages using ``--stageinfo`` option for ``build``
+  subcommand. 
+
+Available chips
+===============
+
+{% for chip in sup_chips -%}
+* {{ chip }}
+{% endfor %}
+
+Required inputs
+===============
+
+The following dependencies have to be provided by the user:
+
+.. table::
+
+  +-{% for i in range(inputs_len_0) -%}{{ "-" }}{% endfor %}-+-{% for i in range(inputs_len_1) -%}{{ "-" }}{% endfor %}-+
+  | Name{% for i in range(inputs_len_0 - 4) -%}{{ " " }}{% endfor %} | Is required to execute entire flow?{% for i in range(inputs_len_1 - 35) -%}{{ " " }}{% endfor %} |
+  +={% for i in range(inputs_len_0) -%}{{ "=" }}{% endfor %}=+={% for i in range(inputs_len_1) -%}{{ "=" }}{% endfor %}=+
+{% for user_dep_name, usr_dep_req in user_deps.items() -%}
+  {{ "  " }}| {{ user_dep_name }}{% for i in range(inputs_len_0 - user_dep_name|length) -%}{{ " " }}{% endfor %} | {{ usr_dep_req }}{% for i in range(inputs_len_1 - usr_dep_req|length) -%}{{ " " }}{% endfor %} |
+  +-{% for i in range(inputs_len_0) -%}{{ "-" }}{% endfor %}-+-{% for i in range(inputs_len_1) -%}{{ "-" }}{% endfor %}-+
+{% endfor %}
+{{ "  " }}
+
+Stages within this flow
+=======================
+
+{% for stage in stages -%}
+* {{ stage }}
+{% endfor %}
+
+Targets
+=======
+
+.. table::
+
+  +-{% for i in range(targets_len_0) -%}{{ "-" }}{% endfor %}-+------------+-{% for i in range(targets_len_2) -%}{{ "-" }}{% endfor %}-+
+  | Name{% for i in range(targets_len_0 - 4) -%}{{ " " }}{% endfor %} | On-demand? | Description{% for i in range(targets_len_2 - 11) -%}{{ " " }}{% endfor %} |
+  +={% for i in range(targets_len_0) -%}{{ "=" }}{% endfor %}=+============+={% for i in range(targets_len_2) -%}{{ "=" }}{% endfor %}=+
+{% for target_name, target_spec in targets.items() -%}
+  {{ "  " }}| {{ target_name }}{% for i in range(targets_len_0 - target_name|length) -%}{{ " " }}{% endfor %} | {% if target_spec.qualifier == "demand" -%}yes{% else %}no {% endif %}        | {{ target_spec.meta }}{% for i in range(targets_len_2 - target_spec.meta|length) -%}{{ " " }}{% endfor %} |
+  +-{% for i in range(targets_len_0) -%}{{ "-" }}{% endfor %}-+------------+-{% for i in range(targets_len_2) -%}{{ "-" }}{% endfor %}-+
+{% endfor %}
+{{ "  " }}

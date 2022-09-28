@@ -79,6 +79,7 @@ jobs:
       - name: 📓 Build the documentation
         run: |
           . ./docs/env/conda/bin/activate f4pga-docs
+          make -C docs gen_flow_rst
           make -C docs html
 
       - name: '📤 Upload artifact: Sphinx HTML'
