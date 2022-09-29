@@ -1,0 +1,139 @@
+# Copyright (C) 2020-2022 F4PGA Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+name: Action
+
+on:
+  workflow_call:
+
+jobs:
+
+
+  xc7-a50t:
+    runs-on: ubuntu-latest
+    name: '🎬 arty_35 | counter_test'
+
+    steps:
+
+      - name: 🧰 Checkout
+        uses: actions/checkout@v3
+
+      - run: git clone https://github.com/chipsalliance/f4pga-examples
+
+      - name: 🚧 F4PGA Action (F4PGA)
+        uses: ./action
+        with:
+          image: xc7/a50t
+          cmd: TARGET="arty_35" make -C f4pga-examples/xc7/counter_test
+
+      - name: '📤 Upload artifact: Arty 35 bitstream (F4PGA)'
+        uses: actions/upload-artifact@v3
+        with:
+          name: Action-F4PGA-arty_35-Bitstream
+          path: f4pga-examples/xc7/counter_test/build/arty_35/top.bit
+          if-no-files-found: error
+
+      - name: '🗑️ Clean bitstream'
+        run: sudo rm -rf f4pga-examples/xc7/counter_test/build
+
+      - name: 🚧 F4PGA Action (SymbiFlow)
+        uses: ./action
+        with:
+          image: xc7/a50t
+          cmd: >-
+            F4PGA_USE_DEPRECATED=true
+            TARGET="arty_35"
+            make
+            -C f4pga-examples/xc7/counter_test
+
+      - name: '📤 Upload artifact: Arty 35 bitstream (SymbiFlow)'
+        uses: actions/upload-artifact@v3
+        with:
+          name: Action-SymbiFlow-arty_35-Bitstream
+          path: f4pga-examples/xc7/counter_test/build/arty_35/top.bit
+          if-no-files-found: error
+
+
+  xc7-a100t:
+    runs-on: ubuntu-latest
+    name: '🎬 arty_100 | picosoc_demo'
+
+    steps:
+
+      - name: 🧰 Checkout
+        uses: actions/checkout@v3
+
+      - run: git clone https://github.com/chipsalliance/f4pga-examples
+
+      - name: 🚧 F4PGA Action (SymbiFlow)
+        uses: ./action
+        with:
+          image: xc7/a100t
+          cmd: |
+            cd f4pga-examples/xc7/picosoc_demo
+            TARGET=arty_100 make
+
+      - name: '📤 Upload artifact: Arty 100 bitstream (SymbiFlow)'
+        uses: actions/upload-artifact@v3
+        with:
+          name: Action-SymbiFlow-arty_100-Bitstream
+          path: f4pga-examples/xc7/picosoc_demo/build/arty_100/top.bit
+          if-no-files-found: error
+
+
+  eos-s3:
+    runs-on: ubuntu-latest
+    name: '🎬 eos-s3 | btn_counter'
+
+    steps:
+
+      - name: 🧰 Checkout
+        uses: actions/checkout@v3
+
+      - run: git clone https://github.com/chipsalliance/f4pga-examples
+
+      - name: 🚧 F4PGA Action (F4PGA)
+        uses: ./action
+        with:
+          image: eos-s3
+          cmd: |
+            cd f4pga-examples/eos-s3/btn_counter
+            make
+
+      - name: '📤 Upload artifact: eos-s3 bitstream (F4PGA)'
+        uses: actions/upload-artifact@v3
+        with:
+          name: Action-F4PGA-eos-s3-Bitstream
+          path: f4pga-examples/eos-s3/btn_counter/build/top.bit
+          if-no-files-found: error
+
+      - name: '🗑️ Clean bitstream'
+        run: sudo rm -rf f4pga-examples/eos-s3/btn_counter/build
+
+      - name: 🚧 F4PGA Action (SymbiFlow)
+        uses: ./action
+        with:
+          image: eos-s3
+          cmd: |
+            cd f4pga-examples/eos-s3/btn_counter
+            F4PGA_USE_DEPRECATED=true make
+
+      - name: '📤 Upload artifact: eos-s3 bitstream (SymbiFlow)'
+        uses: actions/upload-artifact@v3
+        with:
+          name: Action-SymbiFlow-eos-s3-Bitstream
+          path: f4pga-examples/eos-s3/btn_counter/build/top.bit
+          if-no-files-found: error
