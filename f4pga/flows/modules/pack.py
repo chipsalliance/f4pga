@@ -19,7 +19,8 @@
 
 from pathlib import Path
 
-from f4pga.flows.common import vpr_specific_values, noisy_warnings, vpr as common_vpr, VprArgs
+from f4pga.flows.common import noisy_warnings
+from f4pga.flows.tools.vpr import vpr_specific_values, vpr, VprArgs
 from f4pga.flows.module import Module, ModuleContext
 
 
@@ -42,7 +43,7 @@ class PackModule(Module):
         build_dir = Path(ctx.outputs.net).parent
 
         yield "Packing with VPR..."
-        common_vpr(
+        vpr(
             "pack",
             VprArgs(
                 share=ctx.share,

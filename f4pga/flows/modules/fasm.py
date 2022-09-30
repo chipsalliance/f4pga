@@ -19,7 +19,8 @@
 
 from pathlib import Path
 
-from f4pga.flows.common import vpr_specific_values, VprArgs, get_verbosity_level, sub as common_sub
+from f4pga.flows.common import get_verbosity_level, sub as common_sub
+from f4pga.flows.tools.vpr import vpr_specific_values, VprArgs
 from f4pga.flows.module import Module, ModuleContext
 
 

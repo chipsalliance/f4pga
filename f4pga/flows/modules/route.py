@@ -19,7 +19,7 @@
 
 from pathlib import Path
 
-from f4pga.flows.common import vpr_specific_values, vpr as common_vpr, VprArgs, options_dict_to_list, save_vpr_log
+from f4pga.flows.tools.vpr import vpr_specific_values, vpr, VprArgs, save_vpr_log
 from f4pga.flows.module import Module, ModuleContext
 
 
@@ -35,7 +35,7 @@ class RouteModule(Module):
         build_dir = Path(ctx.takes.eblif).parent
 
         yield "Routing with VPR..."
-        common_vpr(
+        vpr(
             "route",
             VprArgs(
                 share=ctx.share,

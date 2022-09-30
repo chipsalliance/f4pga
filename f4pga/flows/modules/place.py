@@ -20,7 +20,7 @@
 from pathlib import Path
 from re import match as re_match
 
-from f4pga.flows.common import vpr_specific_values, vpr as common_vpr, VprArgs, save_vpr_log
+from f4pga.flows.tools.vpr import vpr_specific_values, vpr, VprArgs, save_vpr_log
 from f4pga.flows.module import Module, ModuleContext
 
 
@@ -48,7 +48,7 @@ class PlaceModule(Module):
             vpr_options.update({"fix_clusters": ctx.takes.place_constraints})
 
         yield "Running VPR..."
-        common_vpr(
+        vpr(
             "place",
             VprArgs(
                 share=ctx.share,

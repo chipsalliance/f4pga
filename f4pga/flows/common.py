@@ -95,44 +95,6 @@ def deep(fun, allow_none=False):
     return d
 
 
-class VprArgs:
-    """
-    Represents argument list for VPR (Versatile Place and Route).
-    """
-
-    arch_dir: str
-    arch_def: str
-    lookahead: str
-    rr_graph: str
-    place_delay: str
-    device_name: str
-    eblif: str
-    optional: list
-
-    def __init__(
-        self,
-        share: str,
-        eblif,
-        arch_def,
-        lookahead,
-        rr_graph,
-        place_delay,
-        device_name,
-        vpr_options={},
-        sdc_file: "str | None" = None,
-    ):
-        self.arch_dir = str(Path(share) / "arch")
-        self.arch_def = arch_def
-        self.lookahead = lookahead
-        self.rr_graph = rr_graph
-        self.place_delay = place_delay
-        self.device_name = device_name
-        self.eblif = str(Path(eblif).resolve())
-        self.optional = options_dict_to_list(vpr_options)
-        if sdc_file is not None:
-            self.optional += ["--sdc_file", sdc_file]
-
-
 class SubprocessException(Exception):
     return_code: int
 
@@ -150,43 +112,6 @@ def sub(*args, env=None, cwd=None, print_stdout_on_fail=False):
         print(f"stderr:\n{out.stderr.decode()}\n\n")
         exit(out.returncode)
     return out.stdout
-
-
-def vpr(mode: str, vprargs: VprArgs, cwd=None):
-    """
-    Execute `vpr`.
-    """
-    return sub(
-        *(
-            [
-                "vpr",
-                vprargs.arch_def,
-                vprargs.eblif,
-                "--device",
-                vprargs.device_name,
-                "--read_rr_graph",
-                vprargs.rr_graph,
-                "--read_router_lookahead",
-                vprargs.lookahead,
-                "--read_placement_delay_lookup",
-                vprargs.place_delay,
-            ]
-            + ([f"--{mode}"] if mode in ["pack", "place", "route", "analysis"] else [])
-            + vprargs.optional
-        ),
-        cwd=cwd,
-        print_stdout_on_fail=True,
-    )
-
-
-vpr_specific_values = [
-    "arch_def",
-    "rr_graph_lookahead_bin",
-    "rr_graph_real_bin",
-    "vpr_place_delay",
-    "vpr_grid_layout_name",
-    "vpr_options?",
-]
 
 
 def options_dict_to_list(opt_dict: dict):
@@ -208,13 +133,6 @@ def noisy_warnings(device):
     Emit some noisy warnings.
     """
     environ["OUR_NOISY_WARNINGS"] = f"noisy_warnings-{device}_pack.log"
-
-
-def save_vpr_log(filename, build_dir=""):
-    """
-    Save VPR logic (moves the default output file into a desired path).
-    """
-    sh_mv(str(Path(build_dir) / "vpr_stdout.log"), filename)
 
 
 def fatal(code, message):
