@@ -31,7 +31,16 @@ class FasmModule(Module):
     def execute(self, ctx: ModuleContext):
         build_dir = str(Path(ctx.takes.eblif).parent)
 
-        vprargs = VprArgs(ctx.share, ctx.takes.eblif, ctx.values)
+        vprargs = VprArgs(
+            share=ctx.share,
+            eblif=ctx.takes.eblif,
+            arch_def=ctx.values.arch_def,
+            lookahead=ctx.values.rr_graph_lookahead_bin,
+            rr_graph=ctx.values.rr_graph_real_bin,
+            place_delay=ctx.values.vpr_place_delay,
+            device_name=ctx.values.vpr_grid_layout_name,
+            vpr_options=ctx.values.vpr_options if ctx.values.vpr_options else {},
+        )
 
         optional = []
         if ctx.values.pnr_corner is not None:

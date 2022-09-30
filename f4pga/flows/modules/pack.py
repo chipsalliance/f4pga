@@ -42,7 +42,21 @@ class PackModule(Module):
         build_dir = Path(ctx.outputs.net).parent
 
         yield "Packing with VPR..."
-        common_vpr("pack", VprArgs(ctx.share, ctx.takes.eblif, ctx.values, sdc_file=ctx.takes.sdc), cwd=build_dir)
+        common_vpr(
+            "pack",
+            VprArgs(
+                share=ctx.share,
+                eblif=ctx.takes.eblif,
+                arch_def=ctx.values.arch_def,
+                lookahead=ctx.values.rr_graph_lookahead_bin,
+                rr_graph=ctx.values.rr_graph_real_bin,
+                place_delay=ctx.values.vpr_place_delay,
+                device_name=ctx.values.vpr_grid_layout_name,
+                vpr_options=ctx.values.vpr_options if ctx.values.vpr_options else {},
+                sdc_file=ctx.takes.sdc,
+            ),
+            cwd=build_dir,
+        )
 
         og_log = build_dir / "vpr_stdout.log"
 
