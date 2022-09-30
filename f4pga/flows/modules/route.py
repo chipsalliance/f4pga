@@ -62,7 +62,7 @@ class RouteModule(Module):
         self.no_of_phases = 2
         self.takes = ["eblif", "place", "sdc?"]
         self.produces = ["route"]
-        self.values = ["device", "vpr_options?"] + vpr_specific_values()
+        self.values = ["device", "vpr_options?"] + vpr_specific_values
 
 
 ModuleClass = RouteModule

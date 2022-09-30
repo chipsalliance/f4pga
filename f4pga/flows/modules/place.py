@@ -82,7 +82,7 @@ class PlaceModule(Module):
         self.no_of_phases = 2
         self.takes = ["build_dir", "eblif", "sdc?", "place_constraints?", "io_place?"]
         self.produces = ["place"]
-        self.values = ["device", "vpr_options?"] + vpr_specific_values()
+        self.values = ["device", "vpr_options?"] + vpr_specific_values
 
 
 ModuleClass = PlaceModule

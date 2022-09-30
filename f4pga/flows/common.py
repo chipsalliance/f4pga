@@ -179,7 +179,7 @@ def vpr(mode: str, vprargs: VprArgs, cwd=None):
     )
 
 
-_vpr_specific_values = [
+vpr_specific_values = [
     "arch_def",
     "rr_graph_lookahead_bin",
     "rr_graph_real_bin",
@@ -187,11 +187,6 @@ _vpr_specific_values = [
     "vpr_grid_layout_name",
     "vpr_options?",
 ]
-
-
-def vpr_specific_values():
-    global _vpr_specific_values
-    return _vpr_specific_values
 
 
 def options_dict_to_list(opt_dict: dict):

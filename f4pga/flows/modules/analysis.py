@@ -72,7 +72,7 @@ class analysisModule(Module):
         self.no_of_phases = 2
         self.takes = ["eblif", "route", "sdc?"]
         self.produces = ["merged_post_implementation_v", "post_implementation_v", "analysis_log"]
-        self.values = ["device", "vpr_options?"] + vpr_specific_values()
+        self.values = ["device", "vpr_options?"] + vpr_specific_values
 
 
 ModuleClass = analysisModule

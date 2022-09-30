@@ -81,7 +81,7 @@ class FasmModule(Module):
         self.no_of_phases = 2
         self.takes = ["eblif", "net", "place", "route", "fasm_extra?", "sdc?"]
         self.produces = ["fasm"]
-        self.values = ["device", "top", "pnr_corner?"] + vpr_specific_values()
+        self.values = ["device", "top", "pnr_corner?"] + vpr_specific_values
         self.prod_meta = {"fasm": "FPGA assembly file"}
 
 

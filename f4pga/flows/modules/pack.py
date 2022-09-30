@@ -77,9 +77,7 @@ class PackModule(Module):
         self.no_of_phases = 2
         self.takes = ["eblif", "sdc?"]
         self.produces = ["net", "util_rpt", "timing_rpt", "pack_log!"]
-        self.values = [
-            "device",
-        ] + vpr_specific_values()
+        self.values = ["device"] + vpr_specific_values
 
 
 ModuleClass = PackModule
