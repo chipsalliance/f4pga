@@ -1,0 +1,25 @@
+{
+    "default_part": "XC7A35TCSG324-1",
+    "values": {
+        "top": "top"
+    },
+    "dependencies": {
+        "sources": [
+            "counter.v"
+        ],
+        "synth_log": "synth.log",
+        "pack_log": "pack.log"
+    },
+    "XC7A35TCSG324-1": {
+        "default_target": "bitstream",
+        "dependencies": {
+            "build_dir": "build/arty_35",
+            "xdc": [
+                "../../constraints/arty.xdc"
+            ]
+        },
+        "values": {
+            "part": "xc7a35tcpg236-1"
+        }
+    }
+}
