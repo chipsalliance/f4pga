@@ -133,14 +133,17 @@ class SubprocessException(Exception):
     return_code: int
 
 
-def sub(*args, env=None, cwd=None):
+def sub(*args, env=None, cwd=None, print_stdout_on_fail=False):
     """
     Execute subroutine.
     """
 
     out = run(args, capture_output=True, env=env, cwd=cwd)
     if out.returncode != 0:
-        print(f"[ERROR]: {args[0]} non-zero return code.\n" f"stderr:\n{out.stderr.decode()}\n\n")
+        print(f"[ERROR]: {args[0]} non-zero return code.\n")
+        if print_stdout_on_fail:
+            print(f"stdout:\n{out.stdout.decode()}\n\n")
+        print(f"stderr:\n{out.stderr.decode()}\n\n")
         exit(out.returncode)
     return out.stdout
 
@@ -179,6 +182,7 @@ def vpr(mode: str, vprargs: VprArgs, cwd=None):
             + vprargs.optional
         ),
         cwd=cwd,
+        print_stdout_on_fail=True,
     )
 
 
