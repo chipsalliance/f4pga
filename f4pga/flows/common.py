@@ -110,21 +110,25 @@ class VprArgs:
     optional: list
 
     def __init__(
-        self, share: str, eblif, values: Namespace, sdc_file: "str | None" = None, vpr_extra_opts: "list | None" = None
+        self,
+        share: str,
+        eblif,
+        arch_def,
+        lookahead,
+        rr_graph,
+        place_delay,
+        device_name,
+        vpr_options={},
+        sdc_file: "str | None" = None,
     ):
         self.arch_dir = str(Path(share) / "arch")
-        self.arch_def = values.arch_def
-        self.lookahead = values.rr_graph_lookahead_bin
-        self.rr_graph = values.rr_graph_real_bin
-        self.place_delay = values.vpr_place_delay
-        self.device_name = values.vpr_grid_layout_name
+        self.arch_def = arch_def
+        self.lookahead = lookahead
+        self.rr_graph = rr_graph
+        self.place_delay = place_delay
+        self.device_name = device_name
         self.eblif = str(Path(eblif).resolve())
-        if values.vpr_options is not None:
-            self.optional = options_dict_to_list(values.vpr_options)
-        else:
-            self.optional = []
-        if vpr_extra_opts is not None:
-            self.optional += vpr_extra_opts
+        self.optional = options_dict_to_list(vpr_options)
         if sdc_file is not None:
             self.optional += ["--sdc_file", sdc_file]
 

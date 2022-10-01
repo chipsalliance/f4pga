@@ -41,21 +41,25 @@ class PlaceModule(Module):
         return {"place": default_output_name(ctx.takes.eblif)}
 
     def execute(self, ctx: ModuleContext):
-        place_constraints = ctx.takes.place_constraints
-
         build_dir = ctx.takes.build_dir
 
-        vpr_options = ["--fix_clusters", place_constraints] if place_constraints else []
+        vpr_options = ctx.values.vpr_options if ctx.values.vpr_options else {}
+        if ctx.takes.place_constraints:
+            vpr_options.update({"fix_clusters": ctx.takes.place_constraints})
 
         yield "Running VPR..."
         common_vpr(
             "place",
             VprArgs(
-                ctx.share,
-                ctx.takes.eblif,
-                ctx.values,
+                share=ctx.share,
+                eblif=ctx.takes.eblif,
+                arch_def=ctx.values.arch_def,
+                lookahead=ctx.values.rr_graph_lookahead_bin,
+                rr_graph=ctx.values.rr_graph_real_bin,
+                place_delay=ctx.values.vpr_place_delay,
+                device_name=ctx.values.vpr_grid_layout_name,
+                vpr_options=vpr_options,
                 sdc_file=ctx.takes.sdc,
-                vpr_extra_opts=["--fix_clusters", place_constraints],
             ),
             cwd=build_dir,
         )
