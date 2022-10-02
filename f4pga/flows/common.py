@@ -156,17 +156,6 @@ def vpr(mode: str, vprargs: VprArgs, cwd=None):
     """
     Execute `vpr`.
     """
-
-    modeargs = []
-    if mode == "pack":
-        modeargs = ["--pack"]
-    elif mode == "place":
-        modeargs = ["--place"]
-    elif mode == "route":
-        modeargs = ["--route"]
-    elif mode == "analysis":
-        modeargs = ["--analysis"]
-
     return sub(
         *(
             [
@@ -182,7 +171,7 @@ def vpr(mode: str, vprargs: VprArgs, cwd=None):
                 "--read_placement_delay_lookup",
                 vprargs.place_delay,
             ]
-            + modeargs
+            + ([f"--{mode}"] if mode in ["pack", "place", "route", "analysis"] else [])
             + vprargs.optional
         ),
         cwd=cwd,
