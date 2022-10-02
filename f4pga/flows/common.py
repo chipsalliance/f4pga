@@ -215,13 +215,6 @@ def noisy_warnings(device):
     environ["OUR_NOISY_WARNINGS"] = f"noisy_warnings-{device}_pack.log"
 
 
-def my_path():
-    """
-    Get current PWD.
-    """
-    return str(Path(sys_argv[0]).resolve().parent)
-
-
 def save_vpr_log(filename, build_dir=""):
     """
     Save VPR logic (moves the default output file into a desired path).
