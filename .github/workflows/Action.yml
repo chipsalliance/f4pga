@@ -160,7 +160,8 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: arty_35-Bitstream-Verilog-Counter
-          path: test/verilog/counter/top.bit
+          path: test/verilog/counter/build/arty_35/top.bit
+          if-no-files-found: error
 
 
   Test-VHDL:
@@ -187,7 +188,8 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: arty_35-Bitstream-VHDL-Counter
-          path: test/vhdl/counter/top.bit
+          path: test/vhdl/counter/build/arty_35/Arty_Counter.bit
+          if-no-files-found: error
 
 
   Test-VHDL-plugin:
@@ -214,4 +216,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: arty_35-Bitstream-VHDL-plugin-Counter
-          path: test/vhdl/counter/top.bit
+          path: test/vhdl/counter/build/arty_35/Arty_Counter.bit
+          if-no-files-found: error
