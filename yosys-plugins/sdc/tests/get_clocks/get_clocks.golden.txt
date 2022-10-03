@@ -1,0 +1,6 @@
+clk clk2 clk_int_1
+clk clk2 clk_int_1 main_clkout0
+clk2
+clk_int_1
+clk clk2 clk_int_1
+clk clk2 clk_int_1

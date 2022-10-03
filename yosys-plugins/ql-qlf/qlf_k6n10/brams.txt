@@ -1,0 +1,139 @@
+bram $__QLF_RAM16K_M0
+  init 1
+  abits 8
+  dbits 32
+  groups 2
+  ports  1  1
+  wrmode 0 1
+  enable 1 1
+  transp 0  0
+  clocks 1  1
+  clkpol 1  1
+endbram
+
+bram $__QLF_RAM16K_M1
+  init 1
+  abits  9
+  dbits  32
+  groups 2
+  ports  1 1
+  wrmode 0 1
+  enable 1 1
+  transp 0 0
+  clocks 1 1
+  clkpol 1 1
+endbram
+
+bram $__QLF_RAM16K_M2
+  init 1
+  abits  10
+  dbits  32
+  groups 2
+  ports  1 1
+  wrmode 0 1
+  enable 1 1
+  transp 0 0
+  clocks 1 1
+  clkpol 1 1
+endbram
+
+bram $__QLF_RAM16K_M3
+  init 1
+  abits 11
+  dbits  32
+  groups 2
+  ports  1 1
+  wrmode 0 1
+  enable 1 1
+  transp 0 0
+  clocks 1 1
+  clkpol 1 1
+endbram
+
+
+# The syn_* attributes are described in:
+# https://www.latticesemi.com/-/media/LatticeSemi/Documents/Tutorials/AK/LatticeDiamondTutorial311.ashx
+attr_icase 1
+
+match $__QLF_RAM16K_M0
+  # implicitly requested RAM or ROM
+  attribute !syn_ramstyle syn_ramstyle=auto
+  attribute !syn_romstyle syn_romstyle=auto
+  attribute !ram_block
+  attribute !rom_block
+  attribute !logic_block
+  min dbits 17
+  make_transp
+endmatch
+
+
+match $__QLF_RAM16K_M1
+  # implicitly requested RAM or ROM
+  attribute !syn_ramstyle syn_ramstyle=auto
+  attribute !syn_romstyle syn_romstyle=auto
+  attribute !ram_block
+  attribute !rom_block
+  attribute !logic_block
+  min dbits 9
+  make_transp
+  or_next_if_better
+endmatch
+
+match $__QLF_RAM16K_M1
+  # implicitly requested RAM or ROM
+  attribute !syn_ramstyle syn_ramstyle=auto
+  attribute !syn_romstyle syn_romstyle=auto
+  attribute !ram_block
+  attribute !rom_block
+  attribute !logic_block
+  min efficiency 2
+  make_transp
+endmatch
+
+
+match $__QLF_RAM16K_M2
+  # implicitly requested RAM or ROM
+  attribute !syn_ramstyle syn_ramstyle=auto
+  attribute !syn_romstyle syn_romstyle=auto
+  attribute !ram_block
+  attribute !rom_block
+  attribute !logic_block
+  min dbits 5
+  make_transp
+  or_next_if_better
+endmatch
+
+match $__QLF_RAM16K_M2
+  # implicitly requested RAM or ROM
+  attribute !syn_ramstyle syn_ramstyle=auto
+  attribute !syn_romstyle syn_romstyle=auto
+  attribute !ram_block
+  attribute !rom_block
+  attribute !logic_block
+  min efficiency 2
+  make_transp
+endmatch
+
+match $__QLF_RAM16K_M3
+  # implicitly requested RAM or ROM
+  attribute !syn_ramstyle syn_ramstyle=auto
+  attribute !syn_romstyle syn_romstyle=auto
+  attribute !ram_block
+  attribute !rom_block
+  attribute !logic_block
+  max dbits 4
+  make_transp
+  or_next_if_better
+endmatch
+
+match $__QLF_RAM16K_M3
+  # implicitly requested RAM or ROM
+  attribute !syn_ramstyle syn_ramstyle=auto
+  attribute !syn_romstyle syn_romstyle=auto
+  attribute !ram_block
+  attribute !rom_block
+  attribute !logic_block
+  min efficiency 2
+  make_transp
+endmatch
+

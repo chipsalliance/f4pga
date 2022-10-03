@@ -1,0 +1,89 @@
+# -*- Makefile -*-
+# This Makefile template is supposed to be included in each plugin's Makefile.
+# Plugin Makefiles need to specify the plugin's name and source files.
+# The plugin name is how the final shared object will be named.
+# This shared object can be imported to Yosys with `plugin -i` command.
+#
+# Below is an example of a plugin Makefile that uses this template:
+# NAME = plugin_name
+# SOURCES = source1.cc source2.cc
+# include ../Makefile_plugin.common
+#
+# For the above example the final plugin shared object will be named plugin_name.so.
+# In order to test the plugin it has to be copied to Yosys's shared folder.
+# The install target in this Makefile copies the plugins into the shared folder
+# of the Yosys installation that is found in the PATH.
+# This is needed because the shared folder is where Yosys will look for the
+# plugin object when `plugin -i` is called in Yosys's synthesis script.
+#
+# To add tests for the plugin the Makefile_test.common Makefile should be used.
+# Refer to Makefile_test.common to learn more details.
+#
+# Below is a directory structure which shows how the plugin sources and tests
+# should be laid out
+#
+# |-- Makefile_plugin.common
+# |-- Makefile_test.common
+# |-- example
+# |   |-- Makefile
+# |   |-- source1.cc
+# |   |-- source2.cc
+# |   |-- tests
+# |       |-- Makefile
+# |       |-- test_case_1
+# |       |   |-- test_case_1.tcl
+# |       |   |-- test_case_1.v
+# |       |   |-- test_case_1.golden.ext
+# |       |   |-- ...
+# |-- example2
+# |-- ...
+
+SHELL := /usr/bin/env bash
+
+# Either find yosys in system and use its path or use the given path
+YOSYS_PATH ?= $(realpath $(dir $(shell command -v yosys))/..)
+
+# Find yosys-config, throw an error if not found
+YOSYS_CONFIG = $(YOSYS_PATH)/bin/yosys-config
+ifeq (,$(wildcard $(YOSYS_CONFIG)))
+  $(error "Didn't find 'yosys-config' under '$(YOSYS_PATH)'")
+endif
+
+CXX ?= $(shell $(YOSYS_CONFIG) --cxx)
+CXXFLAGS := $(shell $(YOSYS_CONFIG) --cxxflags) $(CXXFLAGS) #-DSDC_DEBUG
+LDFLAGS := $(shell $(YOSYS_CONFIG) --ldflags) $(LDFLAGS)
+LDLIBS := $(shell $(YOSYS_CONFIG) --ldlibs) $(LDLIBS)
+EXTRA_FLAGS ?=
+
+DATA_DIR = $(DESTDIR)$(shell $(YOSYS_CONFIG) --datdir)
+PLUGINS_DIR = $(DATA_DIR)/plugins
+
+OBJS := $(patsubst %.cc,%.o,$(SOURCES))
+DEPS ?=
+
+$(PLUGINS_DIR):
+	@mkdir -p $@
+
+all: $(NAME).so
+
+$(OBJS): %.o: %.cc $(DEPS)
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(EXTRA_FLAGS) -c -o $@ $(filter %.cc, $^)
+
+$(NAME).so: $(OBJS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared -o $@ $^ $(LDLIBS)
+
+../pmgen.py:
+	@$(MAKE) -C .. pmgen.py
+
+install_plugin: $(NAME).so | $(PLUGINS_DIR)
+	install -D $< $(PLUGINS_DIR)/$<
+
+test:
+	@$(MAKE) -C tests all
+
+.PHONY: install
+install: install_plugin
+
+clean:
+	rm -f *.d *.o *.so
+	$(MAKE) -C tests clean

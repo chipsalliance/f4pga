@@ -1,0 +1,18 @@
+{
+	"$iopadmap$top.LED": {
+		"IOSTANDARD": "LVCMOS33",
+		"IO_LOC_PAIRS": "LED[2]:H5"
+	},
+	"$iopadmap$top.LED_1": {
+		"IOSTANDARD": "LVCMOS33",
+		"IO_LOC_PAIRS": "LED[3]:J5"
+	},
+	"$iopadmap$top.LED_2": {
+		"IOSTANDARD": "LVCMOS33",
+		"IO_LOC_PAIRS": "LED[4]:T9"
+	},
+	"$iopadmap$top.LED_3": {
+		"IOSTANDARD": "LVCMOS33",
+		"IO_LOC_PAIRS": "LED[5]:T10"
+	}
+}

@@ -35,6 +35,13 @@ jobs:
 
       - name: Check Licenses
         uses: SymbiFlow/actions/checks@main
+        with:
+          exclude_license: |
+            ./yosys-plugins/design_introspection/tests/selection_to_tcl_list/selection_to_tcl_list.v
+            ./third_party/minilitex_ddr_arty/minilitex_ddr_arty.v
+            ./third_party/VexRiscv_Lite/VexRiscv_Lite.v
+          #third_party: |
+          #  ./third_party/googletest/
 
 
   Format:
@@ -276,3 +283,62 @@ jobs:
         run: |
           PYTHONPATH=$(pwd) python3 -m f4pga
           PYTHONPATH=$(pwd) python3 -m f4pga -h
+
+
+  Yosys-plugins:
+    name: 🔌 Plugins
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: 🧰 Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v4
+
+      - name: 🔧 Install
+        run: |
+          sudo apt-get update
+          sudo apt-get install \
+            bison \
+            build-essential \
+            clang-format-8 \
+            cmake \
+            flex \
+            g++-9 \
+            gawk \
+            git \
+            graphviz \
+            libffi-dev \
+            libboost-system-dev \
+            libboost-python-dev \
+            libboost-filesystem-dev \
+            libreadline-dev \
+            pkg-config \
+            tcl-dev \
+            xdot \
+            zlib1g-dev
+
+      - name: Format
+        run: |
+          set -e
+          source .github/scripts/common.sh
+          make -C yosys-plugins format -j`nproc`
+          test $(git status --porcelain | wc -l) -eq 0 || { git diff; false; }
+
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1
+
+      - name: 🔧 Install Yosys
+        run: |
+          export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
+          source .github/scripts/setup.sh
+
+      - name: 🚧 Build and test plugins
+        run: |
+          export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
+          source yosys-plugins/env/conda/bin/activate yosys-plugins
+          source .github/scripts/build-and-test.sh

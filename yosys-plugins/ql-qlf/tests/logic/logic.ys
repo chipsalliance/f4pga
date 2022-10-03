@@ -1,0 +1,10 @@
+plugin -i ql-qlf
+read_verilog ./logic.v
+hierarchy -top top
+proc
+equiv_opt -assert -map +/quicklogic/qlf_k4n8/cells_sim.v synth_quicklogic -family qlf_k4n8
+design -load postopt
+cd top
+
+stat
+select -assert-count 9 t:$lut

@@ -1,0 +1,259 @@
+{
+  "$iopadmap$top.cpu_reset": {
+    "IOSTANDARD": "LVCMOS33",
+    "IO_LOC_PAIRS": "cpu_reset:C2"
+  },
+  "$iopadmap$top.serial_rx": {
+    "IOSTANDARD": "LVCMOS33",
+    "IO_LOC_PAIRS": "serial_rx:A9"
+  },
+  "$iopadmap$top.serial_tx": {
+    "IOSTANDARD": "LVCMOS33",
+    "IO_LOC_PAIRS": "serial_tx:D10"
+  },
+  "IOBUF": {
+    "IN_TERM": "UNTUNED_SPLIT_40",
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_dq[0]:K5",
+    "SLEW": "FAST"
+  },
+  "IOBUF_1": {
+    "IN_TERM": "UNTUNED_SPLIT_40",
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_dq[1]:L3",
+    "SLEW": "FAST"
+  },
+  "IOBUF_10": {
+    "IN_TERM": "UNTUNED_SPLIT_40",
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_dq[10]:U4",
+    "SLEW": "FAST"
+  },
+  "IOBUF_11": {
+    "IN_TERM": "UNTUNED_SPLIT_40",
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_dq[11]:V5",
+    "SLEW": "FAST"
+  },
+  "IOBUF_12": {
+    "IN_TERM": "UNTUNED_SPLIT_40",
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_dq[12]:V1",
+    "SLEW": "FAST"
+  },
+  "IOBUF_13": {
+    "IN_TERM": "UNTUNED_SPLIT_40",
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_dq[13]:T3",
+    "SLEW": "FAST"
+  },
+  "IOBUF_14": {
+    "IN_TERM": "UNTUNED_SPLIT_40",
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_dq[14]:U3",
+    "SLEW": "FAST"
+  },
+  "IOBUF_15": {
+    "IN_TERM": "UNTUNED_SPLIT_40",
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_dq[15]:R3",
+    "SLEW": "FAST"
+  },
+  "IOBUF_2": {
+    "IN_TERM": "UNTUNED_SPLIT_40",
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_dq[2]:K3",
+    "SLEW": "FAST"
+  },
+  "IOBUF_3": {
+    "IN_TERM": "UNTUNED_SPLIT_40",
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_dq[3]:L6",
+    "SLEW": "FAST"
+  },
+  "IOBUF_4": {
+    "IN_TERM": "UNTUNED_SPLIT_40",
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_dq[4]:M3",
+    "SLEW": "FAST"
+  },
+  "IOBUF_5": {
+    "IN_TERM": "UNTUNED_SPLIT_40",
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_dq[5]:M1",
+    "SLEW": "FAST"
+  },
+  "IOBUF_6": {
+    "IN_TERM": "UNTUNED_SPLIT_40",
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_dq[6]:L4",
+    "SLEW": "FAST"
+  },
+  "IOBUF_7": {
+    "IN_TERM": "UNTUNED_SPLIT_40",
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_dq[7]:M2",
+    "SLEW": "FAST"
+  },
+  "IOBUF_8": {
+    "IN_TERM": "UNTUNED_SPLIT_40",
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_dq[8]:V4",
+    "SLEW": "FAST"
+  },
+  "IOBUF_9": {
+    "IN_TERM": "UNTUNED_SPLIT_40",
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_dq[9]:T5",
+    "SLEW": "FAST"
+  },
+  "OBUFTDS": {
+    "IOSTANDARD": "DIFF_SSTL135",
+    "IO_LOC_PAIRS": "ddram_dqs_p[0]:N2,ddram_dqs_n[0]:N1",
+    "SLEW": "FAST"
+  },
+  "OBUFTDS_1": {
+    "IOSTANDARD": "DIFF_SSTL135",
+    "IO_LOC_PAIRS": "ddram_dqs_p[1]:U2,ddram_dqs_n[1]:V2",
+    "SLEW": "FAST"
+  },
+  "OBUFTDS_2": {
+    "IOSTANDARD": "DIFF_SSTL135",
+    "IO_LOC_PAIRS": "ddram_clk_p:U9,ddram_clk_n:V9",
+    "SLEW": "FAST"
+  },
+  "clkbuf": {
+    "IOSTANDARD": "LVCMOS33",
+    "IO_LOC_PAIRS": "clk100:E3"
+  },
+  "obuf_a0": {
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_a[0]:R2",
+    "SLEW": "FAST"
+  },
+  "obuf_a1": {
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_a[1]:M6",
+    "SLEW": "FAST"
+  },
+  "obuf_a10": {
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_a[10]:R6",
+    "SLEW": "FAST"
+  },
+  "obuf_a11": {
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_a[11]:U6",
+    "SLEW": "FAST"
+  },
+  "obuf_a12": {
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_a[12]:T6",
+    "SLEW": "FAST"
+  },
+  "obuf_a13": {
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_a[13]:T8",
+    "SLEW": "FAST"
+  },
+  "obuf_a2": {
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_a[2]:N4",
+    "SLEW": "FAST"
+  },
+  "obuf_a3": {
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_a[3]:T1",
+    "SLEW": "FAST"
+  },
+  "obuf_a4": {
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_a[4]:N6",
+    "SLEW": "FAST"
+  },
+  "obuf_a5": {
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_a[5]:R7",
+    "SLEW": "FAST"
+  },
+  "obuf_a6": {
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_a[6]:V6",
+    "SLEW": "FAST"
+  },
+  "obuf_a7": {
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_a[7]:U7",
+    "SLEW": "FAST"
+  },
+  "obuf_a8": {
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_a[8]:R8",
+    "SLEW": "FAST"
+  },
+  "obuf_a9": {
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_a[9]:V7",
+    "SLEW": "FAST"
+  },
+  "obuf_ba0": {
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_ba[0]:R1",
+    "SLEW": "FAST"
+  },
+  "obuf_ba1": {
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_ba[1]:P4",
+    "SLEW": "FAST"
+  },
+  "obuf_ba2": {
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_ba[2]:P2",
+    "SLEW": "FAST"
+  },
+  "obuf_cas": {
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_cas_n:M4",
+    "SLEW": "FAST"
+  },
+  "obuf_cke": {
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_cke:N5",
+    "SLEW": "FAST"
+  },
+  "obuf_cs": {
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_cs_n:U8",
+    "SLEW": "FAST"
+  },
+  "obuf_dm0": {
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_dm[0]:L1",
+    "SLEW": "FAST"
+  },
+  "obuf_dm1": {
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_dm[1]:U1",
+    "SLEW": "FAST"
+  },
+  "obuf_odt": {
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_odt:R5",
+    "SLEW": "FAST"
+  },
+  "obuf_ras": {
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_ras_n:P3",
+    "SLEW": "FAST"
+  },
+  "obuf_rst": {
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_reset_n:K6",
+    "SLEW": "FAST"
+  },
+  "obuf_we": {
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "ddram_we_n:P5",
+    "SLEW": "FAST"
+  }
+}

@@ -1,0 +1,1691 @@
+// Copyright 2020-2022 F4PGA Authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// SPDX-License-Identifier: Apache-2.0
+
+`default_nettype none
+
+(* abc9_flop, lib_whitebox *)
+module sh_dff(
+    output reg Q,
+    input wire D,
+    (* clkbuf_sink *)
+    input wire C
+);
+
+    initial Q <= 1'b0;
+    always @(posedge C)
+        Q <= D;
+
+endmodule
+
+(* abc9_box, lib_blackbox *)
+module adder_carry(
+    output wire sumout,
+    output wire cout,
+    input wire p,
+    input wire g,
+    input wire cin
+);
+    assign sumout = p ^ cin;
+    assign cout = p ? cin : g;
+
+endmodule
+
+(* abc9_box, lib_whitebox *)
+module adder_lut5(
+   output wire lut5_out,
+   (* abc9_carry *)
+   output wire cout,
+   input wire [0:4] in,
+   (* abc9_carry *)
+   input wire cin
+);
+    parameter [0:15] LUT=0;
+    parameter IN2_IS_CIN = 0;
+
+    wire [0:4] li = (IN2_IS_CIN) ? {in[0], in[1], cin, in[3], in[4]} : {in[0], in[1], in[2], in[3],in[4]};
+
+    // Output function
+    wire [0:15] s1 = li[0] ?
+        {LUT[0], LUT[2], LUT[4], LUT[6], LUT[8], LUT[10], LUT[12], LUT[14], LUT[16], LUT[18], LUT[20], LUT[22], LUT[24], LUT[26], LUT[28], LUT[30]}:
+        {LUT[1], LUT[3], LUT[5], LUT[7], LUT[9], LUT[11], LUT[13], LUT[15], LUT[17], LUT[19], LUT[21], LUT[23], LUT[25], LUT[27], LUT[29], LUT[31]};
+
+    wire [0:7] s2 = li[1] ? {s1[0], s1[2], s1[4], s1[6], s1[8], s1[10], s1[12], s1[14]} :
+                            {s1[1], s1[3], s1[5], s1[7], s1[9], s1[11], s1[13], s1[15]};
+
+    wire [0:3] s3 = li[2] ? {s2[0], s2[2], s2[4], s2[6]} : {s2[1], s2[3], s2[5], s2[7]};
+    wire [0:1] s4 = li[3] ? {s3[0], s3[2]} : {s3[1], s3[3]};
+
+    assign lut5_out = li[4] ? s4[0] : s4[1];
+
+    // Carry out function
+    assign cout = (s3[2]) ? cin : s3[3];
+
+endmodule
+
+(* abc9_lut=1, lib_whitebox *)
+module frac_lut6(
+    input wire [0:5] in,
+    output wire [0:3] lut4_out,
+    output wire [0:1] lut5_out,
+    output wire lut6_out
+);
+    parameter [0:63] LUT = 0;
+    // Effective LUT input
+    wire [0:5] li = in;
+
+    // Output function
+    wire [0:31] s1 = li[0] ?
+    {LUT[0] , LUT[2] , LUT[4] , LUT[6] , LUT[8] , LUT[10], LUT[12], LUT[14], 
+     LUT[16], LUT[18], LUT[20], LUT[22], LUT[24], LUT[26], LUT[28], LUT[30],
+     LUT[32], LUT[34], LUT[36], LUT[38], LUT[40], LUT[42], LUT[44], LUT[46],
+     LUT[48], LUT[50], LUT[52], LUT[54], LUT[56], LUT[58], LUT[60], LUT[62]}:
+    {LUT[1] , LUT[3] , LUT[5] , LUT[7] , LUT[9] , LUT[11], LUT[13], LUT[15], 
+     LUT[17], LUT[19], LUT[21], LUT[23], LUT[25], LUT[27], LUT[29], LUT[31],
+     LUT[33], LUT[35], LUT[37], LUT[39], LUT[41], LUT[43], LUT[45], LUT[47],
+     LUT[49], LUT[51], LUT[53], LUT[55], LUT[57], LUT[59], LUT[61], LUT[63]};
+
+    wire [0:15] s2 = li[1] ?
+    {s1[0] , s1[2] , s1[4] , s1[6] , s1[8] , s1[10], s1[12], s1[14],
+     s1[16], s1[18], s1[20], s1[22], s1[24], s1[26], s1[28], s1[30]}:
+    {s1[1] , s1[3] , s1[5] , s1[7] , s1[9] , s1[11], s1[13], s1[15],
+     s1[17], s1[19], s1[21], s1[23], s1[25], s1[27], s1[29], s1[31]};
+
+    wire [0:7] s3 = li[2] ?
+    {s2[0], s2[2], s2[4], s2[6], s2[8], s2[10], s2[12], s2[14]}:
+    {s2[1], s2[3], s2[5], s2[7], s2[9], s2[11], s2[13], s2[15]};
+
+    wire [0:3] s4 = li[3] ? {s3[0], s3[2], s3[4], s3[6]}:
+                            {s3[1], s3[3], s3[5], s3[7]};
+
+    wire [0:1] s5 = li[4] ? {s4[0], s4[2]} : {s4[1], s4[3]};
+
+    assign lut4_out[0] = s4[0];
+    assign lut4_out[1] = s4[1];
+    assign lut4_out[2] = s4[2];
+    assign lut4_out[3] = s4[3];
+
+    assign lut5_out[0] = s5[0];
+    assign lut5_out[1] = s5[1];
+
+    assign lut6_out = li[5] ? s5[0] : s5[1];
+
+endmodule
+
+(* abc9_flop, lib_whitebox *)
+module dff(
+    output reg Q,
+    input wire D,
+    (* clkbuf_sink *)
+    input wire C
+);
+    initial Q <= 1'b0;
+
+    always @(posedge C)
+      Q <= D;
+
+endmodule
+
+(* abc9_flop, lib_whitebox *)
+module dffn(
+    output reg Q,
+    input wire D,
+    (* clkbuf_sink *)
+    input wire C
+);
+    initial Q <= 1'b0;
+
+    always @(negedge C)
+      Q <= D;
+
+endmodule
+
+(* abc9_flop, lib_whitebox *)
+module dffsre(
+    output reg Q,
+    input wire D,
+    (* clkbuf_sink *)
+    input wire C,
+    input wire E,
+    input wire R,
+    input wire S
+);
+    initial Q <= 1'b0;
+
+    always @(posedge C or negedge S or negedge R)
+      if (!R)
+        Q <= 1'b0;
+      else if (!S)
+        Q <= 1'b1;
+      else if (E)
+        Q <= D;
+
+endmodule
+
+(* abc9_flop, lib_whitebox *)
+module dffnsre(
+    output reg Q,
+    input wire D,
+    (* clkbuf_sink *)
+    input wire C,
+    input wire E,
+    input wire R,
+    input wire S
+);
+    initial Q <= 1'b0;
+
+    always @(negedge C or negedge S or negedge R)
+      if (!R)
+        Q <= 1'b0;
+      else if (!S)
+        Q <= 1'b1;
+      else if (E)
+        Q <= D;
+
+endmodule
+
+(* abc9_flop, lib_whitebox *)
+module sdffsre(
+    output reg Q,
+    input wire D,
+    (* clkbuf_sink *)
+    input wire C,
+    input wire E,
+    input wire R,
+    input wire S
+);
+    initial Q <= 1'b0;
+
+    always @(posedge C)
+      if (!R)
+        Q <= 1'b0;
+      else if (!S)
+        Q <= 1'b1;
+      else if (E)
+        Q <= D;
+
+endmodule
+
+(* abc9_flop, lib_whitebox *)
+module sdffnsre(
+    output reg Q,
+    input wire D,
+    (* clkbuf_sink *)
+    input wire C,
+    input wire E,
+    input wire R,
+    input wire S
+);
+    initial Q <= 1'b0;
+
+    always @(negedge C)
+      if (!R)
+        Q <= 1'b0;
+      else if (!S)
+        Q <= 1'b1;
+      else if (E)
+        Q <= D;
+
+endmodule
+
+(* abc9_flop, lib_whitebox *)
+module latchsre (
+    output reg Q,
+    input wire S,
+    input wire R,
+    input wire D,
+    input wire G,
+    input wire E
+);
+    initial Q <= 1'b0;
+
+    always @*
+      begin
+        if (!R)
+          Q <= 1'b0;
+        else if (!S)
+          Q <= 1'b1;
+        else if (E && G)
+          Q <= D;
+      end
+
+endmodule
+
+(* abc9_flop, lib_whitebox *)
+module latchnsre (
+    output reg Q,
+    input wire S,
+    input wire R,
+    input wire D,
+    input wire G,
+    input wire E
+);
+    initial Q <= 1'b0;
+
+    always @*
+      begin
+        if (!R)
+          Q <= 1'b0;
+        else if (!S)
+          Q <= 1'b1;
+        else if (E && !G)
+          Q <= D;
+      end
+
+endmodule
+
+
+module TDP_BRAM18 (
+    (* clkbuf_sink *)
+    input wire CLOCKA,
+    (* clkbuf_sink *)
+    input wire CLOCKB,
+    input wire READENABLEA,
+    input wire READENABLEB,
+    input wire [13:0] ADDRA,
+    input wire [13:0] ADDRB,
+    input wire [15:0] WRITEDATAA,
+    input wire [15:0] WRITEDATAB,
+    input wire [1:0] WRITEDATAAP,
+    input wire [1:0] WRITEDATABP,
+    input wire WRITEENABLEA,
+    input wire WRITEENABLEB,
+    input wire [1:0] BYTEENABLEA,
+    input wire [1:0] BYTEENABLEB,
+    //input wire [2:0] WRITEDATAWIDTHA,
+    //input wire [2:0] WRITEDATAWIDTHB,
+    //input wire [2:0] READDATAWIDTHA,
+    //input wire [2:0] READDATAWIDTHB,
+    output wire [15:0] READDATAA,
+    output wire [15:0] READDATAB,
+    output wire [1:0] READDATAAP,
+    output wire [1:0] READDATABP
+);
+    parameter INITP_00 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INITP_01 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INITP_02 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INITP_03 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INITP_04 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INITP_05 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INITP_06 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INITP_07 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_00 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_01 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_02 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_03 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_04 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_05 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_06 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_07 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_08 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_09 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_0A = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_0B = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_0C = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_0D = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_0E = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_0F = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_10 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_11 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_12 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_13 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_14 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_15 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_16 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_17 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_18 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_19 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_1A = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_1B = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_1C = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_1D = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_1E = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_1F = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_20 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_21 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_22 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_23 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_24 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_25 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_26 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_27 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_28 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_29 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_2A = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_2B = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_2C = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_2D = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_2E = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_2F = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_30 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_31 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_32 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_33 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_34 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_35 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_36 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_37 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_38 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_39 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_3A = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_3B = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_3C = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_3D = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_3E = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_3F = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter integer READ_WIDTH_A = 0;
+    parameter integer READ_WIDTH_B = 0;
+    parameter integer WRITE_WIDTH_A = 0;
+    parameter integer WRITE_WIDTH_B = 0;
+
+endmodule
+
+module TDP36K (
+    RESET_ni,
+    WEN_A1_i,
+    WEN_B1_i,
+    REN_A1_i,
+    REN_B1_i,
+    CLK_A1_i,
+    CLK_B1_i,
+    BE_A1_i,
+    BE_B1_i,
+    ADDR_A1_i,
+    ADDR_B1_i,
+    WDATA_A1_i,
+    WDATA_B1_i,
+    RDATA_A1_o,
+    RDATA_B1_o,
+    FLUSH1_i,
+    WEN_A2_i,
+    WEN_B2_i,
+    REN_A2_i,
+    REN_B2_i,
+    CLK_A2_i,
+    CLK_B2_i,
+    BE_A2_i,
+    BE_B2_i,
+    ADDR_A2_i,
+    ADDR_B2_i,
+    WDATA_A2_i,
+    WDATA_B2_i,
+    RDATA_A2_o,
+    RDATA_B2_o,
+    FLUSH2_i
+);
+    parameter [80:0] MODE_BITS = 81'd0;
+
+    // First 18K RAMFIFO (41 bits)
+    localparam [ 0:0] SYNC_FIFO1_i  = MODE_BITS[0];
+    localparam [ 2:0] RMODE_A1_i    = MODE_BITS[3 : 1];
+    localparam [ 2:0] RMODE_B1_i    = MODE_BITS[6 : 4];
+    localparam [ 2:0] WMODE_A1_i    = MODE_BITS[9 : 7];
+    localparam [ 2:0] WMODE_B1_i    = MODE_BITS[12:10];
+    localparam [ 0:0] FMODE1_i      = MODE_BITS[13];
+    localparam [ 0:0] POWERDN1_i    = MODE_BITS[14];
+    localparam [ 0:0] SLEEP1_i      = MODE_BITS[15];
+    localparam [ 0:0] PROTECT1_i    = MODE_BITS[16];
+    localparam [11:0] UPAE1_i       = MODE_BITS[28:17];
+    localparam [11:0] UPAF1_i       = MODE_BITS[40:29];
+
+    // Second 18K RAMFIFO (39 bits)
+    localparam [ 0:0] SYNC_FIFO2_i  = MODE_BITS[41];
+    localparam [ 2:0] RMODE_A2_i    = MODE_BITS[44:42];
+    localparam [ 2:0] RMODE_B2_i    = MODE_BITS[47:45];
+    localparam [ 2:0] WMODE_A2_i    = MODE_BITS[50:48];
+    localparam [ 2:0] WMODE_B2_i    = MODE_BITS[53:51];
+    localparam [ 0:0] FMODE2_i      = MODE_BITS[54];
+    localparam [ 0:0] POWERDN2_i    = MODE_BITS[55];
+    localparam [ 0:0] SLEEP2_i      = MODE_BITS[56];
+    localparam [ 0:0] PROTECT2_i    = MODE_BITS[57];
+    localparam [10:0] UPAE2_i       = MODE_BITS[68:58];
+    localparam [10:0] UPAF2_i       = MODE_BITS[79:69];
+
+    // Split (1 bit)
+    localparam [ 0:0] SPLIT_i       = MODE_BITS[80];
+
+    parameter INITP_00 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INITP_01 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INITP_02 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INITP_03 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INITP_04 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INITP_05 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INITP_06 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INITP_07 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INITP_08 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INITP_09 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INITP_0A = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INITP_0B = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INITP_0C = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INITP_0D = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INITP_0E = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INITP_0F = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_00 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_01 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_02 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_03 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_04 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_05 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_06 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_07 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_08 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_09 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_0A = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_0B = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_0C = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_0D = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_0E = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_0F = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_10 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_11 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_12 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_13 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_14 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_15 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_16 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_17 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_18 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_19 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_1A = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_1B = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_1C = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_1D = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_1E = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_1F = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_20 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_21 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_22 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_23 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_24 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_25 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_26 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_27 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_28 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_29 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_2A = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_2B = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_2C = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_2D = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_2E = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_2F = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_30 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_31 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_32 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_33 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_34 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_35 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_36 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_37 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_38 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_39 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_3A = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_3B = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_3C = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_3D = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_3E = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_3F = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_40 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_41 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_42 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_43 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_44 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_45 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_46 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_47 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_48 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_49 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_4A = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_4B = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_4C = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_4D = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_4E = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_4F = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_50 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_51 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_52 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_53 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_54 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_55 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_56 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_57 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_58 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_59 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_5A = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_5B = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_5C = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_5D = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_5E = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_5F = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_60 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_61 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_62 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_63 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_64 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_65 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_66 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_67 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_68 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_69 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_6A = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_6B = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_6C = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_6D = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_6E = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_6F = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_70 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_71 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_72 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_73 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_74 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_75 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_76 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_77 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_78 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_79 = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_7A = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_7B = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_7C = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_7D = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_7E = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+    parameter INIT_7F = 256'h0000000000000000000000000000000000000000000000000000000000000000;
+
+    input wire RESET_ni;
+    input wire WEN_A1_i;
+    input wire WEN_B1_i;
+    input wire REN_A1_i;
+    input wire REN_B1_i;
+    (* clkbuf_sink *)
+    input wire CLK_A1_i;
+    (* clkbuf_sink *)
+    input wire CLK_B1_i;
+    input wire [1:0] BE_A1_i;
+    input wire [1:0] BE_B1_i;
+    input wire [14:0] ADDR_A1_i;
+    input wire [14:0] ADDR_B1_i;
+    input wire [17:0] WDATA_A1_i;
+    input wire [17:0] WDATA_B1_i;
+    output reg [17:0] RDATA_A1_o;
+    output reg [17:0] RDATA_B1_o;
+    input wire FLUSH1_i;
+    input wire WEN_A2_i;
+    input wire WEN_B2_i;
+    input wire REN_A2_i;
+    input wire REN_B2_i;
+    (* clkbuf_sink *)
+    input wire CLK_A2_i;
+    (* clkbuf_sink *)
+    input wire CLK_B2_i;
+    input wire [1:0] BE_A2_i;
+    input wire [1:0] BE_B2_i;
+    input wire [13:0] ADDR_A2_i;
+    input wire [13:0] ADDR_B2_i;
+    input wire [17:0] WDATA_A2_i;
+    input wire [17:0] WDATA_B2_i;
+    output reg [17:0] RDATA_A2_o;
+    output reg [17:0] RDATA_B2_o;
+    input wire FLUSH2_i;
+    wire EMPTY2;
+    wire EPO2;
+    wire EWM2;
+    wire FULL2;
+    wire FMO2;
+    wire FWM2;
+    wire EMPTY1;
+    wire EPO1;
+    wire EWM1;
+    wire FULL1;
+    wire FMO1;
+    wire FWM1;
+    wire UNDERRUN1;
+    wire OVERRUN1;
+    wire UNDERRUN2;
+    wire OVERRUN2;
+    wire UNDERRUN3;
+    wire OVERRUN3;
+    wire EMPTY3;
+    wire EPO3;
+    wire EWM3;
+    wire FULL3;
+    wire FMO3;
+    wire FWM3;
+    wire ram_fmode1;
+    wire ram_fmode2;
+    wire [17:0] ram_rdata_a1;
+    wire [17:0] ram_rdata_b1;
+    wire [17:0] ram_rdata_a2;
+    wire [17:0] ram_rdata_b2;
+    reg [17:0] ram_wdata_a1;
+    reg [17:0] ram_wdata_b1;
+    reg [17:0] ram_wdata_a2;
+    reg [17:0] ram_wdata_b2;
+    reg [14:0] laddr_a1;
+    reg [14:0] laddr_b1;
+    wire [13:0] ram_addr_a1;
+    wire [13:0] ram_addr_b1;
+    wire [13:0] ram_addr_a2;
+    wire [13:0] ram_addr_b2;
+    wire smux_clk_a1;
+    wire smux_clk_b1;
+    wire smux_clk_a2;
+    wire smux_clk_b2;
+    reg [1:0] ram_be_a1;
+    reg [1:0] ram_be_a2;
+    reg [1:0] ram_be_b1;
+    reg [1:0] ram_be_b2;
+    wire [2:0] ram_rmode_a1;
+    wire [2:0] ram_wmode_a1;
+    wire [2:0] ram_rmode_b1;
+    wire [2:0] ram_wmode_b1;
+    wire [2:0] ram_rmode_a2;
+    wire [2:0] ram_wmode_a2;
+    wire [2:0] ram_rmode_b2;
+    wire [2:0] ram_wmode_b2;
+    wire ram_ren_a1;
+    wire ram_ren_b1;
+    wire ram_ren_a2;
+    wire ram_ren_b2;
+    wire ram_wen_a1;
+    wire ram_wen_b1;
+    wire ram_wen_a2;
+    wire ram_wen_b2;
+    wire ren_o;
+    wire [11:0] ff_raddr;
+    wire [11:0] ff_waddr;
+    reg [35:0] fifo_rdata;
+    wire [1:0] fifo_rmode;
+    wire [1:0] fifo_wmode;
+    wire [1:0] bwl;
+    wire [17:0] pl_dout0;
+    wire [17:0] pl_dout1;
+    wire sclk_a1;
+    wire sclk_b1;
+    wire sclk_a2;
+    wire sclk_b2;
+    wire sreset;
+    wire flush1;
+    wire flush2;
+    assign sreset = RESET_ni;
+    assign flush1 = ~FLUSH1_i;
+    assign flush2 = ~FLUSH2_i;
+    assign ram_fmode1 = FMODE1_i & SPLIT_i;
+    assign ram_fmode2 = FMODE2_i & SPLIT_i;
+    assign smux_clk_a1 = CLK_A1_i;
+    assign smux_clk_b1 = (FMODE1_i ? (SYNC_FIFO1_i ? CLK_A1_i : CLK_B1_i) : CLK_B1_i);
+    assign smux_clk_a2 = (SPLIT_i ? CLK_A2_i : CLK_A1_i);
+    assign smux_clk_b2 = (SPLIT_i ? (FMODE2_i ? (SYNC_FIFO2_i ? CLK_A2_i : CLK_B2_i) : CLK_B2_i) : (FMODE1_i ? (SYNC_FIFO1_i ? CLK_A1_i : CLK_B1_i) : CLK_B1_i));
+    assign sclk_a1 = smux_clk_a1;
+    assign sclk_a2 = smux_clk_a2;
+    assign sclk_b1 = smux_clk_b1;
+    assign sclk_b2 = smux_clk_b2;
+    assign ram_ren_a1 = (SPLIT_i ? REN_A1_i : (FMODE1_i ? 0 : REN_A1_i));
+    assign ram_ren_a2 = (SPLIT_i ? REN_A2_i : (FMODE1_i ? 0 : REN_A1_i));
+    assign ram_ren_b1 = (SPLIT_i ? REN_B1_i : (FMODE1_i ? ren_o : REN_B1_i));
+    assign ram_ren_b2 = (SPLIT_i ? REN_B2_i : (FMODE1_i ? ren_o : REN_B1_i));
+    localparam MODE_36 = 3'b011;
+    assign ram_wen_a1 = (SPLIT_i ? WEN_A1_i : (FMODE1_i ? ~FULL3 & WEN_A1_i : (WMODE_A1_i == MODE_36 ? WEN_A1_i : WEN_A1_i & ~ADDR_A1_i[4])));
+    assign ram_wen_a2 = (SPLIT_i ? WEN_A2_i : (FMODE1_i ? ~FULL3 & WEN_A1_i : (WMODE_A1_i == MODE_36 ? WEN_A1_i : WEN_A1_i & ADDR_A1_i[4])));
+    assign ram_wen_b1 = (SPLIT_i ? WEN_B1_i : (WMODE_B1_i == MODE_36 ? WEN_B1_i : WEN_B1_i & ~ADDR_B1_i[4]));
+    assign ram_wen_b2 = (SPLIT_i ? WEN_B2_i : (WMODE_B1_i == MODE_36 ? WEN_B1_i : WEN_B1_i & ADDR_B1_i[4]));
+    assign ram_addr_a1 = (SPLIT_i ? ADDR_A1_i[13:0] : (FMODE1_i ? {ff_waddr[11:2], ff_waddr[0], 3'b000} : {ADDR_A1_i[14:5], ADDR_A1_i[3:0]}));
+    assign ram_addr_b1 = (SPLIT_i ? ADDR_B1_i[13:0] : (FMODE1_i ? {ff_raddr[11:2], ff_raddr[0], 3'b000} : {ADDR_B1_i[14:5], ADDR_B1_i[3:0]}));
+    assign ram_addr_a2 = (SPLIT_i ? ADDR_A2_i[13:0] : (FMODE1_i ? {ff_waddr[11:2], ff_waddr[0], 3'b000} : {ADDR_A1_i[14:5], ADDR_A1_i[3:0]}));
+    assign ram_addr_b2 = (SPLIT_i ? ADDR_B2_i[13:0] : (FMODE1_i ? {ff_raddr[11:2], ff_raddr[0], 3'b000} : {ADDR_B1_i[14:5], ADDR_B1_i[3:0]}));
+    assign bwl = (SPLIT_i ? ADDR_A1_i[4:3] : (FMODE1_i ? ff_waddr[1:0] : ADDR_A1_i[4:3]));
+    localparam MODE_18 = 3'b010;
+    localparam MODE_9 = 3'b001;
+    always @(*) begin : WDATA_SEL
+        case (SPLIT_i)
+            1: begin
+                ram_wdata_a1 = WDATA_A1_i;
+                ram_wdata_a2 = WDATA_A2_i;
+                ram_wdata_b1 = WDATA_B1_i;
+                ram_wdata_b2 = WDATA_B2_i;
+                ram_be_a2 = BE_A2_i;
+                ram_be_b2 = BE_B2_i;
+                ram_be_a1 = BE_A1_i;
+                ram_be_b1 = BE_B1_i;
+            end
+            0: begin
+                case (WMODE_A1_i)
+                    MODE_36: begin
+                        ram_wdata_a1 = WDATA_A1_i;
+                        ram_wdata_a2 = WDATA_A2_i;
+                        ram_be_a2 = (FMODE1_i ? 2'b11 : BE_A2_i);
+                        ram_be_a1 = (FMODE1_i ? 2'b11 : BE_A1_i);
+                    end
+                    MODE_18: begin
+                        ram_wdata_a1 = WDATA_A1_i;
+                        ram_wdata_a2 = WDATA_A1_i;
+                        ram_be_a1 = (FMODE1_i ? (ff_waddr[1] ? 2'b00 : 2'b11) : BE_A1_i);
+                        ram_be_a2 = (FMODE1_i ? (ff_waddr[1] ? 2'b11 : 2'b00) : BE_A1_i);
+                    end
+                    MODE_9: begin
+                        ram_wdata_a1[7:0] = WDATA_A1_i[7:0];
+                        ram_wdata_a1[16] = WDATA_A1_i[16];
+                        ram_wdata_a1[15:8] = WDATA_A1_i[7:0];
+                        ram_wdata_a1[17] = WDATA_A1_i[16];
+                        ram_wdata_a2[7:0] = WDATA_A1_i[7:0];
+                        ram_wdata_a2[16] = WDATA_A1_i[16];
+                        ram_wdata_a2[15:8] = WDATA_A1_i[7:0];
+                        ram_wdata_a2[17] = WDATA_A1_i[16];
+                        case (bwl)
+                            0: {ram_be_a2, ram_be_a1} = 4'b0001;
+                            1: {ram_be_a2, ram_be_a1} = 4'b0010;
+                            2: {ram_be_a2, ram_be_a1} = 4'b0100;
+                            3: {ram_be_a2, ram_be_a1} = 4'b1000;
+                        endcase
+                    end
+                    default: begin
+                        ram_wdata_a1 = WDATA_A1_i;
+                        ram_wdata_a2 = WDATA_A1_i;
+                        ram_be_a2 = (FMODE1_i ? 2'b11 : BE_A1_i);
+                        ram_be_a1 = (FMODE1_i ? 2'b11 : BE_A1_i);
+                    end
+                endcase
+                case (WMODE_B1_i)
+                    MODE_36: begin
+                        ram_wdata_b1 = (FMODE1_i ? 18'b000000000000000000 : WDATA_B1_i);
+                        ram_wdata_b2 = (FMODE1_i ? 18'b000000000000000000 : WDATA_B2_i);
+                        ram_be_b2 = BE_B2_i;
+                        ram_be_b1 = BE_B1_i;
+                    end
+                    MODE_18: begin
+                        ram_wdata_b1 = (FMODE1_i ? 18'b000000000000000000 : WDATA_B1_i);
+                        ram_wdata_b2 = (FMODE1_i ? 18'b000000000000000000 : WDATA_B1_i);
+                        ram_be_b1 = BE_B1_i;
+                        ram_be_b2 = BE_B1_i;
+                    end
+                    MODE_9: begin
+                        ram_wdata_b1[7:0] = WDATA_B1_i[7:0];
+                        ram_wdata_b1[16] = WDATA_B1_i[16];
+                        ram_wdata_b1[15:8] = WDATA_B1_i[7:0];
+                        ram_wdata_b1[17] = WDATA_B1_i[16];
+                        ram_wdata_b2[7:0] = WDATA_B1_i[7:0];
+                        ram_wdata_b2[16] = WDATA_B1_i[16];
+                        ram_wdata_b2[15:8] = WDATA_B1_i[7:0];
+                        ram_wdata_b2[17] = WDATA_B1_i[16];
+                        case (ADDR_B1_i[4:3])
+                            0: {ram_be_b2, ram_be_b1} = 4'b0001;
+                            1: {ram_be_b2, ram_be_b1} = 4'b0010;
+                            2: {ram_be_b2, ram_be_b1} = 4'b0100;
+                            3: {ram_be_b2, ram_be_b1} = 4'b1000;
+                        endcase
+                    end
+                    default: begin
+                        ram_wdata_b1 = (FMODE1_i ? 18'b000000000000000000 : WDATA_B1_i);
+                        ram_wdata_b2 = (FMODE1_i ? 18'b000000000000000000 : WDATA_B1_i);
+                        ram_be_b2 = BE_B1_i;
+                        ram_be_b1 = BE_B1_i;
+                    end
+                endcase
+            end
+        endcase
+    end
+    assign ram_rmode_a1 = (SPLIT_i ? (RMODE_A1_i == MODE_36 ? MODE_18 : RMODE_A1_i) : (RMODE_A1_i == MODE_36 ? MODE_18 : RMODE_A1_i));
+    assign ram_rmode_a2 = (SPLIT_i ? (RMODE_A2_i == MODE_36 ? MODE_18 : RMODE_A2_i) : (RMODE_A1_i == MODE_36 ? MODE_18 : RMODE_A1_i));
+    assign ram_wmode_a1 = (SPLIT_i ? (WMODE_A1_i == MODE_36 ? MODE_18 : WMODE_A1_i) : (WMODE_A1_i == MODE_36 ? MODE_18 : (FMODE1_i ? MODE_18 : WMODE_A1_i)));
+    assign ram_wmode_a2 = (SPLIT_i ? (WMODE_A2_i == MODE_36 ? MODE_18 : WMODE_A2_i) : (WMODE_A1_i == MODE_36 ? MODE_18 : (FMODE1_i ? MODE_18 : WMODE_A1_i)));
+    assign ram_rmode_b1 = (SPLIT_i ? (RMODE_B1_i == MODE_36 ? MODE_18 : RMODE_B1_i) : (RMODE_B1_i == MODE_36 ? MODE_18 : (FMODE1_i ? MODE_18 : RMODE_B1_i)));
+    assign ram_rmode_b2 = (SPLIT_i ? (RMODE_B2_i == MODE_36 ? MODE_18 : RMODE_B2_i) : (RMODE_B1_i == MODE_36 ? MODE_18 : (FMODE1_i ? MODE_18 : RMODE_B1_i)));
+    assign ram_wmode_b1 = (SPLIT_i ? (WMODE_B1_i == MODE_36 ? MODE_18 : WMODE_B1_i) : (WMODE_B1_i == MODE_36 ? MODE_18 : WMODE_B1_i));
+    assign ram_wmode_b2 = (SPLIT_i ? (WMODE_B2_i == MODE_36 ? MODE_18 : WMODE_B2_i) : (WMODE_B1_i == MODE_36 ? MODE_18 : WMODE_B1_i));
+    always @(*) begin : FIFO_READ_SEL
+        case (RMODE_B1_i)
+            MODE_36: fifo_rdata = {ram_rdata_b2[17:16], ram_rdata_b1[17:16], ram_rdata_b2[15:0], ram_rdata_b1[15:0]};
+            MODE_18: fifo_rdata = (ff_raddr[1] ? {18'b000000000000000000, ram_rdata_b2} : {18'b000000000000000000, ram_rdata_b1});
+            MODE_9:
+                case (ff_raddr[1:0])
+                    0: fifo_rdata = {19'b0000000000000000000, ram_rdata_b1[16], 8'b00000000, ram_rdata_b1[7:0]};
+                    1: fifo_rdata = {19'b0000000000000000000, ram_rdata_b1[17], 8'b00000000, ram_rdata_b1[15:8]};
+                    2: fifo_rdata = {19'b0000000000000000000, ram_rdata_b2[16], 8'b00000000, ram_rdata_b2[7:0]};
+                    3: fifo_rdata = {19'b0000000000000000000, ram_rdata_b2[17], 8'b00000000, ram_rdata_b2[15:8]};
+                endcase
+            default: fifo_rdata = {ram_rdata_b2, ram_rdata_b1};
+        endcase
+    end
+    localparam MODE_1 = 3'b101;
+    localparam MODE_2 = 3'b110;
+    localparam MODE_4 = 3'b100;
+    always @(*) begin : RDATA_SEL
+        case (SPLIT_i)
+            1: begin
+                RDATA_A1_o = (FMODE1_i ? {10'b0000000000, EMPTY1, EPO1, EWM1, UNDERRUN1, FULL1, FMO1, FWM1, OVERRUN1} : ram_rdata_a1);
+                RDATA_B1_o = ram_rdata_b1;
+                RDATA_A2_o = (FMODE2_i ? {10'b0000000000, EMPTY2, EPO2, EWM2, UNDERRUN2, FULL2, FMO2, FWM2, OVERRUN2} : ram_rdata_a2);
+                RDATA_B2_o = ram_rdata_b2;
+            end
+            0: begin
+                if (FMODE1_i) begin
+                    RDATA_A1_o = {10'b0000000000, EMPTY3, EPO3, EWM3, UNDERRUN3, FULL3, FMO3, FWM3, OVERRUN3};
+                    RDATA_A2_o = 18'b000000000000000000;
+                end
+                else
+                    case (RMODE_A1_i)
+                        MODE_36: begin
+                            RDATA_A1_o = {ram_rdata_a1[17:0]};
+                            RDATA_A2_o = {ram_rdata_a2[17:0]};
+                        end
+                        MODE_18: begin
+                            RDATA_A1_o = (laddr_a1[4] ? ram_rdata_a2 : ram_rdata_a1);
+                            RDATA_A2_o = 18'b000000000000000000;
+                        end
+                        MODE_9: begin
+                            RDATA_A1_o = (laddr_a1[4] ? {{2 {ram_rdata_a2[16]}}, {2 {ram_rdata_a2[7:0]}}} : {{2 {ram_rdata_a1[16]}}, {2 {ram_rdata_a1[7:0]}}});
+                            RDATA_A2_o = 18'b000000000000000000;
+                        end
+                        MODE_4: begin
+                            RDATA_A2_o = 18'b000000000000000000;
+                            RDATA_A1_o[17:4] = 14'b00000000000000;
+                            RDATA_A1_o[3:0] = (laddr_a1[4] ? ram_rdata_a2[3:0] : ram_rdata_a1[3:0]);
+                        end
+                        MODE_2: begin
+                            RDATA_A2_o = 18'b000000000000000000;
+                            RDATA_A1_o[17:2] = 16'b0000000000000000;
+                            RDATA_A1_o[1:0] = (laddr_a1[4] ? ram_rdata_a2[1:0] : ram_rdata_a1[1:0]);
+                        end
+                        MODE_1: begin
+                            RDATA_A2_o = 18'b000000000000000000;
+                            RDATA_A1_o[17:1] = 17'b00000000000000000;
+                            RDATA_A1_o[0] = (laddr_a1[4] ? ram_rdata_a2[0] : ram_rdata_a1[0]);
+                        end
+                        default: begin
+                            RDATA_A1_o = {ram_rdata_a2[1:0], ram_rdata_a1[15:0]};
+                            RDATA_A2_o = {ram_rdata_a2[17:16], ram_rdata_a1[17:16], ram_rdata_a2[15:2]};
+                        end
+                    endcase
+                case (RMODE_B1_i)
+                    MODE_36: begin
+                        RDATA_B1_o = {ram_rdata_b1};
+                        RDATA_B2_o = {ram_rdata_b2};
+                    end
+                    MODE_18: begin
+                        RDATA_B1_o = (FMODE1_i ? fifo_rdata[17:0] : (laddr_b1[4] ? ram_rdata_b2 : ram_rdata_b1));
+                        RDATA_B2_o = 18'b000000000000000000;
+                    end
+                    MODE_9: begin
+                        RDATA_B1_o = (FMODE1_i ? {fifo_rdata[17:0]} : (laddr_b1[4] ? {1'b0, ram_rdata_b2[16], 8'b00000000, ram_rdata_b2[7:0]} : {1'b0, ram_rdata_b1[16], 8'b00000000, ram_rdata_b1[7:0]}));
+                        RDATA_B2_o = 18'b000000000000000000;
+                    end
+                    MODE_4: begin
+                        RDATA_B2_o = 18'b000000000000000000;
+                        RDATA_B1_o[17:4] = 14'b00000000000000;
+                        RDATA_B1_o[3:0] = (laddr_b1[4] ? ram_rdata_b2[3:0] : ram_rdata_b1[3:0]);
+                    end
+                    MODE_2: begin
+                        RDATA_B2_o = 18'b000000000000000000;
+                        RDATA_B1_o[17:2] = 16'b0000000000000000;
+                        RDATA_B1_o[1:0] = (laddr_b1[4] ? ram_rdata_b2[1:0] : ram_rdata_b1[1:0]);
+                    end
+                    MODE_1: begin
+                        RDATA_B2_o = 18'b000000000000000000;
+                        RDATA_B1_o[17:1] = 17'b00000000000000000;
+                        RDATA_B1_o[0] = (laddr_b1[4] ? ram_rdata_b2[0] : ram_rdata_b1[0]);
+                    end
+                    default: begin
+                        RDATA_B1_o = ram_rdata_b1;
+                        RDATA_B2_o = ram_rdata_b2;
+                    end
+                endcase
+            end
+        endcase
+    end
+    always @(posedge sclk_a1 or negedge sreset)
+        if (sreset == 0)
+            laddr_a1 <= 1'sb0;
+        else
+            laddr_a1 <= ADDR_A1_i;
+    always @(posedge sclk_b1 or negedge sreset)
+        if (sreset == 0)
+            laddr_b1 <= 1'sb0;
+        else
+            laddr_b1 <= ADDR_B1_i;
+    assign fifo_wmode = ((WMODE_A1_i == MODE_36) ? 2'b00 : ((WMODE_A1_i == MODE_18) ? 2'b01 : ((WMODE_A1_i == MODE_9) ? 2'b10 : 2'b00)));
+    assign fifo_rmode = ((RMODE_B1_i == MODE_36) ? 2'b00 : ((RMODE_B1_i == MODE_18) ? 2'b01 : ((RMODE_B1_i == MODE_9) ? 2'b10 : 2'b00)));
+    fifo_ctl #(
+        .ADDR_WIDTH(12),
+        .FIFO_WIDTH(3'd4),
+        .DEPTH(7)
+    ) fifo36_ctl(
+        .rclk(sclk_b1),
+        .rst_R_n(flush1),
+        .wclk(sclk_a1),
+        .rst_W_n(flush1),
+        .ren(REN_B1_i),
+        .wen(ram_wen_a1),
+        .sync(SYNC_FIFO1_i),
+        .rmode(fifo_rmode),
+        .wmode(fifo_wmode),
+        .ren_o(ren_o),
+        .fflags({FULL3, FMO3, FWM3, OVERRUN3, EMPTY3, EPO3, EWM3, UNDERRUN3}),
+        .raddr(ff_raddr),
+        .waddr(ff_waddr),
+        .upaf(UPAF1_i),
+        .upae(UPAE1_i)
+    );
+    TDP18K_FIFO #(
+        .UPAF_i(UPAF1_i[10:0]),
+        .UPAE_i(UPAE1_i[10:0]),
+        .SYNC_FIFO_i(SYNC_FIFO1_i),
+        .POWERDN_i(POWERDN1_i),
+        .SLEEP_i(SLEEP1_i),
+        .PROTECT_i(PROTECT1_i)
+    )u1(
+        .RMODE_A_i(ram_rmode_a1),
+        .RMODE_B_i(ram_rmode_b1),
+        .WMODE_A_i(ram_wmode_a1),
+        .WMODE_B_i(ram_wmode_b1),
+        .WEN_A_i(ram_wen_a1),
+        .WEN_B_i(ram_wen_b1),
+        .REN_A_i(ram_ren_a1),
+        .REN_B_i(ram_ren_b1),
+        .CLK_A_i(sclk_a1),
+        .CLK_B_i(sclk_b1),
+        .BE_A_i(ram_be_a1),
+        .BE_B_i(ram_be_b1),
+        .ADDR_A_i(ram_addr_a1),
+        .ADDR_B_i(ram_addr_b1),
+        .WDATA_A_i(ram_wdata_a1),
+        .WDATA_B_i(ram_wdata_b1),
+        .RDATA_A_o(ram_rdata_a1),
+        .RDATA_B_o(ram_rdata_b1),
+        .EMPTY_o(EMPTY1),
+        .EPO_o(EPO1),
+        .EWM_o(EWM1),
+        .UNDERRUN_o(UNDERRUN1),
+        .FULL_o(FULL1),
+        .FMO_o(FMO1),
+        .FWM_o(FWM1),
+        .OVERRUN_o(OVERRUN1),
+        .FLUSH_ni(flush1),
+        .FMODE_i(ram_fmode1)
+    );
+    TDP18K_FIFO #(
+        .UPAF_i(UPAF2_i),
+        .UPAE_i(UPAE2_i),
+        .SYNC_FIFO_i(SYNC_FIFO2_i),
+        .POWERDN_i(POWERDN2_i),
+        .SLEEP_i(SLEEP2_i),
+        .PROTECT_i(PROTECT2_i)
+    )u2(
+        .RMODE_A_i(ram_rmode_a2),
+        .RMODE_B_i(ram_rmode_b2),
+        .WMODE_A_i(ram_wmode_a2),
+        .WMODE_B_i(ram_wmode_b2),
+        .WEN_A_i(ram_wen_a2),
+        .WEN_B_i(ram_wen_b2),
+        .REN_A_i(ram_ren_a2),
+        .REN_B_i(ram_ren_b2),
+        .CLK_A_i(sclk_a2),
+        .CLK_B_i(sclk_b2),
+        .BE_A_i(ram_be_a2),
+        .BE_B_i(ram_be_b2),
+        .ADDR_A_i(ram_addr_a2),
+        .ADDR_B_i(ram_addr_b2),
+        .WDATA_A_i(ram_wdata_a2),
+        .WDATA_B_i(ram_wdata_b2),
+        .RDATA_A_o(ram_rdata_a2),
+        .RDATA_B_o(ram_rdata_b2),
+        .EMPTY_o(EMPTY2),
+        .EPO_o(EPO2),
+        .EWM_o(EWM2),
+        .UNDERRUN_o(UNDERRUN2),
+        .FULL_o(FULL2),
+        .FMO_o(FMO2),
+        .FWM_o(FWM2),
+        .OVERRUN_o(OVERRUN2),
+        .FLUSH_ni(flush2),
+        .FMODE_i(ram_fmode2)
+    );
+endmodule
+
+module BRAM2x18_TDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1ADDR, C1DATA, C1EN, CLK1, CLK2, CLK3, CLK4, D1ADDR, D1DATA, D1EN, E1ADDR, E1DATA, E1EN, F1ADDR, F1DATA, F1EN, G1ADDR, G1DATA, G1EN, H1ADDR, H1DATA, H1EN);
+    parameter CFG_ABITS = 11;
+    parameter CFG_DBITS = 18;
+    parameter CFG_ENABLE_B = 4;
+    parameter CFG_ENABLE_D = 4;
+    parameter CFG_ENABLE_F = 4;
+    parameter CFG_ENABLE_H = 4;
+
+    parameter CLKPOL2 = 1;
+    parameter CLKPOL3 = 1;
+    parameter [18431:0] INIT0 = 18432'bx;
+    parameter [18431:0] INIT1 = 18432'bx;
+
+    localparam MODE_36 = 3'b011; // 36- or 32-bit
+    localparam MODE_18 = 3'b010; // 18- or 16-bit
+    localparam MODE_9 = 3'b001; // 9- or 8-bit
+    localparam MODE_4 = 3'b100; // 4-bit
+    localparam MODE_2 = 3'b110; // 2-bit
+    localparam MODE_1 = 3'b101; // 1-bit
+
+    input CLK1;
+    input CLK2;
+    input CLK3;
+    input CLK4;
+
+    input [CFG_ABITS-1:0] A1ADDR;
+    output [CFG_DBITS-1:0] A1DATA;
+    input A1EN;
+
+    input [CFG_ABITS-1:0] B1ADDR;
+    input [CFG_DBITS-1:0] B1DATA;
+    input [CFG_ENABLE_B-1:0] B1EN;
+
+    input [CFG_ABITS-1:0] C1ADDR;
+    output [CFG_DBITS-1:0] C1DATA;
+    input C1EN;
+
+    input [CFG_ABITS-1:0] D1ADDR;
+    input [CFG_DBITS-1:0] D1DATA;
+    input [CFG_ENABLE_D-1:0] D1EN;
+
+    input [CFG_ABITS-1:0] E1ADDR;
+    output [CFG_DBITS-1:0] E1DATA;
+    input E1EN;
+
+    input [CFG_ABITS-1:0] F1ADDR;
+    input [CFG_DBITS-1:0] F1DATA;
+    input [CFG_ENABLE_F-1:0] F1EN;
+
+    input [CFG_ABITS-1:0] G1ADDR;
+    output [CFG_DBITS-1:0] G1DATA;
+    input G1EN;
+
+    input [CFG_ABITS-1:0] H1ADDR;
+    input [CFG_DBITS-1:0] H1DATA;
+    input [CFG_ENABLE_H-1:0] H1EN;
+
+    wire FLUSH1;
+    wire FLUSH2;
+    wire SPLIT;
+
+    wire [13:CFG_ABITS] A1ADDR_CMPL = {14-CFG_ABITS{1'b0}};
+    wire [13:CFG_ABITS] B1ADDR_CMPL = {14-CFG_ABITS{1'b0}};
+    wire [13:CFG_ABITS] C1ADDR_CMPL = {14-CFG_ABITS{1'b0}};
+    wire [13:CFG_ABITS] D1ADDR_CMPL = {14-CFG_ABITS{1'b0}};
+    wire [13:CFG_ABITS] E1ADDR_CMPL = {14-CFG_ABITS{1'b0}};
+    wire [13:CFG_ABITS] F1ADDR_CMPL = {14-CFG_ABITS{1'b0}};
+    wire [13:CFG_ABITS] G1ADDR_CMPL = {14-CFG_ABITS{1'b0}};
+    wire [13:CFG_ABITS] H1ADDR_CMPL = {14-CFG_ABITS{1'b0}};
+
+    wire [13:0] A1ADDR_TOTAL = {A1ADDR_CMPL, A1ADDR};
+    wire [13:0] B1ADDR_TOTAL = {B1ADDR_CMPL, B1ADDR};
+    wire [13:0] C1ADDR_TOTAL = {C1ADDR_CMPL, C1ADDR};
+    wire [13:0] D1ADDR_TOTAL = {D1ADDR_CMPL, D1ADDR};
+    wire [13:0] E1ADDR_TOTAL = {E1ADDR_CMPL, E1ADDR};
+    wire [13:0] F1ADDR_TOTAL = {F1ADDR_CMPL, F1ADDR};
+    wire [13:0] G1ADDR_TOTAL = {G1ADDR_CMPL, G1ADDR};
+    wire [13:0] H1ADDR_TOTAL = {H1ADDR_CMPL, H1ADDR};
+
+    wire [17:CFG_DBITS] A1_RDATA_CMPL;
+    wire [17:CFG_DBITS] C1_RDATA_CMPL;
+    wire [17:CFG_DBITS] E1_RDATA_CMPL;
+    wire [17:CFG_DBITS] G1_RDATA_CMPL;
+
+    wire [17:CFG_DBITS] B1_WDATA_CMPL;
+    wire [17:CFG_DBITS] D1_WDATA_CMPL;
+    wire [17:CFG_DBITS] F1_WDATA_CMPL;
+    wire [17:CFG_DBITS] H1_WDATA_CMPL;
+
+    wire [13:0] PORT_A1_ADDR;
+    wire [13:0] PORT_A2_ADDR;
+    wire [13:0] PORT_B1_ADDR;
+    wire [13:0] PORT_B2_ADDR;
+
+    case (CFG_DBITS)
+        1: begin
+            assign PORT_A1_ADDR = A1EN ? A1ADDR_TOTAL : (B1EN ? B1ADDR_TOTAL : 14'd0);
+            assign PORT_B1_ADDR = C1EN ? C1ADDR_TOTAL : (D1EN ? D1ADDR_TOTAL : 14'd0);
+            assign PORT_A2_ADDR = E1EN ? E1ADDR_TOTAL : (F1EN ? F1ADDR_TOTAL : 14'd0);
+            assign PORT_B2_ADDR = G1EN ? G1ADDR_TOTAL : (H1EN ? H1ADDR_TOTAL : 14'd0);
+            defparam bram_2x18k.MODE_BITS = { 1'b1,
+                11'd10, 11'd10, 4'd0, MODE_1, MODE_1, MODE_1, MODE_1, 1'd0,
+                12'd10, 12'd10, 4'd0, MODE_1, MODE_1, MODE_1, MODE_1, 1'd0
+            };
+        end
+
+        2: begin
+            assign PORT_A1_ADDR = A1EN ? (A1ADDR_TOTAL << 1) : (B1EN ? (B1ADDR_TOTAL << 1) : 14'd0);
+            assign PORT_B1_ADDR = C1EN ? (C1ADDR_TOTAL << 1) : (D1EN ? (D1ADDR_TOTAL << 1) : 14'd0);
+            assign PORT_A2_ADDR = E1EN ? (E1ADDR_TOTAL << 1) : (F1EN ? (F1ADDR_TOTAL << 1) : 14'd0);
+            assign PORT_B2_ADDR = G1EN ? (G1ADDR_TOTAL << 1) : (H1EN ? (H1ADDR_TOTAL << 1) : 14'd0);
+            defparam bram_2x18k.MODE_BITS = { 1'b1,
+                11'd10, 11'd10, 4'd0, MODE_2, MODE_2, MODE_2, MODE_2, 1'd0,
+                12'd10, 12'd10, 4'd0, MODE_2, MODE_2, MODE_2, MODE_2, 1'd0
+            };
+        end
+
+        4: begin
+            assign PORT_A1_ADDR = A1EN ? (A1ADDR_TOTAL << 2) : (B1EN ? (B1ADDR_TOTAL << 2) : 14'd0);
+            assign PORT_B1_ADDR = C1EN ? (C1ADDR_TOTAL << 2) : (D1EN ? (D1ADDR_TOTAL << 2) : 14'd0);
+            assign PORT_A2_ADDR = E1EN ? (E1ADDR_TOTAL << 2) : (F1EN ? (F1ADDR_TOTAL << 2) : 14'd0);
+            assign PORT_B2_ADDR = G1EN ? (G1ADDR_TOTAL << 2) : (H1EN ? (H1ADDR_TOTAL << 2) : 14'd0);
+            defparam bram_2x18k.MODE_BITS = { 1'b1,
+                11'd10, 11'd10, 4'd0, MODE_4, MODE_4, MODE_4, MODE_4, 1'd0,
+                12'd10, 12'd10, 4'd0, MODE_4, MODE_4, MODE_4, MODE_4, 1'd0
+            };
+        end
+
+        8, 9: begin
+            assign PORT_A1_ADDR = A1EN ? (A1ADDR_TOTAL << 3) : (B1EN ? (B1ADDR_TOTAL << 3) : 14'd0);
+            assign PORT_B1_ADDR = C1EN ? (C1ADDR_TOTAL << 3) : (D1EN ? (D1ADDR_TOTAL << 3) : 14'd0);
+            assign PORT_A2_ADDR = E1EN ? (E1ADDR_TOTAL << 3) : (F1EN ? (F1ADDR_TOTAL << 3) : 14'd0);
+            assign PORT_B2_ADDR = G1EN ? (G1ADDR_TOTAL << 3) : (H1EN ? (H1ADDR_TOTAL << 3) : 14'd0);
+            defparam bram_2x18k.MODE_BITS = { 1'b1,
+                11'd10, 11'd10, 4'd0, MODE_9, MODE_9, MODE_9, MODE_9, 1'd0,
+                12'd10, 12'd10, 4'd0, MODE_9, MODE_9, MODE_9, MODE_9, 1'd0
+            };
+        end
+
+        16, 18: begin
+            assign PORT_A1_ADDR = A1EN ? (A1ADDR_TOTAL << 4) : (B1EN ? (B1ADDR_TOTAL << 4) : 14'd0);
+            assign PORT_B1_ADDR = C1EN ? (C1ADDR_TOTAL << 4) : (D1EN ? (D1ADDR_TOTAL << 4) : 14'd0);
+            assign PORT_A2_ADDR = E1EN ? (E1ADDR_TOTAL << 4) : (F1EN ? (F1ADDR_TOTAL << 4) : 14'd0);
+            assign PORT_B2_ADDR = G1EN ? (G1ADDR_TOTAL << 4) : (H1EN ? (H1ADDR_TOTAL << 4) : 14'd0);
+            defparam bram_2x18k.MODE_BITS = { 1'b1,
+                11'd10, 11'd10, 4'd0, MODE_18, MODE_18, MODE_18, MODE_18, 1'd0,
+                12'd10, 12'd10, 4'd0, MODE_18, MODE_18, MODE_18, MODE_18, 1'd0
+            };
+        end
+
+        default: begin
+            assign PORT_A1_ADDR = A1EN ? A1ADDR_TOTAL : (B1EN ? B1ADDR_TOTAL : 14'd0);
+            assign PORT_B1_ADDR = C1EN ? C1ADDR_TOTAL : (D1EN ? D1ADDR_TOTAL : 14'd0);
+            assign PORT_A2_ADDR = E1EN ? E1ADDR_TOTAL : (F1EN ? F1ADDR_TOTAL : 14'd0);
+            assign PORT_B2_ADDR = G1EN ? G1ADDR_TOTAL : (H1EN ? H1ADDR_TOTAL : 14'd0);
+            defparam bram_2x18k.MODE_BITS = { 1'b1,
+                11'd10, 11'd10, 4'd0, MODE_36, MODE_36, MODE_36, MODE_36, 1'd0,
+                12'd10, 12'd10, 4'd0, MODE_36, MODE_36, MODE_36, MODE_36, 1'd0
+            };
+        end
+    endcase
+
+    assign FLUSH1 = 1'b0;
+    assign FLUSH2 = 1'b0;
+
+    wire [17:0] PORT_A1_RDATA = {A1_RDATA_CMPL, A1DATA};
+    wire [17:0] PORT_B1_RDATA = {C1_RDATA_CMPL, C1DATA};
+    wire [17:0] PORT_A2_RDATA = {E1_RDATA_CMPL, E1DATA};
+    wire [17:0] PORT_B2_RDATA = {G1_RDATA_CMPL, G1DATA};
+
+    wire [17:0] PORT_A1_WDATA = {B1_WDATA_CMPL, B1DATA};
+    wire [17:0] PORT_B1_WDATA = {D1_WDATA_CMPL, D1DATA};
+    wire [17:0] PORT_A2_WDATA = {F1_WDATA_CMPL, F1DATA};
+    wire [17:0] PORT_B2_WDATA = {H1_WDATA_CMPL, H1DATA};
+
+    wire PORT_A1_CLK = CLK1;
+    wire PORT_A2_CLK = CLK3;
+    wire PORT_B1_CLK = CLK2;
+    wire PORT_B2_CLK = CLK4;
+
+    wire PORT_A1_REN = A1EN;
+    wire PORT_A1_WEN = B1EN[0];
+    wire [CFG_ENABLE_B-1:0] PORT_A1_BE = {B1EN[1],B1EN[0]};
+
+    wire PORT_A2_REN = E1EN;
+    wire PORT_A2_WEN = F1EN[0];
+    wire [CFG_ENABLE_F-1:0] PORT_A2_BE = {F1EN[1],F1EN[0]};
+
+    wire PORT_B1_REN = C1EN;
+    wire PORT_B1_WEN = D1EN[0];
+    wire [CFG_ENABLE_D-1:0] PORT_B1_BE = {D1EN[1],D1EN[0]};
+
+    wire PORT_B2_REN = G1EN;
+    wire PORT_B2_WEN = H1EN[0];
+    wire [CFG_ENABLE_H-1:0] PORT_B2_BE = {H1EN[1],H1EN[0]};
+
+    TDP36K bram_2x18k (
+        .WDATA_A1_i(PORT_A1_WDATA),
+        .RDATA_A1_o(PORT_A1_RDATA),
+        .ADDR_A1_i(PORT_A1_ADDR),
+        .CLK_A1_i(PORT_A1_CLK),
+        .REN_A1_i(PORT_A1_REN),
+        .WEN_A1_i(PORT_A1_WEN),
+        .BE_A1_i(PORT_A1_BE),
+
+        .WDATA_A2_i(PORT_A2_WDATA),
+        .RDATA_A2_o(PORT_A2_RDATA),
+        .ADDR_A2_i(PORT_A2_ADDR),
+        .CLK_A2_i(PORT_A2_CLK),
+        .REN_A2_i(PORT_A2_REN),
+        .WEN_A2_i(PORT_A2_WEN),
+        .BE_A2_i(PORT_A2_BE),
+
+        .WDATA_B1_i(PORT_B1_WDATA),
+        .RDATA_B1_o(PORT_B1_RDATA),
+        .ADDR_B1_i(PORT_B1_ADDR),
+        .CLK_B1_i(PORT_B1_CLK),
+        .REN_B1_i(PORT_B1_REN),
+        .WEN_B1_i(PORT_B1_WEN),
+        .BE_B1_i(PORT_B1_BE),
+
+        .WDATA_B2_i(PORT_B2_WDATA),
+        .RDATA_B2_o(PORT_B2_RDATA),
+        .ADDR_B2_i(PORT_B2_ADDR),
+        .CLK_B2_i(PORT_B2_CLK),
+        .REN_B2_i(PORT_B2_REN),
+        .WEN_B2_i(PORT_B2_WEN),
+        .BE_B2_i(PORT_B2_BE),
+
+        .FLUSH1_i(FLUSH1),
+        .FLUSH2_i(FLUSH2)
+    );
+endmodule
+
+module BRAM2x18_SDP (A1ADDR, A1DATA, A1EN, B1ADDR, B1DATA, B1EN, C1ADDR, C1DATA, C1EN, CLK1, CLK2, D1ADDR, D1DATA, D1EN);
+    parameter CFG_ABITS = 11;
+    parameter CFG_DBITS = 18;
+    parameter CFG_ENABLE_B = 4;
+    parameter CFG_ENABLE_D = 4;
+
+    parameter CLKPOL2 = 1;
+    parameter CLKPOL3 = 1;
+    parameter [18431:0] INIT0 = 18432'bx;
+    parameter [18431:0] INIT1 = 18432'bx;
+
+    localparam MODE_36 = 3'b011; // 36- or 32-bit
+    localparam MODE_18 = 3'b010; // 18- or 16-bit
+    localparam MODE_9 = 3'b001; // 9- or 8-bit
+    localparam MODE_4 = 3'b100; // 4-bit
+    localparam MODE_2 = 3'b110; // 2-bit
+    localparam MODE_1 = 3'b101; // 1-bit
+
+    input CLK1;
+    input CLK2;
+
+    input [CFG_ABITS-1:0] A1ADDR;
+    output [CFG_DBITS-1:0] A1DATA;
+    input A1EN;
+
+    input [CFG_ABITS-1:0] B1ADDR;
+    input [CFG_DBITS-1:0] B1DATA;
+    input [CFG_ENABLE_B-1:0] B1EN;
+
+    input [CFG_ABITS-1:0] C1ADDR;
+    output [CFG_DBITS-1:0] C1DATA;
+    input C1EN;
+
+    input [CFG_ABITS-1:0] D1ADDR;
+    input [CFG_DBITS-1:0] D1DATA;
+    input [CFG_ENABLE_D-1:0] D1EN;
+
+    wire FLUSH1;
+    wire FLUSH2;
+
+    wire [13:CFG_ABITS] A1ADDR_CMPL = {14-CFG_ABITS{1'b0}};
+    wire [13:CFG_ABITS] B1ADDR_CMPL = {14-CFG_ABITS{1'b0}};
+    wire [13:CFG_ABITS] C1ADDR_CMPL = {14-CFG_ABITS{1'b0}};
+    wire [13:CFG_ABITS] D1ADDR_CMPL = {14-CFG_ABITS{1'b0}};
+
+    wire [13:0] A1ADDR_TOTAL = {A1ADDR_CMPL, A1ADDR};
+    wire [13:0] B1ADDR_TOTAL = {B1ADDR_CMPL, B1ADDR};
+    wire [13:0] C1ADDR_TOTAL = {C1ADDR_CMPL, C1ADDR};
+    wire [13:0] D1ADDR_TOTAL = {D1ADDR_CMPL, D1ADDR};
+
+    wire [17:CFG_DBITS] A1_RDATA_CMPL;
+    wire [17:CFG_DBITS] C1_RDATA_CMPL;
+
+    wire [17:CFG_DBITS] B1_WDATA_CMPL;
+    wire [17:CFG_DBITS] D1_WDATA_CMPL;
+
+    wire [13:0] PORT_A1_ADDR;
+    wire [13:0] PORT_A2_ADDR;
+    wire [13:0] PORT_B1_ADDR;
+    wire [13:0] PORT_B2_ADDR;
+
+    case (CFG_DBITS)
+        1: begin
+            assign PORT_A1_ADDR = A1ADDR_TOTAL;
+            assign PORT_B1_ADDR = B1ADDR_TOTAL;
+            assign PORT_A2_ADDR = C1ADDR_TOTAL;
+            assign PORT_B2_ADDR = D1ADDR_TOTAL;
+            defparam bram_2x18k.MODE_BITS = { 1'b1,
+                11'd10, 11'd10, 4'd0, MODE_1, MODE_1, MODE_1, MODE_1, 1'd0,
+                12'd10, 12'd10, 4'd0, MODE_1, MODE_1, MODE_1, MODE_1, 1'd0
+            };
+        end
+
+        2: begin
+            assign PORT_A1_ADDR = A1ADDR_TOTAL << 1;
+            assign PORT_B1_ADDR = B1ADDR_TOTAL << 1;
+            assign PORT_A2_ADDR = C1ADDR_TOTAL << 1;
+            assign PORT_B2_ADDR = D1ADDR_TOTAL << 1;
+            defparam bram_2x18k.MODE_BITS = { 1'b1,
+                11'd10, 11'd10, 4'd0, MODE_2, MODE_2, MODE_2, MODE_2, 1'd0,
+                12'd10, 12'd10, 4'd0, MODE_2, MODE_2, MODE_2, MODE_2, 1'd0
+            };
+        end
+
+        4: begin
+            assign PORT_A1_ADDR = A1ADDR_TOTAL << 2;
+            assign PORT_B1_ADDR = B1ADDR_TOTAL << 2;
+            assign PORT_A2_ADDR = C1ADDR_TOTAL << 2;
+            assign PORT_B2_ADDR = D1ADDR_TOTAL << 2;
+            defparam bram_2x18k.MODE_BITS = { 1'b1,
+                11'd10, 11'd10, 4'd0, MODE_4, MODE_4, MODE_4, MODE_4, 1'd0,
+                12'd10, 12'd10, 4'd0, MODE_4, MODE_4, MODE_4, MODE_4, 1'd0
+            };
+        end
+
+        8, 9: begin
+            assign PORT_A1_ADDR = A1ADDR_TOTAL << 3;
+            assign PORT_B1_ADDR = B1ADDR_TOTAL << 3;
+            assign PORT_A2_ADDR = C1ADDR_TOTAL << 3;
+            assign PORT_B2_ADDR = D1ADDR_TOTAL << 3;
+            defparam bram_2x18k.MODE_BITS = { 1'b1,
+                11'd10, 11'd10, 4'd0, MODE_9, MODE_9, MODE_9, MODE_9, 1'd0,
+                12'd10, 12'd10, 4'd0, MODE_9, MODE_9, MODE_9, MODE_9, 1'd0
+            };
+        end
+
+        16, 18: begin
+            assign PORT_A1_ADDR = A1ADDR_TOTAL << 4;
+            assign PORT_B1_ADDR = B1ADDR_TOTAL << 4;
+            assign PORT_A2_ADDR = C1ADDR_TOTAL << 4;
+            assign PORT_B2_ADDR = D1ADDR_TOTAL << 4;
+            defparam bram_2x18k.MODE_BITS = { 1'b1,
+                11'd10, 11'd10, 4'd0, MODE_18, MODE_18, MODE_18, MODE_18, 1'd0,
+                12'd10, 12'd10, 4'd0, MODE_18, MODE_18, MODE_18, MODE_18, 1'd0
+            };
+        end
+
+        default: begin
+            assign PORT_A1_ADDR = A1ADDR_TOTAL;
+            assign PORT_B1_ADDR = B1ADDR_TOTAL;
+            assign PORT_A2_ADDR = D1ADDR_TOTAL;
+            assign PORT_B2_ADDR = C1ADDR_TOTAL;
+            defparam bram_2x18k.MODE_BITS = { 1'b1,
+                11'd10, 11'd10, 4'd0, MODE_36, MODE_36, MODE_36, MODE_36, 1'd0,
+                12'd10, 12'd10, 4'd0, MODE_36, MODE_36, MODE_36, MODE_36, 1'd0
+            };
+        end
+    endcase
+
+    assign FLUSH1 = 1'b0;
+    assign FLUSH2 = 1'b0;
+
+    wire [17:0] PORT_A1_RDATA;
+    wire [17:0] PORT_B1_RDATA;
+    wire [17:0] PORT_A2_RDATA;
+    wire [17:0] PORT_B2_RDATA;
+
+    wire [17:0] PORT_A1_WDATA;
+    wire [17:0] PORT_B1_WDATA;
+    wire [17:0] PORT_A2_WDATA;
+    wire [17:0] PORT_B2_WDATA;
+
+    // Assign read/write data - handle special case for 9bit mode
+    // parity bit for 9bit mode is placed in R/W port on bit #16
+    case (CFG_DBITS)
+        9: begin
+            assign A1DATA = {PORT_A1_RDATA[16], PORT_A1_RDATA[7:0]};
+            assign C1DATA = {PORT_A2_RDATA[16], PORT_A2_RDATA[7:0]};
+            assign PORT_A1_WDATA = {18{1'b0}};
+            assign PORT_B1_WDATA = {B1_WDATA_CMPL[17], B1DATA[8], B1_WDATA_CMPL[16:9], B1DATA[7:0]};
+            assign PORT_A2_WDATA = {18{1'b0}};
+            assign PORT_B2_WDATA = {D1_WDATA_CMPL[17], D1DATA[8], D1_WDATA_CMPL[16:9], D1DATA[7:0]};
+        end
+        default: begin
+            assign A1DATA = PORT_A1_RDATA[CFG_DBITS-1:0];
+            assign C1DATA = PORT_A2_RDATA[CFG_DBITS-1:0];
+            assign PORT_A1_WDATA = {18{1'b1}};
+            assign PORT_B1_WDATA = {B1_WDATA_CMPL, B1DATA};
+            assign PORT_A2_WDATA = {18{1'b1}};
+            assign PORT_B2_WDATA = {D1_WDATA_CMPL, D1DATA};
+
+        end
+    endcase
+
+    wire PORT_A1_CLK = CLK1;
+    wire PORT_A2_CLK = CLK2;
+    wire PORT_B1_CLK = CLK1;
+    wire PORT_B2_CLK = CLK2;
+
+    wire PORT_A1_REN = A1EN;
+    wire PORT_A1_WEN = 1'b0;
+    wire [CFG_ENABLE_B-1:0] PORT_A1_BE = {PORT_A1_WEN,PORT_A1_WEN};
+
+    wire PORT_A2_REN = C1EN;
+    wire PORT_A2_WEN = 1'b0;
+    wire [CFG_ENABLE_D-1:0] PORT_A2_BE = {PORT_A2_WEN,PORT_A2_WEN};
+
+    wire PORT_B1_REN = 1'b0;
+    wire PORT_B1_WEN = B1EN[0];
+    wire [CFG_ENABLE_B-1:0] PORT_B1_BE = {B1EN[1],B1EN[0]};
+
+    wire PORT_B2_REN = 1'b0;
+    wire PORT_B2_WEN = D1EN[0];
+    wire [CFG_ENABLE_D-1:0] PORT_B2_BE = {D1EN[1],D1EN[0]};
+
+    TDP36K  bram_2x18k (
+        .WDATA_A1_i(PORT_A1_WDATA),
+        .RDATA_A1_o(PORT_A1_RDATA),
+        .ADDR_A1_i(PORT_A1_ADDR),
+        .CLK_A1_i(PORT_A1_CLK),
+        .REN_A1_i(PORT_A1_REN),
+        .WEN_A1_i(PORT_A1_WEN),
+        .BE_A1_i(PORT_A1_BE),
+
+        .WDATA_A2_i(PORT_A2_WDATA),
+        .RDATA_A2_o(PORT_A2_RDATA),
+        .ADDR_A2_i(PORT_A2_ADDR),
+        .CLK_A2_i(PORT_A2_CLK),
+        .REN_A2_i(PORT_A2_REN),
+        .WEN_A2_i(PORT_A2_WEN),
+        .BE_A2_i(PORT_A2_BE),
+
+        .WDATA_B1_i(PORT_B1_WDATA),
+        .RDATA_B1_o(PORT_B1_RDATA),
+        .ADDR_B1_i(PORT_B1_ADDR),
+        .CLK_B1_i(PORT_B1_CLK),
+        .REN_B1_i(PORT_B1_REN),
+        .WEN_B1_i(PORT_B1_WEN),
+        .BE_B1_i(PORT_B1_BE),
+
+        .WDATA_B2_i(PORT_B2_WDATA),
+        .RDATA_B2_o(PORT_B2_RDATA),
+        .ADDR_B2_i(PORT_B2_ADDR),
+        .CLK_B2_i(PORT_B2_CLK),
+        .REN_B2_i(PORT_B2_REN),
+        .WEN_B2_i(PORT_B2_WEN),
+        .BE_B2_i(PORT_B2_BE),
+
+        .FLUSH1_i(FLUSH1),
+        .FLUSH2_i(FLUSH2)
+    );
+endmodule
+
+module \_$_mem_v2_asymmetric (RD_ADDR, RD_ARST, RD_CLK, RD_DATA, RD_EN, RD_SRST, WR_ADDR, WR_CLK, WR_DATA, WR_EN);
+    localparam CFG_ABITS = 10;
+    localparam CFG_DBITS = 36;
+    localparam CFG_ENABLE_B = 4;
+
+    localparam CLKPOL2 = 1;
+    localparam CLKPOL3 = 1;
+
+    parameter READ_ADDR_WIDTH = 11;
+    parameter READ_DATA_WIDTH = 16;
+    parameter WRITE_ADDR_WIDTH = 10;
+    parameter WRITE_DATA_WIDTH = 32;
+    parameter ABITS = 0;
+    parameter MEMID = 0;
+    parameter [36863:0] INIT = 36864'bx;
+    parameter OFFSET = 0;
+    parameter RD_ARST_VALUE = 0;
+    parameter RD_CE_OVER_SRST = 0;
+    parameter RD_CLK_ENABLE = 0;
+    parameter RD_CLK_POLARITY = 0;
+    parameter RD_COLLISION_X_MASK = 0;
+    parameter RD_INIT_VALUE = 0;
+    parameter RD_PORTS = 0;
+    parameter RD_SRST_VALUE = 0;
+    parameter RD_TRANSPARENCY_MASK = 0;
+    parameter RD_WIDE_CONTINUATION = 0;
+    parameter SIZE = 0;
+    parameter WIDTH = 0;
+    parameter WR_CLK_ENABLE = 0;
+    parameter WR_CLK_POLARITY = 0;
+    parameter WR_PORTS = 0;
+    parameter WR_PRIORITY_MASK = 0;
+    parameter WR_WIDE_CONTINUATION = 0;
+
+    localparam MODE_36  = 3'b111;   // 36 or 32-bit
+    localparam MODE_18  = 3'b110;   // 18 or 16-bit
+    localparam MODE_9   = 3'b101;   // 9 or 8-bit
+    localparam MODE_4   = 3'b100;   // 4-bit
+    localparam MODE_2   = 3'b010;   // 32-bit
+    localparam MODE_1   = 3'b001;   // 32-bit
+
+    input RD_CLK;
+    input WR_CLK;
+    input RD_ARST;
+    input RD_SRST;
+
+    input [CFG_ABITS-1:0] RD_ADDR;
+    output [CFG_DBITS-1:0] RD_DATA;
+    input RD_EN;
+
+    input [CFG_ABITS-1:0] WR_ADDR;
+    input [CFG_DBITS-1:0] WR_DATA;
+    input [CFG_ENABLE_B-1:0] WR_EN;
+
+    wire [14:0] RD_ADDR_15;
+    wire [14:0] WR_ADDR_15;
+
+    wire [35:0] DOBDO;
+
+    wire [14:CFG_ABITS] RD_ADDR_CMPL;
+    wire [14:CFG_ABITS] WR_ADDR_CMPL;
+    wire [35:CFG_DBITS] RD_DATA_CMPL;
+    wire [35:CFG_DBITS] WR_DATA_CMPL;
+
+    wire [14:0] RD_ADDR_TOTAL;
+    wire [14:0] WR_ADDR_TOTAL;
+    wire [35:0] RD_DATA_TOTAL;
+    wire [35:0] WR_DATA_TOTAL;
+
+    wire FLUSH1;
+    wire FLUSH2;
+
+    assign RD_ADDR_CMPL = {15-CFG_ABITS{1'b0}};
+    assign WR_ADDR_CMPL = {15-CFG_ABITS{1'b0}};
+
+    assign RD_ADDR_TOTAL = {RD_ADDR_CMPL, RD_ADDR};
+    assign WR_ADDR_TOTAL = {WR_ADDR_CMPL, WR_ADDR};
+
+    assign RD_DATA_TOTAL = {RD_DATA_CMPL, RD_DATA};
+    assign WR_DATA_TOTAL = {WR_DATA_CMPL, WR_DATA};
+
+    case (CFG_DBITS)
+        1: begin
+            assign RD_ADDR_15 = RD_ADDR_TOTAL;
+            assign WR_ADDR_15 = WR_ADDR_TOTAL;
+            defparam bram_asymmetric.MODE_BITS = { 1'b0,
+                11'd10, 11'd10, 4'd0, MODE_1, MODE_1, MODE_1, MODE_1, 1'd0,
+                12'd10, 12'd10, 4'd0, MODE_1, MODE_1, MODE_1, MODE_1, 1'd0
+            };
+        end
+
+        2: begin
+            assign RD_ADDR_15 = RD_ADDR_TOTAL << 1;
+            assign WR_ADDR_15 = WR_ADDR_TOTAL << 1;
+            defparam bram_asymmetric.MODE_BITS = { 1'b0,
+                11'd10, 11'd10, 4'd0, MODE_2, MODE_2, MODE_2, MODE_2, 1'd0,
+                12'd10, 12'd10, 4'd0, MODE_2, MODE_2, MODE_2, MODE_2, 1'd0
+            };
+        end
+
+        4: begin
+            assign RD_ADDR_15 = RD_ADDR_TOTAL << 2;
+            assign WR_ADDR_15 = WR_ADDR_TOTAL << 2;
+            defparam bram_asymmetric.MODE_BITS = { 1'b0,
+                11'd10, 11'd10, 4'd0, MODE_4, MODE_4, MODE_4, MODE_4, 1'd0,
+                12'd10, 12'd10, 4'd0, MODE_4, MODE_4, MODE_4, MODE_4, 1'd0
+            };
+        end
+        8, 9: begin
+            assign RD_ADDR_15 = RD_ADDR_TOTAL << 3;
+            assign WR_ADDR_15 = WR_ADDR_TOTAL << 3;
+            defparam bram_asymmetric.MODE_BITS = { 1'b0,
+                11'd10, 11'd10, 4'd0, MODE_9, MODE_9, MODE_9, MODE_9, 1'd0,
+                12'd10, 12'd10, 4'd0, MODE_9, MODE_9, MODE_9, MODE_9, 1'd0
+            };
+        end
+
+        16, 18: begin
+            assign RD_ADDR_15 = RD_ADDR_TOTAL << 4;
+            assign WR_ADDR_15 = WR_ADDR_TOTAL << 4;
+            defparam bram_asymmetric.MODE_BITS = { 1'b0,
+                11'd10, 11'd10, 4'd0, MODE_18, MODE_18, MODE_18, MODE_18, 1'd0,
+                12'd10, 12'd10, 4'd0, MODE_18, MODE_18, MODE_18, MODE_18, 1'd0
+            };
+        end
+        32, 36: begin
+            assign RD_ADDR_15 = RD_ADDR_TOTAL << 5;
+            assign WR_ADDR_15 = WR_ADDR_TOTAL << 5;
+            defparam bram_asymmetric.MODE_BITS = { 1'b0,
+                11'd10, 11'd10, 4'd0, MODE_36, MODE_36, MODE_36, MODE_36, 1'd0,
+                12'd10, 12'd10, 4'd0, MODE_36, MODE_36, MODE_36, MODE_36, 1'd0
+            };
+        end
+        default: begin
+            assign RD_ADDR_15 = RD_ADDR_TOTAL;
+            assign WR_ADDR_15 = WR_ADDR_TOTAL;
+            defparam bram_asymmetric.MODE_BITS = { 1'b0,
+                11'd10, 11'd10, 4'd0, MODE_36, MODE_36, MODE_36, MODE_36, 1'd0,
+                12'd10, 12'd10, 4'd0, MODE_36, MODE_36, MODE_36, MODE_36, 1'd0
+            };
+        end
+    endcase
+
+    assign FLUSH1 = 1'b0;
+    assign FLUSH2 = 1'b0;
+
+    TDP36K bram_asymmetric (
+        .RESET_ni(1'b1),
+        .WDATA_A1_i(18'h3FFFF),
+        .WDATA_A2_i(18'h3FFFF),
+        .RDATA_A1_o(RD_DATA_TOTAL[17:0]),
+        .RDATA_A2_o(RD_DATA_TOTAL[35:18]),
+        .ADDR_A1_i(RD_ADDR_15),
+        .ADDR_A2_i(RD_ADDR_15),
+        .CLK_A1_i(RD_CLK),
+        .CLK_A2_i(RD_CLK),
+        .REN_A1_i(RD_EN),
+        .REN_A2_i(RD_EN),
+        .WEN_A1_i(1'b0),
+        .WEN_A2_i(1'b0),
+        .BE_A1_i({RD_EN, RD_EN}),
+        .BE_A2_i({RD_EN, RD_EN}),
+
+        .WDATA_B1_i(WR_DATA[17:0]),
+        .WDATA_B2_i(WR_DATA[35:18]),
+        .RDATA_B1_o(DOBDO[17:0]),
+        .RDATA_B2_o(DOBDO[35:18]),
+        .ADDR_B1_i(WR_ADDR_15),
+        .ADDR_B2_i(WR_ADDR_15),
+        .CLK_B1_i(WR_CLK),
+        .CLK_B2_i(WR_CLK),
+        .REN_B1_i(1'b0),
+        .REN_B2_i(1'b0),
+        .WEN_B1_i(WR_EN[0]),
+        .WEN_B2_i(WR_EN[0]),
+        .BE_B1_i(WR_EN[1:0]),
+        .BE_B2_i(WR_EN[3:2]),
+
+        .FLUSH1_i(FLUSH1),
+        .FLUSH2_i(FLUSH2)
+    );
+endmodule

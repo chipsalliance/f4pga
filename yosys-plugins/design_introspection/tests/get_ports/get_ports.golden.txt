@@ -1,0 +1,8 @@
+signal_p port
+signal_p
+clk port
+clk
+led[0] port
+led[0]
+led[1] port
+led[1]
