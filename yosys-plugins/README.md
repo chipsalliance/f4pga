@@ -44,7 +44,7 @@ The plugin adds the following command:
 
 ## QuickLogic IOB plugin
 
-[QuickLogic IOB plugin](./ql-iob-plugin/) annotates IO buffer cells with information from IO placement constraints.
+[QuickLogic IOB plugin](./ql-iob/) annotates IO buffer cells with information from IO placement constraints.
 Used during synthesis for QuickLogic EOS-S3 architecture.
 
 The plugin adds the following command:
@@ -53,7 +53,7 @@ The plugin adds the following command:
 
 ## QuickLogic QLF FPGAs plugin
 
-[QuickLogic QLF plugin](./ql-qlf-plugin) extends Yosys with synthesis support for `qlf_k4n8` and `qlf_k6n10` architectures.
+[QuickLogic QLF plugin](./ql-qlf/) extends Yosys with synthesis support for `qlf_k4n8` and `qlf_k6n10` architectures.
 
 The plugin adds the following command:
 

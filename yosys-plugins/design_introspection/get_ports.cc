@@ -17,7 +17,7 @@
  *
  */
 #include "get_ports.h"
-#include "../common/utils.h"
+#include "../utils.h"
 
 USING_YOSYS_NAMESPACE
 

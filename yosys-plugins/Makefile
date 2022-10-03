@@ -23,23 +23,23 @@ PLUGINS_TEST := $(foreach plugin,$(PLUGIN_LIST),test_$(plugin))
 all: plugins
 
 TOP_DIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
-REQUIREMENTS_FILE ?= requirements.txt
+REQUIREMENTS_FILE = requirements.txt
 ENVIRONMENT_FILE ?= environment.yml
 
--include third_party/make-env/conda.mk
+-include ../third_party/make-env/conda.mk
 
 define install_plugin =
 $(1).so:
-	$$(MAKE) -C $(1)-plugin $$@
+	$$(MAKE) -C $(1) $$@
 
 install_$(1):
-	$$(MAKE) -C $(1)-plugin install
+	$$(MAKE) -C $(1) install
 
 clean_$(1):
-	$$(MAKE) -C $(1)-plugin clean
+	$$(MAKE) -C $(1) clean
 
 test_$(1):
-	@$$(MAKE) --no-print-directory -C $(1)-plugin test
+	@$$(MAKE) --no-print-directory -C $(1) test
 endef
 
 $(foreach plugin,$(PLUGIN_LIST),$(eval $(call install_plugin,$(plugin))))

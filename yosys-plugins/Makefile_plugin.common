@@ -24,7 +24,7 @@
 #
 # |-- Makefile_plugin.common
 # |-- Makefile_test.common
-# |-- example-plugin
+# |-- example
 # |   |-- Makefile
 # |   |-- source1.cc
 # |   |-- source2.cc
@@ -35,7 +35,7 @@
 # |       |   |-- test_case_1.v
 # |       |   |-- test_case_1.golden.ext
 # |       |   |-- ...
-# |-- example2-plugin
+# |-- example2
 # |-- ...
 
 SHELL := /usr/bin/env bash

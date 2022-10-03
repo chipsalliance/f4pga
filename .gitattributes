@@ -6,4 +6,4 @@
 third_party/**          linguist-vendored
 
 # FIXME: All vendor files should be under third_party
-xdc-plugin/tests/minilitex_ddr_arty/**     linguist-vendored
+yosys-plugins/xdc/tests/minilitex_ddr_arty/**     linguist-vendored

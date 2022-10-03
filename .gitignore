@@ -3,4 +3,4 @@
 *.so
 *.swp
 *.log
-ql-qlf-plugin/pmgen/*
+yosys-plugins/ql-qlf/pmgen/*

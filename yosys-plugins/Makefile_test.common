@@ -25,12 +25,12 @@ ifeq (,$(wildcard $(YOSYS_CONFIG)))
 $(error "Didn't find 'yosys-config' under '$(YOSYS_PATH)'")
 endif
 
-GTEST_DIR ?= $(abspath ../../third_party/googletest)
+GTEST_DIR ?= $(abspath ../../../third_party/googletest)
 CXX ?= $(shell $(YOSYS_CONFIG) --cxx)
 CXXFLAGS ?= $(shell $(YOSYS_CONFIG) --cxxflags) -I.. -I$(GTEST_DIR)/googletest/include
 LDLIBS ?= $(shell $(YOSYS_CONFIG) --ldlibs) -L$(GTEST_DIR)/build/lib -lgtest -lgtest_main -lpthread
 LDFLAGS ?= $(shell $(YOSYS_CONFIG) --ldflags)
-TEST_UTILS ?= $(abspath ../../test-utils/test-utils.tcl)
+TEST_UTILS ?= $(abspath ../../test-utils.tcl)
 
 define test_tpl =
 $(1): $(1)/ok

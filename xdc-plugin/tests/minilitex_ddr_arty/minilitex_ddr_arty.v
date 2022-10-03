@@ -1,1 +1,0 @@
-../../../third_party/minilitex_ddr_arty/minilitex_ddr_arty.v

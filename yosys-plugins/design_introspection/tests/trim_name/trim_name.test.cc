@@ -1,4 +1,4 @@
-#include "../common/utils.h"
+#include "../utils.h"
 
 #include <gtest/gtest.h>
 

@@ -19,7 +19,7 @@
 export PATH="$HOME/.local-bin/bin:$PATH"
 
 # OS X specific common setup
-if [[ "${OS}" == "macOS" ]]; then
+if [[ "x${OS}" == "xmacOS" ]]; then
 	export PATH="/usr/local/opt/ccache/libexec:$PATH"
 fi
 

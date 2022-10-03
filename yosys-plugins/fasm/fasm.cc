@@ -23,7 +23,7 @@
  *   annotations on the design cells.
  */
 
-#include "../common/bank_tiles.h"
+#include "../bank_tiles.h"
 #include "kernel/log.h"
 #include "kernel/register.h"
 #include "kernel/rtlil.h"

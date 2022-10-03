@@ -17,7 +17,7 @@
 
 set -e
 
-source .github/workflows/common.sh
+source .github/scripts/common.sh
 
 ##########################################################################
 
@@ -50,8 +50,8 @@ start_section Install-Yosys
     echo '================================='
     echo 'Making env with Yosys and Surelog'
     echo '================================='
-    make env
-    source env/conda/bin/activate yosys-plugins
+    make -C yosys-plugins env
+    source yosys-plugins/env/conda/bin/activate yosys-plugins
     conda list
 )
 end_section
@@ -60,7 +60,7 @@ end_section
 
 start_section Yosys-Version
 (
-    source env/conda/bin/activate yosys-plugins
+    source yosys-plugins/env/conda/bin/activate yosys-plugins
     echo $(which yosys)
     echo $(which yosys-config)
     echo $(yosys --version)
