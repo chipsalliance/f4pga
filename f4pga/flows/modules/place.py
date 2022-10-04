@@ -24,21 +24,13 @@ from f4pga.flows.tools.vpr import vpr_specific_values, vpr, VprArgs, save_vpr_lo
 from f4pga.flows.module import Module, ModuleContext
 
 
-def default_output_name(eblif):
-    return str(Path(eblif).with_suffix(".place"))
-
-
-def place_constraints_file(ctx: ModuleContext):
-    if ctx.takes.place_constraints:
-        return ctx.takes.place_constraints, False
-    if ctx.takes.io_place:
-        return ctx.takes.io_place, False
-    return str(Path(ctx.takes.eblif).with_suffix(".place"))
+def p_default_output_name(eblif):
+    return Path(eblif).with_suffix(".place")
 
 
 class PlaceModule(Module):
     def map_io(self, ctx: ModuleContext):
-        return {"place": default_output_name(ctx.takes.eblif)}
+        return {"place": str(p_default_output_name(ctx.takes.eblif))}
 
     def execute(self, ctx: ModuleContext):
         build_dir = ctx.takes.build_dir
@@ -72,7 +64,7 @@ class PlaceModule(Module):
         # modules may produce some temporary files with names that differ from
         # the ones in flow configuration.
         if ctx.is_output_explicit("place"):
-            Path(default_output_name(ctx.takes.eblif)).rename(ctx.outputs.place)
+            p_default_output_name(ctx.takes.eblif).rename(ctx.outputs.place)
 
         yield "Saving log..."
         save_vpr_log("place.log", build_dir=build_dir)

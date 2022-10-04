@@ -31,7 +31,7 @@ def open_flow_cfg(path: str) -> dict:
         return json_load(rfptr)
 
 
-def _get_ovs_raw(dict_name: str, flow_cfg, part: "str | None", stage: "str | None"):
+def p_get_ovs_raw(dict_name: str, flow_cfg, part: "str | None", stage: "str | None"):
     vals = flow_cfg.get(dict_name)
     if vals is None:
         vals = {}
@@ -55,11 +55,6 @@ def verify_platform_name(platform: str, mypath: str):
     return False
 
 
-def _is_kword(w: str):
-    kwords = {"dependencies", "values", "default_platform", "default_target"}
-    return w in kwords
-
-
 class FlowDefinition:
     stages: "dict[str, Stage]"  # stage name -> module path mapping
     r_env: ResolutionEnv
@@ -80,6 +75,9 @@ class FlowDefinition:
         return self.stages.keys()
 
 
+KWORDS = {"dependencies", "values", "default_platform", "default_target"}
+
+
 class ProjectFlowConfig:
     flow_cfg: dict
     path: str
@@ -90,7 +88,7 @@ class ProjectFlowConfig:
 
     def parts(self):
         for part in self.flow_cfg.keys():
-            if not _is_kword(part):
+            if part not in KWORDS:
                 yield part
 
     def get_default_part(self) -> "str | None":
@@ -103,13 +101,13 @@ class ProjectFlowConfig:
         """
         Get dependencies without value resolution applied.
         """
-        return _get_ovs_raw("dependencies", self.flow_cfg, part, None)
+        return p_get_ovs_raw("dependencies", self.flow_cfg, part, None)
 
     def get_values_raw(self, part: "str | None" = None, stage: "str | None" = None):
         """
         Get values without value resolution applied.
         """
-        return _get_ovs_raw("values", self.flow_cfg, part, stage)
+        return p_get_ovs_raw("values", self.flow_cfg, part, stage)
 
     def get_stage_value_overrides(self, part: str, stage: str):
         stage_vals_ovds = {}
@@ -155,7 +153,7 @@ def override_prj_flow_cfg_by_cli(cfg: ProjectFlowConfig, cli_d: "dict[str, dict[
             p_dependencies.update(cli_p_dependencies)
 
         for stage_name, cli_stage_cfg in part_cfg.items():
-            if _is_kword(stage_name):
+            if stage_name in KWORDS:
                 continue
 
             stage_cfg = part_cfg.get(stage_name)

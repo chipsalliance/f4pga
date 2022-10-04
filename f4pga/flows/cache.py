@@ -24,13 +24,6 @@ from json import dump as json_dump, load as json_load, JSONDecodeError
 from f4pga.flows.common import sfprint
 
 
-def _get_hash(path: Path):
-    if not path.is_dir():
-        with path.open("rb") as rfptr:
-            return zlib_adler32(rfptr.read())
-    return 0  # Directories always get '0' hash.
-
-
 class F4Cache:
     """
     `F4Cache` is used to track changes among dependencies and keep the status of the files on a persistent storage.
@@ -76,7 +69,13 @@ class F4Cache:
     def process_file(self, path: Path):
         """Process file for tracking with f4cache."""
 
-        hash = _get_hash(path)
+        if path.is_dir():
+            # Directories always get '0' hash.
+            hash = 0
+        else:
+            with path.open("rb") as rfptr:
+                hash = zlib_adler32(rfptr.read())
+
         self.current_hashes[path.as_posix()] = hash
 
     def update(self, path: Path, consumer: str):
