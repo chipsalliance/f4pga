@@ -19,7 +19,7 @@
 
 from pathlib import Path
 
-from f4pga.flows.common import vpr_specific_values, vpr as common_vpr, VprArgs
+from f4pga.flows.tools.vpr import vpr_specific_values, vpr, VprArgs
 from f4pga.flows.module import Module, ModuleContext
 
 
@@ -42,7 +42,7 @@ class analysisModule(Module):
         build_dir = Path(ctx.takes.eblif).parent
 
         yield "Analysis with VPR..."
-        common_vpr(
+        vpr(
             "analysis",
             VprArgs(
                 share=ctx.share,
@@ -72,7 +72,7 @@ class analysisModule(Module):
         self.no_of_phases = 2
         self.takes = ["eblif", "route", "sdc?"]
         self.produces = ["merged_post_implementation_v", "post_implementation_v", "analysis_log"]
-        self.values = ["device", "vpr_options?"] + vpr_specific_values()
+        self.values = ["device", "vpr_options?"] + vpr_specific_values
 
 
 ModuleClass = analysisModule
