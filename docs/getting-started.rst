@@ -68,7 +68,7 @@ Conda (Recommended)
 -------------------
 
 .. IMPORTANT::
-  Dure to size constraints, Architecture Definition packages cannot be distributed through Conda.
+  Due to size constraints, Architecture Definition packages cannot be distributed through Conda.
   Hence, installing a functional F4PGA system is a two step process: bootstraping the conda environment and getting the
   tarballs (or vice versa).
   In the future, getting and managing the tarballs might be handled by F4PGA.
