@@ -684,7 +684,7 @@ ql-k4n8_fast: &ql-k4n8
           pinmap_xml: >-
             ${shareDir}/arch/qlf_k4n8-qlf_k4n8_umc22_fast_qlf_k4n8-qlf_k4n8_umc22_fast/pinmap_qlf_k4n8_umc22.xml
           csv_file: >-
-            ${shareDir}/arch/qlf_k4n8-qlf_k4n8_umc22_fast_qlf_k4n8-qlf_k4n8_umc22_fast/pinmap_qlf_k4n8_umc22.csv
+            ${shareDir}/arch/qlf_k4n8-qlf_k4n8_umc22_fast_qlf_k4n8-qlf_k4n8_umc22_fast/pinmap_qlf_k4n8_umc22_24x24.csv
           $PYTHONPATH: '${binDir}/python/'
     repack: &ql-k4n8-stages-repack
       module: 'generic_script_wrapper'
@@ -796,7 +796,7 @@ ql-k4n8_slow:
           pinmap_xml: >-
             ${shareDir}/arch/qlf_k4n8-qlf_k4n8_umc22_slow_qlf_k4n8-qlf_k4n8_umc22_slow/pinmap_qlf_k4n8_umc22.xml
           csv_file: >-
-            ${shareDir}/arch/qlf_k4n8-qlf_k4n8_umc22_slow_qlf_k4n8-qlf_k4n8_umc22_slow/pinmap_qlf_k4n8_umc22.csv
+            ${shareDir}/arch/qlf_k4n8-qlf_k4n8_umc22_slow_qlf_k4n8-qlf_k4n8_umc22_slow/pinmap_qlf_k4n8_umc22_24x24.csv
           $PYTHONPATH: '${binDir}/python/'
     repack:
       <<: *ql-k4n8-stages-repack
