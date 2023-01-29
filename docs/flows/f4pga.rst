@@ -174,7 +174,7 @@ buffer types that they can use in designs:
 Nevertheless, the actual chips consist only of the ``BUFGCTRL`` primitives,
 which are the most universal and can function as other clock buffer
 primitives from the Xilinx manual. Because of that, only one architecture model
-is required for VPR. The rest of the primitives is mapped to this general
+is required for VPR. The rest of the primitives are mapped to this general
 buffer during the techmapping process. The model of ``BUFGCTRL`` primitive used
 by VPR is called ``BUFGCTR_VPR`` (More information about the architecture
 modeling in VPR can be found in the `VTR FPGA Architecture Description`_).
