@@ -193,14 +193,12 @@ def make_top_level_tile(tile_type, sub_tiles, tile_types, equivalent_tiles=None)
         # Equivalent sites
         xml_equiv = ET.SubElement(xml_sub_tile, "equivalent_sites")
         for site_type, site_pinmap in equivalent_sub_tiles.items():
-
             # Site tag
             pb_name = "PB-{}".format(site_type.upper())
             xml_site = ET.SubElement(xml_equiv, "site", {"pb_type": pb_name, "pin_mapping": "custom"})
 
             # Same type, map one-to-one
             if tile_type.upper() == site_type.upper() or site_pinmap is None:
-
                 all_pins = {**tile_pinlists["clock"], **tile_pinlists["input"], **tile_pinlists["output"]}
 
                 for pin, count in all_pins.items():
@@ -211,7 +209,6 @@ def make_top_level_tile(tile_type, sub_tiles, tile_types, equivalent_tiles=None)
 
             # Explicit pinmap as a list of tuples (from, to)
             elif isinstance(site_pinmap, list):
-
                 for tl_pin, pb_pin in site_pinmap:
                     ET.SubElement(
                         xml_site,

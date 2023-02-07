@@ -67,7 +67,6 @@ def main():
     pad_alias_map = defaultdict(lambda: dict())
 
     for pin_map_entry in csv.DictReader(args.map):
-
         if pin_map_entry["type"] not in IOB_TYPES:
             continue
 
@@ -88,7 +87,6 @@ def main():
     used_pads = set()
 
     for pcf_constraint in parse_simple_pcf(args.pcf):
-
         # Skip non-io constraints
         if type(pcf_constraint).__name__ != "PcfIoConstraint":
             continue

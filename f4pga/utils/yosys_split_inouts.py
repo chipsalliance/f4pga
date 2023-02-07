@@ -168,7 +168,6 @@ def main(input: str, output: str = None):
     net_map = {}
     port_map = []
     for name, port in inouts.items():
-
         # Remove the inout port from the module
         del module["ports"][name]
         nets -= get_nets(port["bits"])
@@ -215,10 +214,8 @@ def main(input: str, output: str = None):
 
     # Remove remapped nets
     for name, net in list(netnames.items()):
-
         # Remove "bits" used by the net that were re-mapped.
         if len(set(net["bits"]) & set(net_map.keys())):
-
             # Remove
             net["bits"] = ["x" if b in net_map else b for b in net["bits"]]
 
@@ -250,7 +247,6 @@ def main(input: str, output: str = None):
 
         # Process cell connections
         for port_name, port_nets in list(connections.items()):
-
             # Skip if no net of this connection were remapped
             if len(set(net_map.keys()) & set(port_nets)) == 0:
                 continue
@@ -259,7 +255,6 @@ def main(input: str, output: str = None):
             # versa.
             for dir in ["input", "output"]:
                 if port_directions[port_name] == dir and port_name.endswith("$" + dir[:3]):
-
                     for i, n in enumerate(port_nets):
                         if n in net_map:
                             mapped_n = net_map[n][dir[0]]

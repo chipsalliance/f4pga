@@ -101,7 +101,6 @@ def parse_library(xml_library):
     cells = []
 
     for xml_node in xml_library:
-
         # Skip those
         if xml_node.tag in ["PortProperties"]:
             continue
@@ -111,7 +110,6 @@ def parse_library(xml_library):
 
         # Load pins
         for xml_pins in itertools.chain(xml_node.findall("INPUT"), xml_node.findall("OUTPUT")):
-
             # Pin direction
             if xml_pins.tag == "INPUT":
                 direction = PinDirection.INPUT
@@ -179,7 +177,6 @@ def parse_library(xml_library):
 
 
 def load_logic_cells(xml_placement, cellgrid, cells_library):
-
     # Load "LOGIC" tiles
     xml_logic = xml_placement.find("LOGIC")
     assert xml_logic is not None
@@ -218,10 +215,8 @@ def load_logic_cells(xml_placement, cellgrid, cells_library):
 
 
 def load_other_cells(xml_placement, cellgrid, cells_library):
-
     # Loop over XML entries
     for xml in xml_placement:
-
         # Got a "Cell" tag
         if xml.tag == "Cell":
             cell_name = xml.get("name")
@@ -296,7 +291,6 @@ def make_tile_type_name(cells):
 
 
 def parse_placement(xml_placement, cells_library):
-
     # Load tilegrid quadrants
     quadrants = {}
 
@@ -342,14 +336,12 @@ def parse_placement(xml_placement, cells_library):
     tile_types = {}
     tile_types_at_loc = {}
     for loc, cells in cellgrid.items():
-
         # Generate type and assign
         type = make_tile_type_name(cells)
         tile_types_at_loc[loc] = type
 
         # A new type? complete its definition
         if type not in tile_types:
-
             cell_types = [c.type for c in cells]
             cell_count = {t: len([c for c in cells if c.type == t]) for t in cell_types}
 
@@ -360,11 +352,9 @@ def parse_placement(xml_placement, cells_library):
     # Make the final tilegrid
     tilegrid = {}
     for loc, type in tile_types_at_loc.items():
-
         # Group cells by type
         tile_cells_by_type = defaultdict(lambda: [])
         for cell in cellgrid[loc]:
-
             tile_cells_by_type[cell.type].append(cell)
 
         # Create a list of cell instances within the tile
@@ -413,10 +403,8 @@ def update_switchbox_pins(switchbox):
     for stage_id, stage in switchbox.stages.items():
         for switch_id, switch in stage.switches.items():
             for mux_id, mux in switch.muxes.items():
-
                 # Add the mux output pin as top level output if necessary
                 if mux.output.name is not None:
-
                     loc = SwitchboxPinLoc(
                         stage_id=stage.id,
                         switch_id=switch.id,
@@ -444,7 +432,6 @@ def update_switchbox_pins(switchbox):
                 # Add the mux input pins as top level inputs if necessary
                 for pin in mux.inputs.values():
                     if pin.name is not None:
-
                         loc = SwitchboxPinLoc(
                             stage_id=stage.id,
                             switch_id=switch.id,
@@ -458,7 +445,6 @@ def update_switchbox_pins(switchbox):
     # Add top-level input pins to the switchbox.
     keys = sorted(input_locs.keys(), key=lambda k: k[0])
     for name, locs in {k: input_locs[k] for k in keys}.items():
-
         # Determine the pin type
         is_hop = is_regular_hop_wire(name)
         _, hop = get_name_and_hop(name)
@@ -498,7 +484,6 @@ def parse_switchbox(xml_sbox, xml_common=None):
 
     # Load stages
     for xml_stage in stages:
-
         # Get stage id
         stage_id = int(xml_stage.attrib["StageNumber"])
         assert stage_id not in switchbox.stages, (stage_id, switchbox.stages.keys())
@@ -609,7 +594,6 @@ def parse_wire_mapping_table(xml_root, switchbox_grid, switchbox_types):
         # Rows
         xml_rows = [e for e in xml_root if e.tag.startswith("Row_")]
         for xml_row in xml_rows:
-
             # Decode row range
             match = RE_LOC.match(xml_row.tag)
             assert match is not None, xml_row.tag
@@ -623,7 +607,6 @@ def parse_wire_mapping_table(xml_root, switchbox_grid, switchbox_types):
             # Columns
             xml_cols = [e for e in xml_row if e.tag.startswith("Col_")]
             for xml_col in xml_cols:
-
                 # Decode column range
                 match = RE_LOC.match(xml_col.tag)
                 assert match is not None, xml_col.tag
@@ -651,7 +634,6 @@ def parse_wire_mapping_table(xml_root, switchbox_grid, switchbox_types):
 
     for loc, xml_maps in yield_locs_and_maps():
         for xml_map in xml_maps:
-
             # Decode stage id
             match = RE_STAGE.match(xml_map.tag)
             assert match is not None, xml_map.tag
@@ -662,7 +644,6 @@ def parse_wire_mapping_table(xml_root, switchbox_grid, switchbox_types):
             # Decode wire joints
             joints = {k: v for k, v in xml_map.attrib.items() if k.startswith("Join.")}
             for joint_key, joint_map in joints.items():
-
                 # Decode the joint key
                 match = RE_JOINT.match(joint_key)
                 assert match is not None, joint_key
@@ -711,7 +692,6 @@ def parse_port_mapping_table(xml_root, switchbox_grid):
     # Sections are named "*_Table"
     xml_tables = [e for e in xml_root if e.tag.endswith("_Table")]
     for xml_table in xml_tables:
-
         # Get the origin
         origin = xml_table.tag.split("_")[0]
         assert origin in ["Left", "Right", "Top", "Bottom"], origin
@@ -735,7 +715,6 @@ def parse_port_mapping_table(xml_root, switchbox_grid):
 
         # Parse the port mapping table(s)
         for port_mapping_xml in xml_table.findall("PortMappingTable"):
-
             # Get the direction of the switchbox offset
             orientation = port_mapping_xml.attrib["Orientation"]
             if orientation == "Horizontal":
@@ -762,7 +741,6 @@ def parse_port_mapping_table(xml_root, switchbox_grid):
 
                 sbox_xmls = [e for e in index_xml if e.tag.startswith("SBox")]
                 for sbox_xml in sbox_xmls:
-
                     offset = int(sbox_xml.attrib["Offset"])
                     mapped_name = sbox_xml.get("MTB_PortName", None)
 
@@ -841,7 +819,6 @@ def parse_clock_network(xml_clock_network):
     # pin connection from the pinmap. This way the connections between
     # switchboxes which drive them can be used for generic routing.
     for cell_name in clock_cells.keys():
-
         cell = clock_cells[cell_name]
         pin_map = cell.pin_map
 
@@ -879,7 +856,6 @@ def populate_clk_mux_port_maps(port_maps, clock_cells, tile_grid, cells_library)
 
         # Add map entries
         for mux_pin_name, sbox_pin_name in clock_cell.pin_map.items():
-
             # Get the pin definition to get its driection.
             cell_pin = [p for p in cell_pins if p.name == mux_pin_name]
             assert len(cell_pin) == 1, (clock_cell, mux_pin_name)
@@ -905,7 +881,6 @@ def specialize_switchboxes_with_port_maps(switchbox_types, switchbox_grid, port_
     """
 
     for loc, port_map in port_maps.items():
-
         # No switchbox at that location
         if loc not in switchbox_grid:
             continue
@@ -927,7 +902,6 @@ def specialize_switchboxes_with_port_maps(switchbox_types, switchbox_grid, port_
         # Remap pin names
         did_remap = False
         for stage, switch, mux in yield_muxes(new_switchbox):
-
             # Remap output
             alt_name = "{}.{}.{}".format(stage.id, switch.id, mux.id)
 
@@ -973,7 +947,6 @@ def specialize_switchboxes_with_wire_maps(switchbox_types, switchbox_grid, port_
     """
 
     for loc, wire_map in wire_maps.items():
-
         # No switchbox at that location
         if loc not in switchbox_grid:
             continue
@@ -995,7 +968,6 @@ def specialize_switchboxes_with_wire_maps(switchbox_types, switchbox_grid, port_
         # Remap pin names
         did_remap = False
         for pin_loc, (wire_name, map_loc) in wire_map.items():
-
             # Get port map at the destination location of the wire that is
             # being remapped.
             assert map_loc in port_maps, (map_loc, wire_name)
@@ -1051,7 +1023,6 @@ def find_special_cells(tile_grid):
     for loc, tile in tile_grid.items():
         for cell_type, cell_names in tile.cell_names.items():
             for (cell_name,) in cell_names:
-
                 # Skip LOGIC as it is always contained in a single tile
                 if cell_name == "LOGIC":
                     continue
@@ -1077,7 +1048,6 @@ def parse_pinmap(xml_root, tile_grid):
 
     # Parse "PACKAGE" sections.
     for xml_package in xml_root.findall("PACKAGE"):
-
         # Initialize map
         pkg_name = xml_package.attrib["name"]
         pkg_pin_map = defaultdict(lambda: set())
@@ -1108,7 +1078,6 @@ def parse_pinmap(xml_root, tile_grid):
 
             # Add the pin mapping
             for cell_name, cell_loc in zip(cell_names, cell_locs):
-
                 # Find the cell
                 if cell_loc not in tile_grid:
                     print("WARNING: No tile for package pin '{}' at '{}'".format(pin_name, cell_loc))
@@ -1181,7 +1150,6 @@ def import_data(xml_root):
     switchbox_grid = {}
     switchbox_types = {}
     for xml_node in xml_routing:
-
         # Not a switchbox
         if not xml_node.tag.endswith("_SBOX"):
             continue
@@ -1190,7 +1158,6 @@ def import_data(xml_root):
         xml_common = xml_node.find("COMMON_STAGES")
         for xml_sbox in xml_node:
             if xml_sbox != xml_common:
-
                 # Parse the switchbox definition
                 switchbox = parse_switchbox(xml_sbox, xml_common)
 
@@ -1264,7 +1231,6 @@ def import_routing_timing(csv_file):
 
     # Read and parse CSV
     with open(csv_file, "r") as fp:
-
         # Read the first line, it should specify timing units
         line = fp.readline()
         line = line.strip().split(",")
@@ -1288,7 +1254,6 @@ def import_routing_timing(csv_file):
         # Reformat
         switchbox_timings = {}
         for timing in data:
-
             # Switchbox type
             switchbox_type = timing["SBox_Type"]
             if switchbox_type not in switchbox_timings:
@@ -1334,7 +1299,6 @@ def import_routing_timing(csv_file):
 
 
 def main():
-
     # Parse arguments
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
 

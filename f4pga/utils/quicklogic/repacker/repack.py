@@ -85,7 +85,6 @@ class RepackingConstraint:
     """
 
     def __init__(self, net, block_type, port_spec):
-
         port = PathNode.from_string(port_spec)
 
         self.net = net
@@ -144,7 +143,6 @@ def fixup_route_throu_luts(clb_block, new_net_ids):
 
         for port in block.ports.values():
             for pin, conn in port.connections.items():
-
                 if port.type in ["input", "clock"]:
                     if blk_inp is None:
                         blk_inp = Port(port, pin)
@@ -221,10 +219,8 @@ def insert_buffers(nets, eblif, clb_block):
     """
 
     def walk(block, net, collected_blocks):
-
         # This is a leaf block
         if block.is_leaf:
-
             # Check every input port connection, identify driving nets. Store
             # the block if at least one input is driven by the given net.
             for port in block.ports.values():
@@ -243,7 +239,6 @@ def insert_buffers(nets, eblif, clb_block):
 
     # Insert buffers for each new net
     for net_inp, net_out in nets:
-
         # Insert the buffer cell. Here it is a LUT-1 configured as buffer.
         cell = Cell("$lut")
         cell.name = net_out
@@ -259,7 +254,6 @@ def insert_buffers(nets, eblif, clb_block):
 
         # Remap block cell connections
         for block in blocks:
-
             # Find cell for the block
             cell = eblif.find_cell(block.name)
             assert cell is not None, block
@@ -321,7 +315,6 @@ def identify_blocks_to_repack(clb_block, repacking_rules):
 
         # This is not a leaf block
         else:
-
             # Add the implicit LUT hierarchy to the path
             if is_lut:
                 path.append(PathNode.from_string("lut[0]"))
@@ -371,7 +364,6 @@ def fix_block_path(block_path, arch_path, change_mode=True):
 
     # Process the path
     for i in range(length):
-
         # Parse both path nodes
         arch_node = PathNode.from_string(arch_path[i])
         block_node = PathNode.from_string(block_path[i])
@@ -415,7 +407,6 @@ def identify_repack_target_candidates(clb_pbtype, path):
     """
 
     def walk(arch_path, pbtype, pbtype_index, curr_path=None):
-
         # Parse the path node
         if arch_path:
             path_node = PathNode.from_string(arch_path[0])
@@ -445,14 +436,12 @@ def identify_repack_target_candidates(clb_pbtype, path):
 
         # Recurse
         for mode_name, mode in pbtype.modes.items():
-
             # Check mode if given
             if path_node.mode is not None and path_node.mode != mode_name:
                 continue
 
             # Recurse for children
             for child, i in mode.yield_children():
-
                 # Recurse
                 part = "{}[{}][{}]".format(pbtype_name, pbtype_index, mode_name)
                 yield from walk(arch_path, child, i, curr_path + [part])
@@ -501,7 +490,6 @@ def annotate_net_endpoints(clb_graph, block, block_path=None, constraints=None, 
     nodes_by_net = {}
 
     for node in clb_graph.nodes.values():
-
         # Consider only SOURCE and SINK nodes
         if node.type not in [NodeType.SOURCE, NodeType.SINK]:
             continue
@@ -555,7 +543,6 @@ def annotate_net_endpoints(clb_graph, block, block_path=None, constraints=None, 
 
     # Reassign top-level SOURCE and SINK nodes according to the constraints
     for constraint in constraints:
-
         # Check if the constraint is for this block type
         if constraint.block_type != block_type:
             continue
@@ -586,7 +573,6 @@ def annotate_net_endpoints(clb_graph, block, block_path=None, constraints=None, 
         # port or vice-versa.
         node_types = set([node.type for node in nodes_by_net[constraint.net]])
         if port_node.type not in node_types:
-
             name_map = {NodeType.SINK: "output", NodeType.SOURCE: "input"}
 
             logging.warning(
@@ -626,7 +612,6 @@ def rotate_truth_table(table, rotation_map):
     # Rotate
     new_table = [0 for i in range(2**width)]
     for daddr in range(2**width):
-
         # Remap address bits
         saddr = 0
         for i in range(width):
@@ -711,7 +696,6 @@ def repack_netlist_cell(eblif, cell, block, src_pbtype, model, rule, def_map=Non
     # If the cell is a LUT then rotate its truth table. Append the rotated
     # truth table as a parameter to the repacked cell.
     if cell.type == "$lut":
-
         # Build the init parameter
         init = rotate_truth_table(cell.init, lut_rotation)
         init = "".join(["1" if x else "0" for x in init][::-1])
@@ -729,7 +713,6 @@ def repack_netlist_cell(eblif, cell, block, src_pbtype, model, rule, def_map=Non
     # If the cell is a LUT-based const generator append the LUT parameter as
     # well.
     if cell.type == "$const":
-
         assert lut_width == 0, (cell, lut_width)
 
         # Assume that the model is a LUT. Take its widest input port and use
@@ -745,7 +728,6 @@ def repack_netlist_cell(eblif, cell, block, src_pbtype, model, rule, def_map=Non
 
     # Process parameters for "adder_lut4"
     if cell.type == "adder_lut4":
-
         # Remap the Cin mux select to MODE
         if "IN2_IS_CIN" in cell.parameters:
             repacked_cell.parameters["MODE"] = cell.parameters["IN2_IS_CIN"]
@@ -779,10 +761,8 @@ def syncrhonize_attributes_and_parameters(eblif, packed_netlist):
     """
 
     def walk(block):
-
         # This is a leaf
         if block.is_leaf and not block.is_open:
-
             if any(block.instance.startswith(inst) for inst in ["outpad", "inpad"]):
                 return
 
@@ -845,7 +825,6 @@ def expand_port_maps(rules, clb_pbtypes):
     """
 
     for rule in rules:
-
         # Get src and dst pb_types
         path = [PathNode.from_string(p) for p in rule.src.split(".")]
         path = [PathNode(p.name, mode=p.mode) for p in path]
@@ -860,7 +839,6 @@ def expand_port_maps(rules, clb_pbtypes):
         # Expand port map
         port_map = {}
         for src_port, dst_port in rule.port_map.items():
-
             # Get pin lists
             src_pins = list(src_pbtype.yield_port_pins(src_port))
             dst_pins = list(dst_pbtype.yield_port_pins(dst_port))
@@ -894,7 +872,6 @@ def load_json_constraints(json_root):
 
     constraints = []
     for json_constr in json_constrs:
-
         constraint = RepackingConstraint(
             net=json_constr["net"], block_type=json_constr["tile"], port_spec=json_constr["pin"]
         )
@@ -918,7 +895,6 @@ def load_pcf_constraints(pcf):
     constraints = []
     for pcf_constr in parse_simple_pcf(pcf):
         if type(pcf_constr).__name__ == "PcfClkConstraint":
-
             # There are only "clb" and "io" tile types
             # We select the same global clock for
             # each tile where net is used
@@ -956,7 +932,6 @@ def write_packed_netlist(fname, netlist):
 
 
 def main():
-
     # Parse arguments
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
 
@@ -1151,7 +1126,6 @@ def main():
         iter_list = list(blocks_to_repack)
         blocks_to_repack = []
         for block, rule in iter_list:
-
             # Remap index of the destination block pointed by the path of the
             # rule.
             blk_path = block.get_path()
@@ -1197,7 +1171,6 @@ def main():
         # Check for conflicts
         repack_targets = set()
         for block, rule, (path, pbtype) in blocks_to_repack:
-
             if path in repack_targets:
                 logging.error("Multiple blocks are to be repacked into '{}'".format(path))
             repack_targets.add(path)
@@ -1295,7 +1268,6 @@ def main():
         # Restore names of leaf blocks
         for src_block, rule, (dst_path, dst_pbtype) in blocks_to_repack:
             if dst_path in leaf_block_names:
-
                 search_path = dst_path.split(".", maxsplit=1)[1]
                 dst_block = repacked_clb_block.get_block_by_path(search_path)
                 assert dst_block is not None, dst_path
@@ -1339,7 +1311,6 @@ def main():
     # would cause top-level port renaming.
     logging.info("Cleaning repacked circuit netlist...")
     if absorb_buffer_luts:
-
         net_map = netlist_cleaning.absorb_buffer_luts(eblif, outputs=True)
 
         # Synchronize packed netlist net names
@@ -1384,7 +1355,6 @@ def main():
         # Find the header line
         for i in range(len(placement)):
             if placement[i].startswith("Netlist_File:"):
-
                 # Replace the header
                 placement[i] = "Netlist_File: {} Netlist_ID: {}\n".format(
                     os.path.basename(net_out_fname), "SHA256:" + net_digest

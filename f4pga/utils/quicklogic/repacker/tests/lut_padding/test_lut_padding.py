@@ -57,7 +57,6 @@ def test_lut_padding(monkeypatch, lut_width, lut_inputs):
     net_in = os.path.join(basedir, "lut{}_{}.net".format(lut_width, lut_inputs))
 
     with tempfile.TemporaryDirectory() as tempdir:
-
         eblif_out = os.path.join(tempdir, "out.eblif")
         net_out = os.path.join(tempdir, "out.net")
 

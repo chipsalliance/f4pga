@@ -43,7 +43,6 @@ def parse_options(lines, opts=None):
     # join all remaining ones into a single string
     opt_string = ""
     for line in lines:
-
         # Remove comments
         pos = line.find("#")
         if pos != -1:
@@ -60,7 +59,6 @@ def parse_options(lines, opts=None):
 
     # Remove all C/C++ style "/* ... */" comments
     while True:
-
         # Find beginning of a block comment. Finish if none is found
         p0 = opt_string.find("/*")
         if p0 == -1:
@@ -82,7 +80,6 @@ def parse_options(lines, opts=None):
     # Scan and process options
     parts = iter(shlex.split(opt_string))
     while True:
-
         # Get the option
         try:
             opt = next(parts)
@@ -210,7 +207,6 @@ def translate_options(opts):
 # =============================================================================
 
 if __name__ == "__main__":
-
     # Read lines from stdin, parse options
     lines = sys.stdin.readlines()
     opts = parse_options(lines)
