@@ -38,7 +38,6 @@ class Cell:
     """
 
     def __init__(self, type):
-
         # Cell name. This one is for reference only. It won't be writteb back
         # with the .cname attribute. Use the cname field for that.
         self.name = None
@@ -103,7 +102,6 @@ class Eblif:
     """
 
     def __init__(self, model):
-
         # Top-level module name
         self.model = model
 
@@ -168,7 +166,6 @@ class Eblif:
 
         # Convert inputs
         for port in self.inputs:
-
             cell = Cell("$input")
             cell.name = port
             cell.ports["inpad"] = port
@@ -177,7 +174,6 @@ class Eblif:
 
         # Convert outputs
         for port in self.outputs:
-
             cell = Cell("$output")
             cell.name = "out:" + port
             cell.cname = cell.name
@@ -215,7 +211,6 @@ class Eblif:
                 # Insert a buffer if the port name does not match the net name
                 net = cell.ports["outpad"]
                 if name != net:
-
                     cell = Cell("$lut")
                     cell.name = name
                     cell.ports["lut_in[0]"] = net
@@ -421,10 +416,8 @@ class Eblif:
 
         # Cells
         for cell in self.cells.values():
-
             # A constant source
             if cell.type == "$const":
-
                 # Skip consts
                 if not consts:
                     continue
@@ -435,7 +428,6 @@ class Eblif:
 
             # A LUT
             elif cell.type == "$lut":
-
                 # Identify LUT input pins and their bind indices
                 nets = {}
                 for port, net in cell.ports.items():
@@ -458,7 +450,6 @@ class Eblif:
 
             # A latch
             elif cell.type in ["$fe", "$re", "$ah", "$al", "$as"]:
-
                 line = ".latch {} {} {} {} {}".format(
                     str(cell.ports["D"]), str(cell.ports["Q"]), cell.type[1:], str(cell.ports["clock"]), str(cell.init)
                 )
@@ -466,13 +457,11 @@ class Eblif:
 
             # A generic latch controlled by a single global clock
             elif cell.type == "$latch":
-
                 line = ".latch {} {} {}".format(str(cell.ports["D"]), str(cell.ports["Q"]), str(cell.init))
                 lines.append(line)
 
             # A generic subcircuit
             else:
-
                 # The subcircuit along with its connections
                 line = ".subckt {}".format(cell.type)
                 for port, net in cell.ports.items():

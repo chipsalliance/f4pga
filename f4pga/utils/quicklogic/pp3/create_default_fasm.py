@@ -80,7 +80,6 @@ class SwitchboxConfigBuilder:
 
         # Create all mux nodes
         for stage, switch, mux in yield_muxes(self.switchbox):
-
             # Create the node
             key = (stage.id, switch.id, mux.id)
             node = self.Node(self.NodeType.MUX, key)
@@ -95,7 +94,6 @@ class SwitchboxConfigBuilder:
         # Create all source and sink nodes, populate their connections with mux
         # nodes.
         for pin in self.switchbox.pins:
-
             # Node type
             if pin.direction == PinDirection.INPUT:
                 node_type = self.NodeType.SOURCE
@@ -107,7 +105,6 @@ class SwitchboxConfigBuilder:
             # Create one for each stage type
             stage_ids = set([loc.stage_id for loc in pin.locs])
             for stage_id in stage_ids:
-
                 # Create the node
                 key = pin.name
                 node = self.Node(node_type, key)
@@ -127,14 +124,12 @@ class SwitchboxConfigBuilder:
 
             # Populate connections
             for pin_loc in pin.locs:
-
                 # Get the correct node list
                 stage_type = self.switchbox.stages[pin_loc.stage_id].type
                 assert stage_type in self.nodes, stage_type
                 nodes = self.nodes[stage_type]
 
                 if pin.direction == PinDirection.INPUT:
-
                     # Get the mux node
                     key = (pin_loc.stage_id, pin_loc.switch_id, pin_loc.mux_id)
                     assert key in nodes, key
@@ -164,7 +159,6 @@ class SwitchboxConfigBuilder:
                     node.out.add(key)
 
                 elif pin.direction == PinDirection.OUTPUT:
-
                     # Get the sink node
                     key = pin.name
                     assert key in nodes, key
@@ -189,7 +183,6 @@ class SwitchboxConfigBuilder:
 
         # Populate mux to mux connections
         for conn in self.switchbox.connections:
-
             # Get the correct node list
             stage_type = self.switchbox.stages[conn.dst.stage_id].type
             assert stage_type in self.nodes, stage_type
@@ -242,7 +235,6 @@ class SwitchboxConfigBuilder:
         nodes = self.nodes[stage_type]
 
         def walk(node):
-
             # Examine all driven nodes
             for sink_key in node.out:
                 assert sink_key in nodes, sink_key
@@ -250,7 +242,6 @@ class SwitchboxConfigBuilder:
 
                 # The sink is free
                 if sink_node.net is None:
-
                     # Assign it to the net
                     sink_node.net = node.net
                     if sink_node.type == self.NodeType.MUX:
@@ -285,7 +276,6 @@ class SwitchboxConfigBuilder:
 
         for stage_type, nodes in self.nodes.items():
             for key, node in nodes.items():
-
                 if node.type == self.NodeType.MUX and node.sel is None:
                     result = False
                     print("WARNING: mux unconfigured", key)
@@ -301,7 +291,6 @@ class SwitchboxConfigBuilder:
 
         for stage_type, nodes in self.nodes.items():
             for key, node in nodes.items():
-
                 # For muxes with active selection
                 if node.type == self.NodeType.MUX and node.sel is not None:
                     stage_id, switch_id, mux_id = key
@@ -343,7 +332,6 @@ class SwitchboxConfigBuilder:
 
         nets = sorted(list(nets))
         for i, net in enumerate(nets):
-
             hue = i / len(nets)
             light = 0.33
             saturation = 1.0
@@ -368,14 +356,12 @@ class SwitchboxConfigBuilder:
 
         # Stage types
         for stage_type, nodes in self.nodes.items():
-
             # Stage header
             dot.append('  subgraph "cluster_{}" {{'.format(stage_type))
             dot.append("    label=\"Stage '{}'\";".format(stage_type))
 
             # Nodes and internal mux edges
             for key, node in nodes.items():
-
                 # Source node
                 if node.type == self.NodeType.SOURCE:
                     name = "{}_inp_{}".format(stage_type, key2str(key))
@@ -470,7 +456,6 @@ class SwitchboxConfigBuilder:
 
             # Mux to mux connections
             for key, node in nodes.items():
-
                 # Source node
                 if node.type == self.NodeType.SOURCE:
                     pass
@@ -536,7 +521,6 @@ class SwitchboxConfigBuilder:
 
 
 def main():
-
     # Parse arguments
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
 
@@ -653,7 +637,6 @@ def main():
 
     # Power on all LOGIC cells
     for loc, tile in tile_grid.items():
-
         # Get the tile type object
         tile_type = tile_types[tile.type]
 

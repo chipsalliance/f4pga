@@ -516,7 +516,6 @@ class Fasm2Bels(object):
             c for c in self.connections if c.src.type == ConnectionType.TILE and c.dst.type == ConnectionType.TILE
         ]
         for connection in connections:
-
             # Only to a GMUX at the given location
             dst = connection.dst
             if dst.loc != loc or "GMUX" not in dst.pin:
@@ -567,7 +566,6 @@ class Fasm2Bels(object):
 
         connections = [c for c in self.connections if c.dst.type == ConnectionType.CLOCK]
         for connection in connections:
-
             # Only to a QMUX at the given location
             dst = connection.dst
             if dst.loc != loc or "QMUX" not in dst.pin:
@@ -605,7 +603,6 @@ class Fasm2Bels(object):
 
             # Make map entries
             for i in range(3):
-
                 # Calculate GMUX index for QCLKIN<i> input of the QMUX
                 idx = (gmux_idx + i) % 5
 
@@ -636,7 +633,6 @@ class Fasm2Bels(object):
 
         connections = [c for c in self.connections if c.dst.type == ConnectionType.CLOCK]
         for connection in connections:
-
             # Only to a CAND at the given location
             # Note: Check also the row above. CAND cells are located in two
             # rows but with fasm features everything gets aligned to even rows
@@ -679,7 +675,6 @@ class Fasm2Bels(object):
         gmux_map = dict()
         gmux_locs = [loc for loc, tile in self.vpr_tile_grid.items() if "GMUX" in tile.type]
         for loc in gmux_locs:
-
             # Group GMUX input pin connections by GMUX cell names
             gmux_connections = defaultdict(lambda: dict())
             for cell_pin, conn in self.designconnections[loc].items():
@@ -689,7 +684,6 @@ class Fasm2Bels(object):
 
             # Examine each GMUX config
             for gmux, connections in gmux_connections.items():
-
                 # FIXME: Handle IS0 inversion (if any)
 
                 # The IS0 pin has to be routed
@@ -707,7 +701,6 @@ class Fasm2Bels(object):
 
                 # IP selected
                 if sel == 0:
-
                     # Create a global clock wire for the CLOCK pad
                     match = re.match(r"GMUX(?P<idx>[0-9]+)", gmux)
                     assert match is not None, gmux
@@ -739,7 +732,6 @@ class Fasm2Bels(object):
 
                 # IC selected
                 else:
-
                     # Check if the IC pin has an active driver. If not then
                     # discard the mux.
                     if connections.get("IC", (None, None))[1] in [None, "GND", "VCC"]:
@@ -776,7 +768,6 @@ class Fasm2Bels(object):
         qmux_map = defaultdict(lambda: dict())
         qmux_locs = [loc for loc, tile in self.vpr_tile_grid.items() if "QMUX" in tile.type]
         for loc in qmux_locs:
-
             # Group QMUX input pin connections by QMUX cell names
             qmux_connections = defaultdict(lambda: dict())
             for cell_pin, conn in self.designconnections[loc].items():
@@ -786,7 +777,6 @@ class Fasm2Bels(object):
 
             # Examine each QMUX config
             for qmux, connections in qmux_connections.items():
-
                 # FIXME: Handle IS0 and IS1 inversion (if any)
 
                 # Both IS0 and IS1 must be routed to something
@@ -814,7 +804,6 @@ class Fasm2Bels(object):
 
                 # Input from the routing network selected, create a new wire
                 if sel == 3:
-
                     # Check if the HSCKIN input is connected to an active
                     # driver. If not then discard the QMUX
                     if connections.get("HSCKIN", (None, None))[1] in [None, "GND", "VCC"]:
@@ -832,7 +821,6 @@ class Fasm2Bels(object):
 
                 # Input from a GMUX is selected, assign its wire here
                 else:
-
                     # The GMUX is not active. Discard the QMUX
                     gmux_loc, gmux_cell, gmux_pin = sel_map[sel]
                     if gmux_cell not in gmux_map:
@@ -867,7 +855,6 @@ class Fasm2Bels(object):
         # Process CAND
         for loc, all_features in self.colclk_data.items():
             for cand, features in all_features.items():
-
                 hilojoint = False
                 enjoint = False
 
@@ -980,7 +967,6 @@ def parse_pcf(pcf):
 
 
 if __name__ == "__main__":
-
     # Parse arguments
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
 

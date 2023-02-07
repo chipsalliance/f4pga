@@ -45,7 +45,6 @@ def absorb_buffer_luts(netlist, outputs=False):
 
         # A pass-through LUT
         if cell.type == "$lut" and cell.init == [0, 1]:
-
             # Get input and output nets
             assert INP_PORT in cell.ports, cell
             net_inp = cell.ports[INP_PORT]
@@ -68,7 +67,6 @@ def absorb_buffer_luts(netlist, outputs=False):
     # Merge them downstream
     net_map = {}
     for cell in buffers.values():
-
         # Get input and output nets
         assert INP_PORT in cell.ports, cell
         net_inp = cell.ports[INP_PORT]
@@ -83,7 +81,6 @@ def absorb_buffer_luts(netlist, outputs=False):
         # This cell drives a top-level output directly. Change input nets and
         # leave the output one
         if net_out in netlist.outputs:
-
             # Replace the output net in all cells with the input one
             for c in netlist.cells.values():
                 for port, net in c.ports.items():
@@ -99,7 +96,6 @@ def absorb_buffer_luts(netlist, outputs=False):
 
         # A regular buffer
         else:
-
             # Replace the output net in all cells with the input one
             for c in netlist.cells.values():
                 for port, net in c.ports.items():

@@ -77,7 +77,6 @@ class Router:
         sinks = {}
 
         for node in self.graph.nodes.values():
-
             if node.type not in [NodeType.SOURCE, NodeType.SINK]:
                 continue
 
@@ -100,7 +99,6 @@ class Router:
         # Make nets
         nets = set(sinks.keys()) | set(sources.keys())
         for net_name in nets:
-
             net = Net(net_name)
 
             # A net may or may not have a source node(s). If there are no
@@ -130,7 +128,6 @@ class Router:
         top_level_sources = set()
 
         def walk_depth_first(node, curr_route=None):
-
             # FIXME: Two possible places for optimization:
             # - create an edge lookup list indexed by dst node ids
             # - do not copy the current route list for each recursion level
@@ -159,7 +156,6 @@ class Router:
             # Check all incoming edges
             for edge in self.graph.edges:
                 if edge.dst_id == node.id:
-
                     # Recurse
                     next_node = self.graph.nodes[edge.src_id]
                     route = walk_depth_first(next_node, list(curr_route))
@@ -181,7 +177,6 @@ class Router:
 
         # Route all sinks to any of the net sources
         for sink in net.sinks:
-
             # Find the route
             node = self.graph.nodes[sink]
 
@@ -191,7 +186,6 @@ class Router:
             # No route found. Check if we have some free top-level ports that
             # we can use.
             if not route and top_level_sources:
-
                 # Use the frist one
                 top_node_id = next(iter(top_level_sources))
                 top_node = self.graph.nodes[top_node_id]

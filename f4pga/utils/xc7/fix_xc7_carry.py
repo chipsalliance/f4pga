@@ -413,7 +413,6 @@ def create_bit_to_cell_map(design, top_module):
         for port, connections in cell["connections"].items():
             is_output = port_directions[port] == "output"
             for bit_idx, bit in enumerate(connections):
-
                 list_of_cells = bit_to_cells.get(bit, None)
                 if list_of_cells is None:
                     list_of_cells = [None]
@@ -570,7 +569,6 @@ def fixup_congested_rows(design, top_module, bit_to_cells, bit_to_nets, chain):
                 # If this is the last CARRY4 in the chain, see if the
                 # remaining part of the chain is idle.
                 elif chain_idx == len(chain) - 1 and check_if_rest_of_carry4_is_unused(cellname, cell_idx + 1):
-
                     # Because the rest of the CARRY4 is idle, it is safe to
                     # use the next row up to output the top of the carry.
                     connections["S{}".format(cell_idx + 1)] = ["1'b0"]

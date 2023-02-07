@@ -190,7 +190,6 @@ def write_tiles(xml_arch, arch_tile_types, tile_types, equivalent_sites):
 
     # Add tiles
     for tile_type, sub_tiles in arch_tile_types.items():
-
         xml = make_top_level_tile(tile_type, sub_tiles, tile_types, equivalent_sites)
 
         xml_tiles.append(xml)
@@ -208,7 +207,6 @@ def write_pb_types(xml_arch, arch_pb_types, tile_types, nsmap):
 
     # Add pb_types
     for pb_type in arch_pb_types:
-
         xml = make_top_level_pb_type(tile_types[pb_type], nsmap)
         xml_cplx.append(xml)
 
@@ -275,7 +273,6 @@ def write_tilegrid(xml_arch, arch_tile_grid, loc_map, layout_name):
 
     # Individual tiles
     for flat_loc, tile in arch_tile_grid.items():
-
         if tile is None:
             continue
 
@@ -342,7 +339,6 @@ def write_direct_connections(xml_arch, tile_grid, connections):
     # Populate connections
     conns = [c for c in connections if is_direct(c)]
     for connection in conns:
-
         src_tile = get_tile(connection.src)
         dst_tile = get_tile(connection.dst)
 
@@ -388,7 +384,6 @@ def write_direct_connections(xml_arch, tile_grid, connections):
 
 
 def main():
-
     # Parse arguments
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
 
@@ -417,7 +412,6 @@ def main():
     # Flatten the VPR tilegrid
     flat_tile_grid = dict()
     for vpr_loc, tile in vpr_tile_grid.items():
-
         flat_loc = (vpr_loc.x, vpr_loc.y)
         if flat_loc not in flat_tile_grid:
             flat_tile_grid[flat_loc] = {}
@@ -432,9 +426,7 @@ def main():
     arch_models = set()
 
     for flat_loc, tiles in flat_tile_grid.items():
-
         if len(tiles):
-
             # Group identical sub-tiles together, maintain their order
             sub_tiles = OrderedDict()
             for z, tile in tiles.items():
@@ -464,7 +456,6 @@ def main():
             )
 
         else:
-
             # Add an empty location
             arch_tile_grid[flat_loc] = None
 

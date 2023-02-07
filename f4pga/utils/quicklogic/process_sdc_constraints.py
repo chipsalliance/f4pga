@@ -78,7 +78,6 @@ def expand_indices(items):
 
     # Process each item
     for item in items:
-
         # Match using regex. If there is no match then pass the item through
         match = RE_INDICES.fullmatch(item)
         if not match:
@@ -128,7 +127,6 @@ def process_get_ports(match, pad_to_net, valid_pins=None, valid_nets=None):
 
     # A helper mapping func.
     def map_pad_to_net(pad):
-
         # Unescape square brackets
         pad = pad.replace("\\[", "[")
         pad = pad.replace("\\]", "]")
@@ -175,7 +173,6 @@ def process_get_ports(match, pad_to_net, valid_pins=None, valid_nets=None):
 
 
 def main():
-
     # Parse arguments
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
 

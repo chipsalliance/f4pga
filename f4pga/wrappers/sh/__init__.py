@@ -144,7 +144,6 @@ def p_parse_vpr_args(vpr_options=None, log_suffix=None, isQuickLogic=False):
 
 
 def p_parse_vpr_args_xc7(vpr_options=None, log_suffix=None):
-
     parser = ArgumentParser(description=__doc__, formatter_class=RawDescriptionHelpFormatter)
     parser.add_argument("--device", "-d", required=False, type=str, help="")
     parser.add_argument("--eblif", "-e", required=True, type=str, help="")
@@ -253,7 +252,6 @@ def p_parse_vpr_args_xc7(vpr_options=None, log_suffix=None):
 
 
 def p_parse_vpr_args_quicklogic(vpr_options=None, log_suffix=None):
-
     parser = ArgumentParser(description=__doc__, formatter_class=RawDescriptionHelpFormatter)
     parser.add_argument("--device", "-d", required=True, type=str, help="")
     parser.add_argument("--family", "-f", required=True, type=str, help="")

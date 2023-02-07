@@ -47,7 +47,6 @@ def parse_simple_pcf(f):
         assert len(args) == 3, args
 
         if args[0] == "set_io":
-
             yield PcfIoConstraint(
                 net=args[1],
                 pad=args[2],
@@ -56,7 +55,6 @@ def parse_simple_pcf(f):
             )
 
         if args[0] == "set_clk":
-
             yield PcfClkConstraint(
                 pin=args[1],
                 net=args[2],

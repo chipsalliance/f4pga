@@ -64,7 +64,6 @@ def load_clb_nets_into_pb_graph(clb_block, clb_graph):
 
     # Annotate nodes with nets
     for node in clb_graph.nodes.values():
-
         # Disassemble node path parts
         parts = node.path.split(".")
         parts = [PathNode.from_string(p) for p in parts]
@@ -125,7 +124,6 @@ def build_packed_netlist_from_pb_graph(clb_graph):
     nodes_up = {}
 
     for edge in clb_graph.edges:
-
         # Check if the edge is active
         if clb_graph.edge_net(edge) is None:
             continue
@@ -138,7 +136,6 @@ def build_packed_netlist_from_pb_graph(clb_graph):
     # Create the block hierarchy for nodes that have nets assigned.
     clb_block = None
     for node in clb_graph.nodes.values():
-
         # No net
         if node.net is None:
             continue
@@ -183,7 +180,6 @@ def build_packed_netlist_from_pb_graph(clb_graph):
 
     # Add open blocks.
     for node in clb_graph.nodes.values():
-
         # Consider only nodes without nets
         if node.net:
             continue
@@ -218,7 +214,6 @@ def build_packed_netlist_from_pb_graph(clb_graph):
 
     # Add block ports and their connections
     for node in clb_graph.nodes.values():
-
         # Disassemble node path parts
         parts = node.path.split(".")
         parts = [PathNode.from_string(p) for p in parts]
@@ -237,14 +232,12 @@ def build_packed_netlist_from_pb_graph(clb_graph):
         port_name = parts[-1].name
         port_type = node.port_type.name.lower()
         if port_name not in block.ports:
-
             # The relevant information will be updated as more nodes gets
             # discovered.
             port = packed_netlist.Port(name=port_name, type=port_type)
             block.ports[port_name] = port
 
         else:
-
             port = block.ports[port_name]
             assert port.type == port_type, (port.type, port_type)
 
@@ -265,7 +258,6 @@ def build_packed_netlist_from_pb_graph(clb_graph):
 
         # Got a driver, this is an intermediate port
         if driver_node is not None:
-
             # Get the driver pb_type and port
             driver_path = clb_graph.nodes[driver_node].path.split(".")
             driver_path = [PathNode.from_string(driver_path[i]) for i in [-2, -1]]
@@ -287,10 +279,8 @@ def build_packed_netlist_from_pb_graph(clb_graph):
 
     # Assign names to leaf blocks
     def leaf_walk(block):
-
         # A leaf
         if block.is_leaf and not block.is_open:
-
             # Identify all output pins that drive nets
             nets = []
             for port in block.ports.values():

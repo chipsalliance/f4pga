@@ -124,7 +124,6 @@ class PlaceConstraints(object):
                 existing = constrained_blocks[name]
 
                 if existing.x != constraint.x or existing.y != constraint.y or existing.z != constraint.z:
-
                     print("Error: block '{}' has multiple conflicting constraints!".format(name))
                     print("", constrained_blocks[name])
                     print("", constraint)
@@ -307,7 +306,7 @@ def eprint(*args, **kwargs):
 def get_cmt(cmt_dict, loc):
     """Returns the clock region of an input location."""
     for k, v in cmt_dict.items():
-        for (x, y) in v["vpr_loc"]:
+        for x, y in v["vpr_loc"]:
             if x == loc[0] and y == loc[1]:
                 return v["clock_region"]
 
@@ -421,7 +420,6 @@ class VprGrid(object):
 
 class ClockPlacer(object):
     def __init__(self, vpr_grid, io_locs, blif_data, roi, graph_limit, allow_bufg_logic_sources=False):
-
         self.roi = roi
         self.cmt_to_bufg_tile = {}
         self.bufg_from_cmt = {
@@ -573,7 +571,6 @@ class ClockPlacer(object):
                 clock["sink_nets"].append(sink_net)
 
                 if sink_net not in self.input_pins and sink_net not in self.clock_sources:
-
                     # Allow IBUFs. At this point we cannot distinguish between
                     # IBUFs for clock and logic.
                     if bel == "IBUF_VPR":
@@ -608,7 +605,6 @@ class ClockPlacer(object):
         # Store the parent CMT in clock_cmts.
         for block, loc in block_locs.items():
             if block in self.clock_blocks:
-
                 clock = self.clock_blocks[block]
                 if CLOCKS[clock["subckt"]]["type"] == "BUFGCTRL":
                     pass
@@ -626,7 +622,6 @@ class ClockPlacer(object):
         # Any clocks that were previously constrained must be preserved
         for block, (loc_x, loc_y, _) in blocks.items():
             if block in self.clock_blocks:
-
                 clock = self.clock_blocks[block]
                 if CLOCKS[clock["subckt"]]["type"] == "BUFGCTRL":
                     pass
@@ -677,7 +672,6 @@ class ClockPlacer(object):
         ibuf_cmt_sinks = defaultdict(set)
 
         for net in self.clock_sources:
-
             is_net_ibuf = False
 
             if net not in self.input_pins:
@@ -688,7 +682,6 @@ class ClockPlacer(object):
                         is_net_ibuf = True
 
             for clock_name in self.clock_sources[net]:
-
                 if clock_name in unused_blocks:
                     continue
 
