@@ -27,7 +27,6 @@ from eblif_netlist import Eblif  # noqa: E402
 
 
 def test_netlist_roundtrip():
-
     basedir = os.path.dirname(__file__)
     golden_file = os.path.join(basedir, "netlist.golden.eblif")
 
@@ -35,7 +34,6 @@ def test_netlist_roundtrip():
     eblif = Eblif.from_file(golden_file)
 
     with tempfile.TemporaryDirectory() as tempdir:
-
         # Write the EBLIF back
         output_file = os.path.join(tempdir, "netlist.output.eblif")
         eblif.to_file(output_file)

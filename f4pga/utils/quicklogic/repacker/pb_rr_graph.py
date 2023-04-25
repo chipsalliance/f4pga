@@ -95,7 +95,6 @@ class Graph:
     """
 
     def __init__(self):
-
         # Nodes by id
         self.nodes = {}
         # Edges (assorted)
@@ -170,7 +169,6 @@ class Graph:
         # Handler for "lut" pb_types. It creates an additional level of
         # hierarchy to match the representation in packed netlist.
         def process_lut(xml_pbtype, up_node_map, path):
-
             # The parent is actually a leaf so it does not have any modes
             # However, the mode name must equal to the pb_type name.
             curr_path = path + "[{}].lut[0]".format(xml_pbtype.attrib["name"])
@@ -214,14 +212,12 @@ class Graph:
 
             # Process each mode
             for mode, xml_mode in xml_modes.items():
-
                 # Append mode name to the current path
                 curr_path = path + "[{}]".format(mode)
 
                 # Enumerate childern, build their paths
                 children = []
                 for xml_child, index in yield_pb_children(xml_mode):
-
                     child_path = ".".join([curr_path, "{}[{}]".format(xml_child.attrib["name"], index)])
 
                     children.append(
@@ -294,7 +290,6 @@ class Graph:
 
         # Add nodes
         for xml_port in xml_pbtype:
-
             if xml_port.tag in ["input", "output", "clock"]:
                 width = int(xml_port.attrib["num_pins"])
 
@@ -337,7 +332,6 @@ class Graph:
 
         # A helper function
         def get_node_path(pin):
-
             # Split parts
             parts = pin.split(".")
             assert len(parts) == 2, pin
@@ -365,7 +359,6 @@ class Graph:
 
         # Process interconnects
         for xml_conn in xml_ic:
-
             # Direct
             if xml_conn.tag == "direct":
                 inps = list(yield_pins(xml_ic, xml_conn.attrib["input"], False))
@@ -390,7 +383,6 @@ class Graph:
 
                 # Build edges for each input port
                 for inp_port in inp_ports:
-
                     # Get input pins, should be only one
                     inp_pins = list(yield_pins(xml_ic, inp_port, False))
                     assert len(inp_pins) == 1, xml_conn.attrib
@@ -439,7 +431,6 @@ class Graph:
 
             net_colors = {}
             for i, net in enumerate(nets):
-
                 h = i / len(nets)
                 l = 0.50  # noqa: E741
                 s = 1.0
@@ -455,7 +446,6 @@ class Graph:
 
         # Node color
         def node_color(node, highlight=False):
-
             if highlight_nodes:
                 if highlight:
                     return "#FF2020"
@@ -486,7 +476,6 @@ class Graph:
 
         # Edge color
         def edge_color(edge):
-
             if color_by == "net":
                 net = self.edge_net(edge)
                 if net:
@@ -508,7 +497,6 @@ class Graph:
         # Build nodes
         nodes = {}
         for node in self.nodes.values():
-
             if nets_only and node.net is None:
                 continue
 
@@ -555,7 +543,6 @@ class Graph:
 
         # Add edges
         for edge in self.edges:
-
             if nets_only:
                 if not self.edge_net(edge):
                     continue

@@ -196,7 +196,6 @@ def build_tile_connections(tile_types, tile_grid, switchbox_types, switchbox_gri
 
             # A foreign connection
             elif sbox_pin.type == SwitchboxPinType.FOREIGN:
-
                 # Get the hop offset
                 pin_name, hop = get_name_and_hop(sbox_pin.name)
                 assert hop is not None, sbox_pin
@@ -213,7 +212,6 @@ def build_tile_connections(tile_types, tile_grid, switchbox_types, switchbox_gri
             # Find the pin in the tile
             for pin in tile.pins:
                 if pin.direction == OPPOSITE_DIRECTION[sbox_pin.direction]:
-
                     # Check if the pin name refers to the full tile pin name
                     # ie. with the cell name.
                     if pin.name == pin_name:
@@ -283,7 +281,6 @@ def build_hop_connections(switchbox_types, switchbox_grid):
         # should go into a HOP input.
         dst_pins = [pin for pin in dst_switchbox.inputs.values() if pin.type == SwitchboxPinType.HOP]
         for dst_pin in dst_pins:
-
             # Parse the name, determine hop offset. Skip non-hop wires.
             hop_name, hop_ofs = get_name_and_hop(dst_pin.name)
             if hop_ofs is None:
@@ -346,7 +343,6 @@ def build_hop_connections(switchbox_types, switchbox_grid):
 
 
 def find_clock_cell(alias, tile_grid):
-
     for loc, tile in tile_grid.items():
         if tile is None:
             continue
@@ -364,7 +360,6 @@ def find_clock_cell(alias, tile_grid):
 
 
 def build_gmux_qmux_connections(tile_types, tile_grid, switchbox_types, switchbox_grid, clock_cells):
-
     # Define names of all global clock wires.
     # Each global clock mux as an implicitly defined output equal to its name.
     clock_wires = list(clock_cells.keys())
@@ -377,9 +372,7 @@ def build_gmux_qmux_connections(tile_types, tile_grid, switchbox_types, switchbo
     # Conections between clock cells (muxes)
     connections = []
     for clock_cell in clock_cells.values():
-
         for pin_name, pin_conn in clock_cell.pin_map.items():
-
             # Destination pin name. Treat CAND and QMUX destinations
             # differently as there are going to be no tiles for them.
             if clock_cell.type in ["CAND", "QMUX"]:
@@ -395,14 +388,12 @@ def build_gmux_qmux_connections(tile_types, tile_grid, switchbox_types, switchbo
 
             # This pin connects to a global clock wire
             if pin_conn in clock_wires:
-
                 # Get the other cell
                 other_cell = clock_cells.get(pin_conn, None)
 
                 # Not found in the clock cells. Probably it is the CLOCK cell
                 # try finding it by its name / alias
                 if other_cell is None:
-
                     src_loc, src_tile, src_cell = find_clock_cell(pin_conn, tile_grid)
 
                     # Didint find the cell

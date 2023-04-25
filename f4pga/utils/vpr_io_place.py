@@ -187,7 +187,6 @@ class IoPlace(object):
         # This is an inout net
         if net_name in self.inout_nets:
             for prefix, suffix in zip(["", "out:"], ["_$inp", "_$out"]):
-
                 match = NETNAME_REGEX.match(net_name)
                 name = prefix + match.group(1) + suffix + match.group(2)
 
@@ -225,7 +224,6 @@ class IoPlace(object):
                 existing = constrained_blocks[name]
 
                 if existing.x != constraint.x or existing.y != constraint.y or existing.z != constraint.z:
-
                     print("Error: block '{}' has multiple conflicting constraints!".format(name))
                     print("", constrained_blocks[name])
                     print("", constraint)

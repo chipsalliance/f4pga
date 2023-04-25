@@ -178,7 +178,6 @@ def main():
 
     # Read the requested configurtion from a JSON file
     if args.json is not None:
-
         if args.pcf is not None or args.eblif is not None:
             print("Use either '--json' or '--pcf' + '--eblif' options!")
             exit(-1)
@@ -188,7 +187,6 @@ def main():
 
     # Generate the config according to the EBLIF netlist and PCF constraints.
     else:
-
         if args.json is not None or (args.eblif is None or args.pcf is None):
             print("Use either '--json' or '--pcf' + '--eblif' options!")
             exit(-1)
@@ -197,7 +195,6 @@ def main():
         pad_alias_map = {}
 
         for pin_map_entry in csv.DictReader(args.map):
-
             if pin_map_entry["type"] not in IOB_TYPES:
                 continue
 
@@ -225,7 +222,6 @@ def main():
         eblif_outputs = eblif["outputs"]["args"]
 
         for constraint in pcf:
-
             pad_name = constraint.pad
 
             if pad_name not in pad_map and pad_name not in pad_alias_map:

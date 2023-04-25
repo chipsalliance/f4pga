@@ -29,7 +29,6 @@ from packed_netlist import PackedNetlist  # noqa: E402
 
 
 def test_netlist_roundtrip():
-
     basedir = os.path.dirname(__file__)
     golden_file = os.path.join(basedir, "netlist.golden.net")
 
@@ -42,7 +41,6 @@ def test_netlist_roundtrip():
     xml_tree = ET.parse(golden_file, ET.XMLParser(remove_blank_text=True))
 
     with tempfile.TemporaryDirectory() as tempdir:
-
         # Transform and save the golden file
         sorted_golden_file = os.path.join(tempdir, "netlist.golden.sorted.net")
         with open(sorted_golden_file, "w") as fp:

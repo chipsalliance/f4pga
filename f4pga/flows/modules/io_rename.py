@@ -48,7 +48,7 @@ from f4pga.flows.module import Module, ModuleContext
 from f4pga.flows.runner import get_module
 
 
-def _switch_keys(d: "dict[str, ]", renames: "dict[str, str]") -> "dict[str, ]":
+def p_switch_keys(d: "dict[str, ]", renames: "dict[str, str]") -> "dict[str, ]":
     newd = {}
     for k, v in d.items():
         r = renames.get(k)
@@ -59,7 +59,7 @@ def _switch_keys(d: "dict[str, ]", renames: "dict[str, str]") -> "dict[str, ]":
     return newd
 
 
-def _switchback_attrs(d: Namespace, renames: "dict[str, str]") -> SimpleNamespace:
+def p_switchback_attrs(d: Namespace, renames: "dict[str, str]") -> SimpleNamespace:
     newn = SimpleNamespace()
     for k, v in vars(d).items():
         setattr(newn, k, v)
@@ -71,7 +71,7 @@ def _switchback_attrs(d: Namespace, renames: "dict[str, str]") -> SimpleNamespac
     return newn
 
 
-def _switch_entries(l: "list[str]", renames: "dict[str, str]") -> "list[str]":
+def p_switch_entries(l: "list[str]", renames: "dict[str, str]") -> "list[str]":
     newl = []
     for e in l:
         r = renames.get(e)
@@ -83,7 +83,7 @@ def _switch_entries(l: "list[str]", renames: "dict[str, str]") -> "list[str]":
     return newl
 
 
-def _or_empty_dict(d: "dict | None"):
+def p_or_empty_dict(d: "dict | None"):
     return d if d is not None else {}
 
 
@@ -95,16 +95,16 @@ class IORenameModule(Module):
 
     def map_io(self, ctx: ModuleContext):
         newctx = ctx.shallow_copy()
-        newctx.takes = _switchback_attrs(ctx.takes, self.rename_takes)
-        newctx.values = _switchback_attrs(ctx.values, self.rename_values)
+        newctx.takes = p_switchback_attrs(ctx.takes, self.rename_takes)
+        newctx.values = p_switchback_attrs(ctx.values, self.rename_values)
         r = self.module.map_io(newctx)
-        return _switch_keys(r, self.rename_produces)
+        return p_switch_keys(r, self.rename_produces)
 
     def execute(self, ctx: ModuleContext):
         newctx = ctx.shallow_copy()
-        newctx.takes = _switchback_attrs(ctx.takes, self.rename_takes)
-        newctx.values = _switchback_attrs(ctx.values, self.rename_values)
-        newctx.outputs = _switchback_attrs(ctx.produces, self.rename_produces)
+        newctx.takes = p_switchback_attrs(ctx.takes, self.rename_takes)
+        newctx.values = p_switchback_attrs(ctx.values, self.rename_values)
+        newctx.outputs = p_switchback_attrs(ctx.produces, self.rename_produces)
         print(newctx.takes)
         return self.module.execute(newctx)
 
@@ -113,18 +113,18 @@ class IORenameModule(Module):
         module_class = get_module(mod_path)
         module: Module = module_class(params.get("params"))
 
-        self.rename_takes = _or_empty_dict(params.get("rename_takes"))
-        self.rename_produces = _or_empty_dict(params.get("rename_produces"))
-        self.rename_values = _or_empty_dict(params.get("rename_values"))
+        self.rename_takes = p_or_empty_dict(params.get("rename_takes"))
+        self.rename_produces = p_or_empty_dict(params.get("rename_produces"))
+        self.rename_values = p_or_empty_dict(params.get("rename_values"))
 
         self.module = module
         self.name = f"{module.name}-io_renamed"
         self.no_of_phases = module.no_of_phases
-        self.takes = _switch_entries(module.takes, self.rename_takes)
-        self.produces = _switch_entries(module.produces, self.rename_produces)
-        self.values = _switch_entries(module.values, self.rename_values)
+        self.takes = p_switch_entries(module.takes, self.rename_takes)
+        self.produces = p_switch_entries(module.produces, self.rename_produces)
+        self.values = p_switch_entries(module.values, self.rename_values)
         if hasattr(module, "prod_meta"):
-            self.prod_meta = _switch_keys(module.prod_meta, self.rename_produces)
+            self.prod_meta = p_switch_keys(module.prod_meta, self.rename_produces)
 
 
 ModuleClass = IORenameModule

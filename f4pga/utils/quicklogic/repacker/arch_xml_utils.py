@@ -75,7 +75,6 @@ def get_parent_pb_and_mode(xml_pbtype):
 
     # pb_type parent
     if xml_pbtype.tag == "pb_type":
-
         if xml_parent.tag == "pb_type":
             return xml_parent, xml_parent
 
@@ -83,7 +82,6 @@ def get_parent_pb_and_mode(xml_pbtype):
             return xml_parent.getparent(), xml_parent
 
     elif xml_pbtype.tag == "mode":
-
         return xml_parent.getparent(), xml_pbtype
 
 
@@ -152,7 +150,6 @@ def get_pb_and_port(xml_ic, port_spec):
     port = match.group("port")
     for xml_port in xml_pbtype:
         if xml_port.tag in ["input", "output", "clock"]:
-
             # Got it
             if xml_port.attrib["name"] == port:
                 return xml_pbtype, xml_port
@@ -242,7 +239,6 @@ def yield_pins(xml_ic, port_spec, skip_index=True):
     # Yield individual pin names
     for i in indices:
         for j in bits:
-
             name = match.group("pbtype")
             if i is not None:
                 name += "[{}]".format(i)

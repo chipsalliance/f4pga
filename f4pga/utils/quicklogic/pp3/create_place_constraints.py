@@ -95,7 +95,6 @@ def main():
     io_constraints = {}
 
     for line in args.input:
-
         # Strip, skip comments
         line = line.strip()
         if line.startswith("#"):
@@ -119,7 +118,6 @@ def main():
     BUF_CELL = {"type": "GMUX_IP", "ipin": "IP", "opin": "IZ"}
 
     for inp_net in eblif_data["inputs"]["args"]:
-
         # This one is not constrained, skip it
         if inp_net not in io_constraints:
             continue
@@ -159,7 +157,6 @@ def main():
 
     # Emit constraints for GCLK cells
     for inp_net, iob_cell, con_net, buf_cell, clk_net in clock_connections:
-
         src_loc = io_constraints[inp_net]
         if src_loc not in clock_to_gmux:
             eprint("ERROR: No GMUX location for input CLOCK pad for net '{}' at {}".format(inp_net, src_loc))

@@ -19,7 +19,8 @@
 
 from pathlib import Path
 
-from f4pga.flows.common import vpr_specific_values, VprArgs, get_verbosity_level, sub as common_sub
+from f4pga.flows.common import get_verbosity_level, sub as common_sub
+from f4pga.flows.tools.vpr import vpr_specific_values, VprArgs
 from f4pga.flows.module import Module, ModuleContext
 
 
@@ -81,7 +82,7 @@ class FasmModule(Module):
         self.no_of_phases = 2
         self.takes = ["eblif", "net", "place", "route", "fasm_extra?", "sdc?"]
         self.produces = ["fasm"]
-        self.values = ["device", "top", "pnr_corner?"] + vpr_specific_values()
+        self.values = ["device", "top", "pnr_corner?"] + vpr_specific_values
         self.prod_meta = {"fasm": "FPGA assembly file"}
 
 

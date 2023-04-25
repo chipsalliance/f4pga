@@ -41,7 +41,6 @@ def fixup_cell_names(design):
         # Process cells
         cells = mod_data["cells"]
         for cell_name in list(cells.keys()):
-
             # Fixup name
             if "." in cell_name:
                 new_name = cell_name.replace(".", "_")

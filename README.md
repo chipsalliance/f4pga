@@ -10,7 +10,7 @@
 # FOSS Flows For FPGA (F4PGA) project
 
 <p align="center">
-  <a title="'Automerge' workflow status" href="https://github.com/chipsalliance/f4pga/actions/workflows/Doc.yml"><img alt="'Automerge' workflow status" src="https://img.shields.io/github/workflow/status/chipsalliance/f4pga/Automerge/main?longCache=true&style=flat-square&label=Tests&logo=Github%20Actions&logoColor=fff"></a><!--
+  <a title="'Automerge' workflow status" href="https://github.com/chipsalliance/f4pga/actions/workflows/Doc.yml"><img alt="'Automerge' workflow status" src="https://img.shields.io/github/actions/workflow/status/chipsalliance/f4pga/Automerge.yml?branch=main&longCache=true&style=flat-square&label=Tests&logo=Github%20Actions&logoColor=fff"></a><!--
   -->
 </p>
 

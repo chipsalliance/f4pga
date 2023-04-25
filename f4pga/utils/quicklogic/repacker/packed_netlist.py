@@ -190,7 +190,6 @@ class Block:
     """
 
     def __init__(self, name, instance, mode=None, parent=None):
-
         # Basic attributes
         self.name = name
         self.instance = instance
@@ -230,7 +229,6 @@ class Block:
             xml_ports = elem.find(tag)
             if xml_ports is not None:
                 for xml_port in xml_ports:
-
                     # Got a port rotation map
                     if xml_port.tag == "port_rotation_map":
                         port_name = xml_port.attrib["name"]
@@ -257,7 +255,6 @@ class Block:
 
         # Recursively parse sub-blocks
         for xml_block in elem.findall("block"):
-
             sub_block = Block.from_etree(xml_block)
 
             sub_block.parent = block
@@ -265,11 +262,9 @@ class Block:
 
         # Parse attributes and parameters
         for tag, data in zip(["attributes", "parameters"], [block.attributes, block.parameters]):
-
             # Find the list
             xml_list = elem.find(tag)
             if xml_list is not None:
-
                 # Only a leaf block can have attributes / parameters
                 assert block.is_leaf, "Non-leaf block '{}' with {}".format(block.instance, tag)
 
@@ -303,7 +298,6 @@ class Block:
         # Attributes / parameters
         if self.is_leaf:
             for tag, data in zip(["attributes", "parameters"], [self.attributes, self.parameters]):
-
                 xml_list = ET.Element(tag)
 
                 sub_tag = tag[:-1]
@@ -323,14 +317,12 @@ class Block:
             for key in keys:
                 port = self.ports[key]
                 if port.type == port_type:
-
                     # Encode port
                     xml_port = port.to_etree()
                     xml_ports.append(xml_port)
 
                     # Rotation map
                     if port.rotation_map:
-
                         # Encode
                         rotation = []
                         for i in range(port.width):
@@ -387,7 +379,6 @@ class Block:
 
         # Walk towards the tree root
         while block is not None:
-
             # Type or type with index (instance)
             if with_indices:
                 node = block.instance
@@ -413,7 +404,6 @@ class Block:
         """
 
         def walk(block):
-
             if not block.is_leaf and not block.is_open:
                 block.name = name
 
@@ -429,14 +419,12 @@ class Block:
         """
 
         def walk(block):
-
             # Rename nets in port connections. Check whether the block itself
             # should be renamed as well (output pads need to be).
             rename_block = block.name.startswith("out:")
 
             for port in block.ports.values():
                 for pin, conn in port.connections.items():
-
                     if isinstance(conn, str):
                         port.connections[pin] = net_map.get(conn, conn)
 
@@ -445,7 +433,6 @@ class Block:
 
             # Rename the leaf block if necessary
             if block.is_leaf and not block.is_open and rename_block:
-
                 if block.name in net_map:
                     block.name = net_map[block.name]
                 elif block.name.startswith("out:"):
@@ -483,7 +470,6 @@ class Block:
 
         # Check parent and siblings
         if self.parent is not None:
-
             # Parent
             if self.parent.type == block_type:
                 return self.parent
@@ -530,11 +516,9 @@ class Block:
 
         # Recursive walk function
         def walk(block):
-
             # Examine block ports
             for port in block.ports.values():
                 for pin in range(port.width):
-
                     net = block.find_net_for_port(port.name, pin)
                     if net:
                         nets.add(net)
@@ -553,7 +537,6 @@ class Block:
         """
 
         def walk(block, parts):
-
             # Check if instance matches
             instance = "{}[{}]".format(parts[0].name, parts[0].index)
             if block.instance != instance:
@@ -594,7 +577,6 @@ class Block:
         """
 
         def walk(block, count=0):
-
             # This is a non-ope leaf, count it
             if block.is_leaf and not block.is_open:
                 count += 1

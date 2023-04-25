@@ -96,7 +96,6 @@ class Port:
 
         # Selected pins
         if range_spec is not None:
-
             # TODO: Compile the regex upfront
             match = re.fullmatch(r"((?P<i1>[0-9]+):)?(?P<i0>[0-9]+)", range_spec)
             assert match is not None, range_spec
@@ -164,7 +163,6 @@ class Model:
         models = {}
 
         def walk(pb_type):
-
             # This is a mode, recurse
             if isinstance(pb_type, Mode):
                 for child in pb_type.pb_types.values():
@@ -172,7 +170,6 @@ class Model:
 
             # This is a pb_type. Make a model if it is a leaf
             elif isinstance(pb_type, PbType):
-
                 # Not a leaf, recurse for modes
                 if not pb_type.is_leaf:
                     for mode in pb_type.modes.values():
@@ -282,13 +279,11 @@ class PbType:
         # Build ports
         for xml_port in elem:
             if xml_port.tag in ["input", "output", "clock"]:
-
                 port = Port.from_etree(xml_port)
                 pb_type.ports[port.name] = port
 
         # This is a native LUT leaf pb_type. Add one more level of hierarchy
         if is_leaf_pbtype(elem) and cls == "lut":
-
             # Rename the default mode so that it matches the pb_type name
             mode = pb_type.modes["default"]
             mode.name = pb_type.name
@@ -344,7 +339,6 @@ class PbType:
         # Walk the hierarchy along the path
         pbtype = self
         while True:
-
             # Pop a node from the path
             part = path[0]
             path = path[1:]
@@ -368,7 +362,6 @@ class PbType:
 
             # Mode not given
             else:
-
                 # No more path, return the pb_type
                 if not path:
                     return pbtype

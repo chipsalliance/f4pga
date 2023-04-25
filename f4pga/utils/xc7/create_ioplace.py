@@ -73,7 +73,7 @@ def p_main(blif, map, net, pcf=None, output=stdout, iostandard_defs_file=None, i
         net_to_pad |= set((constr.net, constr.pad) for constr in parse_simple_pcf(pcf))
     # Check for conflicting pad constraints
     net_to_pad_map = dict()
-    for (net, pad) in net_to_pad:
+    for net, pad in net_to_pad:
         if net not in net_to_pad_map:
             net_to_pad_map[net] = pad
         elif pad != net_to_pad_map[net]:

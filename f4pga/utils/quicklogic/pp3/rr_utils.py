@@ -76,7 +76,6 @@ def add_edge(graph, src_node_id, dst_node_id, switch_id, meta_name=None, meta_va
     # in the opposite way.
     switch = graph.switch_map[switch_id]
     if switch.type in [rr.SwitchType.SHORT, rr.SwitchType.PASS_GATE]:
-
         graph.add_edge(dst_node_id, src_node_id, switch_id, meta_name, meta_value)
 
 
@@ -155,7 +154,6 @@ def connect(graph, src_node, dst_node, switch_id=None, segment_id=None, meta_nam
     chany_to_chany = src_node.type == rr.NodeType.CHANY and dst_node.type == rr.NodeType.CHANY
     chanx_to_chanx = src_node.type == rr.NodeType.CHANX and dst_node.type == rr.NodeType.CHANX
     if chany_to_chanx or chanx_to_chany:
-
         # Check loc
         node_joint_location(src_node, dst_node)
 
@@ -164,7 +162,6 @@ def connect(graph, src_node, dst_node, switch_id=None, segment_id=None, meta_nam
 
     # CHANX to CHANX or CHANY to CHANY
     elif chany_to_chany or chanx_to_chanx:
-
         loc = node_joint_location(src_node, dst_node)
         direction = "X" if src_node.type == rr.NodeType.CHANY else "Y"
 
@@ -178,13 +175,11 @@ def connect(graph, src_node, dst_node, switch_id=None, segment_id=None, meta_nam
 
     # OPIN to CHANX/CHANY
     elif src_node.type == rr.NodeType.OPIN and dst_node.type in [rr.NodeType.CHANX, rr.NodeType.CHANY]:
-
         # All OPINs go right (towards +X)
         assert src_node.loc.side == tracks.Direction.RIGHT, src_node
 
         # Connected to CHANX
         if dst_node.type == rr.NodeType.CHANX:
-
             loc = node_joint_location(src_node, dst_node)
 
             # Padding node
@@ -197,7 +192,6 @@ def connect(graph, src_node, dst_node, switch_id=None, segment_id=None, meta_nam
 
         # Connected to CHANY
         elif dst_node.type == rr.NodeType.CHANY:
-
             # Directly
             add_edge(graph, src_node.id, dst_node.id, switch_id, meta_name, meta_value)
 
@@ -207,13 +201,11 @@ def connect(graph, src_node, dst_node, switch_id=None, segment_id=None, meta_nam
 
     # CHANX/CHANY to IPIN
     elif dst_node.type == rr.NodeType.IPIN and src_node.type in [rr.NodeType.CHANX, rr.NodeType.CHANY]:
-
         # All IPINs go top (toward +Y)
         assert dst_node.loc.side == tracks.Direction.TOP, dst_node
 
         # Connected to CHANY
         if src_node.type == rr.NodeType.CHANY:
-
             loc = node_joint_location(src_node, dst_node)
 
             # Padding node
@@ -226,7 +218,6 @@ def connect(graph, src_node, dst_node, switch_id=None, segment_id=None, meta_nam
 
         # Connected to CHANX
         elif src_node.type == rr.NodeType.CHANX:
-
             # Directly
             add_edge(graph, src_node.id, dst_node.id, switch_id, meta_name, meta_value)
 

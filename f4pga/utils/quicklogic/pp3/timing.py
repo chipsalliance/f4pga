@@ -129,7 +129,6 @@ def compute_switchbox_timing_model(switchbox, timing_data):
 
     for pin in switchbox.inputs.values():
         for loc in pin.locs:
-
             dst_key = (loc.stage_id, loc.switch_id, loc.mux_id, loc.pin_id)
             src_key = (loc.stage_id, pin.name)
 
@@ -138,11 +137,9 @@ def compute_switchbox_timing_model(switchbox, timing_data):
     # Compute timing model for each driver
     driver_timing = {}
     for driver, sinks in sink_map.items():
-
         # Collect timing data for each sink edge
         edge_timings = {}
         for stage_id, switch_id, mux_id, pin_id in sinks:
-
             # Try getting timing data. If not found then probably we are
             # computing timing for VCC or GND input.
             try:
@@ -211,7 +208,6 @@ def compute_switchbox_timing_model(switchbox, timing_data):
 
         # Compute error of the delay model
         for sink in sinks:
-
             # Compute for this sink
             error = {}
             for n, true_delay in edge_timings[sink].items():
@@ -254,7 +250,6 @@ def populate_switchbox_timing(switchbox, driver_timing, sink_map, vpr_switches):
 
     # Populate timing data to the switchbox
     for driver, timing in driver_timing.items():
-
         # Driver VPR switch
         driver_vpr_switch = create_vpr_switch(
             type="mux",
@@ -300,7 +295,6 @@ def copy_switchbox_timing(src_switchbox, dst_switchbox):
 
     # Mux timing
     for dst_stage, dst_switch, dst_mux in yield_muxes(dst_switchbox):
-
         src_stage = src_switchbox.stages[dst_stage.id]
         src_switch = src_stage.switches[dst_switch.id]
         src_mux = src_switch.muxes[dst_mux.id]
@@ -324,7 +318,6 @@ def add_vpr_switches_for_cell(cell_type, cell_timings):
     vpr_switches = {}
     for celltype, cell_data in timings.items():
         for instance, inst_data in cell_data.items():
-
             # Add IOPATHs
             for timing, timing_data in inst_data.items():
                 if timing_data["type"].lower() != "iopath":

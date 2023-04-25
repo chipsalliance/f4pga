@@ -19,7 +19,7 @@
 
 from pathlib import Path
 
-from f4pga.flows.common import sub as common_sub
+from f4pga.flows.common import sub as common_sub, options_dict_to_list
 from f4pga.flows.module import Module, ModuleContext
 
 

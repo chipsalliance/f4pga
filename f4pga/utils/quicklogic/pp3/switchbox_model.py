@@ -151,7 +151,6 @@ class SwitchboxModel(object):
 
             # Expand all its inputs
             for pin_id, pin in mux.inputs.items():
-
                 # An input goes to another mux, expand it
                 if pin.name is None and pin_id in connections:
                     connection = connections[pin_id]
@@ -165,10 +164,8 @@ class SwitchboxModel(object):
 
                 # This is a switchbox input
                 elif pin.name is not None:
-
                     # We've hit the target
                     if pin.name == target_name:
-
                         # Append the current mux and its selection
                         final_route = list(route)
                         final_route[-1] = tuple(list(final_route[-1]) + [pin_id])
@@ -268,7 +265,6 @@ class SwitchboxModel(object):
 
             # Input nodes + mux edges
             for pin in mux.inputs.values():
-
                 key = (stage.id, switch.id, mux.id, pin.id)
                 assert key not in self.mux_input_to_node
 
@@ -347,7 +343,6 @@ class SwitchboxModel(object):
 
         for pin in self.switchbox.inputs.values():
             for loc in pin.locs:
-
                 stage = self.switchbox.stages[loc.stage_id]
                 switch = stage.switches[loc.switch_id]
                 mux = switch.muxes[loc.mux_id]
@@ -365,7 +360,6 @@ class SwitchboxModel(object):
         segment_id = self.graph.get_segment_id_from_name("sbox")
 
         for pin in self.switchbox.inputs.values():
-
             node = add_node(self.graph, self.loc, "Y", segment_id)
 
             assert pin.name not in self.input_to_node, pin.name
@@ -373,7 +367,6 @@ class SwitchboxModel(object):
 
         # Create driver nodes, connect everything
         for (pin_name, vpr_switch), locs in driver_map.items():
-
             # Create the driver node
             drv_node = add_node(self.graph, self.loc, "X", segment_id)
 
@@ -394,7 +387,6 @@ class SwitchboxModel(object):
             # Now connect the driver node with its loads
             switch_id = self.graph.get_switch_id("short")
             for loc in locs:
-
                 key = (loc.stage_id, loc.switch_id, loc.mux_id, loc.pin_id)
                 dst_node = self.mux_input_to_node[key]
 
@@ -411,7 +403,6 @@ class SwitchboxModel(object):
         # to the rr graph. For now if there is any fixed mux, remove the
         # whole switchbox.
         if len(self.fixed_muxsels):
-
             # A list of muxes to avoid
             self.fixed_muxes = set([f[:3] for f in self.fixed_muxsels])
 
@@ -476,7 +467,6 @@ class QmuxSwitchboxModel(SwitchboxModel):
         )
 
         for cell in self.qmux_cells.values():
-
             # Get IS0 and IS1 connection endpoints
             eps = {}
             for connection in self.connections:
@@ -489,7 +479,6 @@ class QmuxSwitchboxModel(SwitchboxModel):
             # Find all routes for IS0 and IS1 pins that go to GND and VCC
             routes = {}
             for pin in PINS:
-
                 # Find the routes
                 vcc_routes = self.get_switchbox_routes(self.switchbox, eps[pin].pin, "VCC")
                 gnd_routes = self.get_switchbox_routes(self.switchbox, eps[pin].pin, "GND")
@@ -512,10 +501,8 @@ class QmuxSwitchboxModel(SwitchboxModel):
         for cell_name, cell_routes in self.ctrl_routes.items():
             for pin, pin_routes in cell_routes.items():
                 for net, net_routes in pin_routes.items():
-
                     routes = []
                     for route in net_routes:
-
                         # Assume 3-stage switchbox
                         assert len(route) == 3, "FIXME: Assuming 3-stage switchbox!"
 

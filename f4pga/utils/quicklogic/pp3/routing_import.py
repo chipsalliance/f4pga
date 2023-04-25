@@ -97,20 +97,17 @@ def is_local(connection):
 
 
 def get_vpr_switch_for_clock_cell(graph, cell, src, dst):
-
     # Get a switch to model the mux delay properly. First try using
     # the cell name
     try:
         switch_name = "{}.{}.{}.{}".format(cell.type, cell.name, src, dst)
         switch_id = graph.get_switch_id(switch_name)
     except KeyError:
-
         # Not found, try using the cell type
         try:
             switch_name = "{}.{}.{}.{}".format(cell.type, cell.type, src, dst)
             switch_id = graph.get_switch_id(switch_name)
         except KeyError:
-
             # Still not found, use the generic one
             switch_id = graph.get_switch_id("generic")
 
@@ -256,10 +253,8 @@ class QmuxModel(object):
 
         # Collect features
         for pin, net in pins.items():
-
             # Get switchbox routing features (already prefixed)
             for muxsel in self.ctrl_routes[pin][net]:
-
                 stage_id, switch_id, mux_id, pin_id = muxsel
                 stage = self.switchbox_model.switchbox.stages[stage_id]
 
@@ -309,7 +304,6 @@ class CandModel(object):
         self._build()
 
     def _build(self):
-
         # Get segment id
         segment_id = self.graph.get_segment_id_from_name("clock")
 
@@ -430,7 +424,6 @@ def build_tile_pin_to_node_map(graph, nodes_by_id, tile_types, tile_grid):
 
         # For each pin of the tile
         for pin in tile_types[tile.type].pins:
-
             node_id = get_node_id_for_tile_pin(graph, loc, tile.type, pin.name)
             if node_id is None:
                 print("WARNING: No node for pin '{}' at {}".format(pin.name, loc))
@@ -452,7 +445,6 @@ def build_tile_connection_map(graph, nodes_by_id, tile_grid, connections):
 
     # Adds entry to the map
     def add_to_map(conn_loc):
-
         tile = tile_grid.get(conn_loc.loc, None)
         if tile is None:
             print("WARNING: No tile for pin '{} at {}".format(conn_loc.pin, conn_loc.loc))
@@ -578,7 +570,6 @@ def add_track_chain(graph, direction, u, v0, v1, segment_id, switch_id):
 
     # Add track chain
     for v in coords:
-
         # Add track (node)
         if direction == "X":
             track = tracks.Track(
@@ -665,7 +656,6 @@ def add_tracks_for_const_network(graph, const, tile_grid):
     # For each column add one that spand over the entire grid height
     const_node_map = {}
     for x in range(xmin, xmax):
-
         # Add the column
         col_entry_node, _, col_node_map = add_track_chain(graph, "Y", x, ymin + 1, ymax - 1, segment_id, switch_id)
 
@@ -725,7 +715,6 @@ def populate_hop_connections(graph, switchbox_models, connections):
     bar = progressbar_utils.progressbar
     conns = [c for c in connections if is_hop(c)]
     for connection in bar(conns):
-
         # Get switchbox models
         src_switchbox_model = switchbox_models[connection.src.loc]
         dst_switchbox_model = switchbox_models[connection.dst.loc]
@@ -756,7 +745,6 @@ def populate_tile_connections(graph, switchbox_models, connections, connection_l
     bar = progressbar_utils.progressbar
     conns = [c for c in connections if is_tile(c)]
     for connection in bar(conns):
-
         # Connection to/from the local tile
         if is_local(connection):
             loc = connection.src.loc
@@ -798,7 +786,6 @@ def populate_tile_connections(graph, switchbox_models, connections, connection_l
 
         # Connection to/from a foreign tile
         else:
-
             # Get segment id and switch id
             segment_id = graph.get_segment_id_from_name("special")
             switch_id = graph.get_delayless_switch_id()
@@ -817,10 +804,8 @@ def populate_tile_connections(graph, switchbox_models, connections, connection_l
             # Connect the track
             eps = [connection.src, connection.dst]
             for i, ep in enumerate(eps):
-
                 # Endpoint at tile
                 if ep.type == ConnectionType.TILE:
-
                     # To tile
                     if ep == connection.dst:
                         if ep not in connection_loc_to_node:
@@ -841,7 +826,6 @@ def populate_tile_connections(graph, switchbox_models, connections, connection_l
 
                 # Endpoint at switchbox
                 elif ep.type == ConnectionType.SWITCHBOX:
-
                     # No switchbox model at the loc, skip.
                     if ep.loc not in switchbox_models:
                         continue
@@ -875,7 +859,6 @@ def populate_direct_connections(graph, connections, connection_loc_to_node):
     bar = progressbar_utils.progressbar
     conns = [c for c in connections if is_direct(c)]
     for connection in bar(conns):
-
         # Get segment id and switch id
         if connection.src.pin.startswith("CLOCK"):
             switch_id = graph.get_delayless_switch_id()
@@ -913,10 +896,8 @@ def populate_const_connections(graph, switchbox_models, tile_types, tile_grid, t
 
     # Connect the global const network to switchbox inputs
     for loc, switchbox_model in bar(switchbox_models.items()):
-
         # Look for input connected to a const
         for pin in switchbox_model.switchbox.inputs.values():
-
             # Got a const input
             if pin.name in const_node_map:
                 const_node = const_node_map[pin.name][loc]
@@ -956,10 +937,8 @@ def populate_cand_connections(graph, switchbox_models, cand_node_map):
 
     bar = progressbar_utils.progressbar
     for loc, switchbox_model in bar(switchbox_models.items()):
-
         # Look for input connected to a CAND
         for pin in switchbox_model.switchbox.inputs.values():
-
             # Got a CAND input
             if pin.name in cand_node_map:
                 cand_node = cand_node_map[pin.name][loc]
@@ -994,7 +973,6 @@ def create_quadrant_clock_tracks(graph, connections, connection_loc_to_node):
     bar = progressbar_utils.progressbar
     conns = [c for c in connections if is_clock(c)]
     for connection in bar(conns):
-
         # Source is a tile
         if connection.src.type == ConnectionType.TILE:
             src_node = connection_loc_to_node.get(connection.src, None)
@@ -1093,7 +1071,6 @@ def create_column_clock_tracks(graph, clock_cells, quadrants):
     cand_node_map = {}
 
     for cell in clock_cells.values():
-
         # A clock column is defined by a CAND cell
         if cell.type != "CAND":
             continue
@@ -1146,7 +1123,6 @@ def yield_edges(edges):
 
     # Process edges
     for edge in edges:
-
         # Reformat metadata
         if edge.metadata:
             metadata = [(meta.name, meta.value) for meta in edge.metadata]
@@ -1172,7 +1148,6 @@ def yield_edges(edges):
 
 
 def main():
-
     # Parse arguments
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
 

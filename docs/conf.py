@@ -187,10 +187,10 @@ intersphinx_mapping = {
 # -- Sphinx.Ext.ExtLinks -----------------------------------------------------------------------------------------------
 
 extlinks = {
-   'wikipedia': ('https://en.wikipedia.org/wiki/%s', 'wikipedia:'),
-   'gh':        ('https://github.com/%s', 'gh:'),
-   'ghsharp':   ('https://github.com/chipsalliance/f4pga/issues/%s', '#'),
-   'ghissue':   ('https://github.com/chipsalliance/f4pga/issues/%s', 'issue #'),
-   'ghpull':    ('https://github.com/chipsalliance/f4pga/pull/%s', 'pull request #'),
-   'ghsrc':     ('https://github.com/chipsalliance/f4pga/blob/main/%s', '')
+   'wikipedia': ('https://en.wikipedia.org/wiki/%s', 'wikipedia: %s'),
+   'gh':        ('https://github.com/%s', 'gh:%s'),
+   'ghsharp':   ('https://github.com/chipsalliance/f4pga/issues/%s', '#%s'),
+   'ghissue':   ('https://github.com/chipsalliance/f4pga/issues/%s', 'issue #%s'),
+   'ghpull':    ('https://github.com/chipsalliance/f4pga/pull/%s', 'pull request #%s'),
+   'ghsrc':     ('https://github.com/chipsalliance/f4pga/blob/main/%s', '%s')
 }

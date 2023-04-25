@@ -105,7 +105,6 @@ class VModule(object):
         }
 
     def group_vector_signals(self, signals, io=False):
-
         # IOs beside name, have also direction, convert them to format
         # we can process
         if io:
@@ -225,7 +224,6 @@ class VModule(object):
         str: Verilog entry
         """
         if typ == "BIDIR":
-
             # We do not emit the BIDIR cell for non inout IOs
             direction = self.get_io_config(parameters)
             if direction is None:
@@ -337,7 +335,6 @@ class VModule(object):
 
             # check every connection pin if it has
             for pin in cellpins:
-
                 # Cell name and pin name match
                 if cell_name in cell_input_names:
                     if pin in cell_input_names[cell_name]:
@@ -492,7 +489,6 @@ class VModule(object):
                     loc,
                     wire,
                 ) in connections.items():
-
                     # That wire is connected to something. Skip processing
                     # of the cell here
                     if loc is not None:
@@ -561,10 +557,8 @@ class VModule(object):
         # Prune BELs that do not drive anythin (have all outputs disconnected)
         for loc, elements in list(self.elements.items()):
             for type, element in list(elements.items()):
-
                 # Handle IO cells
                 if element.type in ["CLOCK", "BIDIR", "SDIOMUX"]:
-
                     if element.type == "CLOCK":
                         direction = "input"
                     else:
@@ -576,7 +570,6 @@ class VModule(object):
 
                 # Handle non-io cells
                 else:
-
                     # Get connected pin names and output pin names
                     connected_pins = set(element.ios.keys())
                     output_pins = set(
@@ -596,7 +589,6 @@ class VModule(object):
                 del self.elements[loc]
 
     def get_io_name(self, loc):
-
         # default pin name
         name = loc2str(loc) + "_inout"
         # check if we have the original name for this io
@@ -650,7 +642,6 @@ class VModule(object):
         for eloc, locelements in self.elements.items():
             for element in locelements.values():
                 if element.type in ["CLOCK", "BIDIR", "SDIOMUX"]:
-
                     if element.type == "CLOCK":
                         direction = "input"
                     else:

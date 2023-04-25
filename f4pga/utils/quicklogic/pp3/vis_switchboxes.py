@@ -87,7 +87,6 @@ def switchbox_to_dot(switchbox, stage_types=("STREET", "HIGHWAY")):
 
     # Stages
     for stage in switchbox.stages.values():
-
         if stage.type not in stage_types:
             continue
 
@@ -121,7 +120,6 @@ def switchbox_to_dot(switchbox, stage_types=("STREET", "HIGHWAY")):
 
     # Internal connections
     for conn in switchbox.connections:
-
         if switchbox.stages[conn.src.stage_id].type not in stage_types:
             continue
         if switchbox.stages[conn.dst.stage_id].type not in stage_types:
@@ -139,7 +137,6 @@ def switchbox_to_dot(switchbox, stage_types=("STREET", "HIGHWAY")):
         src_node = "input_{}".format(fixup_pin_name(pin.name))
 
         for loc in pin.locs:
-
             if switchbox.stages[loc.stage_id].type not in stage_types:
                 continue
 
@@ -153,7 +150,6 @@ def switchbox_to_dot(switchbox, stage_types=("STREET", "HIGHWAY")):
         dst_node = "output_{}".format(fixup_pin_name(pin.name))
 
         for loc in pin.locs:
-
             if switchbox.stages[loc.stage_id].type not in stage_types:
                 continue
 
@@ -171,7 +167,6 @@ def switchbox_to_dot(switchbox, stage_types=("STREET", "HIGHWAY")):
 
 
 def main():
-
     # Parse arguments
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
 
