@@ -29,7 +29,7 @@ jobs:
     steps:
 
       - name: 🧰 Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: recursive
 
@@ -44,7 +44,7 @@ jobs:
     steps:
 
       - name: 🧰 Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: recursive
 
@@ -66,7 +66,7 @@ jobs:
     steps:
 
       - name: 🧰 Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: recursive
 
@@ -128,7 +128,7 @@ jobs:
     steps:
 
       - name: 🧰 Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 🔧 Prepare environment
         run: ./scripts/prepare_environment.sh
@@ -199,7 +199,7 @@ jobs:
     steps:
 
       - name: 🧰 Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 🛠️ Clone fomu-workshop
         run: git clone https://github.com/im-tomu/fomu-workshop
@@ -241,7 +241,7 @@ jobs:
     steps:
 
       - name: 🧰 Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 🔧 Prepare environment
         run: ./scripts/prepare_environment.sh
@@ -270,7 +270,7 @@ jobs:
     steps:
 
       - name: 🧰 Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 🚧 Test pyF4PGA (PYTHONPATH)
         run: |
