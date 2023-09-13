@@ -81,7 +81,7 @@ export PYTHON3="${PYTHON3:-$(which python3)}"
 yosys_read_cmds=""
 yosys_files="${VERILOG_FILES[*]}"
 if [ -n "$SURELOG_CMD" ]; then
-  yosys_read_cmds="plugin -i uhdm; read_verilog_with_uhdm ${SURELOG_CMD[*]} ${VERILOG_FILES[*]}"
+  yosys_read_cmds="plugin -i systemverilog; read_systemverilog ${SURELOG_CMD[*]} ${VERILOG_FILES[*]}"
   yosys_files=""
 fi
 yosys \
