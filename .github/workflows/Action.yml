@@ -29,7 +29,7 @@ jobs:
     steps:
 
       - name: 🧰 Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - run: git clone https://github.com/chipsalliance/f4pga-examples
 
@@ -74,7 +74,7 @@ jobs:
     steps:
 
       - name: 🧰 Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - run: git clone https://github.com/chipsalliance/f4pga-examples
 
@@ -101,7 +101,7 @@ jobs:
     steps:
 
       - name: 🧰 Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - run: git clone https://github.com/chipsalliance/f4pga-examples
 
@@ -146,7 +146,7 @@ jobs:
     steps:
 
       - name: 🧰 Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 🚧 F4PGA Action (arty_35 | verilog/counter)
         uses: ./action
@@ -171,7 +171,7 @@ jobs:
     steps:
 
       - name: 🧰 Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 🚧 GHDL synth
         run: make -C test/vhdl/counter synth
@@ -199,7 +199,7 @@ jobs:
     steps:
 
       - name: 🧰 Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 🚧 GHDL synth
         run: make -C test/vhdl/counter synth-plugin
