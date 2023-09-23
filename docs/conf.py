@@ -20,15 +20,14 @@
 # Updated documentation of the configuration options is available at
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
-import sys, os
+from sys import path as sys_path
 from pathlib import Path
 
 from tabulate import tabulate
 
 ROOT = Path(__file__).resolve().parent
 
-#sys.path.insert(0, os.path.abspath('.'))
-sys.path.insert(0, str(ROOT))
+sys_path.insert(0, str(ROOT))
 
 from changes import generate_changes_inc
 
@@ -69,6 +68,7 @@ release = '' # The full version, including alpha/beta/rc tags.
 extensions = [
     'sphinx.ext.extlinks',
     'sphinx.ext.intersphinx',
+    "sphinxcontrib.autoprogram",
     'sphinx_verilog_domain',
     'sphinxcontrib.bibtex',
     'myst_parser'

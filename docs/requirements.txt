@@ -1,6 +1,8 @@
+-r ../f4pga/requirements.txt
 myst-parser
 pyyaml
 sphinx>=4.5.0
+sphinxcontrib-autoprogram
 sphinxcontrib-bibtex
 https://github.com/f4pga/sphinx_f4pga_theme/archive/f4pga.zip#sphinx-f4pga-theme
 https://github.com/SymbiFlow/sphinx-verilog-domain/archive/master.zip#sphinx-verilog-domain
