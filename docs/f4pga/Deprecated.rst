@@ -5,7 +5,8 @@ Understanding the (deprecated) flow
 
 .. IMPORTANT::
   This section describes the usage of the now deprecated ``symbiflow_*`` entrypoints/wrappers.
-  It is provided for backwards compatibility, so that users of the *old* flow can keep using it.
+  It is provided for :gh:`backwards compatibility <chipsalliance/fpga-tool-perf/pull/390#issuecomment-1023487178>`, so
+  that users of the *old* flow can keep using it.
   However, it is recommended for new users to use the approach explained in :ref:`pyF4PGA`.
 
 This section provides valuable information on how each of the commands used to compile and build
