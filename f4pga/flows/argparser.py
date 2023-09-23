@@ -17,7 +17,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from argparse import ArgumentParser, Namespace
+from argparse import ArgumentParser, Namespace, REMAINDER
 from re import finditer as re_finditer
 
 
@@ -67,6 +67,14 @@ def p_setup_show_dep_parser(parser: ArgumentParser):
     p_add_flow_arg(parser)
 
 
+def _setup_utils_parser(parser: ArgumentParser):
+    parser.add_argument("--function", "-f", metavar="fun_name", type=str, help="Run specific funtion from given module")
+
+    parser.add_argument("util", metavar="util_name", type=str, help="Name of the script to call")
+
+    parser.add_argument("util_args", metavar="util_args", nargs=REMAINDER, type=str, help="Arguments for called script")
+
+
 def setup_argparser():
     """
     Set up argument parser for the program.
@@ -81,6 +89,9 @@ def setup_argparser():
     p_setup_build_parser(subparsers.add_parser("build"))
     show_dep = subparsers.add_parser("showd", description="Show the value(s) assigned to a dependency")
     p_setup_show_dep_parser(show_dep)
+
+    run_util = subparsers.add_parser("utils", description="Run utility script")
+    _setup_utils_parser(run_util)
 
     return parser
 

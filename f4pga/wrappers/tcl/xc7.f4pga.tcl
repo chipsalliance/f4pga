@@ -191,7 +191,7 @@ techmap -map  $::env(TECHMAP_PATH)/carry_map.v
 clean_processes
 write_json $::env(OUT_JSON).carry_fixup.json
 
-exec $::env(PYTHON3) -m f4pga.utils.xc7.fix_xc7_carry < $::env(OUT_JSON).carry_fixup.json > $::env(OUT_JSON).carry_fixup_out.json
+exec $::env(PYTHON3) -m f4pga.aux.utils.xc7.fix_xc7_carry < $::env(OUT_JSON).carry_fixup.json > $::env(OUT_JSON).carry_fixup_out.json
 design -push
 read_json $::env(OUT_JSON).carry_fixup_out.json
 
@@ -245,7 +245,7 @@ write_json $::env(OUT_JSON)
 write_verilog $::env(OUT_SYNTH_V)
 
 design -reset
-exec $::env(PYTHON3) -m f4pga.utils.yosys_split_inouts -i $::env(OUT_JSON) -o $::env(SYNTH_JSON)
+exec $::env(PYTHON3) -m f4pga.aux.utils.yosys_split_inouts -i $::env(OUT_JSON) -o $::env(SYNTH_JSON)
 read_json $::env(SYNTH_JSON)
 yosys -import
 opt_clean

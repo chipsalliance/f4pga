@@ -91,7 +91,7 @@ xc7a50t: &xc7
       params:
         stage_name: ioplace
         interpreter: '${python3}'
-        script: ['-m', 'f4pga.utils.xc7.create_ioplace']
+        script: ['-m', 'f4pga.aux.utils.xc7.create_ioplace']
         outputs:
           io_place:
             mode: stdout
@@ -107,7 +107,7 @@ xc7a50t: &xc7
       params:
         stage_name: place_constraints
         interpreter: '${python3}'
-        script: ['-m', 'f4pga.utils.xc7.create_place_constraints']
+        script: ['-m', 'f4pga.aux.utils.xc7.create_place_constraints']
         outputs:
           place_constraints:
             mode: stdout
@@ -282,13 +282,13 @@ ql-eos-s3:
           PINMAP_FILE: '${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_${package}.csv'
           PCF_FILE: '${:pcf}'
           PYTHON3: '${python3}'
-          UTILS_PATH: '${shareDir}/scripts'
+          UTILS_PATH: '${auxDir}/utils'
     prepare_sdc:
       module: 'generic_script_wrapper'
       params:
         stage_name: prepare_sdc
         interpreter: '${python3}'
-        script: ['-m', 'f4pga.utils.quicklogic.process_sdc_constraints']
+        script: "${auxDir}/utils/quicklogic/process_sdc_constraints.py"
         outputs:
           sdc:
             mode: file
@@ -300,7 +300,7 @@ ql-eos-s3:
           sdc-out: '${:eblif[noext]}.sdc'
           pcf: '${:pcf}'
           pin-map: ''
-          $PYTHONPATH: '${shareDir}/scripts/'
+          $PYTHONPATH: "${auxDir}/utils/quicklogic"
     pack:
       module: 'pack'
       values:
@@ -342,7 +342,7 @@ ql-eos-s3:
       params:
         stage_name: ioplace
         interpreter: '${python3}'
-        script: ['-m', 'f4pga.utils.quicklogic.pp3.create_ioplace']
+        script: "${auxDir}/utils/quicklogic/pp3/create_ioplace.py"
         outputs:
           io_place:
             mode: stdout
@@ -352,13 +352,13 @@ ql-eos-s3:
           net: '${:net}'
           pcf: '${:pcf}'
           map: '${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_${package}.csv'
-          $PYTHONPATH: '${shareDir}/scripts/'
+          $PYTHONPATH: "${auxDir}/utils/"
     place_constraints:
       module: 'generic_script_wrapper'
       params:
         stage_name: place_constraints
         interpreter: '${python3}'
-        script: ['-m', 'f4pga.utils.quicklogic.pp3.create_place_constraints']
+        script: "${auxDir}/utils/quicklogic/pp3/create_place_constraints.py"
         outputs:
           place_constraints:
             mode: stdout
@@ -367,7 +367,7 @@ ql-eos-s3:
           blif: '${:eblif}'
           map: '${shareDir}/arch/ql-eos-s3_wlcsp/clkmap_${package}.csv'
           i: '${:io_place}'
-          $PYTHONPATH: '${shareDir}/scripts/'
+          $PYTHONPATH: "${auxDir}/utils/"
     place:
       module: 'place'
     iomux_jlink:
@@ -375,7 +375,7 @@ ql-eos-s3:
       params:
         stage_name: iomux_jlink
         interpreter: '${python3}'
-        script: ['-m', 'f4pga.utils.quicklogic.pp3.eos-s3.iomux_config']
+        script: "${auxDir}/utils/quicklogic/pp3/eos-s3/iomux_config.py"
         outputs:
           iomux_jlink:
             mode: stdout
@@ -385,13 +385,13 @@ ql-eos-s3:
           pcf: '${:pcf}'
           map: '${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_${package}.csv'
           output-format: jlink
-          $PYTHONPATH: '${shareDir}/scripts/'
+          $PYTHONPATH: "${auxDir}/utils/"
     iomux_openocd:
       module: 'generic_script_wrapper'
       params:
         stage_name: iomux_openocd
         interpreter: '${python3}'
-        script: ['-m', 'f4pga.utils.quicklogic.pp3.eos-s3.iomux_config']
+        script: "${auxDir}/utils/quicklogic/pp3/eos-s3/iomux_config.py"
         outputs:
           iomux_openocd:
             mode: stdout
@@ -401,13 +401,13 @@ ql-eos-s3:
           pcf: '${:pcf}'
           map: '${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_${package}.csv'
           output-format: openocd
-          $PYTHONPATH: '${shareDir}/scripts/'
+          $PYTHONPATH: "${auxDir}/utils/"
     iomux_binary:
       module: 'generic_script_wrapper'
       params:
         stage_name: iomux_binary
         interpreter: '${python3}'
-        script: ['-m', 'f4pga.utils.quicklogic.pp3.eos-s3.iomux_config']
+        script: "${auxDir}/utils/quicklogic/pp3/eos-s3/iomux_config.py"
         outputs:
           iomux_binary:
             mode: stdout
@@ -417,7 +417,7 @@ ql-eos-s3:
           pcf: '${:pcf}'
           map: '${shareDir}/arch/ql-eos-s3_wlcsp/pinmap_${package}.csv'
           output-format: binary
-          $PYTHONPATH: '${shareDir}/scripts/'
+          $PYTHONPATH: "${auxDir}/utils/"
     route:
       module: 'route'
       values:
@@ -616,6 +616,7 @@ ql-eos-s3:
           $FPGA_FAM: eos-s3
           $PATH: '${shareDir}/../../conda/envs/eos-s3/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
           $BIN_DIR_PATH: '${binDir}'
+          $PYTHONPATH: "${auxDir}/utils/quicklogic/pp3"
 
 
 ql-k4n8_fast: &ql-k4n8

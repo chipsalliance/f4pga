@@ -42,7 +42,7 @@ from typing import Iterable
 from f4pga.flows.stage import Stage
 from f4pga.flows.common import set_verbosity_level, sfprint
 from f4pga.flows.argparser import setup_argparser
-from f4pga.flows.commands import cmd_build, cmd_show_dependencies, f4pga_done
+from f4pga.flows.commands import cmd_build, cmd_show_dependencies, cmd_run_util, f4pga_done
 
 
 def platform_stages(platform_flow, r_env):
@@ -76,6 +76,10 @@ def main():
 
     if args.command == "showd":
         cmd_show_dependencies(args)
+        f4pga_done()
+
+    if args.command == "utils":
+        cmd_run_util(args)
         f4pga_done()
 
     sfprint(0, "Please use a command.\nUse `--help` flag to learn more.")

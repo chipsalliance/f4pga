@@ -38,8 +38,8 @@ SH_SUBDIR = "quicklogic" if isQuickLogic else FPGA_FAM
 
 
 if not isQuickLogic:
-    from f4pga.utils.xc7.create_ioplace import main as xc7_create_ioplace
-    from f4pga.utils.xc7.create_place_constraints import main as xc7_create_place_constraints
+    from f4pga.aux.utils.xc7.create_ioplace import main as xc7_create_ioplace
+    from f4pga.aux.utils.xc7.create_place_constraints import main as xc7_create_place_constraints
 
 
 # Helper functions
@@ -411,7 +411,7 @@ if [[ '{device}' =~ ^(qlf_.*)$ ]]; then
     exit -1
   fi
 
-  '{python3}' -m f4pga.utils.quicklogic.qlf_k4n8.create_ioplace \
+  f4pga utils create_ioplace \
     --pcf '{pcf}' \
     --blif '{eblif}' \
     --pinmap_xml '{archs_dir}'/"${{DEVICE_PATH}}_${{DEVICE_PATH}}/${{PINMAPXML}}" \
@@ -435,14 +435,14 @@ elif [[ '{device}' =~ ^(ql-.*)$ ]]; then
   DEVICE_PATH='{device}_wlcsp'
   PINMAP='{archs_dir}'/"${{DEVICE_PATH}}/${{PINMAPCSV}}"
 
-  '{python3}' -m f4pga.utils.quicklogic.pp3.create_ioplace \
+  f4pga utils create_ioplace \
     --pcf '{pcf}' \
     --blif '{eblif}' \
     --map "$PINMAP" \
     --net '{net}' \
     > '{place_file_prefix}_io.place'
 
-  '{python3}' -m f4pga.utils.quicklogic.pp3.create_place_constraints \
+  f4pga utils create_place_constraints \
     --blif '{eblif}' \
     --map '{archs_dir}'/"${{DEVICE_PATH}}/${{CLKMAPCSV}}" \
     -i '{place_file_prefix}_io.place' \
@@ -454,7 +454,7 @@ elif [[ '{device}' =~ ^(ql-.*)$ ]]; then
             + "\n".join(
                 [
                     f"""
-    '{python3}' -m f4pga.utils.quicklogic.pp3.eos-s3.iomux_config \
+    f4pga utils iomux_config \
       --eblif '{eblif}' \
       --pcf '{pcf}' \
       --map "$PINMAP" \
@@ -685,7 +685,7 @@ DESIGN=${EBLIF/.eblif/}
 """
         + f"""
 PYTHONPATH='{F4PGA_SHARE_DIR}/scripts':$PYTHONPATH \
-  '{python3}' -m f4pga.utils.quicklogic.repacker.repack \
+  f4pga utils repack \
     --vpr-arch ${{ARCH_DEF}} \
     --repacking-rules ${{ARCH_DIR}}/${{DEVICE_NAME}}.repacking_rules.json \
     $JSON_ARGS \
@@ -748,7 +748,7 @@ ARCH_DIR='{F4PGA_SHARE_DIR}/arch/'"${{DEVICE_1}}_${{DEVICE_1}}"
 PINMAP_XML=${ARCH_DIR}/${PINMAPXML}
 """
         + f"""
-'{python3}' -m f4pga.utils.quicklogic.create_lib \
+f4pga utils create_lib \
   -n "${{DEV}}_0P72_SSM40" \
   -m fpga_top \
   -c '{part}' \
@@ -792,7 +792,7 @@ def fasm2bels():
 
     p_run_bash_cmds(
         f"""
-'{python3}' -m f4pga.utils.quicklogic.pp3.fasm2bels '{args.bit}' \
+f4pga utils fasm2bels '{args.bit}' \
   --phy-db '{F4PGA_SHARE_DIR}/arch/{args.device}_wlcsp/db_phy.pickle' \
   --device-name "${{DEVICE/ql-/}}" \
   --package-name '{args.part}' \

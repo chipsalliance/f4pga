@@ -30,6 +30,7 @@ from f4pga.context import FPGA_FAM
 from f4pga.flows.common import (
     bin_dir_path,
     share_dir_path,
+    aux_dir_path,
     F4PGAException,
     ResolutionEnv,
     fatal,
@@ -50,6 +51,7 @@ from f4pga.flows.flow_config import (
 from f4pga.flows.flow import Flow
 from f4pga.flows.stage import Stage
 from f4pga.flows.inspector import get_module_info
+from f4pga.util import Util
 
 
 ROOT = Path(__file__).resolve().parent
@@ -121,7 +123,7 @@ def f4pga_done():
 def setup_resolution_env():
     """Sets up a ResolutionEnv with default built-ins."""
 
-    r_env = ResolutionEnv({"shareDir": share_dir_path, "binDir": bin_dir_path})
+    r_env = ResolutionEnv({"shareDir": share_dir_path, "binDir": bin_dir_path, "auxDir": aux_dir_path})
 
     def _noisy_warnings():
         """
@@ -299,3 +301,10 @@ def cmd_show_dependencies(args: Namespace):
         sfprint(0, prstr)
 
     set_verbosity_level(-1)
+
+
+def cmd_run_util(args: Namespace):
+    """Run utility script"""
+
+    util = Util(args.util, args.function, args.util_args)
+    util.exec()
