@@ -1,0 +1,7 @@
+plugin -i ql-qlf
+read_verilog ./iob_no_flatten.v
+
+synth_quicklogic -family qlf_k4n8 -top my_top
+stat
+cd my_top
+select -assert-count 2 t:$_DFF_P_

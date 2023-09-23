@@ -1,0 +1,15 @@
+
+*inter* cells quiet
+bottom_intermediate_inst.OBUF_8
+
+*inter* cells
+bottom_intermediate_inst.OBUF_8
+
+*inter* cells with invalid filter expression
+bottom_intermediate_inst.OBUF_8
+
+Filtered cells
+OBUFTDS_2
+
+All cells
+{$abc$1984$lut$not$aiger1983$1} {$auto$alumacc.cc:485:replace_alu$1385.slice[0].carry4} {$auto$alumacc.cc:485:replace_alu$1385.slice[1].carry4} {$auto$alumacc.cc:485:replace_alu$1385.slice[2].carry4} {$auto$alumacc.cc:485:replace_alu$1385.slice[3].carry4} {$auto$alumacc.cc:485:replace_alu$1385.slice[4].carry4} {$auto$alumacc.cc:485:replace_alu$1385.slice[5].carry4} {$auto$alumacc.cc:485:replace_alu$1385.slice[6].carry4} {$auto$simplemap.cc:420:simplemap_dff$1471} {$auto$simplemap.cc:420:simplemap_dff$1472} {$auto$simplemap.cc:420:simplemap_dff$1473} {$auto$simplemap.cc:420:simplemap_dff$1474} {$auto$simplemap.cc:420:simplemap_dff$1475} {$auto$simplemap.cc:420:simplemap_dff$1476} {$auto$simplemap.cc:420:simplemap_dff$1477} {$auto$simplemap.cc:420:simplemap_dff$1478} {$auto$simplemap.cc:420:simplemap_dff$1479} {$auto$simplemap.cc:420:simplemap_dff$1480} {$auto$simplemap.cc:420:simplemap_dff$1481} {$auto$simplemap.cc:420:simplemap_dff$1482} {$auto$simplemap.cc:420:simplemap_dff$1483} {$auto$simplemap.cc:420:simplemap_dff$1484} {$auto$simplemap.cc:420:simplemap_dff$1485} {$auto$simplemap.cc:420:simplemap_dff$1486} {$auto$simplemap.cc:420:simplemap_dff$1487} {$auto$simplemap.cc:420:simplemap_dff$1488} {$auto$simplemap.cc:420:simplemap_dff$1489} {$auto$simplemap.cc:420:simplemap_dff$1490} {$auto$simplemap.cc:420:simplemap_dff$1491} {$auto$simplemap.cc:420:simplemap_dff$1492} {$auto$simplemap.cc:420:simplemap_dff$1493} {$auto$simplemap.cc:420:simplemap_dff$1494} {$auto$simplemap.cc:420:simplemap_dff$1495} {$auto$simplemap.cc:420:simplemap_dff$1496} {$iopadmap$top.clk} OBUFTDS_2 OBUF_6 OBUF_7 OBUF_OUT bottom_inst.OBUF_10 bottom_inst.OBUF_11 bottom_inst.OBUF_9 bottom_intermediate_inst.OBUF_8

@@ -1,0 +1,10 @@
+*inter* nets quiet
+bottom_intermediate_inst.I bottom_intermediate_inst.O bottom_intermediate_inst.bottom_intermediate_wire inter_wire inter_wire_2
+*inter* nets
+bottom_intermediate_inst.I bottom_intermediate_inst.O bottom_intermediate_inst.bottom_intermediate_wire inter_wire inter_wire_2
+*inter* nets with invalid filter expression
+bottom_intermediate_inst.I bottom_intermediate_inst.O bottom_intermediate_inst.bottom_intermediate_wire inter_wire inter_wire_2
+Filtered nets
+clk
+All nets
+{$abc$1984$aiger1983$38} {$abc$1984$aiger1983$42} {$abc$1984$aiger1983$43} {$abc$1984$aiger1983$44} {$abc$1984$aiger1983$45} {$abc$1984$aiger1983$50} {$abc$1984$aiger1983$51} {$abc$1984$aiger1983$52} {$abc$1984$aiger1983$53} {$abc$1984$aiger1983$58} {$abc$1984$aiger1983$59} {$abc$1984$aiger1983$60} {$abc$1984$aiger1983$61} {$abc$1984$aiger1983$66} {$abc$1984$aiger1983$67} {$abc$1984$aiger1983$68} {$abc$1984$aiger1983$69} {$abc$1984$aiger1983$74} {$abc$1984$aiger1983$75} {$abc$1984$aiger1983$76} {$abc$1984$aiger1983$77} {$abc$1984$aiger1983$82} {$abc$1984$aiger1983$83} {$abc$1984$aiger1983$84} {$abc$1984$aiger1983$85} {$abc$1984$aiger1983$88} {$abc$1984$aiger1983$89} {$abc$1984$aiger1983$90} {$abc$1984$aiger1983$91} {$abc$1984$aiger1983$92} {$abc$1984$aiger1983$93} {$abc$1984$iopadmap$clk} {$auto$alumacc.cc:485:replace_alu$1385.O} LD6 LD7 LD8 LD9 bottom_inst.I bottom_inst.O bottom_inst.OB bottom_intermediate_inst.I bottom_intermediate_inst.O bottom_intermediate_inst.bottom_intermediate_wire clk counter inter_wire inter_wire_2 led out_a out_b signal_n signal_p

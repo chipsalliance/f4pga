@@ -1,0 +1,48 @@
+plugin -i ql-qlf
+
+read_verilog ./bram.v
+design -save read
+
+#BRAM 32x512
+
+hierarchy -top BRAM_32x512
+proc
+memory
+equiv_opt -assert -map +/quicklogic/qlf_k6n10/cells_sim.v synth_quicklogic -family qlf_k6n10 -top BRAM_32x512
+design -load postopt
+cd BRAM_32x512
+stat
+select -assert-count 1 t:DP_RAM16K
+
+#BRAM 16x1024
+
+hierarchy -top BRAM_32x512
+proc
+memory
+equiv_opt -assert -map +/quicklogic/qlf_k6n10/cells_sim.v synth_quicklogic -family qlf_k6n10 -top BRAM_16x1024
+design -load postopt
+cd BRAM_16x1024
+stat
+select -assert-count 1 t:DP_RAM16K
+
+#BRAM 8x2048
+
+hierarchy -top BRAM_8x2048
+proc
+memory
+equiv_opt -assert -map +/quicklogic/qlf_k6n10/cells_sim.v synth_quicklogic -family qlf_k6n10 -top BRAM_8x2048
+design -load postopt
+cd BRAM_8x2048
+stat
+select -assert-count 1 t:DP_RAM16K
+
+#BRAM 4x4096
+
+hierarchy -top BRAM_4x4096
+proc
+memory
+equiv_opt -assert -map +/quicklogic/qlf_k6n10/cells_sim.v synth_quicklogic -family qlf_k6n10 -top BRAM_4x4096
+design -load postopt
+cd BRAM_4x4096
+stat
+select -assert-count 1 t:DP_RAM16K

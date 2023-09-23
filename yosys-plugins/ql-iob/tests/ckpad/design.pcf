@@ -1,0 +1,14 @@
+set_io clk0 B3 # to a BIDIR
+set_io clk1 A3 # to a BIDIR/CLOCK 
+set_io clk2 B4 # to a BIDIR
+set_io clk3 C4 # to a BIDIR/CLOCK
+
+set_io d(0) C1
+set_io d(1) A1
+set_io d(2) A2
+set_io d(3) B2
+
+set_io q(0) B5
+set_io q(1) D6
+set_io q(2) A5
+set_io q(3) C6

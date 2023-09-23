@@ -1,0 +1,47 @@
+{
+  "OBUFTDS_2": {
+    "IOSTANDARD": "DIFF_SSTL135",
+    "IO_LOC_PAIRS": "signal_p:N2,signal_n:N1",
+    "SLEW": "FAST"
+  },
+  "OBUF_6": {
+    "DRIVE": "12",
+    "IOSTANDARD": "LVCMOS33",
+    "IO_LOC_PAIRS": "led[0]:D10",
+    "SLEW": "SLOW"
+  },
+  "OBUF_7": {
+    "IN_TERM": "UNTUNED_SPLIT_40",
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "led[1]:A9",
+    "SLEW": "FAST"
+  },
+  "OBUF_OUT": {
+    "IN_TERM": "UNTUNED_SPLIT_50",
+    "IOSTANDARD": "LVCMOS33",
+    "IO_LOC_PAIRS": "out_a:E3",
+    "SLEW": "FAST"
+  },
+  "bottom_inst.OBUF_10": {
+    "IOSTANDARD": "LVCMOS18",
+    "IO_LOC_PAIRS": "out_b[0]:C2",
+    "SLEW": "SLOW"
+  },
+  "bottom_inst.OBUF_11": {
+    "DRIVE": "4",
+    "IOSTANDARD": "LVCMOS25",
+    "IO_LOC_PAIRS": "out_b[1]:R2",
+    "SLEW": "FAST"
+  },
+  "bottom_inst.OBUF_9": {
+    "IOSTANDARD": "DIFF_SSTL135",
+    "IO_LOC_PAIRS": "led[2]:M6",
+    "SLEW": "FAST"
+  },
+  "bottom_intermediate_inst.OBUF_8": {
+    "DRIVE": "16",
+    "IOSTANDARD": "SSTL135",
+    "IO_LOC_PAIRS": "led[3]:N4",
+    "SLEW": "SLOW"
+  }
+}

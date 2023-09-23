@@ -1,0 +1,183 @@
+# Copyright 2020-2022 F4PGA Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+dsp MULT9X9 MULT18X18 MULT18X36 MULT36X36
+  port A SIGNEDA
+    clk CLK 0
+    rst RSTA 0
+    ena CEA 1
+
+    set REGINPUTA=REGISTER
+    map GSR=GSR
+  endport
+  port B SIGNEDB
+    clk CLK 0
+    rst RSTB 0
+    ena CEB 1
+
+    set REGINPUTB=REGISTER
+    map GSR=GSR
+  endport
+  port Z
+    clk CLK 0
+    rst RSTOUT 0
+    ena CEOUT 1
+
+    set REGOUTPUT=REGISTER
+    map GSR=GSR
+  endport
+enddsp
+
+dsp MULTPREADD9X9 MULTPREADD18X18 MULTADDSUB18X18 MULTADDSUB36X36
+  port A SIGNEDA
+    clk CLK 0
+    rst RSTA 0
+    ena CEA 1
+
+    set REGINPUTA=REGISTER
+    map GSR=GSR
+  endport
+  port B SIGNEDB
+    clk CLK 0
+    rst RSTB 0
+    ena CEB 1
+
+    set REGINPUTB=REGISTER
+    map GSR=GSR
+  endport
+  port C SIGNEDC
+    clk CLK 0
+    rst RSTC 0
+    ena CEC 1
+
+    set REGINPUTC=REGISTER
+    map GSR=GSR
+  endport
+  port Z
+    clk CLK 0
+    rst RSTOUT 0
+    ena CEOUT 1
+
+    set REGOUTPUT=REGISTER
+    map GSR=GSR
+  endport
+enddsp
+
+dsp MULTADDSUB9X9WIDE
+  port A0 SIGNED
+    clk CLK 0
+    rst RSTA0A1 0
+    ena CEA0A1 1
+
+    set REGINPUTAB0=REGISTER
+    map GSR=GSR
+  endport
+  port A1 SIGNED
+    clk CLK 0
+    rst RSTA0A1 0
+    ena CEA0A1 1
+
+    set REGINPUTAB1=REGISTER
+    map GSR=GSR
+  endport
+  port A2 SIGNED
+    clk CLK 0
+    rst RSTA2A3 0
+    ena CEA2A3 1
+
+    set REGINPUTAB2=REGISTER
+    map GSR=GSR
+  endport
+  port A3 SIGNED
+    clk CLK 0
+    rst RSTA2A3 0
+    ena CEA2A3 1
+
+    set REGINPUTAB3=REGISTER
+    map GSR=GSR
+  endport
+  port B0 SIGNED
+    clk CLK 0
+    rst RSTB0B1 0
+    ena CEB0B1 1
+
+    set REGINPUTAB0=REGISTER
+    map GSR=GSR
+  endport
+  port B1 SIGNED
+    clk CLK 0
+    rst RSTB0B1 0
+    ena CEB0B1 1
+
+    set REGINPUTAB1=REGISTER
+    map GSR=GSR
+  endport
+  port B2 SIGNED
+    clk CLK 0
+    rst RSTB2B3 0
+    ena CEB2B3 1
+
+    set REGINPUTAB2=REGISTER
+    map GSR=GSR
+  endport
+  port B3 SIGNED
+    clk CLK 0
+    rst RSTB2B3 0
+    ena CEB2B3 1
+
+    set REGINPUTAB3=REGISTER
+    map GSR=GSR
+  endport
+  port C SIGNED
+    clk CLK 0
+    rst RSTC 0
+    ena CEC 1
+
+    set REGINPUTC=REGISTER
+    map GSR=GSR
+  endport
+  port Z
+    clk CLK 0
+    rst RSTOUT 0
+    ena CEOUT 1
+
+    set REGOUTPUT=REGISTER
+    map GSR=GSR
+  endport
+enddsp
+
+ff FD1P3DX
+  clk CK
+  rst CD
+  ena SP
+  d   D
+  q   Q
+
+  match GSR
+  set RESETMODE=ASYNC
+endff
+
+ff FD1P3IX
+  clk CK
+  rst CD
+  ena SP
+  d   D
+  q   Q
+
+  match GSR
+  set RESETMODE=SYNC
+endff
+
