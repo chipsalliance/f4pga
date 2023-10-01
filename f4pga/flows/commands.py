@@ -224,7 +224,7 @@ def cmd_build(args: Namespace):
     if (project_flow_cfg is None) and part_name is None:
         fatal(-1, "No configuration was provided. Use `--flow`, and/or " "`--part` to configure flow.")
 
-    override_prj_flow_cfg_by_cli(project_flow_cfg, get_cli_flow_config(args, part_name))
+    project_flow_cfg = override_prj_flow_cfg_by_cli(project_flow_cfg, get_cli_flow_config(args))
 
     flow_cfg = make_flow_config(project_flow_cfg, part_name)
 

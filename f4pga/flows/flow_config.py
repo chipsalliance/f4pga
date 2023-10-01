@@ -131,51 +131,13 @@ class ProjectFlowConfig:
 
 
 def override_prj_flow_cfg_by_cli(cfg: ProjectFlowConfig, cli_d: "dict[str, dict[str, dict]]"):
-    for part_name, part_cfg in cli_d.items():
-        print(f"OVERRIDING CONFIG FOR {part_name}")
-        p_cfg = cfg.flow_cfg.get(part_name)
-        if p_cfg is None:
-            p_cfg = {}
-            cfg.flow_cfg[part_name] = p_cfg
-        cli_p_values = part_cfg.get("values")
-        cli_p_dependencies = part_cfg.get("dependencies")
-        p_values = p_cfg.get("values")
-        p_dependencies = p_cfg.get("dependencies")
-        if cli_p_values is not None:
-            if p_values is None:
-                p_values = {}
-                part_cfg["values"] = p_values
-            p_values.update(cli_p_values)
-        if cli_p_dependencies is not None:
-            if p_dependencies is None:
-                p_dependencies = {}
-                part_cfg["dependencies"] = p_dependencies
-            p_dependencies.update(cli_p_dependencies)
-
-        for stage_name, cli_stage_cfg in part_cfg.items():
-            if stage_name in KWORDS:
-                continue
-
-            stage_cfg = part_cfg.get(stage_name)
-            if stage_cfg is None:
-                stage_cfg = {}
-                part_cfg[stage_name] = stage_cfg
-
-            stage_values = stage_cfg.get("values")
-            stage_dependencies = stage_cfg.get("dependencies")
-            cli_stage_values = cli_stage_cfg.get("values")
-            cli_stage_dependencies = cli_stage_cfg.get("dependencies")
-
-            if cli_stage_values is not None:
-                if stage_values is None:
-                    stage_values = {}
-                    stage_cfg["values"] = stage_values
-                stage_values.update(cli_stage_values)
-            if cli_stage_dependencies is not None:
-                if stage_dependencies is None:
-                    stage_dependencies = {}
-                    stage_cfg["dependencies"] = stage_dependencies
-                stage_dependencies.update(cli_stage_dependencies)
+    if "dependencies" not in cfg.flow_cfg:
+        cfg.flow_cfg["dependencies"] = {}
+    if "values" not in cfg.flow_cfg:
+        cfg.flow_cfg["values"] = {}
+    cfg.flow_cfg["dependencies"] = {**cfg.flow_cfg["dependencies"], **cli_d["dependencies"]}
+    cfg.flow_cfg["values"] = {**cfg.flow_cfg["values"], **cli_d["values"]}
+    return cfg
 
 
 class FlowConfig:

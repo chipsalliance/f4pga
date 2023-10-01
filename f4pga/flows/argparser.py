@@ -239,7 +239,7 @@ def p_parse_cli_value(s: str):
     return s.replace("\\", "")
 
 
-def get_cli_flow_config(args: Namespace, part: str):
+def get_cli_flow_config(args: Namespace):
     def create_defdict():
         return {
             "dependencies": {},
@@ -261,4 +261,4 @@ def get_cli_flow_config(args: Namespace, part: str):
     add_entries(args.dep, "dependencies")
     add_entries(args.val, "values")
 
-    return {part: part_flow_config}
+    return part_flow_config
