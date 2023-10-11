@@ -512,6 +512,7 @@ ql-eos-s3:
         inputs:
           '#1': '${:fasm}'
           '#2': '${:eblif[noext]}.bit'
+          '#3': --no-default-bitstream
           dev-type: ql-eos-s3
       values:
         build_dir: .
