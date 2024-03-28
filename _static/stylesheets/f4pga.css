@@ -1,0 +1,25 @@
+#f4pga-header {
+    margin-bottom: 0.4rem;
+}
+
+#f4pga-header a>i {
+    position: relative;
+    bottom: 0.08rem;
+    vertical-align: middle;
+    padding-right: 0.2rem;
+    font-size: 1.3rem;
+}
+
+.highlight>pre:hover:before {
+    padding: 0.1rem 0.5rem;
+    content: attr(click-to-copy);
+    color: rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+    position: absolute;
+    float: right;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: rgb(200, 200, 200);
+    font-size: 0.6rem;
+    cursor: pointer;
+}

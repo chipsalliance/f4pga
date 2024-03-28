@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="lang:clipboard.copy" content="Copy to clipboard">
+  <meta name="lang:clipboard.copied" content="Copied to clipboard">
+  <meta name="lang:search.language" content="en">
+  <meta name="lang:search.pipeline.stopwords" content="True">
+  <meta name="lang:search.pipeline.trimmer" content="True">
+  <meta name="lang:search.result.none" content="No matching documents">
+  <meta name="lang:search.result.one" content="1 matching document">
+  <meta name="lang:search.result.other" content="# matching documents">
+  <meta name="lang:search.tokenizer" content="[\s\-]+">
+
+  
+    <link href="https://fonts.gstatic.com/" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,500,700|Roboto:300,400,400i,700&display=fallback" rel="stylesheet">
+
+    <style>
+      body,
+      input {
+        font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif
+      }
+
+      code,
+      kbd,
+      pre {
+        font-family: "Roboto Mono", "Courier New", Courier, monospace
+      }
+    </style>
+  
+
+  <link rel="stylesheet" href="../_static/stylesheets/application.css"/>
+  <link rel="stylesheet" href="../_static/stylesheets/application-palette.css"/>
+  <link rel="stylesheet" href="../_static/stylesheets/application-fixes.css"/>
+  <link rel="stylesheet" href="../_static/stylesheets/f4pga.css"/>
+  
+  <link rel="stylesheet" href="../_static/fonts/material-icons.css"/>
+  
+  <meta name="theme-color" content="#3f51b5">
+  <script src="../_static/javascripts/modernizr.js"></script>
+  
+  
+  
+    <title>Usage &#8212; F4PGA  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+    <link rel="stylesheet" type="text/css" href="../_static/material.css?v=79c92029" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="icon" href="../_static/favicon.svg"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Modules" href="modules/index.html" />
+    <link rel="prev" title="Overview" href="index.html" />
+  
+   
+
+  </head>
+  <body dir=ltr
+        data-md-color-primary=indigo data-md-color-accent=blue>
+  
+  <svg class="md-svg">
+    <defs data-children-count="0">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+      
+    </defs>
+  </svg>
+  
+  <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer">
+  <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search">
+  <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+  <a href="#f4pga/Usage" tabindex="1" class="md-skip"> Skip to content </a>
+  <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex navheader">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="../index.html" title="F4PGA  documentation"
+           class="md-header-nav__button md-logo">
+          
+            &nbsp;
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          <span class="md-header-nav__topic">F4PGA  documentation</span>
+          <span class="md-header-nav__topic"> Usage </span>
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" action="../search.html" method="GET" name="search">
+      <input type="text" class="md-search__input" name="q" placeholder="Search"
+              autocapitalize="off" autocomplete="off" spellcheck="false"
+              data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            <a href="https://github.com/chipsalliance/f4pga" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    chipsalliance/f4pga
+  </div>
+</a>
+          </div>
+        </div>
+      
+      
+  
+  <script src="../_static/javascripts/version_dropdown.js"></script>
+  <script>
+    var json_loc = "../"versions.json"",
+        target_loc = "../../",
+        text = "Versions";
+    $( document ).ready( add_version_dropdown(json_loc, target_loc, text));
+  </script>
+  
+
+    </div>
+  </nav>
+</header>
+
+  
+  <div class="md-container">
+    
+    
+    
+  <nav class="md-tabs" data-md-component="tabs">
+    <div class="md-tabs__inner md-grid">
+      <ul class="md-tabs__list" style="float:left">
+          <li class="md-tabs__item"><a href="../index.html" class="md-tabs__link">F4PGA  documentation</a></li>
+      </ul>
+      <ul class="md-tabs__list" id="chipsalliance-header" style="float:right">
+        
+	  <li class="md-tabs__item"><a href="https://chipsalliance.org" class="md-tabs__link">
+	    <i class="md-icon">web</i> CHIPS Alliance Website</a></li>
+      </ul>
+    </div>
+  </nav>
+    <main class="md-main">
+      <div class="md-main__inner md-grid" data-md-component="container">
+        
+          <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="../index.html" title="F4PGA documentation" class="md-nav__button md-logo">
+      
+        <img src="../_static/" alt=" logo" width="48" height="48">
+      
+    </a>
+    <a href="../index.html"
+       title="F4PGA documentation">F4PGA  documentation</a>
+  </label>
+    <div class="md-nav__source">
+      <a href="https://github.com/chipsalliance/f4pga" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    chipsalliance/f4pga
+  </div>
+</a>
+    </div>
+  
+  
+
+<ul class="md-nav__list">
+  <li class="md-nav__item">
+  
+    <span class="md-nav__link caption"><span class="caption-text">About F4PGA</span></span>
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../getting-started.html" class="md-nav__link">
+        Getting started</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../how.html" class="md-nav__link">
+        How it works</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../status.html" class="md-nav__link">
+        Supported Architectures</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../community.html" class="md-nav__link">
+        Community</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+    <span class="md-nav__link caption"><span class="caption-text">Python utils</span></span>
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="index.html" class="md-nav__link">
+        Overview</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="#" class="md-nav__link md-nav__link--active">
+        Usage</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="modules/index.html" class="md-nav__link">
+        Modules</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="DevNotes.html" class="md-nav__link">
+        Developer’s notes</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="Deprecated.html" class="md-nav__link">
+        Understanding the (deprecated) flow</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+    <span class="md-nav__link caption"><span class="caption-text">Development</span></span>
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../development/changes.html" class="md-nav__link">
+        Changes</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../development/building-docs.html" class="md-nav__link">
+        Building the documentation</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../development/venv.html" class="md-nav__link">
+        Packages in virtual environment</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+    <span class="md-nav__link caption"><span class="caption-text">Design Flows</span></span>
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../flows/index.html" class="md-nav__link">
+        Introduction</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../flows/synthesis.html" class="md-nav__link">
+        Synthesis</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../flows/pnr.html" class="md-nav__link">
+        Place & Route</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../flows/bitstream.html" class="md-nav__link">
+        Bitstream translation</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../flows/f4pga.html" class="md-nav__link">
+        In F4PGA</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+    <span class="md-nav__link caption"><span class="caption-text">Specifications</span></span>
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="https://fasm.readthedocs.io/en/latest/" class="md-nav__link">
+        FPGA Assembly (FASM) ➚</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="https://chipsalliance/fpga-interchange-schema" class="md-nav__link">
+        FPGA Interchange schema ➚</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+    <span class="md-nav__link caption"><span class="caption-text">Appendix</span></span>
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../glossary.html" class="md-nav__link">
+        Glossary</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../references.html" class="md-nav__link">
+        References</a>
+    
+
+  
+  </li>
+</ul>
+
+</nav>
+              </div>
+            </div>
+          </div>
+          <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                
+<nav class="md-nav md-nav--secondary">
+    <label class="md-nav__title" for="__toc">Contents</label>
+  <ul class="md-nav__list" data-md-scrollfix="">
+        <li class="md-nav__item"><a href="#f4pga-usage--page-root" class="md-nav__link">Usage</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#getting-started" class="md-nav__link">Getting started</a>
+        </li>
+        <li class="md-nav__item"><a href="#fundamental-concepts" class="md-nav__link">Fundamental concepts</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#f4pga" class="md-nav__link">f4pga</a>
+        </li>
+        <li class="md-nav__item"><a href="#modules" class="md-nav__link">Modules</a>
+        </li>
+        <li class="md-nav__item"><a href="#dependencies" class="md-nav__link">Dependencies</a>
+        </li>
+        <li class="md-nav__item"><a href="#target" class="md-nav__link">Target</a>
+        </li>
+        <li class="md-nav__item"><a href="#flow" class="md-nav__link">Flow</a>
+        </li>
+        <li class="md-nav__item"><a href="#f4cache" class="md-nav__link">.f4cache</a>
+        </li>
+        <li class="md-nav__item"><a href="#resolution" class="md-nav__link">Resolution</a>
+        </li>
+        <li class="md-nav__item"><a href="#platform-s-flow-definition" class="md-nav__link">Platform’s flow definition</a>
+        </li>
+        <li class="md-nav__item"><a href="#project-s-flow-configuration" class="md-nav__link">Project’s flow configuration</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#build-a-target" class="md-nav__link">Build a target</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#using-flow-configuration-file" class="md-nav__link">Using flow configuration file</a>
+        </li>
+        <li class="md-nav__item"><a href="#using-command-line-interface" class="md-nav__link">Using Command-Line Interface</a>
+        </li>
+        <li class="md-nav__item"><a href="#pretend-mode" class="md-nav__link">Pretend mode</a>
+        </li>
+        <li class="md-nav__item"><a href="#info-mode" class="md-nav__link">Info mode</a>
+        </li>
+        <li class="md-nav__item"><a href="#summary-of-global-options" class="md-nav__link">Summary of global options</a>
+        </li>
+        <li class="md-nav__item"><a href="#summary-of-all-available-sub-commands" class="md-nav__link">Summary of all available sub-commands</a>
+        </li>
+        <li class="md-nav__item"><a href="#summary-of-all-options-available-for-build-sub-command" class="md-nav__link">Summary of all options available for <code class="docutils literal notranslate"><span class="pre">build</span></code> sub-command</a>
+        </li>
+        <li class="md-nav__item"><a href="#summary-of-all-options-available-for-showd-sub-command" class="md-nav__link">Summary of all options available for <code class="docutils literal notranslate"><span class="pre">showd</span></code> sub-command</a>
+        </li>
+        <li class="md-nav__item"><a href="#dependency-resolution-display" class="md-nav__link">Dependency resolution display</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#common-targets-and-values" class="md-nav__link">Common targets and values</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#need-to-be-provided-by-the-user" class="md-nav__link">Need to be provided by the user</a>
+        </li>
+        <li class="md-nav__item"><a href="#available-in-most-flows" class="md-nav__link">Available in most flows</a>
+        </li>
+        <li class="md-nav__item"><a href="#built-in-values" class="md-nav__link">Built-in values</a>
+        </li>
+        <li class="md-nav__item"><a href="#used-in-flow-definitions" class="md-nav__link">Used in flow definitions</a>
+        </li></ul>
+            </nav>
+        </li></ul>
+            </nav>
+        </li>
+    
+<li class="md-nav__item"><a class="md-nav__extra_link" href="../_sources/f4pga/Usage.md.txt">Show Source</a> </li>
+
+<li id="searchbox" class="md-nav__item"></li>
+
+  </ul>
+</nav>
+              </div>
+            </div>
+          </div>
+        
+        <div class="md-content">
+          <article class="md-content__inner md-typeset" role="main">
+            
+  <section id="usage">
+<h1 id="f4pga-usage--page-root">Usage<a class="headerlink" href="#f4pga-usage--page-root" title="Link to this heading">¶</a></h1>
+<section id="getting-started">
+<h2 id="getting-started">Getting started<a class="headerlink" href="#getting-started" title="Link to this heading">¶</a></h2>
+<p>To use <code class="docutils literal notranslate"><span class="pre">f4pga</span></code> you need a working Python 3 installation which should be included as a part of the conda virtual
+environment set up during F4PGA installation.
+<code class="docutils literal notranslate"><span class="pre">f4pga</span></code> is installed together with F4PGA, regardless of the version of the toolchain.
+However, only <em>XC7</em> architectures are supported currently and <em>Quicklogic</em> support is a work in progress.</p>
+<p>To get started with a project that already uses <code class="docutils literal notranslate"><span class="pre">f4pga</span></code>, go to the project’s directory and run the following line to
+generate a bitstream:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>f4pga<span class="w"> </span>build<span class="w"> </span>-f<span class="w"> </span>flow.json
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">flow.json</span></code> should be a <em>project flow configuration</em> file included with the project.
+If you are unsure if you got the right file, you can check an example of the contents of such file shown in the
+<em>Build a target</em> section below.</p>
+<p>The location of the bitstream will be indicated by <code class="docutils literal notranslate"><span class="pre">f4pga</span></code> after the flow completes.
+Look for a line like this one on stdout:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>Target<span class="w"> </span><span class="sb">`</span>bitstream<span class="sb">`</span><span class="w"> </span>-&gt;<span class="w"> </span>build/arty_35/top.bit
+</pre></div>
+</div>
+</section>
+<section id="fundamental-concepts">
+<h2 id="fundamental-concepts">Fundamental concepts<a class="headerlink" href="#fundamental-concepts" title="Link to this heading">¶</a></h2>
+<p>If you want to create a new project, it’s highly recommended that you read this section first.</p>
+<section id="f4pga">
+<h3 id="f4pga">f4pga<a class="headerlink" href="#f4pga" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">f4pga</span></code> is a modular build system designed to handle various <em>Verilog-to-bitstream</em> flows for FPGAs.
+It works by wrapping the necessary tools in Python, which are called <em>f4pga modules</em>.
+Modules are then referenced in <em>platform flow definition</em> files, together with configuration specific for a given
+platform.
+Flow definition files for the following platforms are included as a part of <em>f4pga</em>:</p>
+<ul class="simple">
+<li><p><strong>AMD Xilinx x7a50t</strong> (and architecturally equivalent devices, such as x7a35t)</p></li>
+<li><p><strong>AMD Xilinx x7a100t</strong></p></li>
+<li><p><strong>AMD Xilinx x7a200t</strong></p></li>
+<li><p><strong>Quicklogic EOS-S3</strong> (currently unsupported, provided only for development purposes)</p></li>
+<li><p><strong>Quicklogic K4N8</strong> (currently unsupported, provided only for development purposes)</p></li>
+</ul>
+<p>You can also write your own <em>platform flow definition</em> file if you want to bring support for a different device.</p>
+<p>Each project that uses <code class="docutils literal notranslate"><span class="pre">f4pga</span></code> to perform any flow should include a <em>.json</em> file describing the project.
+The purpose of that file is to configure inputs for the flow and override configuration values if necessary.</p>
+</section>
+<section id="modules">
+<h3 id="modules">Modules<a class="headerlink" href="#modules" title="Link to this heading">¶</a></h3>
+<p>A <em>module</em> (also referred to as <em>f4pga module</em> in situations where there might be confusion between arbitrary Python
+<em>modules</em> and f4pga <em>modules</em>) is a Python script that wraps a tool used within the F4PGA ecosystem.
+The main purpose of the wrappers is to provide a unified interface for <code class="docutils literal notranslate"><span class="pre">f4pga</span></code> to use and to configure the tool,
+as well as provide information about files required and produced by the tool.</p>
+</section>
+<section id="dependencies">
+<h3 id="dependencies">Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading">¶</a></h3>
+<p>A <em>dependency</em> is any file, directory or a list of such that a <em>module</em> takes as its input or produces on its output.</p>
+<p>Modules specify their dependencies by using symbolic names instead of file paths.
+The files they produce are also given symbolic names and paths which are either set through <em>project flow configuration</em>
+file or derived from the paths of the dependencies taken by the module.</p>
+</section>
+<section id="target">
+<h3 id="target">Target<a class="headerlink" href="#target" title="Link to this heading">¶</a></h3>
+<p><em>Target</em> is a dependency that the user has asked F4PGA to produce.</p>
+</section>
+<section id="flow">
+<h3 id="flow">Flow<a class="headerlink" href="#flow" title="Link to this heading">¶</a></h3>
+<p>A <em>flow</em> is set of <em>modules</em> executed in a right order to produce a <em>target</em>.</p>
+</section>
+<section id="f4cache">
+<h3 id="f4cache">.f4cache<a class="headerlink" href="#f4cache" title="Link to this heading">¶</a></h3>
+<p>All <em>dependencies</em> are tracked by a modification tracking system which stores hashes of the files
+(directories get always <code class="docutils literal notranslate"><span class="pre">'0'</span></code> hash) in <code class="docutils literal notranslate"><span class="pre">.f4cache</span></code> file in the root of the project.
+When F4PGA constructs a <em>flow</em>, it will try to omit execution of modules which would receive the same data on their
+input.
+There is a strong <em>assumption</em> there that a <em>module</em>’s output remains unchanged if the input configuration isn’t
+changed, ie. <em>modules</em> are deterministic. This is might be not true for some tools and in case you really want to re-run
+a stage, there’s a <code class="docutils literal notranslate"><span class="pre">--nocache</span></code> option that treats the <code class="docutils literal notranslate"><span class="pre">.f4cache</span></code> file as if it was empty.</p>
+</section>
+<section id="resolution">
+<h3 id="resolution">Resolution<a class="headerlink" href="#resolution" title="Link to this heading">¶</a></h3>
+<p>A <em>dependency</em> is said to be <em>resolved</em> if it meets one of the following criteria:</p>
+<ul class="simple">
+<li><p>it exists on persistent storage and its hash matches the one stored in .f4cache</p></li>
+<li><p>there exists such <em>flow</em> that all of the dependencies of its modules are <em>resolved</em> and it produces the <em>dependency</em> in
+question.</p></li>
+</ul>
+</section>
+<section id="platform-s-flow-definition">
+<h3 id="platform-s-flow-definition">Platform’s flow definition<a class="headerlink" href="#platform-s-flow-definition" title="Link to this heading">¶</a></h3>
+<p><em>Platform flow definition</em> is a piece of data describing a space of flows for a given platform, serialized into a <em>JSON</em>.
+It’s stored in a file that’s named after the device’s name under <code class="docutils literal notranslate"><span class="pre">f4pga/platforms</span></code>.</p>
+<p><em>Platform flow definition</em> contains a list of modules available for constructing flows and defines a set of values which
+the modules can reference.
+In case of some modules it may also define a set of parameters used during their construction.
+<code class="docutils literal notranslate"><span class="pre">mkdirs</span></code> module uses that to allow production of of multiple directories as separate dependencies.
+This however is an experimental feature which possibly will be removed in favor of having multiple instances of the same
+module with renameable outputs.</p>
+<p>Not all <em>dependencies</em>* have to be <em>resolved</em> at this stage, a <em>platform’s flow definition</em> for example won’t be able to
+provide a list of source files needed in a <em>flow</em>.</p>
+</section>
+<section id="project-s-flow-configuration">
+<h3 id="project-s-flow-configuration">Project’s flow configuration<a class="headerlink" href="#project-s-flow-configuration" title="Link to this heading">¶</a></h3>
+<p>Similarly to <em>platform flow definition</em>, <em>Projects flow configuration</em> is a <em>JSON</em> that is used to configure <em>modules</em>. There are however a couple differences here and there.</p>
+<ul class="simple">
+<li><p>The most obvious one is that this file is unique for a project and is provided by the user of <code class="docutils literal notranslate"><span class="pre">f4pga</span></code>.</p></li>
+<li><p>The other difference is that it doesn’t list <em>modules</em> available for the platform.</p></li>
+<li><p>All the values provided in <em>projects flow configuration</em> will override those provided in <em>platform flow definition</em>.</p></li>
+<li><p>It can contain sections with configurations for different platforms.</p></li>
+<li><p>Unlike <em>platform flow definition</em> it can give explicit paths to dependencies.</p></li>
+<li><p>At this stage all mandatory <em>dependencies</em> should be resolved.</p></li>
+</ul>
+<p>Typically <em>projects flow configuration</em> will be used to resolve dependencies for <em>HDL source code</em> and <em>device constraints</em>.</p>
+</section>
+</section>
+<section id="build-a-target">
+<h2 id="build-a-target">Build a target<a class="headerlink" href="#build-a-target" title="Link to this heading">¶</a></h2>
+<section id="using-flow-configuration-file">
+<h3 id="using-flow-configuration-file">Using flow configuration file<a class="headerlink" href="#using-flow-configuration-file" title="Link to this heading">¶</a></h3>
+<p>To build a <em>target</em> <code class="docutils literal notranslate"><span class="pre">target_name</span></code>, use the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>f4pga<span class="w"> </span>build<span class="w"> </span>-f<span class="w"> </span>flow.json<span class="w"> </span>-p<span class="w"> </span>platform_device_name<span class="w"> </span>-t<span class="w"> </span>target_name
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">flow.json</span></code> is a path to <em>projects flow configuration</em>.</p>
+<p>For example, let’s consider the following <em>projects flow configuration (flow.json)</em>:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"default_part"</span><span class="p">:</span><span class="w"> </span><span class="s2">"XC7A35TCSG324-1"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"dependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"sources"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"counter.v"</span><span class="p">],</span>
+<span class="w">        </span><span class="nt">"xdc"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"arty.xdc"</span><span class="p">],</span>
+<span class="w">        </span><span class="nt">"synth_log"</span><span class="p">:</span><span class="w"> </span><span class="s2">"synth.log"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"pack_log"</span><span class="p">:</span><span class="w"> </span><span class="s2">"pack.log"</span><span class="p">,</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">"values"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"top"</span><span class="p">:</span><span class="w"> </span><span class="s2">"top"</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">"XC7A35TCSG324-1"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"default_target"</span><span class="p">:</span><span class="w"> </span><span class="s2">"bitstream"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"dependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">"build_dir"</span><span class="p">:</span><span class="w"> </span><span class="s2">"build/arty_35"</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>It specifies list of paths to Verilog source files as <code class="docutils literal notranslate"><span class="pre">sources</span></code> dependency.
+Similarly it also provides an <code class="docutils literal notranslate"><span class="pre">XDC</span></code> file with constrains (<code class="docutils literal notranslate"><span class="pre">xdc</span></code> dependency).</p>
+<p>It also names a path for synthesis and logs (<code class="docutils literal notranslate"><span class="pre">synth_log</span></code>, <code class="docutils literal notranslate"><span class="pre">pack_log</span></code>).
+These two are optional on-demand outputs, meaning they won’t be produces unless their paths are explicitly set.</p>
+<p><code class="docutils literal notranslate"><span class="pre">top</span></code> value is set to in order to specify the name of top Verilog module, which is required during synthesis.</p>
+<p><code class="docutils literal notranslate"><span class="pre">build_dir</span></code> is an optional helper dependency.
+When available, modules will put their outputs into that directory.
+It’s also an <em>on-demand</em> output of <code class="docutils literal notranslate"><span class="pre">mkdirs</span></code> module in <em>xc7a50t</em> flow definition, which means that if specified directory
+does not exist, <code class="docutils literal notranslate"><span class="pre">mkdirs</span></code> will create it and provide as <code class="docutils literal notranslate"><span class="pre">build_dir</span></code> dependency.</p>
+<p>With this flow configuration, you can build a bitstream for arty_35 using the
+following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ f4pga build -f flow.json -p XC7A35TCSG324-1 -t bitstream
+</pre></div>
+</div>
+<p>Because we have <code class="docutils literal notranslate"><span class="pre">default_platform</span></code> defined, we can skip the <code class="docutils literal notranslate"><span class="pre">--part</span></code> argument.
+We can also skip the <code class="docutils literal notranslate"><span class="pre">--target</span></code> argument because we have a <code class="docutils literal notranslate"><span class="pre">default_target</span></code> defined for the
+chosen platform. This will default to the <code class="docutils literal notranslate"><span class="pre">bitstream</span></code> target of <code class="docutils literal notranslate"><span class="pre">xc7a50t</span></code> platform:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ f4pga build -f flow.json
+</pre></div>
+</div>
+</section>
+<section id="using-command-line-interface">
+<h3 id="using-command-line-interface">Using Command-Line Interface<a class="headerlink" href="#using-command-line-interface" title="Link to this heading">¶</a></h3>
+<p>Alternatively you can use CLI to pass the configuration without creating a flow file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ f4pga build -p XC7A35TCSG324-1 -Dsources=[counter.v] -Dxdc=[arty.xdc] -Dsynth_log=synth.log -Dpack_log=pack.log -Dbuild_dir=build/arty_35 -Vtop=top -t bitstream
+</pre></div>
+</div>
+<p>CLI flow configuration can be used alongside a flow configuration file and will override
+conflicting dependencies/values from the file.</p>
+<p>CLI configuration follows the following format:</p>
+<p><code class="docutils literal notranslate"><span class="pre">&lt;dependency/value</span> <span class="pre">identifier&gt;=&lt;expression&gt;</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">&lt;dependency/value</span> <span class="pre">identifier&gt;</span></code> is the name of dependency or value optionally prefixed by a stage
+name and a dot (<code class="docutils literal notranslate"><span class="pre">.</span></code>). Using the notation with stage name sets the dependency/value only for the
+specified stage.</p>
+<p><code class="docutils literal notranslate"><span class="pre">&lt;expression&gt;</span></code> is a form of defining a dependency path or a value. Characters are interpreted
+as strings unless the follow one of the following format:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[item1,item2,item3,...]</span></code> - this is a list of strings</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">{key1:value1,key2:value2,key3:value3,...}</span></code> - this is a dictionary</p></li>
+</ul>
+<p>Nesting structures is currently unsupported in CLI.</p>
+</section>
+<section id="pretend-mode">
+<h3 id="pretend-mode">Pretend mode<a class="headerlink" href="#pretend-mode" title="Link to this heading">¶</a></h3>
+<p>You can also add a <code class="docutils literal notranslate"><span class="pre">--pretend</span></code> (<code class="docutils literal notranslate"><span class="pre">-P</span></code>) option if you just want to see the results of dependency resolution for a
+specified target without building it.
+This is useful when you just want to know what files will be generated and where will they be stored.</p>
+</section>
+<section id="info-mode">
+<h3 id="info-mode">Info mode<a class="headerlink" href="#info-mode" title="Link to this heading">¶</a></h3>
+<p>Modules have the ability to include description to the dependencies they produce.</p>
+<p>Running <code class="docutils literal notranslate"><span class="pre">f4pga</span></code> with <code class="docutils literal notranslate"><span class="pre">--info</span></code> (<code class="docutils literal notranslate"><span class="pre">-i</span></code>) flag allows you to see descriptions of these dependencies.
+This option doesn’t require a target to be specified, but you still have to provide a flow configuration and platform
+name.</p>
+<p>This is still an experimental option, most targets currently lack descriptions and no information whether the output is
+<em>on-demand</em> is currently displayed.</p>
+<p>Example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>f4pga<span class="w"> </span>-v<span class="w"> </span>build<span class="w"> </span>-f<span class="w"> </span>flow.json<span class="w"> </span>-p<span class="w"> </span>XC7A35TCSG324-1<span class="w"> </span>-i
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Platform dependencies/targets:
+    build_dir:          &lt;no descritption&gt;
+                        module: `mk_build_dir`
+    eblif:              Extended BLIF hierarchical sequential designs file
+                        generated by YOSYS
+                        module: `synth`
+    fasm_extra:         &lt;no description&gt;
+                        module: `synth`
+    json:               JSON file containing a design generated by YOSYS
+                        module: `synth`
+    synth_json:         &lt;no description&gt;
+                        module: `synth`
+    sdc:                &lt;no description&gt;
+                        module: `synth`
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>This is only a snippet of the entire output.</p>
+</div>
+</section>
+<section id="summary-of-global-options">
+<h3 id="summary-of-global-options">Summary of global options<a class="headerlink" href="#summary-of-global-options" title="Link to this heading">¶</a></h3>
+<table>
+<thead>
+<tr class="row-odd"><th class="head"><p>long</p></th>
+<th class="head text-center"><p>short</p></th>
+<th class="head"><p>arguments</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>–verbose</p></td>
+<td class="text-center"><p>-v</p></td>
+<td><p>-</p></td>
+<td><p>Control verbosity level. 0 for no verbose output. 2 for maximum verbosity</p></td>
+</tr>
+<tr class="row-odd"><td><p>–silent</p></td>
+<td class="text-center"><p>-s</p></td>
+<td><p>-</p></td>
+<td><p>Suppress any output</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="summary-of-all-available-sub-commands">
+<h3 id="summary-of-all-available-sub-commands">Summary of all available sub-commands<a class="headerlink" href="#summary-of-all-available-sub-commands" title="Link to this heading">¶</a></h3>
+<table>
+<thead>
+<tr class="row-odd"><th class="head"><p>name</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>build</p></td>
+<td><p>Build a project</p></td>
+</tr>
+<tr class="row-odd"><td><p>showd</p></td>
+<td><p>Print value of a dependency</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="summary-of-all-options-available-for-build-sub-command">
+<h3 id="summary-of-all-options-available-for-build-sub-command">Summary of all options available for <code class="docutils literal notranslate"><span class="pre">build</span></code> sub-command<a class="headerlink" href="#summary-of-all-options-available-for-build-sub-command" title="Link to this heading">¶</a></h3>
+<table>
+<thead>
+<tr class="row-odd"><th class="head"><p>long</p></th>
+<th class="head text-center"><p>short</p></th>
+<th class="head"><p>arguments</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>–flow</p></td>
+<td class="text-center"><p>-f</p></td>
+<td><p>flow configuration file</p></td>
+<td><p>Use flow configuration file</p></td>
+</tr>
+<tr class="row-odd"><td><p>–part</p></td>
+<td class="text-center"><p>-p</p></td>
+<td><p>part name</p></td>
+<td><p>Specify target part name</p></td>
+</tr>
+<tr class="row-even"><td><p>–target</p></td>
+<td class="text-center"><p>-t</p></td>
+<td><p>target dependency name</p></td>
+<td><p>Specify target to produce</p></td>
+</tr>
+<tr class="row-odd"><td><p>–info</p></td>
+<td class="text-center"><p>-i</p></td>
+<td><p>-</p></td>
+<td><p>Display information about available targets</p></td>
+</tr>
+<tr class="row-even"><td><p>–pretend</p></td>
+<td class="text-center"><p>-P</p></td>
+<td><p>-</p></td>
+<td><p>Resolve dependencies without executing the flow</p></td>
+</tr>
+<tr class="row-odd"><td><p>–nocache</p></td>
+<td class="text-center"><p></p></td>
+<td><p>-</p></td>
+<td><p>Do not perform incremental build (do full a full build)</p></td>
+</tr>
+<tr class="row-even"><td><p>–stageinfo</p></td>
+<td class="text-center"><p>-S</p></td>
+<td><p>stage name</p></td>
+<td><p>Display information about a specified stage</p></td>
+</tr>
+<tr class="row-odd"><td><p>–dep</p></td>
+<td class="text-center"><p>-D</p></td>
+<td><p>dependency_name=pathexpr</p></td>
+<td><p>Add a dependency to configuration</p></td>
+</tr>
+<tr class="row-even"><td><p>–val</p></td>
+<td class="text-center"><p>-V</p></td>
+<td><p>value_name=valueexpr</p></td>
+<td><p>Add a value to configuration</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="summary-of-all-options-available-for-showd-sub-command">
+<h3 id="summary-of-all-options-available-for-showd-sub-command">Summary of all options available for <code class="docutils literal notranslate"><span class="pre">showd</span></code> sub-command<a class="headerlink" href="#summary-of-all-options-available-for-showd-sub-command" title="Link to this heading">¶</a></h3>
+<table>
+<thead>
+<tr class="row-odd"><th class="head"><p>long</p></th>
+<th class="head text-center"><p>short</p></th>
+<th class="head"><p>arguments</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>–flow</p></td>
+<td class="text-center"><p>-f</p></td>
+<td><p>flow configuration file</p></td>
+<td><p>Use flow configuration file</p></td>
+</tr>
+<tr class="row-odd"><td><p>–part</p></td>
+<td class="text-center"><p>-p</p></td>
+<td><p>part name</p></td>
+<td><p>Specify target part name</p></td>
+</tr>
+<tr class="row-even"><td><p>–stage</p></td>
+<td class="text-center"><p>-s</p></td>
+<td><p>part name</p></td>
+<td><p>Specify stage name (to display stage-specific dependencies)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="dependency-resolution-display">
+<h3 id="dependency-resolution-display">Dependency resolution display<a class="headerlink" href="#dependency-resolution-display" title="Link to this heading">¶</a></h3>
+<p>F4PGA displays some information about dependencies when requesting a target.</p>
+<p>Here’s an example of a possible output when trying to build <code class="docutils literal notranslate"><span class="pre">bitstream</span></code> target (use <code class="docutils literal notranslate"><span class="pre">-P</span></code>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">F4PGA</span> <span class="n">Build</span> <span class="n">System</span>
+<span class="n">Scanning</span> <span class="n">modules</span><span class="o">...</span>
+
+<span class="n">Project</span> <span class="n">status</span><span class="p">:</span>
+    <span class="p">[</span><span class="n">R</span><span class="p">]</span> <span class="n">bitstream</span><span class="p">:</span>  <span class="n">bitstream</span> <span class="o">-&gt;</span> <span class="n">build</span><span class="o">/</span><span class="n">arty_35</span><span class="o">/</span><span class="n">top</span><span class="o">.</span><span class="n">bit</span>
+    <span class="p">[</span><span class="n">O</span><span class="p">]</span> <span class="n">build_dir</span><span class="p">:</span>  <span class="n">build</span><span class="o">/</span><span class="n">arty_35</span>
+    <span class="p">[</span><span class="n">R</span><span class="p">]</span> <span class="n">eblif</span><span class="p">:</span>  <span class="n">synth</span> <span class="o">-&gt;</span> <span class="n">build</span><span class="o">/</span><span class="n">arty_35</span><span class="o">/</span><span class="n">top</span><span class="o">.</span><span class="n">eblif</span>
+    <span class="p">[</span><span class="n">R</span><span class="p">]</span> <span class="n">fasm</span><span class="p">:</span>  <span class="n">fasm</span> <span class="o">-&gt;</span> <span class="n">build</span><span class="o">/</span><span class="n">arty_35</span><span class="o">/</span><span class="n">top</span><span class="o">.</span><span class="n">fasm</span>
+    <span class="p">[</span><span class="n">R</span><span class="p">]</span> <span class="n">fasm_extra</span><span class="p">:</span>  <span class="n">synth</span> <span class="o">-&gt;</span> <span class="n">build</span><span class="o">/</span><span class="n">arty_35</span><span class="o">/</span><span class="n">top_fasm_extra</span><span class="o">.</span><span class="n">fasm</span>
+    <span class="p">[</span><span class="n">R</span><span class="p">]</span> <span class="n">io_place</span><span class="p">:</span>  <span class="n">ioplace</span> <span class="o">-&gt;</span> <span class="n">build</span><span class="o">/</span><span class="n">arty_35</span><span class="o">/</span><span class="n">top</span><span class="o">.</span><span class="n">ioplace</span>
+    <span class="p">[</span><span class="n">R</span><span class="p">]</span> <span class="n">net</span><span class="p">:</span>  <span class="n">pack</span> <span class="o">-&gt;</span> <span class="n">build</span><span class="o">/</span><span class="n">arty_35</span><span class="o">/</span><span class="n">top</span><span class="o">.</span><span class="n">net</span>
+    <span class="p">[</span><span class="n">X</span><span class="p">]</span> <span class="n">pcf</span><span class="p">:</span>  <span class="n">MISSING</span>
+    <span class="p">[</span><span class="n">R</span><span class="p">]</span> <span class="n">place</span><span class="p">:</span>  <span class="n">place</span> <span class="o">-&gt;</span> <span class="n">build</span><span class="o">/</span><span class="n">arty_35</span><span class="o">/</span><span class="n">top</span><span class="o">.</span><span class="n">place</span>
+    <span class="p">[</span><span class="n">R</span><span class="p">]</span> <span class="n">place_constraints</span><span class="p">:</span>  <span class="n">place_constraints</span> <span class="o">-&gt;</span> <span class="n">build</span><span class="o">/</span><span class="n">arty_35</span><span class="o">/</span><span class="n">top</span><span class="o">.</span><span class="n">preplace</span>
+    <span class="p">[</span><span class="n">R</span><span class="p">]</span> <span class="n">route</span><span class="p">:</span>  <span class="n">route</span> <span class="o">-&gt;</span> <span class="n">build</span><span class="o">/</span><span class="n">arty_35</span><span class="o">/</span><span class="n">top</span><span class="o">.</span><span class="n">route</span>
+    <span class="p">[</span><span class="n">R</span><span class="p">]</span> <span class="n">sdc</span><span class="p">:</span>  <span class="n">synth</span> <span class="o">-&gt;</span> <span class="n">build</span><span class="o">/</span><span class="n">arty_35</span><span class="o">/</span><span class="n">top</span><span class="o">.</span><span class="n">sdc</span>
+    <span class="p">[</span><span class="n">N</span><span class="p">]</span> <span class="n">sources</span><span class="p">:</span>  <span class="p">[</span><span class="s1">'counter.v'</span><span class="p">]</span>
+    <span class="p">[</span><span class="n">O</span><span class="p">]</span> <span class="n">xdc</span><span class="p">:</span>  <span class="p">[</span><span class="s1">'arty.xdc'</span><span class="p">]</span>
+
+<span class="n">f4pga</span><span class="p">:</span> <span class="n">DONE</span>
+</pre></div>
+</div>
+<p>The letters in the boxes describe the status of a dependency whose name is next to the box.</p>
+<ul>
+<li><p><strong>X</strong> - dependency unresolved.
+Dependency is not present or cannot be produced.
+This isn’t always a bad sign. Some dependencies are not required to, such as <code class="docutils literal notranslate"><span class="pre">pcf</span></code>.</p></li>
+<li><p><strong>O</strong> - dependency present, unchanged.
+This dependency is already built and is confirmed to stay unchanged during flow execution.</p></li>
+<li><p><strong>N</strong> - dependency present, new/changed.
+This dependency is already present on the persistent storage, but it was either missing earlier, or its content
+changed since the last time it was used.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>It won’t continue to be reported as “<strong>N</strong>” after a successful build of any target.
+This may lead to some false “<strong>O</strong>”s in some complex scenarios.
+This should be fixed in the future.</p>
+</div>
+</li>
+<li><p><strong>S</strong> - dependency not present, resolved.
+This dependency is not currently available on the persistent storage, however it will be produced within flow’s
+execution.</p></li>
+<li><p><strong>R</strong> - dependency present, resolved, requires rebuild.
+This dependency is currently available on the persistent storage, however it has to be rebuilt due to the changes in
+the project.</p></li>
+</ul>
+<p>Additional info about a dependency will be displayed next to its name after a colon:</p>
+<ul class="simple">
+<li><p>In case of dependencies that are to be built (<strong>S</strong>/<strong>R</strong>), there’s a name of a module that will produce this
+dependency, followed by <code class="docutils literal notranslate"><span class="pre">-&gt;</span></code> and a path or list of paths to file(s)/directory(ies) that will be produced as this
+dependency.</p></li>
+<li><p>In case of dependencies which do not require execution of any modules, only a path or list of paths to
+file(s)/directory(ies) that will be displayed.</p></li>
+<li><p>In case of unresolved dependencies (<strong>X</strong>), which are never produced by any module, a text saying “<code class="docutils literal notranslate"><span class="pre">MISSING</span></code>” will be
+displayed.</p></li>
+</ul>
+<p>In the example above file <code class="docutils literal notranslate"><span class="pre">counter.v</span></code> has been modified and is now marked as “<strong>N</strong>”.
+This causes a bunch of other dependencies to be rebuilt (”<strong>R</strong>”).
+<code class="docutils literal notranslate"><span class="pre">build_dir</span></code> and <code class="docutils literal notranslate"><span class="pre">xdc</span></code> were already present, so they are marked as “<strong>O</strong>”.</p>
+</section>
+</section>
+<section id="common-targets-and-values">
+<h2 id="common-targets-and-values">Common targets and values<a class="headerlink" href="#common-targets-and-values" title="Link to this heading">¶</a></h2>
+<p>Targets and values are named with some conventions.
+Below are lists of the target and value names along with their meanings.</p>
+<section id="need-to-be-provided-by-the-user">
+<h3 id="need-to-be-provided-by-the-user">Need to be provided by the user<a class="headerlink" href="#need-to-be-provided-by-the-user" title="Link to this heading">¶</a></h3>
+<table>
+<thead>
+<tr class="row-odd"><th class="head"><p>Target name</p></th>
+<th class="head text-center"><p>list</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sources</span></code></p></td>
+<td class="text-center"><p>yes</p></td>
+<td><p>Verilog sources</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">sdc</span></code></p></td>
+<td class="text-center"><p>no</p></td>
+<td><p>Synopsys Design Constraints</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">xdc</span></code></p></td>
+<td class="text-center"><p>yes</p></td>
+<td><p>Xilinx Design Constraints (available only for Xilinx platforms)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pcf</span></code></p></td>
+<td class="text-center"><p>no</p></td>
+<td><p>Physical Constraints File</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="available-in-most-flows">
+<h3 id="available-in-most-flows">Available in most flows<a class="headerlink" href="#available-in-most-flows" title="Link to this heading">¶</a></h3>
+<table>
+<thead>
+<tr class="row-odd"><th class="head"><p>Target name</p></th>
+<th class="head text-center"><p>list</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">eblif</span></code></p></td>
+<td class="text-center"><p>no</p></td>
+<td><p>Extended blif file</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">bitstream</span></code></p></td>
+<td class="text-center"><p>no</p></td>
+<td><p>Bitstream</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">net</span></code></p></td>
+<td class="text-center"><p>no</p></td>
+<td><p>Netlist</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">fasm</span></code></p></td>
+<td class="text-center"><p>no</p></td>
+<td><p>Final FPGA Assembly</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">fasm_extra</span></code></p></td>
+<td class="text-center"><p>no</p></td>
+<td><p>Additional FPGA assembly that may be generated during synthesis</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">build_dir</span></code></p></td>
+<td class="text-center"><p>no</p></td>
+<td><p>A directory to put the output files in</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="built-in-values">
+<h3 id="built-in-values">Built-in values<a class="headerlink" href="#built-in-values" title="Link to this heading">¶</a></h3>
+<table>
+<thead>
+<tr class="row-odd"><th class="head"><p>Value name</p></th>
+<th class="head"><p>type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">shareDir</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">string</span></code></p></td>
+<td><p>Path to f4pga’s installation “share” directory</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">python3</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">string</span></code></p></td>
+<td><p>Path to Python 3 executable</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">noisyWarnings</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">string</span></code></p></td>
+<td><p>Path to noisy warnings log (should be deprecated)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">prjxray_db</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">string</span></code></p></td>
+<td><p>Path to Project X-Ray database</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="used-in-flow-definitions">
+<h3 id="used-in-flow-definitions">Used in flow definitions<a class="headerlink" href="#used-in-flow-definitions" title="Link to this heading">¶</a></h3>
+<table>
+<thead>
+<tr class="row-odd"><th class="head"><p>Value name</p></th>
+<th class="head"><p>type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">top</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">string</span></code></p></td>
+<td><p>Top module name</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">build_dir</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">string</span></code></p></td>
+<td><p>Path to build directory (should be optional)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">device</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">string</span></code></p></td>
+<td><p>Name of the device</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">vpr_options</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dict[string</span> <span class="pre">-&gt;</span> <span class="pre">string</span> <span class="pre">|</span> <span class="pre">number]</span></code></p></td>
+<td><p>Named options passed to VPR. No <code class="docutils literal notranslate"><span class="pre">--</span></code> prefix included.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">part_name</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">string</span></code></p></td>
+<td><p>Name of the chip used. The distinction between <code class="docutils literal notranslate"><span class="pre">device</span></code> and <code class="docutils literal notranslate"><span class="pre">part_name</span></code> is ambiguous at the moment and should be addressed in the future.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">arch_def</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">string</span></code></p></td>
+<td><p>Path to an XML file containing architecture definition.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+</section>
+
+
+          </article>
+        </div>
+      </div>
+    </main>
+  </div>
+  <footer class="md-footer">
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+          
+            <a href="index.html" title="Overview"
+               class="md-flex md-footer-nav__link md-footer-nav__link--prev"
+               rel="prev">
+              <div class="md-flex__cell md-flex__cell--shrink">
+                <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+              </div>
+              <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+                <span class="md-flex__ellipsis">
+                  <span
+                      class="md-footer-nav__direction"> Previous </span> Overview </span>
+              </div>
+            </a>
+          
+          
+            <a href="modules/index.html" title="Modules"
+               class="md-flex md-footer-nav__link md-footer-nav__link--next"
+               rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
+                class="md-flex__ellipsis"> <span
+                class="md-footer-nav__direction"> Next </span> Modules </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink"><i
+                class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          
+        </a>
+        
+      </nav>
+    </div>
+    <div class="md-footer-meta md-typeset">
+      <div class="md-footer-meta__inner md-grid">
+        <div class="md-footer-social">
+          
+            <div class="md-footer-social__link">
+              <a href="https://chipsalliance.org/" target="_blank">CHIPS Alliance</a>
+            </div>
+            </ul>
+            <div class="md-footer-social__link">
+              <a href="https://github.com/chipsalliance/f4pga" target="_blank">GitHub</a>
+            </div>
+        </div>
+        <div class="md-footer-copyright">
+          <div class="md-footer-copyright__highlight">
+              &#169; Copyright F4PGA Authors, 2019 - 2022.
+              
+          </div>
+            Created using
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+             and
+            <a href="https://github.com/f4pga/sphinx_f4pga_theme">Material for
+              Sphinx</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="../_static/javascripts/application.js"></script>
+  <script src="../_static/javascripts/f4pga.js"></script>
+  <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
+  </body>
+</html>

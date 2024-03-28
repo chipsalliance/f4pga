@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="lang:clipboard.copy" content="Copy to clipboard">
+  <meta name="lang:clipboard.copied" content="Copied to clipboard">
+  <meta name="lang:search.language" content="en">
+  <meta name="lang:search.pipeline.stopwords" content="True">
+  <meta name="lang:search.pipeline.trimmer" content="True">
+  <meta name="lang:search.result.none" content="No matching documents">
+  <meta name="lang:search.result.one" content="1 matching document">
+  <meta name="lang:search.result.other" content="# matching documents">
+  <meta name="lang:search.tokenizer" content="[\s\-]+">
+
+  
+    <link href="https://fonts.gstatic.com/" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,500,700|Roboto:300,400,400i,700&display=fallback" rel="stylesheet">
+
+    <style>
+      body,
+      input {
+        font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif
+      }
+
+      code,
+      kbd,
+      pre {
+        font-family: "Roboto Mono", "Courier New", Courier, monospace
+      }
+    </style>
+  
+
+  <link rel="stylesheet" href="../_static/stylesheets/application.css"/>
+  <link rel="stylesheet" href="../_static/stylesheets/application-palette.css"/>
+  <link rel="stylesheet" href="../_static/stylesheets/application-fixes.css"/>
+  <link rel="stylesheet" href="../_static/stylesheets/f4pga.css"/>
+  
+  <link rel="stylesheet" href="../_static/fonts/material-icons.css"/>
+  
+  <meta name="theme-color" content="#3f51b5">
+  <script src="../_static/javascripts/modernizr.js"></script>
+  
+  
+  
+    <title>Understanding the (deprecated) flow &#8212; F4PGA  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+    <link rel="stylesheet" type="text/css" href="../_static/material.css?v=79c92029" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="icon" href="../_static/favicon.svg"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Changes" href="../development/changes.html" />
+    <link rel="prev" title="Developer’s notes" href="DevNotes.html" />
+  
+   
+
+  </head>
+  <body dir=ltr
+        data-md-color-primary=indigo data-md-color-accent=blue>
+  
+  <svg class="md-svg">
+    <defs data-children-count="0">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+      
+    </defs>
+  </svg>
+  
+  <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer">
+  <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search">
+  <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+  <a href="#f4pga/Deprecated" tabindex="1" class="md-skip"> Skip to content </a>
+  <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex navheader">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="../index.html" title="F4PGA  documentation"
+           class="md-header-nav__button md-logo">
+          
+            &nbsp;
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          <span class="md-header-nav__topic">F4PGA  documentation</span>
+          <span class="md-header-nav__topic"> Understanding the (deprecated) flow </span>
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" action="../search.html" method="GET" name="search">
+      <input type="text" class="md-search__input" name="q" placeholder="Search"
+              autocapitalize="off" autocomplete="off" spellcheck="false"
+              data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            <a href="https://github.com/chipsalliance/f4pga" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    chipsalliance/f4pga
+  </div>
+</a>
+          </div>
+        </div>
+      
+      
+  
+  <script src="../_static/javascripts/version_dropdown.js"></script>
+  <script>
+    var json_loc = "../"versions.json"",
+        target_loc = "../../",
+        text = "Versions";
+    $( document ).ready( add_version_dropdown(json_loc, target_loc, text));
+  </script>
+  
+
+    </div>
+  </nav>
+</header>
+
+  
+  <div class="md-container">
+    
+    
+    
+  <nav class="md-tabs" data-md-component="tabs">
+    <div class="md-tabs__inner md-grid">
+      <ul class="md-tabs__list" style="float:left">
+          <li class="md-tabs__item"><a href="../index.html" class="md-tabs__link">F4PGA  documentation</a></li>
+      </ul>
+      <ul class="md-tabs__list" id="chipsalliance-header" style="float:right">
+        
+	  <li class="md-tabs__item"><a href="https://chipsalliance.org" class="md-tabs__link">
+	    <i class="md-icon">web</i> CHIPS Alliance Website</a></li>
+      </ul>
+    </div>
+  </nav>
+    <main class="md-main">
+      <div class="md-main__inner md-grid" data-md-component="container">
+        
+          <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="../index.html" title="F4PGA documentation" class="md-nav__button md-logo">
+      
+        <img src="../_static/" alt=" logo" width="48" height="48">
+      
+    </a>
+    <a href="../index.html"
+       title="F4PGA documentation">F4PGA  documentation</a>
+  </label>
+    <div class="md-nav__source">
+      <a href="https://github.com/chipsalliance/f4pga" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    chipsalliance/f4pga
+  </div>
+</a>
+    </div>
+  
+  
+
+<ul class="md-nav__list">
+  <li class="md-nav__item">
+  
+    <span class="md-nav__link caption"><span class="caption-text">About F4PGA</span></span>
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../getting-started.html" class="md-nav__link">
+        Getting started</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../how.html" class="md-nav__link">
+        How it works</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../status.html" class="md-nav__link">
+        Supported Architectures</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../community.html" class="md-nav__link">
+        Community</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+    <span class="md-nav__link caption"><span class="caption-text">Python utils</span></span>
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="index.html" class="md-nav__link">
+        Overview</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="Usage.html" class="md-nav__link">
+        Usage</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="modules/index.html" class="md-nav__link">
+        Modules</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="DevNotes.html" class="md-nav__link">
+        Developer’s notes</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="#" class="md-nav__link md-nav__link--active">
+        Understanding the (deprecated) flow</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+    <span class="md-nav__link caption"><span class="caption-text">Development</span></span>
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../development/changes.html" class="md-nav__link">
+        Changes</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../development/building-docs.html" class="md-nav__link">
+        Building the documentation</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../development/venv.html" class="md-nav__link">
+        Packages in virtual environment</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+    <span class="md-nav__link caption"><span class="caption-text">Design Flows</span></span>
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../flows/index.html" class="md-nav__link">
+        Introduction</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../flows/synthesis.html" class="md-nav__link">
+        Synthesis</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../flows/pnr.html" class="md-nav__link">
+        Place & Route</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../flows/bitstream.html" class="md-nav__link">
+        Bitstream translation</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../flows/f4pga.html" class="md-nav__link">
+        In F4PGA</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+    <span class="md-nav__link caption"><span class="caption-text">Specifications</span></span>
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="https://fasm.readthedocs.io/en/latest/" class="md-nav__link">
+        FPGA Assembly (FASM) ➚</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="https://chipsalliance/fpga-interchange-schema" class="md-nav__link">
+        FPGA Interchange schema ➚</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+    <span class="md-nav__link caption"><span class="caption-text">Appendix</span></span>
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../glossary.html" class="md-nav__link">
+        Glossary</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../references.html" class="md-nav__link">
+        References</a>
+    
+
+  
+  </li>
+</ul>
+
+</nav>
+              </div>
+            </div>
+          </div>
+          <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                
+<nav class="md-nav md-nav--secondary">
+    <label class="md-nav__title" for="__toc">Contents</label>
+  <ul class="md-nav__list" data-md-scrollfix="">
+        <li class="md-nav__item"><a href="#f4pga-deprecated--page-root" class="md-nav__link">Understanding the (deprecated) flow</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#synthesis" class="md-nav__link">Synthesis</a>
+        </li>
+        <li class="md-nav__item"><a href="#place-and-route" class="md-nav__link">Place and Route</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#pack" class="md-nav__link">Pack</a>
+        </li>
+        <li class="md-nav__item"><a href="#place" class="md-nav__link">Place</a>
+        </li>
+        <li class="md-nav__item"><a href="#route" class="md-nav__link">Route</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#generating-bitstream" class="md-nav__link">Generating Bitstream</a>
+        </li></ul>
+            </nav>
+        </li>
+    
+<li class="md-nav__item"><a class="md-nav__extra_link" href="../_sources/f4pga/Deprecated.rst.txt">Show Source</a> </li>
+
+<li id="searchbox" class="md-nav__item"></li>
+
+  </ul>
+</nav>
+              </div>
+            </div>
+          </div>
+        
+        <div class="md-content">
+          <article class="md-content__inner md-typeset" role="main">
+            
+  <section id="understanding-the-deprecated-flow">
+<span id="understanding"></span><h1 id="f4pga-deprecated--page-root">Understanding the (deprecated) flow<a class="headerlink" href="#f4pga-deprecated--page-root" title="Link to this heading">¶</a></h1>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>This section describes the usage of the now deprecated <code class="docutils literal notranslate"><span class="pre">symbiflow_*</span></code> entrypoints/wrappers.
+It is provided for backwards compatibility, so that users of the <em>old</em> flow can keep using it.
+However, it is recommended for new users to use the approach explained in <a class="reference internal" href="index.html#pyf4pga"><span class="std std-ref">Overview</span></a>.</p>
+</div>
+<p>This section provides valuable information on how each of the commands used to compile and build
+designs in F4PGA work. It is especially helpful for debugging or for using methods
+other than a makefile to build your designs, such as a bash or python script.</p>
+<p>The following describes the commands for running each of the steps for a full design flow
+(synthesis, place and route, and generate bitstream) as well as giving a description of the most
+common flags for those commands. If you would like a more detailed break down of how the design
+flow for F4PGA works take a look at the <a class="reference internal" href="../flows/index.html#flows"><span class="std std-ref">Design Flows section</span></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Files created by synthesis, implementation, and bitstream generation will be dumped into
+the directory from which the command is run by default. To keep all of the files generated by
+the toolchain separate from your design files, you might consider running the toolchain
+commands in a separate directory from your design files.</p>
+</div>
+<section id="synthesis">
+<h2 id="synthesis">Synthesis<a class="headerlink" href="#synthesis" title="Link to this heading">¶</a></h2>
+<p>To synthesize your designs run the <code class="docutils literal notranslate"><span class="pre">symbiflow_synth</span></code> command. The command has the following
+flags:</p>
+<table id="id1">
+<caption><span class="caption-number">Table 1 </span><span class="caption-text">symbiflow_synth</span><a class="headerlink" href="#id1" title="Link to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Flag</p></th>
+<th class="head"><p>Argument</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>-t</p></td>
+<td><p>Defines the name for the top level module</p></td>
+</tr>
+<tr class="row-odd"><td><p>-v</p></td>
+<td><p>A list of paths to verilog files for the design</p></td>
+</tr>
+<tr class="row-even"><td><p>-d</p></td>
+<td><p>FPGA family (i.e. artix7 or zynq7)</p></td>
+</tr>
+<tr class="row-odd"><td><p>-p</p></td>
+<td><p>The part number for the FPGA (i.e xc7a35tcsg324-1)</p></td>
+</tr>
+<tr class="row-even"><td><p>-x</p></td>
+<td><p>Optional command: path to xdc files for design</p></td>
+</tr>
+</tbody>
+</table>
+<p>An example of how to run synthesis on a design containing two separate
+verilog HDL files is below. The design is built for a basys3 board which comes from the artix7
+family and uses the xc7a35tcpg236-1 chip.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>symbiflow_synth<span class="w"> </span>-t<span class="w"> </span>top<span class="w"> </span>-v<span class="w"> </span>example.v<span class="w"> </span>top_example.v<span class="w"> </span>-d<span class="w"> </span>artix7<span class="w"> </span>-p<span class="w"> </span>xc7a35tcpg236-1<span class="w"> </span>-x<span class="w"> </span>design_constraint.xdc
+</pre></div>
+</div>
+<p>Synthesis is carried out using the Yosys open source tool. <code class="docutils literal notranslate"><span class="pre">symbiflow_synth</span></code> generates
+an .eblif file, a few verilog netlists that describe the gate level design for your project, and a log
+file. For more information on Yosys and its relation to F4PGA go to <a class="reference internal" href="../flows/f4pga.html#flows-f4pga-yosys"><span class="std std-ref">Yosys</span></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The build files generated by the toolchain (for example .eblif from synthesis, .net from
+packing, .bit from generate bitstream) are named using the top module specified in
+symbiflow_synth. For example if you specified <code class="docutils literal notranslate"><span class="pre">switch_top</span></code> as the top level module name
+during synthesis using the <code class="docutils literal notranslate"><span class="pre">-t</span></code> flag, the build files generated by the toolchain would be
+named switch_top.eblif, switch_top.net, etc.</p>
+</div>
+</section>
+<section id="place-and-route">
+<h2 id="place-and-route">Place and Route<a class="headerlink" href="#place-and-route" title="Link to this heading">¶</a></h2>
+<p>The three steps for implementing a design are internally handled by the open source VPR
+(Versatile Place and Route) tool. For more information go to <a class="reference external" href="https://docs.verilogtorouting.org/en/latest/vpr/">VPR ➚</a>.</p>
+<section id="pack">
+<h3 id="pack">Pack<a class="headerlink" href="#pack" title="Link to this heading">¶</a></h3>
+<p>Packing is run by the <code class="docutils literal notranslate"><span class="pre">symbiflow_pack</span></code> command and generates several files containing
+a pin usage report, a timing report, a log file, and a netlist. The various flags for the
+pack command are as follows:</p>
+<table id="id2">
+<caption><span class="caption-number">Table 2 </span><span class="caption-text">symbiflow_pack</span><a class="headerlink" href="#id2" title="Link to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Flag</p></th>
+<th class="head"><p>Argument</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>-e</p></td>
+<td><p>Path to .eblif file generated by synthesis</p></td>
+</tr>
+<tr class="row-odd"><td><p>-d</p></td>
+<td><p>Fabric definition for the board (i.e. xc7a100t_test)</p></td>
+</tr>
+<tr class="row-even"><td><p>-s</p></td>
+<td><p>Optional: SDC file path</p></td>
+</tr>
+</tbody>
+</table>
+<p>Note that the -d option for this step (defining the fabric definition) is different
+from the -d from synthesis (defining the FPGA family).</p>
+<p>The following example runs packing on the basys3 board:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>symbiflow_pack<span class="w"> </span>-e<span class="w"> </span>top.eblif<span class="w"> </span>-d<span class="w"> </span>xc7a35t_test
+</pre></div>
+</div>
+</section>
+<section id="place">
+<h3 id="place">Place<a class="headerlink" href="#place" title="Link to this heading">¶</a></h3>
+<p>Placement generates several files describing the location of design elements
+as well as a log file. Placement is run using <code class="docutils literal notranslate"><span class="pre">symbiflow_place</span></code> which utilizes
+the following flags:</p>
+<table id="id3">
+<caption><span class="caption-number">Table 3 </span><span class="caption-text">symbiflow_place</span><a class="headerlink" href="#id3" title="Link to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Flag</p></th>
+<th class="head"><p>Argument</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>-e</p></td>
+<td><p>Path to .eblif file generated by synthesis</p></td>
+</tr>
+<tr class="row-odd"><td><p>-d</p></td>
+<td><p>Fabric definition (xc7a50t_test)</p></td>
+</tr>
+<tr class="row-even"><td><p>-p</p></td>
+<td><p>Optional: PCF file path</p></td>
+</tr>
+<tr class="row-odd"><td><p>-n</p></td>
+<td><p>Path to the .net file generated by pack step</p></td>
+</tr>
+<tr class="row-even"><td><p>-P</p></td>
+<td><p>The part number for the FPGA (i.e xc7a35tcsg324-1)</p></td>
+</tr>
+<tr class="row-odd"><td><p>-s</p></td>
+<td><p>Optional: SDC file path</p></td>
+</tr>
+</tbody>
+</table>
+<p>For the basys3:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>symbiflow_pack<span class="w"> </span>-e<span class="w"> </span>top.eblif<span class="w"> </span>-d<span class="w"> </span>xc7a35t_test<span class="w"> </span>-p<span class="w"> </span>design.pcf<span class="w"> </span>-n<span class="w"> </span>top.net<span class="w"> </span>-P<span class="w"> </span>xc7a35tcpg236-1<span class="w"> </span>-s<span class="w"> </span>design.sdc
+</pre></div>
+</div>
+</section>
+<section id="route">
+<h3 id="route">Route<a class="headerlink" href="#route" title="Link to this heading">¶</a></h3>
+<p>Routing produces several timing reports as well as a post routing netlist and log file.
+<code class="docutils literal notranslate"><span class="pre">symbiflow_route</span></code> uses the -e, -d, and the optional -s flags. The arguments for these flags
+are the same as in the placement step (.eblif, fabric definition, and SDC file path respectively).
+The following is an example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>symbiflow_route<span class="w"> </span>-e<span class="w"> </span>top.eblif<span class="w"> </span>-d<span class="w"> </span>xc7a35t_test<span class="w"> </span>-s<span class="w"> </span>design.sdc
+</pre></div>
+</div>
+</section>
+</section>
+<section id="generating-bitstream">
+<h2 id="generating-bitstream">Generating Bitstream<a class="headerlink" href="#generating-bitstream" title="Link to this heading">¶</a></h2>
+<p>Generating the bitstream consists of two steps. First, run <code class="docutils literal notranslate"><span class="pre">symbiflow_write_fasm</span></code> to generate
+the .fasm file used to create the bitstream. <code class="docutils literal notranslate"><span class="pre">symbiflow_write_fasm</span></code> uses the -e and -d flags
+with the same arguments as the placing and routing steps (.eblif path, and fabric definition).
+Second, run <code class="docutils literal notranslate"><span class="pre">symbiflow_write_bitstream</span></code> which has the following flags:</p>
+<table id="id4">
+<caption><span class="caption-number">Table 4 </span><span class="caption-text">symbiflow_write_bitstream</span><a class="headerlink" href="#id4" title="Link to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Flag</p></th>
+<th class="head"><p>Argument</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>-d</p></td>
+<td><p>FPGA family (i.e. artix7 or zynq7)</p></td>
+</tr>
+<tr class="row-odd"><td><p>-f</p></td>
+<td><p>The path to the .fasm file generated in by write_fasm</p></td>
+</tr>
+<tr class="row-even"><td><p>-p</p></td>
+<td><p>The FPGA part number (i.e xc7a35tcsg324-1)</p></td>
+</tr>
+<tr class="row-odd"><td><p>-b</p></td>
+<td><p>Name of the file to write the bitstream to</p></td>
+</tr>
+</tbody>
+</table>
+<p>Notice that the specification for the part number is a lowercase <code class="docutils literal notranslate"><span class="pre">-p</span></code> instead of a capital
+<code class="docutils literal notranslate"><span class="pre">-P</span></code> as in the placement step. Also note that the <code class="docutils literal notranslate"><span class="pre">-d</span></code> in write_bitstream defines the FPGA
+family instead of the fabric as in the write_fasm step.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If you change the name of the output for your bitstream to something other than top.bit then the
+openFPGALoader command used in the examples would need to change too. For example if I used
+<code class="docutils literal notranslate"><span class="pre">-b</span> <span class="pre">my_module_top</span></code> in symbiflow_write_bitstream then my openFPGALoader command would change to:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>openFPGALoader<span class="w"> </span>-b<span class="w"> </span><span class="nv">$OFL_BOARD</span><span class="w"> </span>my_module_top.bit
+</pre></div>
+</div>
+<p>Note that the only part of the command that changes is “&lt;top module name&gt;.bit;”</p>
+</div>
+<p>The following example generates a bitstream file named example.bit for the basys3 board:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>symbiflow_write_fasm<span class="w"> </span>-e<span class="w"> </span>top.eblif<span class="w"> </span>-d<span class="w"> </span>xc7a50t_test
+symbiflow_write_bitstream<span class="w"> </span>-d<span class="w"> </span>artix7<span class="w"> </span>-f<span class="w"> </span>top.fasm<span class="w"> </span>-p<span class="w"> </span>xc7a35tcpg236-1<span class="w"> </span>-b<span class="w"> </span>example.bit
+</pre></div>
+</div>
+</section>
+</section>
+
+
+          </article>
+        </div>
+      </div>
+    </main>
+  </div>
+  <footer class="md-footer">
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+          
+            <a href="DevNotes.html" title="Developer’s notes"
+               class="md-flex md-footer-nav__link md-footer-nav__link--prev"
+               rel="prev">
+              <div class="md-flex__cell md-flex__cell--shrink">
+                <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+              </div>
+              <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+                <span class="md-flex__ellipsis">
+                  <span
+                      class="md-footer-nav__direction"> Previous </span> Developer’s notes </span>
+              </div>
+            </a>
+          
+          
+            <a href="../development/changes.html" title="Changes"
+               class="md-flex md-footer-nav__link md-footer-nav__link--next"
+               rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
+                class="md-flex__ellipsis"> <span
+                class="md-footer-nav__direction"> Next </span> Changes </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink"><i
+                class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          
+        </a>
+        
+      </nav>
+    </div>
+    <div class="md-footer-meta md-typeset">
+      <div class="md-footer-meta__inner md-grid">
+        <div class="md-footer-social">
+          
+            <div class="md-footer-social__link">
+              <a href="https://chipsalliance.org/" target="_blank">CHIPS Alliance</a>
+            </div>
+            </ul>
+            <div class="md-footer-social__link">
+              <a href="https://github.com/chipsalliance/f4pga" target="_blank">GitHub</a>
+            </div>
+        </div>
+        <div class="md-footer-copyright">
+          <div class="md-footer-copyright__highlight">
+              &#169; Copyright F4PGA Authors, 2019 - 2022.
+              
+          </div>
+            Created using
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+             and
+            <a href="https://github.com/f4pga/sphinx_f4pga_theme">Material for
+              Sphinx</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="../_static/javascripts/application.js"></script>
+  <script src="../_static/javascripts/f4pga.js"></script>
+  <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
+  </body>
+</html>

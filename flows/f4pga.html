@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="lang:clipboard.copy" content="Copy to clipboard">
+  <meta name="lang:clipboard.copied" content="Copied to clipboard">
+  <meta name="lang:search.language" content="en">
+  <meta name="lang:search.pipeline.stopwords" content="True">
+  <meta name="lang:search.pipeline.trimmer" content="True">
+  <meta name="lang:search.result.none" content="No matching documents">
+  <meta name="lang:search.result.one" content="1 matching document">
+  <meta name="lang:search.result.other" content="# matching documents">
+  <meta name="lang:search.tokenizer" content="[\s\-]+">
+
+  
+    <link href="https://fonts.gstatic.com/" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,500,700|Roboto:300,400,400i,700&display=fallback" rel="stylesheet">
+
+    <style>
+      body,
+      input {
+        font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif
+      }
+
+      code,
+      kbd,
+      pre {
+        font-family: "Roboto Mono", "Courier New", Courier, monospace
+      }
+    </style>
+  
+
+  <link rel="stylesheet" href="../_static/stylesheets/application.css"/>
+  <link rel="stylesheet" href="../_static/stylesheets/application-palette.css"/>
+  <link rel="stylesheet" href="../_static/stylesheets/application-fixes.css"/>
+  <link rel="stylesheet" href="../_static/stylesheets/f4pga.css"/>
+  
+  <link rel="stylesheet" href="../_static/fonts/material-icons.css"/>
+  
+  <meta name="theme-color" content="#3f51b5">
+  <script src="../_static/javascripts/modernizr.js"></script>
+  
+  
+  
+    <title>In F4PGA &#8212; F4PGA  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+    <link rel="stylesheet" type="text/css" href="../_static/material.css?v=79c92029" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="icon" href="../_static/favicon.svg"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Glossary" href="../glossary.html" />
+    <link rel="prev" title="Bitstream translation" href="bitstream.html" />
+  
+   
+
+  </head>
+  <body dir=ltr
+        data-md-color-primary=indigo data-md-color-accent=blue>
+  
+  <svg class="md-svg">
+    <defs data-children-count="0">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+      
+    </defs>
+  </svg>
+  
+  <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer">
+  <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search">
+  <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+  <a href="#flows/f4pga" tabindex="1" class="md-skip"> Skip to content </a>
+  <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex navheader">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="../index.html" title="F4PGA  documentation"
+           class="md-header-nav__button md-logo">
+          
+            &nbsp;
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          <span class="md-header-nav__topic">F4PGA  documentation</span>
+          <span class="md-header-nav__topic"> In F4PGA </span>
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" action="../search.html" method="GET" name="search">
+      <input type="text" class="md-search__input" name="q" placeholder="Search"
+              autocapitalize="off" autocomplete="off" spellcheck="false"
+              data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            <a href="https://github.com/chipsalliance/f4pga" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    chipsalliance/f4pga
+  </div>
+</a>
+          </div>
+        </div>
+      
+      
+  
+  <script src="../_static/javascripts/version_dropdown.js"></script>
+  <script>
+    var json_loc = "../"versions.json"",
+        target_loc = "../../",
+        text = "Versions";
+    $( document ).ready( add_version_dropdown(json_loc, target_loc, text));
+  </script>
+  
+
+    </div>
+  </nav>
+</header>
+
+  
+  <div class="md-container">
+    
+    
+    
+  <nav class="md-tabs" data-md-component="tabs">
+    <div class="md-tabs__inner md-grid">
+      <ul class="md-tabs__list" style="float:left">
+          <li class="md-tabs__item"><a href="../index.html" class="md-tabs__link">F4PGA  documentation</a></li>
+      </ul>
+      <ul class="md-tabs__list" id="chipsalliance-header" style="float:right">
+        
+	  <li class="md-tabs__item"><a href="https://chipsalliance.org" class="md-tabs__link">
+	    <i class="md-icon">web</i> CHIPS Alliance Website</a></li>
+      </ul>
+    </div>
+  </nav>
+    <main class="md-main">
+      <div class="md-main__inner md-grid" data-md-component="container">
+        
+          <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="../index.html" title="F4PGA documentation" class="md-nav__button md-logo">
+      
+        <img src="../_static/" alt=" logo" width="48" height="48">
+      
+    </a>
+    <a href="../index.html"
+       title="F4PGA documentation">F4PGA  documentation</a>
+  </label>
+    <div class="md-nav__source">
+      <a href="https://github.com/chipsalliance/f4pga" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    chipsalliance/f4pga
+  </div>
+</a>
+    </div>
+  
+  
+
+<ul class="md-nav__list">
+  <li class="md-nav__item">
+  
+    <span class="md-nav__link caption"><span class="caption-text">About F4PGA</span></span>
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../getting-started.html" class="md-nav__link">
+        Getting started</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../how.html" class="md-nav__link">
+        How it works</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../status.html" class="md-nav__link">
+        Supported Architectures</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../community.html" class="md-nav__link">
+        Community</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+    <span class="md-nav__link caption"><span class="caption-text">Python utils</span></span>
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../f4pga/index.html" class="md-nav__link">
+        Overview</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../f4pga/Usage.html" class="md-nav__link">
+        Usage</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../f4pga/modules/index.html" class="md-nav__link">
+        Modules</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../f4pga/DevNotes.html" class="md-nav__link">
+        Developer’s notes</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../f4pga/Deprecated.html" class="md-nav__link">
+        Understanding the (deprecated) flow</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+    <span class="md-nav__link caption"><span class="caption-text">Development</span></span>
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../development/changes.html" class="md-nav__link">
+        Changes</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../development/building-docs.html" class="md-nav__link">
+        Building the documentation</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../development/venv.html" class="md-nav__link">
+        Packages in virtual environment</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+    <span class="md-nav__link caption"><span class="caption-text">Design Flows</span></span>
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="index.html" class="md-nav__link">
+        Introduction</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="synthesis.html" class="md-nav__link">
+        Synthesis</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="pnr.html" class="md-nav__link">
+        Place & Route</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="bitstream.html" class="md-nav__link">
+        Bitstream translation</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="#" class="md-nav__link md-nav__link--active">
+        In F4PGA</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+    <span class="md-nav__link caption"><span class="caption-text">Specifications</span></span>
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="https://fasm.readthedocs.io/en/latest/" class="md-nav__link">
+        FPGA Assembly (FASM) ➚</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="https://chipsalliance/fpga-interchange-schema" class="md-nav__link">
+        FPGA Interchange schema ➚</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+    <span class="md-nav__link caption"><span class="caption-text">Appendix</span></span>
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../glossary.html" class="md-nav__link">
+        Glossary</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="../references.html" class="md-nav__link">
+        References</a>
+    
+
+  
+  </li>
+</ul>
+
+</nav>
+              </div>
+            </div>
+          </div>
+          <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                
+<nav class="md-nav md-nav--secondary">
+    <label class="md-nav__title" for="__toc">Contents</label>
+  <ul class="md-nav__list" data-md-scrollfix="">
+        <li class="md-nav__item"><a href="#flows-f4pga--page-root" class="md-nav__link">In F4PGA</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#synthesis" class="md-nav__link">Synthesis</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#yosys" class="md-nav__link">Yosys</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#short-description" class="md-nav__link">Short description</a>
+        </li>
+        <li class="md-nav__item"><a href="#usage-in-toolchain" class="md-nav__link">Usage in Toolchain</a>
+        </li>
+        <li class="md-nav__item"><a href="#output-analysis" class="md-nav__link">Output analysis</a>
+        </li>
+        <li class="md-nav__item"><a href="#technology-mapping-in-f4pga-toolchain" class="md-nav__link">Technology mapping in F4PGA toolchain</a>
+        </li>
+        <li class="md-nav__item"><a href="#technology-mapping-for-vpr" class="md-nav__link">Technology mapping for VPR</a>
+        </li>
+        <li class="md-nav__item"><a href="#more-information" class="md-nav__link">More information</a>
+        </li></ul>
+            </nav>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#place-route" class="md-nav__link">Place & Route</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#vpr" class="md-nav__link">VPR</a>
+        </li>
+        <li class="md-nav__item"><a href="#nextpnr" class="md-nav__link">nextpnr</a>
+        </li></ul>
+            </nav>
+        </li></ul>
+            </nav>
+        </li>
+    
+<li class="md-nav__item"><a class="md-nav__extra_link" href="../_sources/flows/f4pga.rst.txt">Show Source</a> </li>
+
+<li id="searchbox" class="md-nav__item"></li>
+
+  </ul>
+</nav>
+              </div>
+            </div>
+          </div>
+        
+        <div class="md-content">
+          <article class="md-content__inner md-typeset" role="main">
+            
+  <section id="in-f4pga">
+<h1 id="flows-f4pga--page-root">In F4PGA<a class="headerlink" href="#flows-f4pga--page-root" title="Link to this heading">¶</a></h1>
+<section id="synthesis">
+<h2 id="synthesis">Synthesis<a class="headerlink" href="#synthesis" title="Link to this heading">¶</a></h2>
+<p>In the F4PGA toolchain synthesis is made with the use of Yosys, that is able to perform all the mentioned steps and
+convert HDL to netlist description.
+The result of these steps is written to a file in <code class="docutils literal notranslate"><span class="pre">.eblif</span></code> format.</p>
+<section id="yosys">
+<span id="flows-f4pga-yosys"></span><h3 id="yosys">Yosys<a class="headerlink" href="#yosys" title="Link to this heading">¶</a></h3>
+<p>Yosys is a Free and Open Source Verilog HDL synthesis tool.
+It was designed to be highly extensible and multiplatform.
+In F4PGA toolchain, it is responsible for the whole synthesis process described in <a class="reference external" href="./design-flow.html">FPGA Design Flow</a></p>
+<p>It is not necessary to call Yosys directly using F4PGA.
+Nevertheless, the following description, should provide sufficient introduction to Yosys usage inside the project.
+It is also a good starting point for a deeper understanding of the whole toolchain.</p>
+<section id="short-description">
+<h4 id="short-description">Short description<a class="headerlink" href="#short-description" title="Link to this heading">¶</a></h4>
+<p>Yosys consists of several subsystems. Most distinguishable are the first and last ones used in the synthesis process,
+called <em>frontend</em> and <em>backend</em> respectively.
+Intermediate subsystems are called <em>passes</em>.</p>
+<p>The <em>frontend</em> is responsible for changing the Verilog input file into an internal Yosys, representation which is common
+for all <em>passes</em> used by the program.
+The <em>passes</em> are responsible for a variety of optimizations (<code class="docutils literal notranslate"><span class="pre">opt_</span></code>) and simplifications (<code class="docutils literal notranslate"><span class="pre">proc_</span></code>).</p>
+<p>Two <em>passes</em>, that are worth to mention separately are <code class="docutils literal notranslate"><span class="pre">ABC</span></code> and <code class="docutils literal notranslate"><span class="pre">techmap</span></code>.
+The first one optimizes logic functions from the design and assigns obtained results into Look Up Tables (LUTs) of
+chosen width.
+The second mentioned <em>pass</em> - <code class="docutils literal notranslate"><span class="pre">techmap</span></code> is responsible for mapping the synthesized design from Yosys internal blocks
+to the primitives used by the implementation tool.
+Recommended synthesis flows for different FPGAs are combined into macros i.e. <code class="docutils literal notranslate"><span class="pre">synth_ice40</span></code> (for Lattice iCE40 FPGA)
+or <code class="docutils literal notranslate"><span class="pre">synth_xilinx</span></code> (for Xilinx 7-series FPGAs).</p>
+<p>The <em>backend</em> on the other hand, is responsible for converting internal Yosys representation into one of the
+standardized formats.
+F4PGA uses <code class="docutils literal notranslate"><span class="pre">.eblif</span></code> as its output file format.</p>
+</section>
+<section id="usage-in-toolchain">
+<h4 id="usage-in-toolchain">Usage in Toolchain<a class="headerlink" href="#usage-in-toolchain" title="Link to this heading">¶</a></h4>
+<p>All operations performed by Yosys are written  in <code class="docutils literal notranslate"><span class="pre">.tcl</span></code> script. Commands used
+in the scripts are responsible for preparing output file to match with the
+expectations of other toolchain tools.
+There is no need to change it even for big designs.
+An example configuration script can be found below:</p>
+<div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="nv">yosys</span><span class="w"> </span><span class="o">-</span>import
+
+<span class="nv">synth_ice40</span><span class="w"> </span><span class="o">-</span>nocarry
+
+<span class="nv">opt_expr</span><span class="w"> </span><span class="o">-</span>undriven
+<span class="nv">opt_clean</span>
+
+<span class="nv">setundef</span><span class="w"> </span><span class="o">-</span>zero<span class="w"> </span><span class="o">-</span>params
+<span class="nv">write_blif</span><span class="w"> </span><span class="o">-</span>attr<span class="w"> </span><span class="o">-</span>cname<span class="w"> </span><span class="o">-</span>param<span class="w"> </span><span class="nv">$::env</span><span class="k">(</span><span class="nv">OUT_EBLIF</span><span class="k">)</span>
+<span class="nv">write_verilog</span><span class="w"> </span><span class="nv">$::env</span><span class="k">(</span><span class="nv">OUT_SYNTH_V</span><span class="k">)</span>
+</pre></div>
+</div>
+<p>It can be seen that this script performs a platform-specific process of synthesis, some optimization steps (<code class="docutils literal notranslate"><span class="pre">opt_</span></code>
+commands), and writes the final file in <code class="docutils literal notranslate"><span class="pre">.eblif</span></code> and Verilog formats.
+Yosys synthesis configuration scripts are platform-specific and can by found in <code class="docutils literal notranslate"><span class="pre">&lt;platform-dir&gt;/yosys/synth.tcl</span></code> in
+the <a class="reference external" href="https://github.com/SymbiFlow/f4pga-arch-defs">F4PGA Architecture Definitions</a> repository.</p>
+<p>To understand performed operations, view the log file.
+It is usually generated in the project build directory. It should be named <code class="docutils literal notranslate"><span class="pre">top.eblif.log</span></code>.</p>
+</section>
+<section id="output-analysis">
+<h4 id="output-analysis">Output analysis<a class="headerlink" href="#output-analysis" title="Link to this heading">¶</a></h4>
+<p>Input file:</p>
+<div class="highlight-verilog notranslate"><div class="highlight"><pre><span></span><span class="k">module</span><span class="w"> </span><span class="n">top</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="k">input</span><span class="w">  </span><span class="n">clk</span><span class="p">,</span>
+<span class="w">    </span><span class="k">output</span><span class="w"> </span><span class="n">LD7</span><span class="p">,</span>
+<span class="p">);</span>
+<span class="w">    </span><span class="k">localparam</span><span class="w"> </span><span class="n">BITS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">1</span><span class="p">;</span>
+<span class="w">    </span><span class="k">localparam</span><span class="w"> </span><span class="n">LOG2DELAY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">25</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kt">reg</span><span class="w"> </span><span class="p">[</span><span class="n">BITS</span><span class="o">+</span><span class="n">LOG2DELAY</span><span class="o">-</span><span class="mh">1</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">counter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+<span class="w">    </span><span class="k">always</span><span class="w"> </span><span class="p">@(</span><span class="k">posedge</span><span class="w"> </span><span class="n">clk</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">            </span><span class="n">counter</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">counter</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mh">1</span><span class="p">;</span>
+<span class="w">    </span><span class="k">end</span>
+
+<span class="w">    </span><span class="k">assign</span><span class="w"> </span><span class="p">{</span><span class="n">LD7</span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">counter</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">LOG2DELAY</span><span class="p">;</span>
+<span class="k">endmodule</span>
+</pre></div>
+</div>
+<p>after synthesis is described only with use of primitives appropriate for
+chosen platform:</p>
+<div class="highlight-verilog notranslate"><div class="highlight"><pre><span></span><span class="k">module</span><span class="w"> </span><span class="n">top</span><span class="p">(</span><span class="n">clk</span><span class="p">,</span><span class="w"> </span><span class="n">LD7</span><span class="p">);</span>
+<span class="w">  </span><span class="kt">wire</span><span class="w"> </span><span class="p">[</span><span class="mh">25</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">_000_</span><span class="p">;</span>
+<span class="w">  </span><span class="kt">wire</span><span class="w"> </span><span class="n">_001_</span><span class="p">;</span>
+
+<span class="p">...</span>
+
+<span class="w">  </span><span class="n">FDRE_ZINI</span><span class="w"> </span><span class="p">#(</span>
+<span class="w">    </span><span class="p">.</span><span class="n">IS_C_INVERTED</span><span class="p">(</span><span class="mh">1'h0</span><span class="p">),</span>
+<span class="w">    </span><span class="p">.</span><span class="n">ZINI</span><span class="p">(</span><span class="mh">1'h1</span><span class="p">)</span>
+<span class="w">  </span><span class="p">)</span><span class="w"> </span><span class="n">_073_</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="p">.</span><span class="n">C</span><span class="p">(</span><span class="n">clk</span><span class="p">),</span>
+<span class="w">    </span><span class="p">.</span><span class="n">CE</span><span class="p">(</span><span class="n">_012_</span><span class="p">),</span>
+<span class="w">    </span><span class="p">.</span><span class="n">D</span><span class="p">(</span><span class="n">_000_</span><span class="p">[</span><span class="mh">0</span><span class="p">]),</span>
+<span class="w">    </span><span class="p">.</span><span class="n">Q</span><span class="p">(</span><span class="n">counter</span><span class="p">[</span><span class="mh">0</span><span class="p">]),</span>
+<span class="w">    </span><span class="p">.</span><span class="n">R</span><span class="p">(</span><span class="n">_013_</span><span class="p">)</span>
+<span class="w">  </span><span class="p">);</span>
+
+<span class="p">...</span>
+
+<span class="w">  </span><span class="n">SR_GND</span><span class="w"> </span><span class="n">_150_</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="p">.</span><span class="n">GND</span><span class="p">(</span><span class="n">_062_</span><span class="p">)</span>
+<span class="w">  </span><span class="p">);</span>
+<span class="w">  </span><span class="k">assign</span><span class="w"> </span><span class="n">_003_</span><span class="p">[</span><span class="mh">25</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">_000_</span><span class="p">;</span>
+<span class="w">  </span><span class="k">assign</span><span class="w"> </span><span class="n">counter</span><span class="p">[</span><span class="mh">25</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LD7</span><span class="p">;</span>
+<span class="k">endmodule</span>
+</pre></div>
+</div>
+<p>The same structure is described by the <code class="docutils literal notranslate"><span class="pre">.eblif</span></code> file.</p>
+</section>
+<section id="technology-mapping-in-f4pga-toolchain">
+<h4 id="technology-mapping-in-f4pga-toolchain">Technology mapping in F4PGA toolchain<a class="headerlink" href="#technology-mapping-in-f4pga-toolchain" title="Link to this heading">¶</a></h4>
+<p>It is important to understand the connection between the synthesis and
+implementation tools used in the F4PGA toolchain. As mentioned before,
+synthesis tools like Yosys take the design description from the source files
+and convert them into a netlist that consists of the primitives used by
+the implementation tool. Usually, to support multiple implementation tools,
+an additional intermediate representation of FPGA primitives is provided.
+The process of translating the primitives from the synthesis
+tool’s internal representation to the specific primitives used in the
+implementation tools is called technology mapping (or techmapping).</p>
+</section>
+<section id="technology-mapping-for-vpr">
+<h4 id="technology-mapping-for-vpr">Technology mapping for VPR<a class="headerlink" href="#technology-mapping-for-vpr" title="Link to this heading">¶</a></h4>
+<p>As mentioned before, VPR is one of the implementation tools (often referred to
+as Place &amp; Route or P&amp;R tools) used in F4PGA. By default, the F4PGA
+toolchain uses it during bitstream generation for, i.e., Xilinx 7-Series
+devices. Since the architecture models for this FPGA family were created from
+scratch, appropriate techmaps were needed to instruct Yosys on translating
+the primitives to the versions compatible with VPR.</p>
+<p>The clock buffers used in the 7-Series devices are a good example for explaining
+the techmapping process. Generally, as stated in the
+<a class="reference external" href="https://www.xilinx.com/support/documentation/user_guides/ug472_7Series_Clocking.pdf#page=38">Xilinx 7 Series FPGAs Clocking Resources User Guide</a>, a designer has various
+buffer types that they can use in designs:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">BUFGCTRL</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">BUFG</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">BUFGCE</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">BUFGCE_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">BUFGMUX</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">BUFGMUX_1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">BUFGMUX_CTRL</span></code></p></li>
+</ul>
+<p>Nevertheless, the actual chips consist only of the <code class="docutils literal notranslate"><span class="pre">BUFGCTRL</span></code> primitives,
+which are the most universal and can function as other clock buffer
+primitives from the Xilinx manual. Because of that, only one architecture model
+is required for VPR. The rest of the primitives are mapped to this general
+buffer during the techmapping process. The model of <code class="docutils literal notranslate"><span class="pre">BUFGCTRL</span></code> primitive used
+by VPR is called <code class="docutils literal notranslate"><span class="pre">BUFGCTR_VPR</span></code> (More information about the architecture
+modeling in VPR can be found in the <a class="reference external" href="https://docs.verilogtorouting.org/en/latest/arch/">VTR FPGA Architecture Description</a>).</p>
+<p>Support for particular primitive in VTR consist of two files:</p>
+<ul class="simple">
+<li><p>Model XML (<code class="docutils literal notranslate"><span class="pre">xxx.model.xml</span></code>) - Contains general information about
+the module’s input and output ports and their relations.</p></li>
+<li><p>Physical Block XML (<code class="docutils literal notranslate"><span class="pre">xxx.pb_type.xml</span></code>) - Describes the actual layout of the
+primitive, with information about the timings, internal connections, etc.</p></li>
+</ul>
+<p>Below you can see the pb_type XML for <code class="docutils literal notranslate"><span class="pre">BUFGCTRL_VPR</span></code> primitive:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cm">&lt;!-- Model of BUFG group in BUFG_CLK_TOP/BOT --&gt;</span>
+<span class="nt">&lt;pb_type</span><span class="w"> </span><span class="na">name=</span><span class="s">"BLK-TL-BUFGCTRL"</span><span class="w"> </span><span class="na">xmlns:xi=</span><span class="s">"https://www.w3.org/2001/XInclude"</span><span class="nt">&gt;</span>
+<span class="w">  </span><span class="nt">&lt;output</span><span class="w"> </span><span class="na">name=</span><span class="s">"O"</span><span class="w"> </span><span class="na">num_pins=</span><span class="s">"1"</span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;input</span><span class="w"> </span><span class="na">name=</span><span class="s">"CE0"</span><span class="w"> </span><span class="na">num_pins=</span><span class="s">"1"</span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;input</span><span class="w"> </span><span class="na">name=</span><span class="s">"CE1"</span><span class="w"> </span><span class="na">num_pins=</span><span class="s">"1"</span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;clock</span><span class="w"> </span><span class="na">name=</span><span class="s">"I0"</span><span class="w"> </span><span class="na">num_pins=</span><span class="s">"1"</span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;clock</span><span class="w"> </span><span class="na">name=</span><span class="s">"I1"</span><span class="w"> </span><span class="na">num_pins=</span><span class="s">"1"</span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;input</span><span class="w"> </span><span class="na">name=</span><span class="s">"IGNORE0"</span><span class="w"> </span><span class="na">num_pins=</span><span class="s">"1"</span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;input</span><span class="w"> </span><span class="na">name=</span><span class="s">"IGNORE1"</span><span class="w"> </span><span class="na">num_pins=</span><span class="s">"1"</span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;input</span><span class="w"> </span><span class="na">name=</span><span class="s">"S0"</span><span class="w"> </span><span class="na">num_pins=</span><span class="s">"1"</span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;input</span><span class="w"> </span><span class="na">name=</span><span class="s">"S1"</span><span class="w"> </span><span class="na">num_pins=</span><span class="s">"1"</span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;mode</span><span class="w"> </span><span class="na">name=</span><span class="s">"EMPTY"</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;pb_type</span><span class="w"> </span><span class="na">name=</span><span class="s">"empty"</span><span class="w"> </span><span class="na">blif_model=</span><span class="s">".latch"</span><span class="w"> </span><span class="na">num_pb=</span><span class="s">"1"</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">    </span><span class="nt">&lt;interconnect</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/mode&gt;</span>
+<span class="w">  </span><span class="nt">&lt;mode</span><span class="w"> </span><span class="na">name=</span><span class="s">"BUFGCTRL"</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;pb_type</span><span class="w"> </span><span class="na">name=</span><span class="s">"BUFGCTRL_VPR"</span><span class="w"> </span><span class="na">blif_model=</span><span class="s">".subckt BUFGCTRL_VPR"</span><span class="w"> </span><span class="na">num_pb=</span><span class="s">"1"</span><span class="nt">&gt;</span>
+<span class="w">      </span><span class="nt">&lt;output</span><span class="w"> </span><span class="na">name=</span><span class="s">"O"</span><span class="w"> </span><span class="na">num_pins=</span><span class="s">"1"</span><span class="nt">/&gt;</span>
+<span class="w">      </span><span class="nt">&lt;input</span><span class="w"> </span><span class="na">name=</span><span class="s">"CE0"</span><span class="w"> </span><span class="na">num_pins=</span><span class="s">"1"</span><span class="nt">/&gt;</span>
+<span class="w">      </span><span class="nt">&lt;input</span><span class="w"> </span><span class="na">name=</span><span class="s">"CE1"</span><span class="w"> </span><span class="na">num_pins=</span><span class="s">"1"</span><span class="nt">/&gt;</span>
+<span class="w">      </span><span class="nt">&lt;clock</span><span class="w"> </span><span class="na">name=</span><span class="s">"I0"</span><span class="w"> </span><span class="na">num_pins=</span><span class="s">"1"</span><span class="nt">/&gt;</span>
+<span class="w">      </span><span class="nt">&lt;clock</span><span class="w"> </span><span class="na">name=</span><span class="s">"I1"</span><span class="w"> </span><span class="na">num_pins=</span><span class="s">"1"</span><span class="nt">/&gt;</span>
+<span class="w">      </span><span class="nt">&lt;input</span><span class="w"> </span><span class="na">name=</span><span class="s">"IGNORE0"</span><span class="w"> </span><span class="na">num_pins=</span><span class="s">"1"</span><span class="nt">/&gt;</span>
+<span class="w">      </span><span class="nt">&lt;input</span><span class="w"> </span><span class="na">name=</span><span class="s">"IGNORE1"</span><span class="w"> </span><span class="na">num_pins=</span><span class="s">"1"</span><span class="nt">/&gt;</span>
+<span class="w">      </span><span class="nt">&lt;input</span><span class="w"> </span><span class="na">name=</span><span class="s">"S0"</span><span class="w"> </span><span class="na">num_pins=</span><span class="s">"1"</span><span class="nt">/&gt;</span>
+<span class="w">      </span><span class="nt">&lt;input</span><span class="w"> </span><span class="na">name=</span><span class="s">"S1"</span><span class="w"> </span><span class="na">num_pins=</span><span class="s">"1"</span><span class="nt">/&gt;</span>
+<span class="w">      </span><span class="nt">&lt;metadata&gt;</span>
+<span class="w">        </span><span class="nt">&lt;meta</span><span class="w"> </span><span class="na">name=</span><span class="s">"fasm_params"</span><span class="nt">&gt;</span>
+<span class="w">          </span>ZPRESELECT_I0<span class="w"> </span>=<span class="w"> </span>ZPRESELECT_I0
+<span class="w">          </span>ZPRESELECT_I1<span class="w"> </span>=<span class="w"> </span>ZPRESELECT_I1
+<span class="w">          </span>IS_IGNORE0_INVERTED<span class="w"> </span>=<span class="w"> </span>IS_IGNORE0_INVERTED
+<span class="w">          </span>IS_IGNORE1_INVERTED<span class="w"> </span>=<span class="w"> </span>IS_IGNORE1_INVERTED
+<span class="w">          </span>ZINV_CE0<span class="w"> </span>=<span class="w"> </span>ZINV_CE0
+<span class="w">          </span>ZINV_CE1<span class="w"> </span>=<span class="w"> </span>ZINV_CE1
+<span class="w">          </span>ZINV_S0<span class="w"> </span>=<span class="w"> </span>ZINV_S0
+<span class="w">          </span>ZINV_S1<span class="w"> </span>=<span class="w"> </span>ZINV_S1
+<span class="w">        </span><span class="nt">&lt;/meta&gt;</span>
+<span class="w">      </span><span class="nt">&lt;/metadata&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/pb_type&gt;</span>
+<span class="w">    </span><span class="nt">&lt;interconnect&gt;</span>
+<span class="w">      </span><span class="nt">&lt;direct</span><span class="w"> </span><span class="na">name=</span><span class="s">"O"</span><span class="w"> </span><span class="na">input=</span><span class="s">"BUFGCTRL_VPR.O"</span><span class="w"> </span><span class="na">output=</span><span class="s">"BLK-TL-BUFGCTRL.O"</span><span class="nt">/&gt;</span>
+<span class="w">      </span><span class="nt">&lt;direct</span><span class="w"> </span><span class="na">name=</span><span class="s">"CE0"</span><span class="w"> </span><span class="na">input=</span><span class="s">"BLK-TL-BUFGCTRL.CE0"</span><span class="w"> </span><span class="na">output=</span><span class="s">"BUFGCTRL_VPR.CE0"</span><span class="nt">/&gt;</span>
+<span class="w">      </span><span class="nt">&lt;direct</span><span class="w"> </span><span class="na">name=</span><span class="s">"CE1"</span><span class="w"> </span><span class="na">input=</span><span class="s">"BLK-TL-BUFGCTRL.CE1"</span><span class="w"> </span><span class="na">output=</span><span class="s">"BUFGCTRL_VPR.CE1"</span><span class="nt">/&gt;</span>
+<span class="w">      </span><span class="nt">&lt;direct</span><span class="w"> </span><span class="na">name=</span><span class="s">"I0"</span><span class="w"> </span><span class="na">input=</span><span class="s">"BLK-TL-BUFGCTRL.I0"</span><span class="w"> </span><span class="na">output=</span><span class="s">"BUFGCTRL_VPR.I0"</span><span class="nt">/&gt;</span>
+<span class="w">      </span><span class="nt">&lt;direct</span><span class="w"> </span><span class="na">name=</span><span class="s">"I1"</span><span class="w"> </span><span class="na">input=</span><span class="s">"BLK-TL-BUFGCTRL.I1"</span><span class="w"> </span><span class="na">output=</span><span class="s">"BUFGCTRL_VPR.I1"</span><span class="nt">/&gt;</span>
+<span class="w">      </span><span class="nt">&lt;direct</span><span class="w"> </span><span class="na">name=</span><span class="s">"IGNORE0"</span><span class="w"> </span><span class="na">input=</span><span class="s">"BLK-TL-BUFGCTRL.IGNORE0"</span><span class="w"> </span><span class="na">output=</span><span class="s">"BUFGCTRL_VPR.IGNORE0"</span><span class="nt">/&gt;</span>
+<span class="w">      </span><span class="nt">&lt;direct</span><span class="w"> </span><span class="na">name=</span><span class="s">"IGNORE1"</span><span class="w"> </span><span class="na">input=</span><span class="s">"BLK-TL-BUFGCTRL.IGNORE1"</span><span class="w"> </span><span class="na">output=</span><span class="s">"BUFGCTRL_VPR.IGNORE1"</span><span class="nt">/&gt;</span>
+<span class="w">      </span><span class="nt">&lt;direct</span><span class="w"> </span><span class="na">name=</span><span class="s">"S0"</span><span class="w"> </span><span class="na">input=</span><span class="s">"BLK-TL-BUFGCTRL.S0"</span><span class="w"> </span><span class="na">output=</span><span class="s">"BUFGCTRL_VPR.S0"</span><span class="nt">/&gt;</span>
+<span class="w">      </span><span class="nt">&lt;direct</span><span class="w"> </span><span class="na">name=</span><span class="s">"S1"</span><span class="w"> </span><span class="na">input=</span><span class="s">"BLK-TL-BUFGCTRL.S1"</span><span class="w"> </span><span class="na">output=</span><span class="s">"BUFGCTRL_VPR.S1"</span><span class="nt">/&gt;</span>
+
+<span class="w">    </span><span class="nt">&lt;/interconnect&gt;</span>
+<span class="w">    </span><span class="nt">&lt;metadata&gt;</span>
+<span class="w">      </span><span class="nt">&lt;meta</span><span class="w"> </span><span class="na">name=</span><span class="s">"fasm_features"</span><span class="nt">&gt;</span>
+<span class="w">        </span>IN_USE
+<span class="w">      </span><span class="nt">&lt;/meta&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/metadata&gt;</span>
+<span class="w">  </span><span class="nt">&lt;/mode&gt;</span>
+<span class="nt">&lt;/pb_type&gt;</span>
+</pre></div>
+</div>
+<p>A correctly prepared techmap for any VPR model contains a declaration of
+the module that should be substituted. Inside the module declaration, one
+should provide a necessary logic and instantiate another module that
+will substitute its original version. Additionally, all equations within
+a techmap that are not used directly in a module instantiation should evaluate
+to a constant value. Therefore most of the techmaps use additional constant
+parameters to modify the signals attached to the instantiated module.</p>
+<p>Here is a piece of a techmap, which instructs Yosys to convert
+a <code class="docutils literal notranslate"><span class="pre">BUFG</span></code> primitive to the <code class="docutils literal notranslate"><span class="pre">BUFGCTRL_VPR</span></code>. In this case, the techmaping process
+consists of two steps. Firstly, the techmap shows how to translate the <code class="docutils literal notranslate"><span class="pre">BUFG</span></code>
+primitive to the <code class="docutils literal notranslate"><span class="pre">BUFGCTRL</span></code>. Then how to translate the <code class="docutils literal notranslate"><span class="pre">BUFGCTRL</span></code> to
+the <code class="docutils literal notranslate"><span class="pre">BUFGCTRL_VPR</span></code>:</p>
+<div class="highlight-verilog notranslate"><div class="highlight"><pre><span></span><span class="k">module</span><span class="w"> </span><span class="n">BUFG</span><span class="w"> </span><span class="p">(</span>
+<span class="w">  </span><span class="k">input</span><span class="w"> </span><span class="n">I</span><span class="p">,</span>
+<span class="w">  </span><span class="k">output</span><span class="w"> </span><span class="n">O</span>
+<span class="w">  </span><span class="p">);</span>
+
+<span class="w">  </span><span class="n">BUFGCTRL</span><span class="w"> </span><span class="n">_TECHMAP_REPLACE_</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="p">.</span><span class="n">O</span><span class="p">(</span><span class="n">O</span><span class="p">),</span>
+<span class="w">    </span><span class="p">.</span><span class="n">CE0</span><span class="p">(</span><span class="mh">1</span><span class="mb">'b1</span><span class="p">),</span>
+<span class="w">    </span><span class="p">.</span><span class="n">CE1</span><span class="p">(</span><span class="mh">1</span><span class="mb">'b0</span><span class="p">),</span>
+<span class="w">    </span><span class="p">.</span><span class="n">I0</span><span class="p">(</span><span class="n">I</span><span class="p">),</span>
+<span class="w">    </span><span class="p">.</span><span class="n">I1</span><span class="p">(</span><span class="mh">1</span><span class="mb">'b1</span><span class="p">),</span>
+<span class="w">    </span><span class="p">.</span><span class="n">IGNORE0</span><span class="p">(</span><span class="mh">1</span><span class="mb">'b0</span><span class="p">),</span>
+<span class="w">    </span><span class="p">.</span><span class="n">IGNORE1</span><span class="p">(</span><span class="mh">1</span><span class="mb">'b1</span><span class="p">),</span>
+<span class="w">    </span><span class="p">.</span><span class="n">S0</span><span class="p">(</span><span class="mh">1</span><span class="mb">'b1</span><span class="p">),</span>
+<span class="w">    </span><span class="p">.</span><span class="n">S1</span><span class="p">(</span><span class="mh">1</span><span class="mb">'b0</span><span class="p">)</span>
+<span class="w">  </span><span class="p">);</span>
+<span class="k">endmodule</span>
+
+<span class="k">module</span><span class="w"> </span><span class="n">BUFGCTRL</span><span class="w"> </span><span class="p">(</span>
+<span class="k">output</span><span class="w"> </span><span class="n">O</span><span class="p">,</span>
+<span class="k">input</span><span class="w"> </span><span class="n">I0</span><span class="p">,</span><span class="w"> </span><span class="k">input</span><span class="w"> </span><span class="n">I1</span><span class="p">,</span>
+<span class="k">input</span><span class="w"> </span><span class="n">S0</span><span class="p">,</span><span class="w"> </span><span class="k">input</span><span class="w"> </span><span class="n">S1</span><span class="p">,</span>
+<span class="k">input</span><span class="w"> </span><span class="n">CE0</span><span class="p">,</span><span class="w"> </span><span class="k">input</span><span class="w"> </span><span class="n">CE1</span><span class="p">,</span>
+<span class="k">input</span><span class="w"> </span><span class="n">IGNORE0</span><span class="p">,</span><span class="w"> </span><span class="k">input</span><span class="w"> </span><span class="n">IGNORE1</span>
+<span class="p">);</span>
+
+<span class="w">  </span><span class="k">parameter</span><span class="w"> </span><span class="p">[</span><span class="mh">0</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">INIT_OUT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">1</span><span class="mb">'b0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">parameter</span><span class="w"> </span><span class="p">[</span><span class="mh">0</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">PRESELECT_I0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">1</span><span class="mb">'b0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">parameter</span><span class="w"> </span><span class="p">[</span><span class="mh">0</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">PRESELECT_I1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">1</span><span class="mb">'b0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">parameter</span><span class="w"> </span><span class="p">[</span><span class="mh">0</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">IS_IGNORE0_INVERTED</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">1</span><span class="mb">'b0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">parameter</span><span class="w"> </span><span class="p">[</span><span class="mh">0</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">IS_IGNORE1_INVERTED</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">1</span><span class="mb">'b0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">parameter</span><span class="w"> </span><span class="p">[</span><span class="mh">0</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">IS_CE0_INVERTED</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">1</span><span class="mb">'b0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">parameter</span><span class="w"> </span><span class="p">[</span><span class="mh">0</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">IS_CE1_INVERTED</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">1</span><span class="mb">'b0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">parameter</span><span class="w"> </span><span class="p">[</span><span class="mh">0</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">IS_S0_INVERTED</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">1</span><span class="mb">'b0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">parameter</span><span class="w"> </span><span class="p">[</span><span class="mh">0</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">IS_S1_INVERTED</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">1</span><span class="mb">'b0</span><span class="p">;</span>
+
+<span class="w">  </span><span class="k">parameter</span><span class="w"> </span><span class="n">_TECHMAP_CONSTMSK_IGNORE0_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">parameter</span><span class="w"> </span><span class="n">_TECHMAP_CONSTVAL_IGNORE0_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">parameter</span><span class="w"> </span><span class="n">_TECHMAP_CONSTMSK_IGNORE1_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">parameter</span><span class="w"> </span><span class="n">_TECHMAP_CONSTVAL_IGNORE1_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">parameter</span><span class="w"> </span><span class="n">_TECHMAP_CONSTMSK_CE0_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">parameter</span><span class="w"> </span><span class="n">_TECHMAP_CONSTVAL_CE0_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">parameter</span><span class="w"> </span><span class="n">_TECHMAP_CONSTMSK_CE1_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">parameter</span><span class="w"> </span><span class="n">_TECHMAP_CONSTVAL_CE1_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">parameter</span><span class="w"> </span><span class="n">_TECHMAP_CONSTMSK_S0_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">parameter</span><span class="w"> </span><span class="n">_TECHMAP_CONSTVAL_S0_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">parameter</span><span class="w"> </span><span class="n">_TECHMAP_CONSTMSK_S1_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">parameter</span><span class="w"> </span><span class="n">_TECHMAP_CONSTVAL_S1_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0</span><span class="p">;</span>
+
+<span class="w">  </span><span class="k">localparam</span><span class="w"> </span><span class="p">[</span><span class="mh">0</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">INV_IGNORE0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span>
+<span class="w">      </span><span class="n">_TECHMAP_CONSTMSK_IGNORE0_</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mh">1</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<span class="w">      </span><span class="n">_TECHMAP_CONSTVAL_IGNORE0_</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mh">0</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<span class="w">      </span><span class="n">IS_IGNORE0_INVERTED</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mh">0</span><span class="p">);</span>
+<span class="w">  </span><span class="k">localparam</span><span class="w"> </span><span class="p">[</span><span class="mh">0</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">INV_IGNORE1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span>
+<span class="w">      </span><span class="n">_TECHMAP_CONSTMSK_IGNORE1_</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mh">1</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<span class="w">      </span><span class="n">_TECHMAP_CONSTVAL_IGNORE1_</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mh">0</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<span class="w">      </span><span class="n">IS_IGNORE1_INVERTED</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mh">0</span><span class="p">);</span>
+<span class="w">  </span><span class="k">localparam</span><span class="w"> </span><span class="p">[</span><span class="mh">0</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">INV_CE0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span>
+<span class="w">      </span><span class="n">_TECHMAP_CONSTMSK_CE0_</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mh">1</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<span class="w">      </span><span class="n">_TECHMAP_CONSTVAL_CE0_</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mh">0</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<span class="w">      </span><span class="n">IS_CE0_INVERTED</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mh">0</span><span class="p">);</span>
+<span class="w">  </span><span class="k">localparam</span><span class="w"> </span><span class="p">[</span><span class="mh">0</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">INV_CE1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span>
+<span class="w">      </span><span class="n">_TECHMAP_CONSTMSK_CE1_</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mh">1</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<span class="w">      </span><span class="n">_TECHMAP_CONSTVAL_CE1_</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mh">0</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<span class="w">      </span><span class="n">IS_CE1_INVERTED</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mh">0</span><span class="p">);</span>
+<span class="w">  </span><span class="k">localparam</span><span class="w"> </span><span class="p">[</span><span class="mh">0</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">INV_S0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span>
+<span class="w">      </span><span class="n">_TECHMAP_CONSTMSK_S0_</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mh">1</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<span class="w">      </span><span class="n">_TECHMAP_CONSTVAL_S0_</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mh">0</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<span class="w">      </span><span class="n">IS_S0_INVERTED</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mh">0</span><span class="p">);</span>
+<span class="w">  </span><span class="k">localparam</span><span class="w"> </span><span class="p">[</span><span class="mh">0</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">INV_S1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span>
+<span class="w">      </span><span class="n">_TECHMAP_CONSTMSK_S1_</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mh">1</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<span class="w">      </span><span class="n">_TECHMAP_CONSTVAL_S1_</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mh">0</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<span class="w">      </span><span class="n">IS_S1_INVERTED</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mh">0</span><span class="p">);</span>
+
+<span class="w">  </span><span class="n">BUFGCTRL_VPR</span><span class="w"> </span><span class="p">#(</span>
+<span class="w">      </span><span class="p">.</span><span class="n">INIT_OUT</span><span class="p">(</span><span class="n">INIT_OUT</span><span class="p">),</span>
+<span class="w">      </span><span class="p">.</span><span class="n">ZPRESELECT_I0</span><span class="p">(</span><span class="n">PRESELECT_I0</span><span class="p">),</span>
+<span class="w">      </span><span class="p">.</span><span class="n">ZPRESELECT_I1</span><span class="p">(</span><span class="n">PRESELECT_I1</span><span class="p">),</span>
+<span class="w">      </span><span class="p">.</span><span class="n">IS_IGNORE0_INVERTED</span><span class="p">(</span><span class="o">!</span><span class="n">IS_IGNORE0_INVERTED</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="n">INV_IGNORE0</span><span class="p">),</span>
+<span class="w">      </span><span class="p">.</span><span class="n">IS_IGNORE1_INVERTED</span><span class="p">(</span><span class="o">!</span><span class="n">IS_IGNORE1_INVERTED</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="n">INV_IGNORE1</span><span class="p">),</span>
+<span class="w">      </span><span class="p">.</span><span class="n">ZINV_CE0</span><span class="p">(</span><span class="o">!</span><span class="n">IS_CE0_INVERTED</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="n">INV_CE0</span><span class="p">),</span>
+<span class="w">      </span><span class="p">.</span><span class="n">ZINV_CE1</span><span class="p">(</span><span class="o">!</span><span class="n">IS_CE1_INVERTED</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="n">INV_CE1</span><span class="p">),</span>
+<span class="w">      </span><span class="p">.</span><span class="n">ZINV_S0</span><span class="p">(</span><span class="o">!</span><span class="n">IS_S0_INVERTED</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="n">INV_S0</span><span class="p">),</span>
+<span class="w">      </span><span class="p">.</span><span class="n">ZINV_S1</span><span class="p">(</span><span class="o">!</span><span class="n">IS_S1_INVERTED</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="n">INV_S1</span><span class="p">)</span>
+<span class="w">  </span><span class="p">)</span><span class="w"> </span><span class="n">_TECHMAP_REPLACE_</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="p">.</span><span class="n">O</span><span class="p">(</span><span class="n">O</span><span class="p">),</span>
+<span class="w">    </span><span class="p">.</span><span class="n">CE0</span><span class="p">(</span><span class="n">CE0</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="n">INV_CE0</span><span class="p">),</span>
+<span class="w">    </span><span class="p">.</span><span class="n">CE1</span><span class="p">(</span><span class="n">CE1</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="n">INV_CE1</span><span class="p">),</span>
+<span class="w">    </span><span class="p">.</span><span class="n">I0</span><span class="p">(</span><span class="n">I0</span><span class="p">),</span>
+<span class="w">    </span><span class="p">.</span><span class="n">I1</span><span class="p">(</span><span class="n">I1</span><span class="p">),</span>
+<span class="w">    </span><span class="p">.</span><span class="n">IGNORE0</span><span class="p">(</span><span class="n">IGNORE0</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="n">INV_IGNORE0</span><span class="p">),</span>
+<span class="w">    </span><span class="p">.</span><span class="n">IGNORE1</span><span class="p">(</span><span class="n">IGNORE1</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="n">INV_IGNORE1</span><span class="p">),</span>
+<span class="w">    </span><span class="p">.</span><span class="n">S0</span><span class="p">(</span><span class="n">S0</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="n">INV_S0</span><span class="p">),</span>
+<span class="w">    </span><span class="p">.</span><span class="n">S1</span><span class="p">(</span><span class="n">S1</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="n">INV_S1</span><span class="p">)</span>
+<span class="w">  </span><span class="p">);</span>
+
+<span class="w"> </span><span class="k">endmodule</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All F4PGA techmaps for Xilinx 7-Series devices use special inverter
+logic that converts constant 0 signals at the BEL to constant-1 signals
+at the site. This behavior is desired since VCC is the default signal in
+7-Series and US/US+ devices. The presented solution matches the conventions
+used by the vendor tools and gives the opportunity to validate generated
+bitstreams with fasm2bels and Vivado.</p>
+</div>
+<p>Yosys provides special techmapping naming conventions for wires,
+parameters, and modules. The special names that start with <code class="docutils literal notranslate"><span class="pre">_TECHMAP_</span></code>
+can be used to force certain behavior during the techmapping process.
+Currently, the following special names are used in F4PGA techmaps:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">_TECHMAP_REPLACE_</span></code> is used as a name for an instantiated module, which will
+replace the one used in the original design. This special name causes
+the instantiated module to inherit the name and all attributes
+from the module that is being replaced.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">_TECHMAP_CONSTMSK_&lt;port_name&gt;_</span></code> and <code class="docutils literal notranslate"><span class="pre">_TECHMAP_CONSTVAL_&lt;port_name&gt;_</span></code>
+are used together as names of parameters. The <code class="docutils literal notranslate"><span class="pre">_TECHMAP_CONSTMASK_&lt;port_name&gt;_</span></code>
+has a length of the input signal. Its bits take the value 1 if
+the corresponding signal bit has a constant value, or 0 otherwise.
+The <code class="docutils literal notranslate"><span class="pre">_TECHMAP_CONSTVAL_&lt;port_name&gt;_</span></code> bits store the actual constant signal
+values when the <code class="docutils literal notranslate"><span class="pre">_TECHMAP_CONSTMASK_&lt;port_name&gt;_</span></code> is equal to 1.</p></li>
+</ul>
+<p>More information about special wire, parameter, and module names can be found in
+<a class="reference external" href="https://yosyshq.net/yosys/files/yosys_manual.pdf#page=153">techmap section in the Yosys Manual</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Techmapping can be used not only to change the names of the primitives
+but primarily to match the port declarations and express the logic behind
+the primitive substitution:</p>
+<dl class="verilog module">
+<dt class="sig sig-object verilog" id="verilog-bufg">
+<span class="pre">module</span> <span class="sig-name descname"><span class="pre">BUFG</span></span><span class="p"><span class="pre">(</span></span><span class="pre">output</span> <span class="sig-prename descclassname"><span class="pre">O</span></span><span class="p"><span class="pre">,</span></span> <span class="pre">input</span> <span class="sig-prename descclassname"><span class="pre">I</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#verilog-bufg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="verilog module">
+<dt class="sig sig-object verilog" id="verilog-bufgctrl">
+<span class="pre">module</span> <span class="sig-name descname"><span class="pre">BUFGCTRL</span></span><span class="p"><span class="pre">(</span></span><span class="pre">output</span> <span class="sig-prename descclassname"><span class="pre">O</span></span><span class="p"><span class="pre">,</span></span> <span class="pre">input</span> <span class="sig-prename descclassname"><span class="pre">CE0</span></span><span class="p"><span class="pre">,</span></span> <span class="pre">input</span> <span class="sig-prename descclassname"><span class="pre">CE1</span></span><span class="p"><span class="pre">,</span></span> <span class="pre">input</span> <span class="sig-prename descclassname"><span class="pre">I0</span></span><span class="p"><span class="pre">,</span></span> <span class="pre">input</span> <span class="sig-prename descclassname"><span class="pre">I1</span></span><span class="p"><span class="pre">,</span></span> <span class="pre">input</span> <span class="sig-prename descclassname"><span class="pre">IGNORE0</span></span><span class="p"><span class="pre">,</span></span> <span class="pre">input</span> <span class="sig-prename descclassname"><span class="pre">IGNORE1</span></span><span class="p"><span class="pre">,</span></span> <span class="pre">input</span> <span class="sig-prename descclassname"><span class="pre">S0</span></span><span class="p"><span class="pre">,</span></span> <span class="pre">input</span> <span class="sig-prename descclassname"><span class="pre">S1</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#verilog-bufgctrl" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+</div>
+</section>
+<section id="more-information">
+<h4 id="more-information">More information<a class="headerlink" href="#more-information" title="Link to this heading">¶</a></h4>
+<p>Additional information about Yosys can be found on the <a class="reference external" href="https://yosyshq.net/yosys/">Yosys Project Website</a> , or in <a class="reference external" href="https://yosyshq.net/yosys/files/yosys_manual.pdf">Yosys Manual</a>. You can also compile
+one of the tests described in Getting Started section and watch the log file
+to understand which operations are performed by Yosys.</p>
+</section>
+</section>
+</section>
+<section id="place-route">
+<h2 id="place-route">Place &amp; Route<a class="headerlink" href="#place-route" title="Link to this heading">¶</a></h2>
+<p>The F4PGA Project uses two different tools for the PnR process - <code class="docutils literal notranslate"><span class="pre">nextpnr</span></code> and <code class="docutils literal notranslate"><span class="pre">Versatile</span> <span class="pre">Place</span> <span class="pre">and</span> <span class="pre">Route</span></code> (VPR).
+Both of them write their final result to a file in the <code class="docutils literal notranslate"><span class="pre">.fasm</span></code> format.</p>
+<section id="vpr">
+<h3 id="vpr">VPR<a class="headerlink" href="#vpr" title="Link to this heading">¶</a></h3>
+<p>See <a class="reference external" href="https://docs.verilogtorouting.org/en/latest/vpr/">VPR ➚</a>.</p>
+</section>
+<section id="nextpnr">
+<h3 id="nextpnr">nextpnr<a class="headerlink" href="#nextpnr" title="Link to this heading">¶</a></h3>
+<p>See <a class="reference external" href="https://github.com/f4pga/nextpnr">nextpnr ➚</a>.</p>
+</section>
+</section>
+</section>
+
+
+          </article>
+        </div>
+      </div>
+    </main>
+  </div>
+  <footer class="md-footer">
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+          
+            <a href="bitstream.html" title="Bitstream translation"
+               class="md-flex md-footer-nav__link md-footer-nav__link--prev"
+               rel="prev">
+              <div class="md-flex__cell md-flex__cell--shrink">
+                <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+              </div>
+              <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+                <span class="md-flex__ellipsis">
+                  <span
+                      class="md-footer-nav__direction"> Previous </span> Bitstream translation </span>
+              </div>
+            </a>
+          
+          
+            <a href="../glossary.html" title="Glossary"
+               class="md-flex md-footer-nav__link md-footer-nav__link--next"
+               rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
+                class="md-flex__ellipsis"> <span
+                class="md-footer-nav__direction"> Next </span> Glossary </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink"><i
+                class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          
+        </a>
+        
+      </nav>
+    </div>
+    <div class="md-footer-meta md-typeset">
+      <div class="md-footer-meta__inner md-grid">
+        <div class="md-footer-social">
+          
+            <div class="md-footer-social__link">
+              <a href="https://chipsalliance.org/" target="_blank">CHIPS Alliance</a>
+            </div>
+            </ul>
+            <div class="md-footer-social__link">
+              <a href="https://github.com/chipsalliance/f4pga" target="_blank">GitHub</a>
+            </div>
+        </div>
+        <div class="md-footer-copyright">
+          <div class="md-footer-copyright__highlight">
+              &#169; Copyright F4PGA Authors, 2019 - 2022.
+              
+          </div>
+            Created using
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+             and
+            <a href="https://github.com/f4pga/sphinx_f4pga_theme">Material for
+              Sphinx</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="../_static/javascripts/application.js"></script>
+  <script src="../_static/javascripts/f4pga.js"></script>
+  <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
+  </body>
+</html>

@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="lang:clipboard.copy" content="Copy to clipboard">
+  <meta name="lang:clipboard.copied" content="Copied to clipboard">
+  <meta name="lang:search.language" content="en">
+  <meta name="lang:search.pipeline.stopwords" content="True">
+  <meta name="lang:search.pipeline.trimmer" content="True">
+  <meta name="lang:search.result.none" content="No matching documents">
+  <meta name="lang:search.result.one" content="1 matching document">
+  <meta name="lang:search.result.other" content="# matching documents">
+  <meta name="lang:search.tokenizer" content="[\s\-]+">
+
+  
+    <link href="https://fonts.gstatic.com/" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,500,700|Roboto:300,400,400i,700&display=fallback" rel="stylesheet">
+
+    <style>
+      body,
+      input {
+        font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif
+      }
+
+      code,
+      kbd,
+      pre {
+        font-family: "Roboto Mono", "Courier New", Courier, monospace
+      }
+    </style>
+  
+
+  <link rel="stylesheet" href="_static/stylesheets/application.css"/>
+  <link rel="stylesheet" href="_static/stylesheets/application-palette.css"/>
+  <link rel="stylesheet" href="_static/stylesheets/application-fixes.css"/>
+  <link rel="stylesheet" href="_static/stylesheets/f4pga.css"/>
+  
+  <link rel="stylesheet" href="_static/fonts/material-icons.css"/>
+  
+  <meta name="theme-color" content="#3f51b5">
+  <script src="_static/javascripts/modernizr.js"></script>
+  
+  
+  
+    <title>FOSS Flows For FPGA &#8212; F4PGA  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+    <link rel="stylesheet" type="text/css" href="_static/material.css?v=79c92029" />
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="icon" href="_static/favicon.svg"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Getting started" href="getting-started.html" />
+  
+   
+
+  </head>
+  <body dir=ltr
+        data-md-color-primary=indigo data-md-color-accent=blue>
+  
+  <svg class="md-svg">
+    <defs data-children-count="0">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+      
+    </defs>
+  </svg>
+  
+  <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer">
+  <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search">
+  <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+  <a href="#index" tabindex="1" class="md-skip"> Skip to content </a>
+  <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex navheader">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="#" title="F4PGA  documentation"
+           class="md-header-nav__button md-logo">
+          
+            &nbsp;
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          <span class="md-header-nav__topic">F4PGA  documentation</span>
+          <span class="md-header-nav__topic"> FOSS Flows For FPGA </span>
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" action="search.html" method="GET" name="search">
+      <input type="text" class="md-search__input" name="q" placeholder="Search"
+              autocapitalize="off" autocomplete="off" spellcheck="false"
+              data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            <a href="https://github.com/chipsalliance/f4pga" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    chipsalliance/f4pga
+  </div>
+</a>
+          </div>
+        </div>
+      
+      
+  
+  <script src="_static/javascripts/version_dropdown.js"></script>
+  <script>
+    var json_loc = ""versions.json"",
+        target_loc = "../",
+        text = "Versions";
+    $( document ).ready( add_version_dropdown(json_loc, target_loc, text));
+  </script>
+  
+
+    </div>
+  </nav>
+</header>
+
+  
+  <div class="md-container">
+    
+    
+    
+  <nav class="md-tabs" data-md-component="tabs">
+    <div class="md-tabs__inner md-grid">
+      <ul class="md-tabs__list" style="float:left">
+          <li class="md-tabs__item"><a href="#" class="md-tabs__link">F4PGA  documentation</a></li>
+      </ul>
+      <ul class="md-tabs__list" id="chipsalliance-header" style="float:right">
+        
+	  <li class="md-tabs__item"><a href="https://chipsalliance.org" class="md-tabs__link">
+	    <i class="md-icon">web</i> CHIPS Alliance Website</a></li>
+      </ul>
+    </div>
+  </nav>
+    <main class="md-main">
+      <div class="md-main__inner md-grid" data-md-component="container">
+        
+          <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="#" title="F4PGA documentation" class="md-nav__button md-logo">
+      
+        <img src="_static/" alt=" logo" width="48" height="48">
+      
+    </a>
+    <a href="#"
+       title="F4PGA documentation">F4PGA  documentation</a>
+  </label>
+    <div class="md-nav__source">
+      <a href="https://github.com/chipsalliance/f4pga" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    chipsalliance/f4pga
+  </div>
+</a>
+    </div>
+  
+  
+
+<ul class="md-nav__list">
+  <li class="md-nav__item">
+  
+    <span class="md-nav__link caption"><span class="caption-text">About F4PGA</span></span>
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="getting-started.html" class="md-nav__link">
+        Getting started</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="how.html" class="md-nav__link">
+        How it works</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="status.html" class="md-nav__link">
+        Supported Architectures</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="community.html" class="md-nav__link">
+        Community</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+    <span class="md-nav__link caption"><span class="caption-text">Python utils</span></span>
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="f4pga/index.html" class="md-nav__link">
+        Overview</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="f4pga/Usage.html" class="md-nav__link">
+        Usage</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="f4pga/modules/index.html" class="md-nav__link">
+        Modules</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="f4pga/DevNotes.html" class="md-nav__link">
+        Developer’s notes</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="f4pga/Deprecated.html" class="md-nav__link">
+        Understanding the (deprecated) flow</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+    <span class="md-nav__link caption"><span class="caption-text">Development</span></span>
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="development/changes.html" class="md-nav__link">
+        Changes</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="development/building-docs.html" class="md-nav__link">
+        Building the documentation</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="development/venv.html" class="md-nav__link">
+        Packages in virtual environment</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+    <span class="md-nav__link caption"><span class="caption-text">Design Flows</span></span>
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="flows/index.html" class="md-nav__link">
+        Introduction</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="flows/synthesis.html" class="md-nav__link">
+        Synthesis</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="flows/pnr.html" class="md-nav__link">
+        Place & Route</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="flows/bitstream.html" class="md-nav__link">
+        Bitstream translation</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="flows/f4pga.html" class="md-nav__link">
+        In F4PGA</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+    <span class="md-nav__link caption"><span class="caption-text">Specifications</span></span>
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="https://fasm.readthedocs.io/en/latest/" class="md-nav__link">
+        FPGA Assembly (FASM) ➚</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="https://chipsalliance/fpga-interchange-schema" class="md-nav__link">
+        FPGA Interchange schema ➚</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+    <span class="md-nav__link caption"><span class="caption-text">Appendix</span></span>
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="glossary.html" class="md-nav__link">
+        Glossary</a>
+    
+
+  
+  </li>
+  <li class="md-nav__item">
+  
+      <a href="references.html" class="md-nav__link">
+        References</a>
+    
+
+  
+  </li>
+</ul>
+
+</nav>
+              </div>
+            </div>
+          </div>
+          <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                
+<nav class="md-nav md-nav--secondary">
+    <label class="md-nav__title" for="__toc">Contents</label>
+  <ul class="md-nav__list" data-md-scrollfix="">
+        <li class="md-nav__item"><a href="#index--page-root" class="md-nav__link">FOSS Flows For FPGA</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#table-of-contents" class="md-nav__link">Table of Contents</a>
+        </li></ul>
+            </nav>
+        </li>
+    
+<li class="md-nav__item"><a class="md-nav__extra_link" href="_sources/index.rst.txt">Show Source</a> </li>
+
+<li id="searchbox" class="md-nav__item"></li>
+
+  </ul>
+</nav>
+              </div>
+            </div>
+          </div>
+        
+        <div class="md-content">
+          <article class="md-content__inner md-typeset" role="main">
+            
+  <section id="foss-flows-for-fpga">
+<h1 id="index--page-root">FOSS Flows For FPGA<a class="headerlink" href="#index--page-root" title="Link to this heading">¶</a></h1>
+<p><a class="reference external" href="https://f4pga.org/">F4PGA ➚</a>, which is a Workgroup under the <a class="reference external" href="https://chipsalliance.org">CHIPS Alliance ➚</a>, is an
+Open Source solution for Hardware Description Language (HDL) to Bitstream FPGA synthesis, currently targeting
+Xilinx’s 7-Series, QuickLogic’s EOS-S3, and Lattice’ iCE40 and ECP5 devices.
+Think of it as the GCC of FPGAs.
+The project aims to design tools that are highly extendable and multiplatform.</p>
+<img alt="_images/hero.svg" class="align-center" src="_images/hero.svg"/><p>The elements of the project include (but are not limited to):</p>
+<ul class="simple">
+<li><p>The F4PGA open source FPGA toolchains for programming FPGAs (formerly known as <a class="reference external" href="https://github.com/https://github.com/SymbiFlow">SymbiFlow ➚</a>):</p>
+<ul>
+<li><p><a class="reference external" href="https://github.com/chipsalliance/f4pga/tree/main/f4pga">F4PGA Python CLI ➚</a></p></li>
+<li><p><a class="reference external" href="https://github.com/SymbiFlow/f4pga-arch-defs">F4PGA Architecture Definitions ➚</a></p></li>
+<li><p><a class="reference external" href="https://github.com/chipsalliance/f4pga-examples">F4PGA Examples ➚</a></p></li>
+<li><p><a class="reference external" href="https://github.com/chipsalliance/yosys-f4pga-plugins">F4PGA Yosys plugins ➚</a></p></li>
+</ul>
+</li>
+<li><p>The FPGA interchange format (an interchange format defined by CHIPS Alliance to enable interoperability between
+different FPGA tools) adopted by the F4PGA toolchain:</p>
+<ul>
+<li><p><a class="reference external" href="https://github.com/chipsalliance/fpga-interchange-schema">FPGA Interchange schema ➚</a></p></li>
+<li><p><a class="reference external" href="https://github.com/chipsalliance/python-fpga-interchange">FPGA Interchange Python utilities ➚</a></p></li>
+<li><p><a class="reference external" href="https://github.com/SymbiFlow/fpga-interchange-tests">FPGA Interchange Test suite ➚</a></p></li>
+</ul>
+</li>
+<li><p>The <a class="reference external" href="https://github.com/chipsalliance/fpga-tool-perf">FPGA tool performance framework ➚</a> framework for benchmarking
+designs against various FPGA tools, and vice versa, over time.</p></li>
+<li><p>FPGA visualisation tools for visual exploration of FPGA bitstream and databases:</p>
+<ul>
+<li><p><a class="reference external" href="https://github.com/SymbiFlow/f4pga-bitstream-viewer">F4PGA bitstream viewer ➚</a></p></li>
+<li><p><a class="reference external" href="https://github.com/chipsalliance/f4pga-database-visualizer">F4PGA database visualizer ➚</a></p></li>
+</ul>
+</li>
+<li><p>Other utilities (FPGA assembly format, documentation and other):</p>
+<ul>
+<li><p><a class="reference external" href="https://github.com/chipsalliance/fasm">F4PGA Assembly (FASM) ➚</a></p></li>
+<li><p><a class="reference external" href="https://github.com/SymbiFlow/f4pga-xc-fasm">Xilinx bitstream generation library ➚</a></p></li>
+<li><p><a class="reference external" href="https://github.com/SymbiFlow/vtr-xml-utils">Verilog-to-routing XML utilities ➚</a></p></li>
+<li><p><a class="reference external" href="https://github.com/chipsalliance/python-sdf-timing">SDF format utilities ➚</a></p></li>
+<li><p><a class="reference external" href="https://github.com/SymbiFlow/symbiflow-tools-data-manager">F4PGA tools data manager ➚</a></p></li>
+<li><p><a class="reference external" href="https://github.com/SymbiFlow/sphinx_symbiflow_theme">F4PGA Sphinx Theme ➚</a></p></li>
+<li><p><a class="reference external" href="https://github.com/SymbiFlow/sphinxcontrib-hdl-diagrams">F4PGA Sphinx HDL diagrams ➚</a></p></li>
+<li><p><a class="reference external" href="https://github.com/SymbiFlow/sphinx-verilog-domain">F4PGA Sphinx Verilog domain ➚</a></p></li>
+</ul>
+</li>
+</ul>
+<section id="table-of-contents">
+<h2 id="table-of-contents">Table of Contents<a class="headerlink" href="#table-of-contents" title="Link to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">About F4PGA</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#guidelines">Guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#toolchain-installation">Toolchain installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="getting-started.html#conda-recommended">Conda (Recommended)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="getting-started.html#bumping-overriding-specific-tools">Bumping/overriding specific tools</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="getting-started.html#other">Other</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="getting-started.html#containers">Containers</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="getting-started.html#loading-bitstreams">Loading bitstreams</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="getting-started.html#installing-openfpgaloader">Installing OpenFPGALoader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="getting-started.html#usage">Usage</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="how.html">How it works</a></li>
+<li class="toctree-l1"><a class="reference internal" href="status.html">Supported Architectures</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="status.html#bitstream-documentation">Bitstream documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="status.html#boards">Boards</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="community.html">Community</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="community.html#communication">Communication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="community.html#sources">Sources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="community.html#contributing">Contributing</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Python utils</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="f4pga/index.html">Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="f4pga/index.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="f4pga/Usage.html">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="f4pga/Usage.html#getting-started">Getting started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="f4pga/Usage.html#fundamental-concepts">Fundamental concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="f4pga/Usage.html#build-a-target">Build a target</a></li>
+<li class="toctree-l2"><a class="reference internal" href="f4pga/Usage.html#common-targets-and-values">Common targets and values</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="f4pga/modules/index.html">Modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="f4pga/modules/index.html#interface">Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="f4pga/modules/index.html#common-modules">Common modules</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="f4pga/DevNotes.html">Developer’s notes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="f4pga/DevNotes.html#last-update-2022-05-06">Last update: 2022-05-06</a></li>
+<li class="toctree-l2"><a class="reference internal" href="f4pga/DevNotes.html#project-s-structure">Project’s structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="f4pga/DevNotes.html#different-subsystems-and-where-to-find-them">Different subsystems and where to find them?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="f4pga/DevNotes.html#todo">TODO:</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="f4pga/Deprecated.html">Understanding the (deprecated) flow</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="f4pga/Deprecated.html#synthesis">Synthesis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="f4pga/Deprecated.html#place-and-route">Place and Route</a></li>
+<li class="toctree-l2"><a class="reference internal" href="f4pga/Deprecated.html#generating-bitstream">Generating Bitstream</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="development/changes.html">Changes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="development/changes.html#tested-environments">Tested environments</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="development/changes.html#id1">8</a></li>
+<li class="toctree-l3"><a class="reference internal" href="development/changes.html#id2">7</a></li>
+<li class="toctree-l3"><a class="reference internal" href="development/changes.html#id3">6</a></li>
+<li class="toctree-l3"><a class="reference internal" href="development/changes.html#id4">5</a></li>
+<li class="toctree-l3"><a class="reference internal" href="development/changes.html#id5">4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="development/changes.html#id6">3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="development/changes.html#id7">2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="development/changes.html#id8">1</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="development/changes.html#future-work">Future work</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="development/building-docs.html">Building the documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/venv.html">Packages in virtual environment</a></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Design Flows</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="flows/index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flows/synthesis.html">Synthesis</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="flows/synthesis.html#rtl-generation">RTL Generation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flows/synthesis.html#technology-mapping">Technology mapping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flows/synthesis.html#optimization">Optimization</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="flows/pnr.html">Place &amp; Route</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="flows/pnr.html#packing">Packing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flows/pnr.html#placing">Placing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flows/pnr.html#routing">Routing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flows/pnr.html#analysis">Analysis</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="flows/bitstream.html">Bitstream translation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flows/f4pga.html">In F4PGA</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="flows/f4pga.html#synthesis">Synthesis</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="flows/f4pga.html#yosys">Yosys</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="flows/f4pga.html#short-description">Short description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flows/f4pga.html#usage-in-toolchain">Usage in Toolchain</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flows/f4pga.html#output-analysis">Output analysis</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flows/f4pga.html#technology-mapping-in-f4pga-toolchain">Technology mapping in F4PGA toolchain</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flows/f4pga.html#technology-mapping-for-vpr">Technology mapping for VPR</a></li>
+<li class="toctree-l4"><a class="reference internal" href="flows/f4pga.html#more-information">More information</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="flows/f4pga.html#place-route">Place &amp; Route</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="flows/f4pga.html#vpr">VPR</a></li>
+<li class="toctree-l3"><a class="reference internal" href="flows/f4pga.html#nextpnr">nextpnr</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://fasm.readthedocs.io/en/latest/">FPGA Assembly (FASM) ➚</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://chipsalliance/fpga-interchange-schema">FPGA Interchange schema ➚</a></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Appendix</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+</ul>
+</div>
+</section>
+</section>
+
+
+          </article>
+        </div>
+      </div>
+    </main>
+  </div>
+  <footer class="md-footer">
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+          
+          
+            <a href="getting-started.html" title="Getting started"
+               class="md-flex md-footer-nav__link md-footer-nav__link--next"
+               rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
+                class="md-flex__ellipsis"> <span
+                class="md-footer-nav__direction"> Next </span> Getting started </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink"><i
+                class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          
+        </a>
+        
+      </nav>
+    </div>
+    <div class="md-footer-meta md-typeset">
+      <div class="md-footer-meta__inner md-grid">
+        <div class="md-footer-social">
+          
+            <div class="md-footer-social__link">
+              <a href="https://chipsalliance.org/" target="_blank">CHIPS Alliance</a>
+            </div>
+            </ul>
+            <div class="md-footer-social__link">
+              <a href="https://github.com/chipsalliance/f4pga" target="_blank">GitHub</a>
+            </div>
+        </div>
+        <div class="md-footer-copyright">
+          <div class="md-footer-copyright__highlight">
+              &#169; Copyright F4PGA Authors, 2019 - 2022.
+              
+          </div>
+            Created using
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+             and
+            <a href="https://github.com/f4pga/sphinx_f4pga_theme">Material for
+              Sphinx</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="_static/javascripts/application.js"></script>
+  <script src="_static/javascripts/f4pga.js"></script>
+  <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
+  </body>
+</html>
