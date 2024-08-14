@@ -22,15 +22,15 @@ Look Up Tables implement only the functionality of logic gates.
 Due to that, the synthesis process has to convert the complicated
 Behavioral model to a simpler description.
 
-Firstly, the design is described in terms of registers and logical operations.
+First, the design is described in terms of registers and logical operations.
 This is the so-called *Register-Transfer Level* (*RTL*).
-Secondly, in order to simplify the design even more, some complex logic is
-rewritten in the way that the final result contain only logic gates
-and registers. This model is on *Logical Gate level* of abstraction.
+Second, in order to simplify the design even more, some complex logic is
+rewritten in such a way that the final result contains only logic gates
+and registers. This model is on the *Logical Gate level* of abstraction.
 
-The process of simplification is quite complicated, because of that it often
-demands additional simulations between mentioned steps to prove that the input
-design is equivalent to its simplified form.
+This process of simplification is quite complicated, so it is often necessary
+to have additional simulations between the mentioned steps, to prove that the
+input design is equivalent to its simplified form.
 
 Technology mapping
 ==================
