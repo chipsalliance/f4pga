@@ -1120,11 +1120,13 @@ def main(
         net=Path(net).open("r"),
         vpr_grid_map=vpr_grid_map,
         arch=arch,
-        db_root=environ.get(
-            "DATABASE_DIR", subprocess_run("prjxray-config", capture_output=True).stdout.decode("utf-8").strip()
-        )
-        if db_root is None
-        else db_root,
+        db_root=(
+            environ.get(
+                "DATABASE_DIR", subprocess_run("prjxray-config", capture_output=True).stdout.decode("utf-8").strip()
+            )
+            if db_root is None
+            else db_root
+        ),
         part=part,
         blif=Path(blif).open("r"),
         input=sys.stdin if input is None else Path(input).open("r"),
