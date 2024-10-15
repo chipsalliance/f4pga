@@ -63,6 +63,8 @@ jobs:
   Docs:
     runs-on: ubuntu-latest
     name: '📓 Docs'
+    permissions:
+      contents: write
     steps:
 
       - name: 🧰 Checkout
