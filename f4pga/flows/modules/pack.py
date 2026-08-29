@@ -35,7 +35,6 @@ class PackModule(Module):
         return {
             "net": str(epath.with_suffix(".net")),
             "util_rpt": str(build_dir / DEFAULT_UTIL_RPT),
-            "timing_rpt": str(build_dir / DEFAULT_TIMING_RPT),
         }
 
     def execute(self, ctx: ModuleContext):
@@ -67,17 +66,25 @@ class PackModule(Module):
         else:
             og_log.unlink()
 
+        timing_report = build_dir / DEFAULT_TIMING_RPT
         if ctx.outputs.timing_rpt:
-            (build_dir / DEFAULT_TIMING_RPT).rename(ctx.outputs.timing_rpt)
+            if not timing_report.exists():
+                raise FileNotFoundError(
+                    f"VPR did not produce requested timing report {timing_report}"
+                )
+            if timing_report != Path(ctx.outputs.timing_rpt):
+                timing_report.rename(ctx.outputs.timing_rpt)
 
         if ctx.outputs.util_rpt:
-            (build_dir / DEFAULT_UTIL_RPT).rename(ctx.outputs.util_rpt)
+            util_report = build_dir / DEFAULT_UTIL_RPT
+            if util_report != Path(ctx.outputs.util_rpt):
+                util_report.rename(ctx.outputs.util_rpt)
 
     def __init__(self, _):
         self.name = "pack"
         self.no_of_phases = 2
         self.takes = ["eblif", "sdc?"]
-        self.produces = ["net", "util_rpt", "timing_rpt", "pack_log!"]
+        self.produces = ["net", "util_rpt", "timing_rpt!", "pack_log!"]
         self.values = ["device"] + vpr_specific_values
 
 

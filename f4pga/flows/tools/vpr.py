@@ -66,24 +66,24 @@ def vpr(mode: str, vprargs: VprArgs, cwd=None):
     """
     Execute `vpr`.
     """
+    args = [
+        "vpr",
+        vprargs.arch_def,
+        vprargs.eblif,
+        "--device",
+        vprargs.device_name,
+        "--read_rr_graph",
+        vprargs.rr_graph,
+    ]
+    if vprargs.lookahead:
+        args += ["--read_router_lookahead", vprargs.lookahead]
+    if vprargs.place_delay:
+        args += ["--read_placement_delay_lookup", vprargs.place_delay]
+    if mode in ["pack", "place", "route", "analysis"]:
+        args += [f"--{mode}"]
+    args += vprargs.optional
     return common_sub(
-        *(
-            [
-                "vpr",
-                vprargs.arch_def,
-                vprargs.eblif,
-                "--device",
-                vprargs.device_name,
-                "--read_rr_graph",
-                vprargs.rr_graph,
-                "--read_router_lookahead",
-                vprargs.lookahead,
-                "--read_placement_delay_lookup",
-                vprargs.place_delay,
-            ]
-            + ([f"--{mode}"] if mode in ["pack", "place", "route", "analysis"] else [])
-            + vprargs.optional
-        ),
+        *args,
         cwd=cwd,
         print_stdout_on_fail=True,
     )
@@ -91,9 +91,9 @@ def vpr(mode: str, vprargs: VprArgs, cwd=None):
 
 vpr_specific_values = [
     "arch_def",
-    "rr_graph_lookahead_bin",
+    "rr_graph_lookahead_bin?",
     "rr_graph_real_bin",
-    "vpr_place_delay",
+    "vpr_place_delay?",
     "vpr_grid_layout_name",
     "vpr_options?",
 ]
